@@ -694,7 +694,7 @@ class SettingsGeneral {
 		if ( isset( $_GET['wpo_dismiss_shop_address_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_shop_address_notice' ) ) {
 				update_option( 'wpo_wcpdf_dismiss_shop_address_notice', true );
-				wp_redirect( remove_query_arg( array( 'wpo_dismiss_shop_address_notice', '_wpnonce' ) ) );
+				wp_safe_redirect( remove_query_arg( array( 'wpo_dismiss_shop_address_notice', '_wpnonce' ) ) );
 				exit;
 			} else {
 				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
@@ -756,7 +756,13 @@ class SettingsGeneral {
 	 * Get the states for a given country code via AJAX.
 	 */
 	public function ajax_get_shop_country_states() {
-		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+		// Accept either the settings nonce or the setup-wizard nonce.
+		$valid = check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security', false )
+			|| check_ajax_referer( 'wpo_wcpdf_setup_nonce', 'security', false );
+
+		if ( ! $valid ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
+		}
 		
 		$request = stripslashes_deep( $_POST );
 
@@ -783,7 +789,7 @@ class SettingsGeneral {
 	 * @param string $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
 	 * @return string The value of the setting.
 	 */
-	private function get_setting( string $key, string $locale = '' ): string {
+	public function get_setting( string $key, string $locale = '' ): string {
 		if ( empty( $key ) ) {
 			return '';
 		}

@@ -6,14 +6,15 @@ jQuery( function( $ ) {
 
 		if ( $.inArray( action, wpo_wcpdf_ajax.bulk_actions ) !== -1 ) {
 			e.preventDefault();
-			let template   = action;
-			let checked    = [];
-			let ubl_output = false;
 
-			// is UBL action
-			if ( action.indexOf( 'ubl' ) != -1 ) {
-				template   = template.replace( '_ubl', '' );
-				ubl_output = true;
+			let document_type = action;
+			let checked       = [];
+			let xml_output    = false;
+
+			// is XML action
+			if ( action.indexOf( 'xml' ) != -1 ) {
+				document_type = document_type.replace( '_xml', '' );
+				xml_output    = true;
 			}
 
 			$( 'tbody th.check-column input[type="checkbox"]:checked' ).each(
@@ -31,15 +32,48 @@ jQuery( function( $ ) {
 			let full_url    = '';
 
 			if ( wpo_wcpdf_ajax.ajaxurl.indexOf ("?" ) != -1 ) {
-				partial_url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				partial_url = wpo_wcpdf_ajax.ajaxurl+'&action=generate_wpo_wcpdf&document_type='+document_type+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			} else {
-				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+template+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
+				partial_url = wpo_wcpdf_ajax.ajaxurl+'?action=generate_wpo_wcpdf&document_type='+document_type+'&bulk&_wpnonce='+wpo_wcpdf_ajax.nonce;
 			}
 
-			// ubl
-			if ( ubl_output ) {
+			// xml
+			if ( xml_output ) {
+
+				// Credit Note: get refund IDs first
+				if ( 'credit-note' === document_type ) {
+					$.ajax( {
+						url:       wpo_wcpdf_ajax.ajaxurl,
+						type:     'POST',
+						dataType: 'json',
+						data: {
+							action:    'wpo_ips_get_refund_order_ids',
+							order_ids: checked,
+							security:  wpo_wcpdf_ajax.nonce
+						},
+						success: function( response ) {
+							if ( response && response.success && response.data && response.data.refund_ids && response.data.refund_ids.length ) {
+								$.each( response.data.refund_ids, function( i, refund_id ) {
+									full_url = partial_url + '&order_ids='+refund_id+'&output=xml';
+									window.open( full_url, '_blank' );
+								} );
+							} else {
+								let msg = ( response && response.data && response.data.message ) ? response.data.message : wpo_wcpdf_ajax.error_no_refunds_found;
+								alert( msg );
+							}
+						},
+						error: function() {
+							alert( wpo_wcpdf_ajax.error_fetching_refund_ids );
+						}
+					} );
+
+					// stop normal XML processing
+					return;
+				}
+
+				// default xml
 				$.each( checked, function( i, order_id ) {
-					full_url = partial_url + '&order_ids='+order_id+'&output=ubl';
+					full_url = partial_url + '&order_ids='+order_id+'&output=xml';
 					window.open( full_url, '_blank' );
 				} );
 
@@ -173,7 +207,7 @@ jQuery( function( $ ) {
 			$form.find( '.read-only' ).hide();
 			$form.find( '.editable-notes' ).show();
 			$form.closest( '.wcpdf-data-fields' ).find( '.wpo-wcpdf-document-buttons' ).show();
-			
+
 			// re-initialize WooCommerce tooltips
 			$( '.wcpdf-data-fields .woocommerce-help-tip' ).tipTip( {
 					attribute: 'data-tip',
@@ -211,7 +245,7 @@ jQuery( function( $ ) {
 			$( '.view-more' ).show();
 		}
 	} );
-	
+
 	function updatePreviewNumber( $table ) {
 		let prefix   = $table.find( 'input[name$="_number_prefix"]' ).val();
 		let suffix   = $table.find( 'input[name$="_number_suffix"]' ).val();
@@ -254,7 +288,7 @@ jQuery( function( $ ) {
 			}
 		} );
 	}
-	
+
 	let previewTimer;
 	$( document ).on( 'input', '.wcpdf-data-fields input', function () {
 		const $table = $( this ).closest( '.wcpdf-data-fields' );
@@ -263,6 +297,87 @@ jQuery( function( $ ) {
 		previewTimer = setTimeout( () => {
 			updatePreviewNumber( $table );
 		}, 300 );
+	} );
+
+	// Edi identifiers
+	const root = '#wpo_ips-edi-box .edi-customer-identifiers';
+
+	$( document.body ).on( 'click', root + ' td.collapse > a', function( e ) {
+		e.preventDefault();
+		let $this  = $( this );
+		let $tbody = $this.closest( 'table' ).find( 'tbody' );
+
+		if ( $tbody.is( ':visible' ) ) {
+			$tbody.slideUp( 'fast' );
+			$this.text( wpo_wcpdf_ajax.edi_metabox.show );
+		} else {
+			$tbody.slideDown( 'fast' );
+			$this.text( wpo_wcpdf_ajax.edi_metabox.hide );
+		}
+	} );
+
+	// Peppol identifiers
+	const peppolRoot = `${root}.peppol`;
+
+	// Edit
+	$( document.body ).on( 'click', peppolRoot + ' thead .editable a', function ( e ) {
+		e.preventDefault();
+		$( this ).closest( 'table' ).addClass( 'is-editing' );
+	} );
+
+	// Cancel
+	$( document.body ).on( 'click', peppolRoot + ' tfoot .button.cancel', function ( e ) {
+		e.preventDefault();
+		$( this ).closest( 'table' ).removeClass( 'is-editing' );
+	} );
+
+	// Save (AJAX)
+	$( document.body ).on( 'click', peppolRoot + ' tfoot .button-primary', function ( e ) {
+		e.preventDefault();
+
+		const $btn    = $( this );
+		const orderId = $btn.data( 'order_id' );
+		const $table  = $btn.closest( 'table' );
+		const $box    = $table.closest( peppolRoot );
+
+		const pairs   = $box.find( 'tbody input[type="text"]' ).serializeArray();
+		const values  = {};
+
+		$.each( pairs, function ( _, p ) { values[p.name] = p.value; } );
+
+		const data = {
+			action:   'wpo_ips_edi_save_order_customer_peppol_identifiers',
+			security: wpo_wcpdf_ajax.nonce,
+			order_id: orderId,
+			values:   values
+		};
+
+		$btn.prop( 'disabled', true );
+
+		$.post( wpo_wcpdf_ajax.ajaxurl, data )
+			.done( function ( response ) {
+				$box.find( 'tbody tr' ).each( function () {
+					const row = $( this );
+					const val = row.find( 'td.edit input[type="text"]' ).val();
+					row.find( 'td.display' ).text( val || '—' );
+				} );
+				
+				$table.removeClass( 'is-editing' );
+
+				const msg = ( response && response.data && response.data.message ) || wpo_wcpdf_ajax.saved;
+				if ( window.wp && wp.a11y && wp.a11y.speak ) {
+					wp.a11y.speak( msg );
+				} else {
+					alert( msg );
+				}
+			} )
+			.fail( function ( jqXHR ) {
+				const msg = ( jqXHR.responseJSON && jqXHR.responseJSON.data && jqXHR.responseJSON.data.message ) || wpo_wcpdf_ajax.fail;
+				alert( msg );
+			} )
+			.always( function () {
+				$btn.prop( 'disabled', false );
+			} );
 	} );
 
 } );

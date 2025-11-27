@@ -54,7 +54,7 @@ class SettingsUpgrade {
 				),
 				array(
 					'label'       => __( 'Cloud storage upload', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Automatically upload your documents via FTP/SFTP or to Dropbox.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Automatically upload your documents via FTP, SFTP, Dropbox or Google Drive.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions'  => array( 'pro', 'bundle' ),
 				),
 				array(
@@ -132,42 +132,42 @@ class SettingsUpgrade {
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/wc-reminder-emails-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Smart Reminder Emails', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Automatically schedule and send Reminder Emails for WooCommerce orders.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=reminder-emails-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=reminder-emails-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-address-labels/woocommerce-address-labels.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-address-labels-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Print Address Labels', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Print out address labels for selected orders straight from WooCommerce.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-address-labels?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=address-labels-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-address-labels?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=address-labels-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-printnode/print-orders.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-printnode-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Automatic Printing - PrintNode', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'A plugin to automatically print completed orders via PrintNode.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=order-printing-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=order-printing-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-ultimate-barcodes/woocommerce-ultimate-barcodes.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-ultimate-barcodes-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Ultimate Barcodes', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Generate barcodes (ZATCA, QR-codes, C128, EAN-13 and more) for your orders, products and even invoices & packing slips.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-ultimate-barcodes?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ultimate-barcodes-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-ultimate-barcodes?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=ultimate-barcodes-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-order-list/woocommerce-order-list.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-order-list-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Print Order List', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'This plugin lets you quickly print a list of your WooCommerce orders. Great for order picking.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-order-list?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=order-list-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-order-list?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=order-list-cross'
 				),
 				array(
 					'plugin_path' => 'wp-menu-cart-pro/wp-menu-cart-pro.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/wp-menu-cart-pro-thumbnail-400x400.jpg',
 					'title'       => __( 'Menu Cart Pro', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Integrates seamlessly with WooCommerce to add a shopping cart to your menu.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/menu-cart-pro?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=menu-cart-pro-cross'
+					'url'         => 'https://wpovernight.com/downloads/menu-cart-pro?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=menu-cart-pro-cross'
 				),
 			);
 

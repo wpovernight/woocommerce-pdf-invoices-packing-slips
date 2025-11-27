@@ -3,25 +3,26 @@ Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, moham
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 4.9.0-beta.1
+Stable tag: 5.1.1-pr1363.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Create, print & automatically email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
+Create, print & automatically email PDF or XML Invoices & PDF Packing Slips for WooCommerce orders.
 
 == Description ==
 
-This WooCommerce extension automatically adds a PDF or UBL invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
+This WooCommerce extension automatically adds a PDF or XML invoice (e-invoicing) to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
 
 = Main features =
-- Automatically attach invoice PDF or UBL to WooCommerce emails of your choice
-- Download the PDF or UBL Invoice / PDF Packing Slip from the order admin page
+- Automatically attach invoice PDF or XML to WooCommerce emails of your choice
+- Download the PDF or XML Invoice / PDF Packing Slip from the order admin page
+- Choose from a range of e‑document formats: UBL 2.1, Peppol BIS 3.0, CII D16B, Factur‑X 1.0, ZUGFeRD 1.0, and ZUGFeRD 2.0.
 - Generate PDF invoices / packing slips in bulk
 - **Fully customizable** HTML/CSS invoice templates
 - Download invoices from the My Account page
-- Sequential invoice numbers - with custom formatting
+- Sequential invoice numbers
 - **Available in:** Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Japanese (see FAQ for adding custom fonts!), Norwegian, Portuguese, Polish, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish & Ukrainian
 
 = Free extensions =
@@ -35,7 +36,7 @@ The following free extensions are available to add additional features to the pl
 = Premium extensions =
 In addition to this, we offer several premium extensions:
 
-- Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox & more with [PDF Invoices & Packing Slips for WooCommerce Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
+- Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox, Google Drive & more with [PDF Invoices & Packing Slips for WooCommerce Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
 - Automatically send new orders or packing slips to your printer as soon as the customer orders! [WooCommerce Automatic Order Printing](https://www.simbahosting.co.uk/s3/product/woocommerce-printnode-automatic-order-printing/?affiliates=2) (from our partners at Simba Hosting)
 - Get the complete feature set, including **Professional**, **Premium Templates**, and additional features with the [WooCommerce PDF Invoices & Packing Slips Plus Bundle](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)
 
@@ -106,6 +107,31 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.1.0 (2025-11-25) =
+- New: Add setting to validate customer Peppol Endpoint ID during checkout
+- Fix: Ensure Buyer VAT identifier includes country prefix in E-Documents
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.4
+
+= 5.0.0 (2025-11-24) =
+- New: Refactored E‑Documents Architecture for better EN16931 Compliance and Multi‑Format Support
+- New: Document filter functions replaced by new global functions
+- Tweak: Enhanced notice displayed when documents are unavailable in the preview
+- Tweak: Ensure script compatibility with WooCommerce 10.3
+- Fix: Extended currency symbol support in Bulk Actions
+- Fix: Harden debug tools AJAX handlers with capability checks and validation
+- Translations: Updated translation template (POT)
+- Tested: Tested up WordPress 6.9
+
+= 4.9.1 (2025-11-06) =
+- Fix: Fatal error when Credit Note passes Order Refund to `wpo_ips_order_has_local_pickup_method()`
+
+= 4.9.0 (2025-11-03) =
+- New: Upgrade Dompdf to version 3.1.4
+- Tweak: Improve display of Shipping cost and location details in PDF totals
+- Fix: Extended currency symbols show in PDF but not in PDF Preview
+- Translations: Updated translation template (POT)
 
 = 4.8.0 (2025-10-21) =
 - New: Added notice for missing custom template files

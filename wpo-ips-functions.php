@@ -130,12 +130,14 @@ function wcpdf_get_bulk_actions() {
 	foreach ( $documents as $document ) {
 		foreach ( $document->output_formats as $output_format ) {
 			$slug = $document->get_type();
+			
 			if ( 'pdf' !== $output_format ) {
 				$slug .= "_{$output_format}";
 			}
 
 			if ( $document->is_enabled( $output_format ) ) {
-				$actions[$slug] = strtoupper( $output_format ) . ' ' . $document->get_title();
+				$prefix           = strtoupper( $output_format ) . ' ';
+				$actions[ $slug ] = $prefix . $document->get_title();
 			}
 		}
 	}
@@ -162,34 +164,6 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
 	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
 
 	return new $class( $html, $settings, $document );
-}
-
-/**
- * Get UBL Maker
- * Use wpo_wcpdf_ubl_maker filter to change the UBL class (which can wrap another UBL library).
- *
- * @return WPO\IPS\Makers\UBLMaker
- */
-function wcpdf_get_ubl_maker() {
-	$class = '\\WPO\\IPS\\Makers\\UBLMaker';
-
-	if ( ! class_exists( $class ) ) {
-		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/UBLMaker.php' );
-	}
-
-	$class = apply_filters( 'wpo_wcpdf_ubl_maker', $class );
-
-	return new $class();
-}
-
-/**
- * Check if UBL is available
- *
- * @return bool
- */
-function wcpdf_is_ubl_available(): bool {
-	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
-	return apply_filters( 'wpo_wcpdf_ubl_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) );
 }
 
 /**
@@ -230,22 +204,6 @@ function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $
 	do_action( 'wpo_wcpdf_headers', $filename, $mode, $pdf );
 }
 
-function wcpdf_ubl_headers( $filename, $size ) {
-	$charset = apply_filters( 'wcpdf_ubl_headers_charset', 'UTF-8' );
-
-	header( 'Content-Description: File Transfer' );
-	header( 'Content-Type: text/xml; charset=' . $charset );
-	header( 'Content-Disposition: attachment; filename=' . $filename );
-	header( 'Content-Transfer-Encoding: binary' );
-	header( 'Connection: Keep-Alive' );
-	header( 'Expires: 0' );
-	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
-	header( 'Pragma: public' );
-	header( 'Content-Length: ' . $size );
-
-	do_action( 'wpo_after_ubl_headers', $filename, $size );
-}
-
 /**
  * Get the document file
  *
@@ -283,7 +241,13 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$function = "get_document_{$output_format}_attachment"; // 'get_document_pdf_attachment' or 'get_document_ubl_attachment'
+	/**
+	 * Calls a dynamic attachment function based on the output format.
+	 *
+	 * @uses get_document_pdf_attachment()
+	 * @uses get_document_xml_attachment()
+	 */
+	$function = "get_document_{$output_format}_attachment";
 
 	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
 		$error_message = "The {$function} method is not callable on WPO_WCPDF()->main.";
@@ -304,7 +268,7 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 function wcpdf_get_document_output_format_extension( string $output_format ): string {
 	$output_formats = array(
 		'pdf' => '.pdf',
-		'ubl' => '.xml',
+		'xml' => '.xml',
 	);
 
 	return isset( $output_formats[ $output_format ] ) ? $output_formats[ $output_format ] : $output_formats['pdf'];
@@ -351,9 +315,10 @@ function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
  * @param string           $message Error message to log.
  * @param string           $level   Log level: debug, info, notice, warning, error, critical, alert, emergency.
  * @param \Throwable|null  $e       (Optional) Exception or error object.
+ * @param string           $source  Source of the log entry, defaults to 'wpo-wcpdf'.
  * @return void
  */
-function wcpdf_log_error( string $message, string $level = 'error', ?\Throwable $e = null ): void {
+function wcpdf_log_error( string $message, string $level = 'error', ?\Throwable $e = null, string $source = 'wpo-wcpdf' ): void {
 	/**
 	 * Appends exception details to the message if available.
 	 *
@@ -375,12 +340,12 @@ function wcpdf_log_error( string $message, string $level = 'error', ?\Throwable 
 	$message = $format_message( $message, $e );
 
 	if ( ! function_exists( 'wc_get_logger' ) ) {
-		error_log( '[WPO_WCPDF] ' . $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( '[' . $source . '] ' . $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		return;
 	}
 
 	$logger  = wc_get_logger();
-	$context = array( 'source' => 'wpo-wcpdf' );
+	$context = array( 'source' => $source );
 
 	$logger->log( $level, $message, $context );
 }
@@ -1212,6 +1177,7 @@ function wpo_wcpdf_order_is_vat_exempt( \WC_Abstract_Order $order ): bool {
  */
 function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?string {
 	$vat_meta_keys = apply_filters( 'wpo_wcpdf_order_customer_vat_number_meta_keys', array(
+		'vat_number',             // Manually added to the order's custom fields
 		'_vat_number',            // WooCommerce EU VAT Number
 		'_billing_vat_number',    // WooCommerce EU VAT Number 2.3.21+
 		'VAT Number',             // WooCommerce EU VAT Compliance
@@ -1453,63 +1419,6 @@ function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
 }
 
 /**
- * Write UBL file
- *
- * @param \WPO\IPS\Documents\OrderDocument $document
- * @param bool $attachment
- * @param bool $contents_only
- *
- * @return string|false
- */
-function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
-	$ubl_maker = wcpdf_get_ubl_maker();
-
-	if ( ! $ubl_maker ) {
-		return wcpdf_error_handling( 'UBL Maker not available. Cannot write UBL file.' );
-	}
-
-	if ( $attachment ) {
-		$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
-
-		if ( ! $tmp_path ) {
-			return wcpdf_error_handling( 'Temporary path not available. Cannot write UBL file.' );
-		}
-
-		$ubl_maker->set_file_path( $tmp_path );
-	}
-
-	$ubl_document = new \WPO\IPS\UBL\Documents\UblDocument();
-	$ubl_document->set_order_document( $document );
-
-	$builder  = new \WPO\IPS\UBL\Builders\SabreBuilder();
-	$contents = apply_filters( 'wpo_ips_ubl_contents',
-		$builder->build( $ubl_document ),
-		$ubl_document,
-		$document
-	);
-
-	if ( empty( $contents ) ) {
-		return wcpdf_error_handling( 'Failed to build UBL contents.' );
-	}
-
-	if ( $contents_only ) {
-		return $contents;
-	}
-
-	$filename = apply_filters( 'wpo_ips_ubl_filename',
-		$document->get_filename(
-			'download',
-			array( 'output' => 'ubl' )
-		),
-		$document
-	);
-
-	$full_filename = $ubl_maker->write( $filename, $contents );
-
-	return $full_filename;
-}
-
-/**
  * Get the country name from the country code.
  *
  * @param string $country_code
@@ -1633,6 +1542,25 @@ function wpo_wcpdf_format_address( array $address ): string {
 	$formatted_address = str_replace( "\n", '', $formatted_address );
 
 	return esc_html( $formatted_address );
+}
+
+/**
+ * Determines whether a specific document type is using historical settings
+ * instead of the latest settings.
+ *
+ * @param string $document_type The document type slug (e.g. 'invoice', 'packing-slip').
+ * @return bool True if the document is using historical settings, false if using the latest settings.
+ */
+function wpo_wcpdf_is_document_using_historical_settings( string $document_type ): bool {
+	$document_settings = get_option( 'wpo_wcpdf_documents_settings_' . $document_type, array() );
+	$is_using          = true;
+	
+	// this setting is inverted on the frontend so that it needs to be actively/purposely enabled to be used
+	if ( ! empty( $document_settings ) && isset( $document_settings['use_latest_settings'] ) ) {
+		$is_using = false;
+	}
+	
+	return apply_filters( 'wpo_wcpdf_is_document_using_historical_settings', $is_using, $document_settings, $document_type );
 }
 
 
@@ -1808,12 +1736,16 @@ function wpo_ips_display_item_meta( \WC_Order_Item $item, array $args = array() 
 /**
  * Check if the order has a local pickup shipping method.
  *
- * @param \WC_Order $order
+ * @param \WC_Abstract_Order $order
  *
  * @return bool
  */
-function wpo_ips_order_has_local_pickup_method( \WC_Order $order ): bool {
+function wpo_ips_order_has_local_pickup_method( \WC_Abstract_Order $order ): bool {
 	$has_local_pickup_method = false;
+	
+	if ( $order instanceof \WC_Order_Refund ) {
+		return $has_local_pickup_method;
+	}
 	
 	if ( ! class_exists( '\Automattic\WooCommerce\Utilities\ArrayUtil' ) ) {
 		return $has_local_pickup_method;
@@ -1827,4 +1759,117 @@ function wpo_ips_order_has_local_pickup_method( \WC_Order $order ): bool {
 	}
 	
 	return $has_local_pickup_method;
+}
+
+/**
+ * Add multiple filters.
+ * 
+ * @param array $filters Array of filters to add.
+ * @return void
+ */
+function wpo_ips_add_filters( array $filters ): void {
+	foreach ( $filters as $filter ) {
+		$args = wpo_ips_normalize_filter_args( $filter );
+		if ( $args['is_valid'] && ! empty( $args['callback'] ) ) {
+			add_filter( $args['hook_name'], $args['callback'], $args['priority'], $args['accepted_args'] );
+		}
+	}
+}
+
+/**
+ * Remove multiple filters.
+ * 
+ * @param array $filters Array of filters to remove.
+ * @return void
+ */
+function wpo_ips_remove_filters( array $filters ): void {
+	foreach ( $filters as $filter ) {
+		$args = wpo_ips_normalize_filter_args( $filter );
+		if ( $args['is_valid'] && ! empty( $args['callback'] ) ) {
+			remove_filter( $args['hook_name'], $args['callback'], $args['priority'] );
+		}
+	}
+}
+
+/**
+ * Normalize filter arguments.
+ * 
+ * @param array $filter Filter arguments.
+ * @return array
+ */
+function wpo_ips_normalize_filter_args( array $filter ): array {
+	$args      = array_values( $filter );
+	$hook_name = '';
+	$callback  = '';
+	$is_valid  = true;
+	
+	// Validate minimum array structure
+	if ( count( $args ) < 2 ) {
+		wcpdf_log_error( 'Filter array must contain at least hook name and callback.', 'critical' );
+		$is_valid = false;
+	} else {
+		// Validate and sanitize hook name
+		$hook_name = isset( $args[0] ) ? sanitize_text_field( $args[0] ) : '';
+		if ( empty( $hook_name ) ) {
+			wcpdf_log_error( 'Empty or invalid hook name provided for filter.', 'critical' );
+			$is_valid = false;
+		}
+		
+		// Validate callback
+		if ( isset( $args[1] ) && is_callable( $args[1] ) ) {
+			$callback = $args[1];
+		} elseif ( isset( $args[1] ) ) {
+			wcpdf_log_error( sprintf( 
+				'Non-callable callback provided for filter "%s": %s', 
+				$hook_name, 
+				is_string( $args[1] ) ? $args[1] : gettype( $args[1] )
+			), 'critical' );
+			$is_valid = false;
+		} else {
+			wcpdf_log_error( sprintf( 
+				'No callback provided for filter "%s".', 
+				$hook_name
+			), 'critical' );
+			$is_valid = false;
+		}
+	}
+	
+	$priority      = isset( $args[2] ) ? absint( $args[2] ) : 10;
+	$accepted_args = isset( $args[3] ) ? absint( $args[3] ) : 1;
+	
+	return compact( 'hook_name', 'callback', 'priority', 'accepted_args', 'is_valid' );
+}
+
+/**
+ * Get refund IDs for given order IDs or order object.
+ *
+ * @param \WC_Order|int|int[] $order_or_ids Order object or order ID(s).
+ * @return int[] Unique array of refund IDs.
+ */
+function wpo_ips_get_refund_ids( $order_or_ids ) {
+	$refund_ids = array();
+
+	// Normalize input to an array of IDs.
+	if ( $order_or_ids instanceof WC_Order ) {
+		$order_ids = array( $order_or_ids->get_id() );
+	} elseif ( is_array( $order_or_ids ) ) {
+		$order_ids = array_map( 'absint', $order_or_ids );
+	} else {
+		$order_ids = array( absint( $order_or_ids ) );
+	}
+
+	foreach ( $order_ids as $order_id ) {
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			continue;
+		}
+
+		foreach ( $order->get_refunds() as $refund ) {
+			$refund_ids[] = $refund->get_id();
+		}
+	}
+
+	// Clean output: remove empty, dedupe, reindex
+	return array_values( array_unique( array_filter( $refund_ids ) ) );
 }

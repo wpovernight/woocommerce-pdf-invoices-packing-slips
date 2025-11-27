@@ -27,23 +27,42 @@ class Invoice extends OrderDocumentMethods {
 		// call parent constructor
 		parent::__construct( $order );
 
-		// output formats (placed after parent construct to override the abstract default)
-		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf', 'ubl' ), $this );
-	}
-
-	public function use_historical_settings() {
-		$document_settings = get_option( 'wpo_wcpdf_documents_settings_'.$this->get_type() );
-		// this setting is inverted on the frontend so that it needs to be actively/purposely enabled to be used
-		if (!empty($document_settings) && isset($document_settings['use_latest_settings'])) {
-			$use_historical_settings = false;
-		} else {
-			$use_historical_settings = true;
+		// Add XML without wiping what the parent put in $this->output_formats
+		if ( ! in_array( 'xml', $this->output_formats, true ) ) {
+			$this->output_formats[] = 'xml';
 		}
-		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', $use_historical_settings, $this );
+
+		$this->output_formats = apply_filters(
+			'wpo_wcpdf_document_output_formats',
+			$this->output_formats,
+			$this
+		);
 	}
 
-	public function storing_settings_enabled() {
-		return apply_filters( 'wpo_wcpdf_document_store_settings', true, $this );
+	/**
+	 * Checks if Invoice uses historical settings
+	 *
+	 * @return void
+	 */
+	public function use_historical_settings(): bool {
+		return apply_filters(
+			'wpo_wcpdf_document_use_historical_settings',
+			wpo_wcpdf_is_document_using_historical_settings( $this->get_type() ),
+			$this
+		);
+	}
+
+	/**
+	 * Checks if Invoice has storing settings enabled
+	 *
+	 * @return void
+	 */
+	public function storing_settings_enabled(): bool {
+		return apply_filters(
+			'wpo_wcpdf_document_store_settings',
+			true,
+			$this
+		);
 	}
 
 	/**
@@ -167,18 +186,12 @@ class Invoice extends OrderDocumentMethods {
 		do_action( "wpo_wcpdf_before_{$this->type}_init_settings", $this );
 
 		foreach ( $this->output_formats as $output_format ) {
-			$page = $option_group = $option_name = '';
+			$page            = $option_group = $option_name = '';
 			$settings_fields = array();
 
-			switch ( $output_format ) {
-				case 'pdf':
-					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
-					$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
-					break;
-				case 'ubl':
-					$page = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}_{$output_format}";
-					$settings_fields = $this->get_ubl_settings_fields( $option_name );
-					break;
+			if ( 'pdf' === $output_format ) {
+				$page            = $option_group = $option_name = "wpo_wcpdf_documents_settings_{$this->get_type()}";
+				$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->get_type()}", $this->get_pdf_settings_fields( $option_name ), $page, $option_group, $option_name ); // legacy filter
 			}
 
 			// custom output format
@@ -641,79 +654,6 @@ class Invoice extends OrderDocumentMethods {
 	}
 
 	/**
-	 * UBL settings fields
-	 */
-	public function get_ubl_settings_fields( $option_name ) {
-		$settings_fields = array(
-			array(
-				'type'     => 'section',
-				'id'       => $this->type . '_ubl',
-				'title'    => '',
-				'callback' => 'section',
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'enabled',
-				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => $this->type . '_ubl',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'enabled',
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'ubl_format',
-				'title'    => __( 'Format', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'select',
-				'section'  => $this->type . '_ubl',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'ubl_format',
-					'options'     => apply_filters( 'wpo_wcpdf_document_ubl_settings_formats', array(
-						'ubl_2_1' => __( 'UBL 2.1' , 'woocommerce-pdf-invoices-packing-slips' ),
-					), $this ),
-					'description' => ! wpo_ips_ubl_is_country_format_extension_active() ? sprintf(
-						/* translators: %1$s: opening link tag, %2$s: closing link tag */
-						__( 'Install extensions to support country-specific e-invoicing formats. See the latest %1$ssupported formats%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="https://github.com/wpovernight/wpo-ips-einvoicing" target="_blank">',
-						'</a>'
-					) : '',
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'attach_to_email_ids',
-				'title'    => __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'multiple_checkboxes',
-				'section'  => $this->type . '_ubl',
-				'args'     => array(
-					'option_name'     => $option_name,
-					'id'              => 'attach_to_email_ids',
-					'fields_callback' => array( $this, 'get_wc_emails' ),
-					/* translators: directory path */
-					'description'     => ! WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
-				)
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'include_encrypted_pdf',
-				'title'    => __( 'Include encrypted PDF:', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => $this->type . '_ubl',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'include_encrypted_pdf',
-					'description' => __( 'Embed the encrypted PDF invoice file within the UBL document. Note that this option may not be supported by all UBL formats.', 'woocommerce-pdf-invoices-packing-slips' ),
-				)
-			),
-		);
-
-		return apply_filters( "wpo_wcpdf_{$this->type}_ubl_settings_fields", $settings_fields, $option_name, $this );
-	}
-
-	/**
 	 * Get the settings categories.
 	 *
 	 * @param string $output_format
@@ -772,17 +712,6 @@ class Invoice extends OrderDocumentMethods {
 					)
 				),
 			),
-			'ubl' => array(
-				'general' => array(
-					'title'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
-					'members' => array(
-						'enabled',
-						'ubl_format',
-						'attach_to_email_ids',
-						'include_encrypted_pdf',
-					),
-				),
-			)
 		);
 
 		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ] ?? array(), $output_format, $this );

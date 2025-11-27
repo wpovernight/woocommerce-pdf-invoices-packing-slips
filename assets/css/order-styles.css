@@ -26,8 +26,8 @@
 	fill: #2aad2a;
 }
 
-.type-shop_order .column-wc_actions a.button.wpo_wcpdf.ubl > svg.icon-ubl,
-.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf.ubl > svg.icon-ubl {
+.type-shop_order .column-wc_actions a.button.wpo_wcpdf.xml > svg.icon-edi,
+.woocommerce_page_wc-orders .column-wc_actions a.button.wpo_wcpdf.xml > svg.icon-edi {
 	left: auto;
 	right: 2px;
 	fill: black;
@@ -40,8 +40,16 @@
 	fill: #51266b;
 }
 
+ul.wpo-ips-edi-actions {
+	margin: 0;
+}
+
+ul.wpo-ips-edi-actions > li {
+	margin: 12px 0 0 0;
+}
+
 .wpo_wcpdf-actions a.button.exists > svg,
-.wpo_wcpdf-ubl-actions a.button.exists > svg {
+.wpo-ips-edi-actions a.button.exists > svg {
 	width: 14px;
 	height: 14px;
 	line-height: 30px;
@@ -49,6 +57,11 @@
 	margin-bottom: 3px;
 	fill: #2aad2a;
 	vertical-align: middle;
+}
+
+.wpo-ips-edi-actions a.button.disabled {
+	pointer-events: none;
+	cursor: not-allowed;
 }
 
 .wpo_wcpdf-actions .printed-data,
@@ -100,6 +113,112 @@
 	width: auto;
 }
 
+#wpo_ips-edi-box .inside {
+	margin: 0;
+	padding: 12px;
+}
+
+#wpo_ips-edi-box .inside > .notice {
+	margin: 0 0 12px 0 !important;
+}
+
+#wpo_ips-edi-box .inside > .notice > p {
+	font-size: 12px !important;
+}
+
+#wpo_ips-edi-box .inside > div table {
+	margin-bottom: 12px;
+}
+
+#wpo_ips-edi-box .inside > div:last-child table {
+	margin-bottom: 0;
+}
+
+#wpo_ips-edi-box .inside table td {
+	font-size: 12px !important;
+}
+
+#wpo_ips-edi-box .inside table td.right {
+	text-align: right;
+}
+
+#wpo_ips-edi-box .inside table thead td {
+	background-color: #f4f4f4;
+}
+
+#wpo_ips-edi-box .inside table thead td:first-of-type {
+	font-weight: bold;
+}
+
+#wpo_ips-edi-box .inside table > tbody > tr:not(:last-of-type) > td {
+	border-bottom: 1px solid #f4f4f4;
+}
+
+#wpo_ips-edi-box .inside .peppol table {
+	width: 100%;
+	table-layout: fixed;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions table td {
+	vertical-align: middle;
+}
+
+#wpo_ips-edi-box .edi-order-actions table th:last-child,
+#wpo_ips-edi-box .edi-order-actions table td:last-child {
+	text-align: right;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .xml {
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	margin-left: 3px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	clear: both;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .xml .dashicons {
+	font-size: 18px;
+	line-height: 1;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .xml.disabled {
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .xml.sent {
+	background-color: #e7f7ec !important;
+	color: #0a7a29 !important;
+	border-color: #e7f7ec !important;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .order-id {
+	font-size: 10px;
+	color: #999;
+}
+
+#wpo_ips-edi-box .inside .peppol tbody td.edit,
+#wpo_ips-edi-box .inside .peppol tfoot,
+#wpo_ips-edi-box .inside .peppol table.is-editing thead .editable a,
+#wpo_ips-edi-box .inside .peppol table.is-editing tbody td.display {
+	display: none;
+}
+
+#wpo_ips-edi-box .inside .peppol tbody td.edit input {
+	width: 100%;
+}
+
+#wpo_ips-edi-box .inside .peppol table.is-editing tbody td.edit {
+	display: table-cell;
+}
+
+#wpo_ips-edi-box .inside .peppol table.is-editing tfoot {
+	display: table-row-group;
+}
+
 .wcpdf-data-fields {
 	margin-left: 10px;
 	margin-right: 10px;
@@ -114,15 +233,15 @@
 }
 
 .wcpdf-data-fields .read-only {
-	height:auto;
-	display:block;
+	height: auto;
+	display: block;
 	padding: 10px;
 }
 
 .wcpdf-data-fields .editable,
 .wcpdf-data-fields .editable-notes {
-	height:auto;
-	display:none;
+	height: auto;
+	display: none;
 	padding: 10px;
 }
 
@@ -236,26 +355,44 @@
 	padding-top: 4px;
 }
 
+.edi-customer-identifiers table td + td,
+.wpo-ips-edi-actions table td + td {
+	text-align: end;
+	text-align: right;
+}
+
+.edi-customer-identifiers .missing {
+	color: #d63638;
+}
+
+.edi-customer-identifiers .optional {
+	color: #996800;
+}
+
+.edi-customer-identifiers td.scheme-required {
+	background-color: #fff3cd;
+}
+
 @media screen and (max-width: 782px) {
-	
+
 	.wp-list-table .column-pdf_invoice_number, .wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number:not(.check-column) {
 		display: none;
 	}
-	
+
 	.wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number {
 		padding: 3px 8px 3px 35%
 	}
-	
+
 }
 
 @media screen and (max-width: 1200px) {
-	
+
 	.wcpdf-data-fields .editable > table,
 	.wcpdf-data-fields .editable-notes > table {
 		width: 100% !important;
 		max-width: 100% !important;
 	}
-	
+
 }
 
 /* Safari */

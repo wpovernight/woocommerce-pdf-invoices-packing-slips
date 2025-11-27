@@ -91,7 +91,7 @@ Ensure your `composer.json` is configured correctly for Strauss. Below is an exa
 	"autoload": {
 		"psr-4": {
 			"WPO\\IPS\\": "includes/",
-			"WPO\\IPS\\UBL\\": "ubl/"
+			"WPO\\IPS\\EDI\\": "edi/"
 		}
 	},
 	"require": {
@@ -138,7 +138,10 @@ Ensure your `composer.json` is configured correctly for Strauss. Below is an exa
 				}
 			},
 			"exclude_from_copy": {
-				"packages": [],
+				"packages": [
+					"symfony/polyfill-mbstring",
+					"symfony/polyfill-iconv"
+				],
 				"namespaces": [],
 				"file_patterns": [
 					"/^psr.*$/"
