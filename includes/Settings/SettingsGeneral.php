@@ -85,7 +85,7 @@ class SettingsGeneral {
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
 					'options_callback' => array( $this, 'get_installed_templates_list' ),
-					'description' => sprintf(
+					'description'      => sprintf(
 						/* translators: 1: plugin template path, 2: theme template path */
 						_n(
 							'Want to use your own template? Copy the file from %1$s to your (child) theme in %2$s to customize it.',
@@ -97,6 +97,22 @@ class SettingsGeneral {
 						'<code>' . esc_html( $theme_template_path ) . '</code>'
 					) . $this->render_missing_template_files_notice( $missing_template_files ),
 				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'template_ink_saving',
+				'title'    => __( 'Ink saving mode', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => 'template_ink_saving',
+					'description'       => __( 'Apply ink-saving styles for this template, replacing dark backgrounds and colors with lighter alternatives.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[template_path]',
+						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_ink_saving_supported_templates', array( 'default/Simple' ) ) ),
+					),
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -570,6 +586,7 @@ class SettingsGeneral {
 					'download_display',
 					'paper_size',
 					'template_path',
+					'template_ink_saving',
 					'test_mode',
 				),
 			),
