@@ -801,11 +801,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	text-decoration: none;
 }
 
-#wpo-wcpdf-settings.edi table.form-table > tbody > tr.edi-multiple label {
-	display: block;
-	margin-bottom: 5px;
-}
-
 #wpo-wcpdf-settings .system-status-table > tbody > tr:nth-of-type(even) {
 	background-color: rgb(245 245 245);
 }
