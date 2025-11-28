@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.1.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.2.0-rc.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-11-25T09:40:39+00:00\n"
+"POT-Creation-Date: 2025-11-28T16:21:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -17,8 +17,8 @@ msgstr ""
 #. Plugin Name of the plugin
 #: woocommerce-pdf-invoices-packingslips.php
 #: views/settings-page.php:25
-#: woocommerce-pdf-invoices-packingslips.php:667
-#: woocommerce-pdf-invoices-packingslips.php:741
+#: woocommerce-pdf-invoices-packingslips.php:676
+#: woocommerce-pdf-invoices-packingslips.php:750
 msgid "PDF Invoices & Packing Slips for WooCommerce"
 msgstr ""
 
@@ -2023,9 +2023,9 @@ msgid "Yes you deserve it!"
 msgstr ""
 
 #: includes/Admin.php:134
-#: includes/Main.php:913
+#: includes/Main.php:926
 #: includes/Settings/SettingsDebug.php:1389
-#: includes/Settings/SettingsGeneral.php:746
+#: includes/Settings/SettingsGeneral.php:763
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:135
 #: views/promo.php:34
@@ -2066,14 +2066,14 @@ msgstr ""
 #: includes/Admin.php:1937
 #: includes/Assets.php:366
 #: includes/Documents/Invoice.php:359
-#: includes/Main.php:1332
+#: includes/Main.php:1345
 #: views/setup-wizard/display-options.php:83
 msgid "Invoice Number"
 msgstr ""
 
 #: includes/Admin.php:362
 #: includes/Documents/Invoice.php:327
-#: includes/Main.php:1333
+#: includes/Main.php:1346
 #: views/setup-wizard/display-options.php:62
 msgid "Invoice Date"
 msgstr ""
@@ -2532,7 +2532,7 @@ msgid "Loading"
 msgstr ""
 
 #: includes/Assets.php:241
-#: includes/Settings/SettingsGeneral.php:317
+#: includes/Settings/SettingsGeneral.php:333
 #: includes/SetupWizard.php:142
 #: views/setup-wizard/shop-name.php:73
 msgid "No states available"
@@ -3003,7 +3003,7 @@ msgid "%s Date:"
 msgstr ""
 
 #: includes/Documents/OrderDocument.php:967
-#: includes/Main.php:1887
+#: includes/Main.php:1900
 msgid "Due Date:"
 msgstr ""
 
@@ -3052,11 +3052,11 @@ msgstr ""
 msgid "Customer Notes:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1824
+#: includes/Documents/OrderDocument.php:1836
 msgid "Admin email"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1827
+#: includes/Documents/OrderDocument.php:1839
 msgid "Manual email"
 msgstr ""
 
@@ -3304,70 +3304,70 @@ msgstr ""
 msgid "We found the following participant(s) related to \"%s\":"
 msgstr ""
 
-#: includes/Main.php:356
+#: includes/Main.php:360
 msgid "You do not have sufficient permissions to access this page. Reason: empty access key"
 msgstr ""
 
-#: includes/Main.php:362
+#: includes/Main.php:366
 msgid "You do not have sufficient permissions to access this page. Reason: empty action"
 msgstr ""
 
-#: includes/Main.php:368
+#: includes/Main.php:372
 msgid "You do not have sufficient permissions to access this page. Reason: invalid nonce"
 msgstr ""
 
-#: includes/Main.php:378
+#: includes/Main.php:382
 msgid "You haven't selected any orders"
 msgstr ""
 
-#: includes/Main.php:383
+#: includes/Main.php:387
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-#: includes/Main.php:402
+#: includes/Main.php:406
 msgid "You have to save the order before generating a PDF document for it."
 msgstr ""
 
 #. translators: %s: Order ID
-#: includes/Main.php:407
+#: includes/Main.php:411
 #, php-format
 msgid "Could not find the order #%s."
 msgstr ""
 
-#: includes/Main.php:482
+#: includes/Main.php:486
 #: includes/Settings.php:234
 #: includes/Settings.php:396
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #. translators: document type
-#: includes/Main.php:537
+#: includes/Main.php:541
 #, php-format
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr ""
 
-#: includes/Main.php:574
+#: includes/Main.php:578
 msgid "Invalid request. Nonce check failed."
 msgstr ""
 
-#: includes/Main.php:582
+#: includes/Main.php:586
 msgid "No orders were provided."
 msgstr ""
 
-#: includes/Main.php:593
+#: includes/Main.php:597
 msgid "No refunds found for the selected orders."
 msgstr ""
 
-#: includes/Main.php:912
+#: includes/Main.php:925
 msgid "Please check your directories write permissions or contact your hosting service provider."
 msgstr ""
 
-#: includes/Main.php:1239
+#: includes/Main.php:1252
 msgid "Nothing to delete!"
 msgstr ""
 
 #. translators: %1$d is the number of files that couldn't be deleted, %2$d is the number of successfully deleted files
-#: includes/Main.php:1260
+#: includes/Main.php:1273
 #, php-format
 msgid "Unable to delete %1$d file! (deleted %2$d)"
 msgid_plural "Unable to delete %1$d files! (deleted %2$d)"
@@ -3375,80 +3375,80 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d is the number of files successfully deleted
-#: includes/Main.php:1273
+#: includes/Main.php:1286
 #, php-format
 msgid "Successfully deleted %d file!"
 msgid_plural "Successfully deleted %d files!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Main.php:1387
-#: includes/Main.php:1418
+#: includes/Main.php:1400
+#: includes/Main.php:1431
 msgid "User"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1395
+#: includes/Main.php:1408
 #, php-format
 msgid "PDF %1$s created via %2$s."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1425
+#: includes/Main.php:1438
 #, php-format
 msgid "PDF %s deleted."
 msgstr ""
 
-#: includes/Main.php:1442
+#: includes/Main.php:1455
 msgid "manually"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1448
+#: includes/Main.php:1461
 #, php-format
 msgid "%1$s document marked as printed via %2$s."
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1464
+#: includes/Main.php:1477
 #, php-format
 msgid "%1$s document unmark printed."
 msgstr ""
 
-#: includes/Main.php:1552
+#: includes/Main.php:1565
 msgid "single order action"
 msgstr ""
 
-#: includes/Main.php:1553
+#: includes/Main.php:1566
 msgid "bulk order action"
 msgstr ""
 
-#: includes/Main.php:1554
+#: includes/Main.php:1567
 msgid "my account"
 msgstr ""
 
-#: includes/Main.php:1555
+#: includes/Main.php:1568
 msgid "order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Main.php:1559
+#: includes/Main.php:1572
 msgid "email attachment"
 msgstr ""
 
 #. translators: 1. document type, 2. mark/unmark
-#: includes/Main.php:1660
+#: includes/Main.php:1673
 #, php-format
 msgid "Document of type %1$s for the selected order could not be marked as printed."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1769
+#: includes/Main.php:1782
 #, php-format
 msgid "Order %s Saved"
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Main.php:1994
+#: includes/Main.php:2007
 #, php-format
 msgid "View %s (PDF)"
 msgstr ""
@@ -3519,24 +3519,24 @@ msgid "Error trying to get orders: %s"
 msgstr ""
 
 #. translators: total scheduled actions
-#: includes/Settings.php:1002
+#: includes/Settings.php:1006
 #, php-format
 msgid "Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found"
 msgstr ""
 
-#: includes/Settings.php:1227
+#: includes/Settings.php:1231
 msgid "Additional settings"
 msgstr ""
 
-#: includes/Settings.php:1371
+#: includes/Settings.php:1375
 msgid "Address field is required."
 msgstr ""
 
-#: includes/Settings.php:1387
+#: includes/Settings.php:1391
 msgid "Invalid address field."
 msgstr ""
 
-#: includes/Settings.php:1396
+#: includes/Settings.php:1400
 msgid "The field is empty."
 msgstr ""
 
@@ -4231,7 +4231,7 @@ msgid "Specify the Electronic Address Scheme (EAS) for the supplier Endpoint abo
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:279
-#: includes/Settings/SettingsGeneral.php:203
+#: includes/Settings/SettingsGeneral.php:219
 msgid "Shop VAT Number"
 msgstr ""
 
@@ -4339,7 +4339,7 @@ msgstr ""
 
 #: includes/Settings/SettingsEDI.php:594
 #: includes/Settings/SettingsEDI.php:645
-#: includes/Settings/SettingsGeneral.php:764
+#: includes/Settings/SettingsGeneral.php:781
 msgid "Invalid nonce."
 msgstr ""
 
@@ -4362,7 +4362,7 @@ msgid "Missing details can be completed in the %s."
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:709
-#: includes/Settings/SettingsGeneral.php:577
+#: includes/Settings/SettingsGeneral.php:594
 msgid "Shop Information"
 msgstr ""
 
@@ -4508,302 +4508,310 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/Settings/SettingsGeneral.php:104
+msgid "Ink saving mode"
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:110
+msgid "Apply ink-saving styles for this template, replacing dark backgrounds and colors with lighter alternatives."
+msgstr ""
+
+#: includes/Settings/SettingsGeneral.php:120
 msgid "Paper size"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:111
+#: includes/Settings/SettingsGeneral.php:127
 #: views/setup-wizard/paper-format.php:13
 msgid "A4"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:112
+#: includes/Settings/SettingsGeneral.php:128
 #: views/setup-wizard/paper-format.php:14
 msgid "Letter"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:119
+#: includes/Settings/SettingsGeneral.php:135
 msgid "Test mode"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:127
+#: includes/Settings/SettingsGeneral.php:143
 msgid "With test mode enabled, any document generated will always use the latest settings, rather than using the settings as configured at the time the document was first created."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:128
+#: includes/Settings/SettingsGeneral.php:144
 msgid "Note: Invoice numbers and dates are not affected by this setting and will still be generated."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:130
+#: includes/Settings/SettingsGeneral.php:146
 msgid "Learn more about test mode"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:137
+#: includes/Settings/SettingsGeneral.php:153
 msgid "Extended currency symbol support"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:143
+#: includes/Settings/SettingsGeneral.php:159
 msgid "Enable this if your currency symbol is not displaying properly"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:149
+#: includes/Settings/SettingsGeneral.php:165
 msgid "Enable font subsetting"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:155
+#: includes/Settings/SettingsGeneral.php:171
 msgid "Font subsetting can reduce file size by only including the characters that are used in the PDF, but limits the ability to edit PDF files later. Recommended if you're using an Asian font."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:161
+#: includes/Settings/SettingsGeneral.php:177
 msgid "Shop header/logo"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:167
+#: includes/Settings/SettingsGeneral.php:183
 #: views/setup-wizard/logo.php:12
 msgid "Select or upload your invoice header/logo"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:168
+#: includes/Settings/SettingsGeneral.php:184
 #: views/setup-wizard/logo.php:13
 msgid "Set image"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:169
+#: includes/Settings/SettingsGeneral.php:185
 #: views/setup-wizard/logo.php:14
 msgid "Remove image"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:176
+#: includes/Settings/SettingsGeneral.php:192
 msgid "Logo height"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:184
+#: includes/Settings/SettingsGeneral.php:200
 msgid "Enter the total height of the logo in mm, cm or in and use a dot for decimals.<br/>For example: 1.15in or 40mm"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:190
+#: includes/Settings/SettingsGeneral.php:206
 #: includes/SetupWizard.php:59
 msgid "Shop Name"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:197
+#: includes/Settings/SettingsGeneral.php:213
 msgid "The name of your business or shop."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:209
-#: includes/Settings/SettingsGeneral.php:221
+#: includes/Settings/SettingsGeneral.php:225
+#: includes/Settings/SettingsGeneral.php:237
 msgid "You can display this number on the invoice from the document settings."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:215
+#: includes/Settings/SettingsGeneral.php:231
 msgid "Shop Chamber of Commerce Number"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:227
+#: includes/Settings/SettingsGeneral.php:243
 msgid "Shop Phone Number"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:234
+#: includes/Settings/SettingsGeneral.php:250
 msgid "The phone number for your business location."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:240
+#: includes/Settings/SettingsGeneral.php:256
 msgid "Shop Email Address"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:248
+#: includes/Settings/SettingsGeneral.php:264
 msgid "The email address for your business location."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:254
+#: includes/Settings/SettingsGeneral.php:270
 msgid "Shop Address Line 1"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:261
+#: includes/Settings/SettingsGeneral.php:277
 msgid "The street address for your business location."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:265
-#: includes/Settings/SettingsGeneral.php:284
-#: includes/Settings/SettingsGeneral.php:304
-#: includes/Settings/SettingsGeneral.php:325
-#: includes/Settings/SettingsGeneral.php:344
-#: includes/Settings/SettingsGeneral.php:363
+#: includes/Settings/SettingsGeneral.php:281
+#: includes/Settings/SettingsGeneral.php:300
+#: includes/Settings/SettingsGeneral.php:320
+#: includes/Settings/SettingsGeneral.php:341
+#: includes/Settings/SettingsGeneral.php:360
+#: includes/Settings/SettingsGeneral.php:379
 msgid "Sync with WooCommerce address"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:273
+#: includes/Settings/SettingsGeneral.php:289
 msgid "Shop Address Line 2"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:280
+#: includes/Settings/SettingsGeneral.php:296
 msgid "An additional, optional address line for your business location."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:292
+#: includes/Settings/SettingsGeneral.php:308
 msgid "Shop Country"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:297
+#: includes/Settings/SettingsGeneral.php:313
 #: views/setup-wizard/shop-name.php:21
 msgid "Select a country"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:300
+#: includes/Settings/SettingsGeneral.php:316
 msgid "The country in which your business is located."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:312
+#: includes/Settings/SettingsGeneral.php:328
 msgid "Shop State"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:320
+#: includes/Settings/SettingsGeneral.php:336
 msgid "The state in which your business is located."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:333
+#: includes/Settings/SettingsGeneral.php:349
 msgid "Shop City"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:340
+#: includes/Settings/SettingsGeneral.php:356
 msgid "The city in which your business is located."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:352
+#: includes/Settings/SettingsGeneral.php:368
 msgid "Shop Postcode / ZIP"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:359
+#: includes/Settings/SettingsGeneral.php:375
 msgid "The postal code, if any, in which your business is located."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:371
+#: includes/Settings/SettingsGeneral.php:387
 msgid "Shop Additional Info"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:380
+#: includes/Settings/SettingsGeneral.php:396
 msgid "Any additional info about your business location."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:386
+#: includes/Settings/SettingsGeneral.php:402
 msgid "Footer: terms & conditions, policies, etc."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:400
+#: includes/Settings/SettingsGeneral.php:416
 msgid "Extra template fields"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:406
+#: includes/Settings/SettingsGeneral.php:422
 msgid "Extra field 1"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:414
+#: includes/Settings/SettingsGeneral.php:430
 msgid "This is footer column 1 in the <i>Modern (Premium)</i> template"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:421
+#: includes/Settings/SettingsGeneral.php:437
 msgid "Extra field 2"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:429
+#: includes/Settings/SettingsGeneral.php:445
 msgid "This is footer column 2 in the <i>Modern (Premium)</i> template"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:436
+#: includes/Settings/SettingsGeneral.php:452
 msgid "Extra field 3"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:444
+#: includes/Settings/SettingsGeneral.php:460
 msgid "This is footer column 3 in the <i>Modern (Premium)</i> template"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:461
+#: includes/Settings/SettingsGeneral.php:477
 msgid "Customize the formatting of shipping and billing addresses in PDF documents, and add custom fields as needed."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:462
-#: includes/Settings/SettingsGeneral.php:476
-#: includes/Settings/SettingsGeneral.php:490
+#: includes/Settings/SettingsGeneral.php:478
+#: includes/Settings/SettingsGeneral.php:492
+#: includes/Settings/SettingsGeneral.php:506
 msgid "Upgrade today!"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:475
+#: includes/Settings/SettingsGeneral.php:491
 msgid "Create PDF documents in multiple languages based on the customer's language or locale."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:489
+#: includes/Settings/SettingsGeneral.php:505
 msgid "Attach up to 3 static files (for example, a terms & conditions document) to the WooCommerce emails of your choice."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:548
+#: includes/Settings/SettingsGeneral.php:564
 msgid "Extension"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:552
+#: includes/Settings/SettingsGeneral.php:568
 msgid "Custom"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:568
+#: includes/Settings/SettingsGeneral.php:584
 msgid "Display Settings"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:597
+#: includes/Settings/SettingsGeneral.php:614
 msgid "Advanced Formatting"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:610
+#: includes/Settings/SettingsGeneral.php:627
 msgid "Customer Address Customization"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:611
-#: includes/Settings/SettingsGeneral.php:619
-#: includes/Settings/SettingsGeneral.php:627
+#: includes/Settings/SettingsGeneral.php:628
+#: includes/Settings/SettingsGeneral.php:636
+#: includes/Settings/SettingsGeneral.php:644
 msgid "Pro"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:618
+#: includes/Settings/SettingsGeneral.php:635
 msgid "Multilingual"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:626
+#: includes/Settings/SettingsGeneral.php:643
 msgid "Static Files"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag
-#: includes/Settings/SettingsGeneral.php:735
+#: includes/Settings/SettingsGeneral.php:752
 #, php-format
 msgid "%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:770
+#: includes/Settings/SettingsGeneral.php:787
 msgid "No country code provided."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:867
+#: includes/Settings/SettingsGeneral.php:884
 msgid "a file"
 msgid_plural "files"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: "file"/"files" label (singular/plural), 2: list of document titles
-#: includes/Settings/SettingsGeneral.php:872
+#: includes/Settings/SettingsGeneral.php:889
 #, php-format
 msgid "Your custom template folder does not contain %1$s for: %2$s."
 msgstr ""
 
 #. translators: 1: Opening <strong>, 2: Closing </strong>
-#: includes/Settings/SettingsGeneral.php:879
+#: includes/Settings/SettingsGeneral.php:896
 #, php-format
 msgid "Documents where files are missing will remain functional and will use the default %1$sSimple%2$s template."
 msgstr ""
 
 #. translators: %s: Template folder path
-#: includes/Settings/SettingsGeneral.php:895
+#: includes/Settings/SettingsGeneral.php:912
 #, php-format
 msgid "If you are not using the latest version of the Premium Templates extension, please update it. Otherwise, copy the template files from the newest version in %s and adapt them to your custom template."
 msgstr ""
 
 #. translators: 1: opening <a>, 2: closing </a>
-#: includes/Settings/SettingsGeneral.php:904
+#: includes/Settings/SettingsGeneral.php:921
 #, php-format
 msgid "Please refer to the %1$sCreating a custom PDF template%2$s article to learn how to update your template."
 msgstr ""
@@ -5881,34 +5889,34 @@ msgid "While updating the PDF Invoices & Packing Slips for WooCommerce plugin we
 msgstr ""
 
 #. translators: %s: Plugin name
-#: woocommerce-pdf-invoices-packingslips.php:666
+#: woocommerce-pdf-invoices-packingslips.php:675
 #, php-format
 msgid "We've added a new option to %s that lets you check for beta and pre-release versions."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:672
+#: woocommerce-pdf-invoices-packingslips.php:681
 msgid "If you'd like to help improve the plugin by testing early releases on a staging site, you can enable this feature from the advanced settings."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:676
+#: woocommerce-pdf-invoices-packingslips.php:685
 msgid "Go to settings"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:679
+#: woocommerce-pdf-invoices-packingslips.php:688
 msgid "Dismiss this notice"
 msgstr ""
 
 #. translators: 1. new unstable version, 2. plugin name
-#: woocommerce-pdf-invoices-packingslips.php:739
+#: woocommerce-pdf-invoices-packingslips.php:748
 #, php-format
 msgid "A new unstable version (%1$s) of %2$s is available."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:748
+#: woocommerce-pdf-invoices-packingslips.php:757
 msgid "Download from the status page"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:753
+#: woocommerce-pdf-invoices-packingslips.php:762
 msgid "Hide this version"
 msgstr ""
 
