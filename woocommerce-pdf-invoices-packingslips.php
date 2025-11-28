@@ -635,8 +635,17 @@ class WPO_WCPDF {
 		$dismiss_arg    = 'wpo_wcpdf_dismiss_unstable_option_announcement';
 		$nonce_action   = 'wcpdf_dismiss_unstable_option_announcement';
 
+		// Fallback if wc_string_to_bool() is unavailable
+		$dismiss_value = get_option( $dismiss_option, 'no' );
+		if ( function_exists( 'wc_string_to_bool' ) ) {
+			$already_dismissed = wc_string_to_bool( (string) $dismiss_value );
+		} else {
+			// simple string check as a fallback
+			$already_dismissed = ( 'yes' === (string) $dismiss_value );
+		}
+
 		// Bail if already dismissed or user cannot manage settings
-		if ( wc_string_to_bool( get_option( $dismiss_option ) ) || ! $this->settings->user_can_manage_settings() ) {
+		if ( $already_dismissed || ! $this->settings->user_can_manage_settings() ) {
 			return;
 		}
 
