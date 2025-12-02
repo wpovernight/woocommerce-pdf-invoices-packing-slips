@@ -50,9 +50,7 @@ class Settings {
 		$this->edi              = SettingsEDI::instance();
 		$this->upgrade          = SettingsUpgrade::instance();
 
-		$this->general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
-		$this->edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
+		$this->load_settings();
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
@@ -211,10 +209,9 @@ class Settings {
 	}
 
 	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
-		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-		$close_preview  = isset( $debug_settings['disable_preview'] );
-
-		if ( $close_preview ) {
+		$this->load_settings();
+		
+		if ( isset( $this->debug_settings['disable_preview'] ) ) {
 			foreach ( $settings_tabs as $tab_key => &$tab ) {
 				if ( is_array( $tab ) && ! empty( $tab['preview_states'] ) ) {
 					$tab['preview_states'] = 1;
@@ -298,8 +295,7 @@ class Settings {
 					}
 
 					// reload settings
-					$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
-					$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
+					$this->load_settings();
 
 					do_action( 'wpo_wcpdf_preview_after_reload_settings' );
 				}
@@ -1239,6 +1235,21 @@ class Settings {
 		}
 
 		return $modified_settings_fields;
+	}
+	
+	/**
+	 * Initializes settings by loading them from the database.
+	 *
+	 * @return void
+	 */
+	private function load_settings(): void {
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
+
+		$this->general_settings = is_array( $general_settings ) ? $general_settings : array();
+		$this->debug_settings   = is_array( $debug_settings )   ? $debug_settings   : array();
+		$this->edi_settings     = is_array( $edi_settings )     ? $edi_settings     : array();
 	}
 
 	/**
