@@ -881,12 +881,12 @@ class Frontend {
 	 * Validate Peppol Endpoint / Legal‑ID pairs after WooCommerce
 	 * has normalised and sanitised all checkout data.
 	 *
-	 * @param array    $data   All posted checkout fields.
-	 * @param WP_Error $errors Errors object to add validation errors to.
+	 * @param array $data   All posted checkout fields.
+	 * @param mixed $errors Errors object to add validation errors to.
 	 * @return void
 	 */
-	public function edi_peppol_validate_classic_checkout_field_values( array $data, \WP_Error $errors ): void {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
+	public function edi_peppol_validate_classic_checkout_field_values( array $data, $errors ): void {
+		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) || ! $errors instanceof \WP_Error ) {
 			return;
 		}
 		
