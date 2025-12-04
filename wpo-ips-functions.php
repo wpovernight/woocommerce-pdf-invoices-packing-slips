@@ -1342,7 +1342,7 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
 		$tag  = $release['tag_name'];
 		$name = ltrim( $release['name'], 'v' );
 
-		if ( preg_match( '/-pr\d+/i', $tag ) ) {
+		if ( preg_match( '/-(pr|i)\d+(?:\.\d+)?/i', $tag ) ) {
 			continue;
 		}
 
