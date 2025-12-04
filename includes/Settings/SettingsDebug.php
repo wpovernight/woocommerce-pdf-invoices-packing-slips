@@ -1970,7 +1970,8 @@ class SettingsDebug {
 		
 		// Load CSS file contents
 		$report_css = '';
-		$css_path   = \WPO_WCPDF()->plugin_path() . '/assets/css/plugin-report.css';
+		$suffix     = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$css_path   = \WPO_WCPDF()->plugin_path() . '/assets/css/plugin-report' . $suffix . '.css';
 
 		if ( \WPO_WCPDF()->file_system->exists( $css_path ) && \WPO_WCPDF()->file_system->is_readable( $css_path ) ) {
 			$report_css = \WPO_WCPDF()->file_system->get_contents( $css_path );
