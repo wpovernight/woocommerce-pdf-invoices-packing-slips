@@ -3,6 +3,16 @@
 <div id="debug-tools">
 	<div class="wrapper">
 		<?php do_action( 'wpo_wcpdf_before_debug_tools', $this ); ?>
+		<!-- plugin_report -->
+		<div class="tool">
+			<h4><?php esc_html_e( 'Download plugin report', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+			<p><?php esc_html_e( 'Download a report with plugin, environment and store information that you can attach to a support request.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+
+			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-ajax.php?action=wpo_ips_plugin_report' ), 'wpo_ips_plugin_report', 'nonce' ) ); ?>" class="button button-secondary">
+				<?php esc_html_e( 'Download report', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</a>
+		</div>
+		<!-- /plugin_report -->
 		<!-- generate_random_string -->
 		<div class="tool">
 			<h4><?php esc_html_e( 'Generate random temporary directory', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>

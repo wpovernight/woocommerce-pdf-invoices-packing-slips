@@ -35,6 +35,8 @@ class SettingsDebug {
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
+		
+		add_action( 'wp_ajax_wpo_ips_plugin_report', array( $this, 'ajax_plugin_report' ) );
 	}
 
 	/**
@@ -800,15 +802,7 @@ class SettingsDebug {
 				$title = $document_title;
 			}
 
-			foreach ( $document->output_formats as $output_format ) {
-				$slug = $document->get_type();
-				
-				if ( 'pdf' !== $output_format ) {
-					$slug .= "_{$output_format}";
-				}
-				
-				$setting_types[ $slug ] = strtoupper( $output_format ) . ' ' .  $title;
-			}
+			$setting_types[ $document->get_type() ] = $title;
 		}
 
 		return apply_filters( 'wpo_wcpdf_setting_types', $setting_types );
@@ -1950,6 +1944,73 @@ class SettingsDebug {
 	 */
 	public function run_unstable_version_check(): void {
 		wpo_wcpdf_get_latest_releases_from_github();
+	}
+	
+	/**
+	 * Generate and download the plugin report as a PDF.
+	 *
+	 * @return void
+	 */
+	public function ajax_plugin_report(): void {
+		if ( ! \WPO_WCPDF()->settings->user_can_manage_settings() ) {
+			wp_die( __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
+		check_ajax_referer( 'wpo_ips_plugin_report', 'nonce' );
+	
+		$report_title    = 'PDF Invoices & Packing Slips for WooCommerce - Report';
+		$premium_plugins = $this->get_premium_plugins();
+		$plugin_version  = \WPO_WCPDF()->version;
+		$store_url       = get_site_url();
+		$report_date     = gmdate( 'Y-m-d H:i:s' );
+		$report_user     = wp_get_current_user();
+		$server_configs  = $this->get_server_config();
+		$dir_permissions = $this->get_directory_permissions();
+		$yearly_reset    = $this->get_yearly_reset_schedule();
+		
+		// Load CSS file contents
+		$report_css = '';
+		$css_path   = \WPO_WCPDF()->plugin_path() . '/assets/css/plugin-report.css';
+
+		if ( \WPO_WCPDF()->file_system->exists( $css_path ) && \WPO_WCPDF()->file_system->is_readable( $css_path ) ) {
+			$report_css = \WPO_WCPDF()->file_system->get_contents( $css_path );
+		}
+		
+		// Load Settings
+		$general_settings   = get_option( 'wpo_wcpdf_settings_general', array() );
+		$debug_settings     = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$edi_settings       = get_option( 'wpo_ips_edi_settings', array() );
+		$documents_settings = array();
+		
+		$all_documents      = \WPO_WCPDF()->documents->get_documents( 'all' );
+		
+		if ( ! empty( $all_documents ) ) {
+			foreach ( $all_documents as $document ) {
+				$document_type                        = $document->get_type();
+				$documents_settings[ $document_type ] = \WPO_WCPDF()->settings->get_document_settings( $document_type, 'pdf' );
+			}
+		}
+		
+		// Extensions Settings
+		$extensions_settings = apply_filters( 'wpo_ips_get_extensions_settings_for_report', array() );
+		
+		ob_start();
+		include \WPO_WCPDF()->plugin_path() . '/views/plugin-report/report.php';
+		$report_html = ob_get_clean();
+
+		$pdf_settings = array(
+			'paper_size'		=> 'A4',
+			'paper_orientation'	=> 'portrait',
+			'font_subsetting'	=> false,
+		);
+		$pdf_maker = \wcpdf_get_pdf_maker( $report_html, $pdf_settings, $this );
+		$pdf       = $pdf_maker->output();
+		
+		$filename  = 'plugin-report-' . gmdate( 'Y-m-d' ) . '.pdf';
+		
+		\wcpdf_pdf_headers( $filename, 'download', $pdf );
+		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit();
 	}
 
 }

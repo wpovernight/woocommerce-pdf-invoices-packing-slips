@@ -1873,3 +1873,103 @@ function wpo_ips_get_refund_ids( $order_or_ids ) {
 	// Clean output: remove empty, dedupe, reindex
 	return array_values( array_unique( array_filter( $refund_ids ) ) );
 }
+
+/**
+ * Safely format any setting value for report output.
+ *
+ * @param mixed $value
+ * @return string
+ */
+function wpo_ips_format_report_setting_value( $value ): string {
+	// Booleans
+	if ( is_bool( $value ) ) {
+		return $value
+			? '<span class="badge badge-enabled">Enabled</span>'
+			: '<span class="badge badge-disabled">Disabled</span>';
+	}
+
+	// Null / empty
+	if ( is_null( $value ) || $value === '' ) {
+		return '<em>None</em>';
+	}
+
+	// Strings
+	if ( is_string( $value ) ) {
+		$normalized = strtolower( trim( $value ) );
+
+		if ( in_array( $normalized, [ 'enabled', 'yes', 'true', 'on' ], true ) ) {
+			return '<span class="badge badge-enabled">Enabled</span>';
+		}
+		if ( in_array( $normalized, [ 'disabled', 'no', 'false', 'off' ], true ) ) {
+			return '<span class="badge badge-disabled">Disabled</span>';
+		}
+		if ( in_array( $normalized, [ 'restricted', 'limited', 'partial', 'deprecated', 'experimental', 'warning' ], true ) ) {
+			return '<span class="badge badge-warning">' . esc_html( ucfirst( $value ) ) . '</span>';
+		}
+
+		return esc_html( $value );
+	}
+
+	// Arrays
+	if ( is_array( $value ) ) {
+
+		// Directory permissions array (value, status, status_message)
+		if ( isset( $value['value'], $value['status'], $value['status_message'] ) ) {
+			$html = '<div class="config-item">';
+
+			$html .= '<div class="config-value"><strong>Value:</strong> ' . esc_html( $value['value'] ) . '</div>';
+
+			$html .= '<div class="config-status"><strong>Status:</strong> ';
+			if ( $value['status'] === 'ok' ) {
+				$html .= '<span class="badge badge-enabled">' . esc_html( $value['status_message'] ) . '</span>';
+			} else {
+				$html .= '<span class="badge badge-disabled">' . esc_html( $value['status_message'] ) . '</span>';
+			}
+			$html .= '</div>';
+
+			if ( ! empty( $value['description'] ) ) {
+				$html .= '<div class="config-description"><em>' . esc_html( $value['description'] ) . '</em></div>';
+			}
+
+			$html .= '</div>';
+
+			return $html;
+		}
+
+		// Server config array (required/value/result[/fallback])
+		if ( isset( $value['required'] ) || isset( $value['value'] ) || isset( $value['result'] ) ) {
+			$html = '<div class="config-item">';
+
+			if ( ! empty( $value['required'] ) ) {
+				$html .= '<div class="config-required"><strong>Required:</strong> ' . $value['required'] . '</div>';
+			}
+			if ( isset( $value['value'] ) && $value['value'] !== '' ) {
+				$html .= '<div class="config-value"><strong>Value:</strong> ' . wpo_ips_format_report_setting_value( $value['value'] ) . '</div>';
+			}
+			if ( array_key_exists( 'result', $value ) ) {
+				$html .= '<div class="config-result"><strong>Result:</strong> ' . wpo_ips_format_report_setting_value( (bool) $value['result'] ) . '</div>';
+			}
+			if ( ! empty( $value['fallback'] ) && empty( $value['result'] ) ) {
+				$html .= '<div class="config-fallback"><em>' . $value['fallback'] . '</em></div>';
+			}
+
+			$html .= '</div>';
+			return $html;
+		}
+
+		// Generic fallback for multidimensional arrays
+		$items = [];
+		foreach ( $value as $key => $val ) {
+			$items[] = esc_html( (string) $key ) . ': ' . wpo_ips_format_report_setting_value( $val );
+		}
+		return '<ul style="margin:0; padding-left:15px;"><li>' . implode( '</li><li>', $items ) . '</li></ul>';
+	}
+
+	// Objects
+	if ( is_object( $value ) ) {
+		return '<pre style="margin:0;">' . esc_html( print_r( $value, true ) ) . '</pre>';
+	}
+
+	// Numbers and everything else
+	return esc_html( (string) $value );
+}

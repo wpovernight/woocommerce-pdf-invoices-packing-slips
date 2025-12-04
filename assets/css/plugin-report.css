@@ -1,0 +1,196 @@
+body {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 12px;
+	line-height: 1.4;
+	color: #333333;
+	margin: 20px;
+	background: #ffffff;
+}
+
+h1, h2, h3, h4 {
+	margin: 0 0 8px 0;
+}
+
+p {
+	margin: 0 0 6px 0;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.report-header {
+	border-bottom: 2px solid #2563eb;
+	padding-bottom: 10px;
+	margin-bottom: 20px;
+}
+
+.report-title {
+	font-size: 18px;
+	font-weight: bold;
+	color: #1e40af;
+	margin-bottom: 6px;
+}
+
+/* Meta info as simple table */
+.report-meta {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	padding: 8px;
+	margin-top: 6px;
+}
+
+.report-meta-table td {
+	padding: 3px 4px;
+	vertical-align: top;
+}
+
+.report-meta-label {
+	font-weight: bold;
+	color: #64748b;
+	width: 30%;
+}
+
+.report-meta-value {
+	color: #334155;
+}
+
+/* Extensions section */
+.extensions-section {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	padding: 8px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.extensions-title {
+	font-weight: bold;
+	color: #475569;
+	font-size: 11px;
+	margin-bottom: 4px;
+}
+
+.extensions-list {
+	margin: 0;
+	padding-left: 15px;
+}
+
+.extensions-list li {
+	color: #64748b;
+	font-size: 11px;
+	margin-bottom: 2px;
+}
+
+.extension-name {
+	font-weight: bold;
+	color: #475569;
+}
+
+.section {
+	margin-bottom: 20px;
+}
+
+.section-title {
+	font-size: 14px;
+	font-weight: bold;
+	color: #1e293b;
+	margin-bottom: 8px;
+	border-bottom: 1px solid #e2e8f0;
+	padding-bottom: 4px;
+}
+
+/* System info */
+.system-info {
+	background: #fefce8;
+	border: 1px solid #eab308;
+	padding: 8px;
+	margin-bottom: 10px;
+}
+
+.config-table tr,
+.settings-table tr {
+    page-break-inside: avoid;
+}
+
+.config-table td {
+	padding: 4px 4px;
+	border-bottom: 1px solid #e2e8f0;
+	vertical-align: top;
+}
+
+.config-table td:first-child {
+	font-weight: bold;
+	color: #64748b;
+	width: 35%;
+}
+
+/* Settings groups */
+.settings-group {
+	border: 1px solid #e2e8f0;
+	margin-bottom: 12px;
+}
+
+.group-header {
+	background: #f1f5f9;
+	padding: 6px 8px;
+	font-weight: bold;
+	font-size: 12px;
+	color: #334155;
+	border-bottom: 1px solid #cbd5e1;
+}
+
+.settings-table td {
+	padding: 5px 8px;
+	border-bottom: 1px solid #f1f5f9;
+	vertical-align: top;
+}
+
+.setting-name {
+	font-weight: bold;
+	color: #475569;
+	width: 40%;
+}
+
+.setting-value {
+	color: #334155;
+}
+
+.setting-value code {
+	font-family: "Courier New", monospace;
+	font-size: 11px;
+	background: #f8fafc;
+	padding: 1px 3px;
+}
+
+.badge {
+	display: inline-block;
+	padding: 2px 5px;
+	font-size: 9px;
+	font-weight: bold;
+}
+
+.badge-enabled {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.badge-disabled {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+.badge-warning {
+	background: #fef3c7;
+	color: #92400e;
+}
+
+.footer {
+	margin-top: 25px;
+	padding-top: 10px;
+	border-top: 1px solid #e2e8f0;
+	text-align: center;
+	color: #94a3b8;
+	font-size: 9px;
+}
