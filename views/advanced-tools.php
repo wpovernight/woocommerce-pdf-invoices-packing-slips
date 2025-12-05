@@ -5,7 +5,7 @@
 		<?php do_action( 'wpo_wcpdf_before_debug_tools', $this ); ?>
 		<!-- plugin_report -->
 		<div class="tool plugin-report">
-			<h4><?php esc_html_e( 'Download plugin report', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+			<h4><span class="dashicons dashicons-sos"></span><?php esc_html_e( 'Download plugin report', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 			<p><?php printf(
 				/* translators: support email link */
 				esc_html__( 'Download a report with plugin, environment, and store information that you can attach to support requests made to %s.', 'woocommerce-pdf-invoices-packing-slips' ),
