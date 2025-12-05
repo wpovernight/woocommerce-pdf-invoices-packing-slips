@@ -2028,7 +2028,7 @@ class SettingsDebug {
 		$extensions_settings = apply_filters( 'wpo_ips_get_extensions_settings_for_report', array() );
 		
 		ob_start();
-		include \WPO_WCPDF()->plugin_path() . '/views/plugin-report/report.php';
+		include \WPO_WCPDF()->plugin_path() . '/views/plugin-report.php';
 		$report_html = ob_get_clean();
 
 		$pdf_settings = array(
