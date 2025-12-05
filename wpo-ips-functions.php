@@ -1897,13 +1897,15 @@ function wpo_ips_format_report_setting_value( $value ): string {
 	if ( is_string( $value ) ) {
 		$normalized = strtolower( trim( $value ) );
 
-		if ( in_array( $normalized, [ 'enabled', 'yes', 'true', 'on' ], true ) ) {
+		if ( in_array( $normalized, array( 'enabled', 'yes', 'true', 'on' ), true ) ) {
 			return '<span class="badge badge-enabled">Enabled</span>';
 		}
-		if ( in_array( $normalized, [ 'disabled', 'no', 'false', 'off' ], true ) ) {
+
+		if ( in_array( $normalized, array( 'disabled', 'no', 'false', 'off' ), true ) ) {
 			return '<span class="badge badge-disabled">Disabled</span>';
 		}
-		if ( in_array( $normalized, [ 'restricted', 'limited', 'partial', 'deprecated', 'experimental', 'warning' ], true ) ) {
+
+		if ( in_array( $normalized, array( 'restricted', 'limited', 'partial', 'deprecated', 'experimental', 'warning' ), true ) ) {
 			return '<span class="badge badge-warning">' . esc_html( ucfirst( $value ) ) . '</span>';
 		}
 
@@ -1915,12 +1917,11 @@ function wpo_ips_format_report_setting_value( $value ): string {
 
 		// Directory permissions array (value, status, status_message)
 		if ( isset( $value['value'], $value['status'], $value['status_message'] ) ) {
-			$html = '<div class="config-item">';
-
+			$html  = '<div class="config-item">';
 			$html .= '<div class="config-value"><strong>Value:</strong> ' . esc_html( $value['value'] ) . '</div>';
 
 			$html .= '<div class="config-status"><strong>Status:</strong> ';
-			if ( $value['status'] === 'ok' ) {
+			if ( 'ok' === $value['status'] ) {
 				$html .= '<span class="badge badge-enabled">' . esc_html( $value['status_message'] ) . '</span>';
 			} else {
 				$html .= '<span class="badge badge-disabled">' . esc_html( $value['status_message'] ) . '</span>';
@@ -1943,25 +1944,38 @@ function wpo_ips_format_report_setting_value( $value ): string {
 			if ( ! empty( $value['required'] ) ) {
 				$html .= '<div class="config-required"><strong>Required:</strong> ' . $value['required'] . '</div>';
 			}
-			if ( isset( $value['value'] ) && $value['value'] !== '' ) {
+
+			if ( isset( $value['value'] ) && '' !== $value['value'] && null !== $value['value'] ) {
 				$html .= '<div class="config-value"><strong>Value:</strong> ' . wpo_ips_format_report_setting_value( $value['value'] ) . '</div>';
 			}
+
 			if ( array_key_exists( 'result', $value ) ) {
-				$html .= '<div class="config-result"><strong>Result:</strong> ' . wpo_ips_format_report_setting_value( (bool) $value['result'] ) . '</div>';
+				$result = (bool) $value['result'];
+
+				$html .= '<div class="config-result"><strong>Result:</strong> ';
+				if ( $result ) {
+					$html .= '<span class="badge badge-enabled">OK</span>';
+				} else {
+					$html .= '<span class="badge badge-warning">Not OK</span>';
+				}
+				$html .= '</div>';
 			}
+
 			if ( ! empty( $value['fallback'] ) && empty( $value['result'] ) ) {
 				$html .= '<div class="config-fallback"><em>' . $value['fallback'] . '</em></div>';
 			}
 
 			$html .= '</div>';
+
 			return $html;
 		}
 
 		// Generic fallback for multidimensional arrays
-		$items = [];
+		$items = array();
 		foreach ( $value as $key => $val ) {
 			$items[] = esc_html( (string) $key ) . ': ' . wpo_ips_format_report_setting_value( $val );
 		}
+
 		return '<ul style="margin:0; padding-left:15px;"><li>' . implode( '</li><li>', $items ) . '</li></ul>';
 	}
 
