@@ -877,7 +877,7 @@ class SettingsEDI {
 						printf(
 							/* translators: %1$s: open link anchor, %2$s: close link anchor */
 							esc_html__( 'For more information on setting up the tax table, please see our %1$sarticle%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/configuring-tax-classifications-for-e-documents-en16931/" target="_blank" rel="noopener noreferrer">', // TODO: add link
+							'<a href="https://docs.wpovernight.com/e-documents/configuring-tax-classifications-for-e-documents/" target="_blank" rel="noopener noreferrer">',
 							'</a>'
 						);
 					?>
