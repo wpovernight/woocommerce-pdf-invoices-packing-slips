@@ -36,14 +36,68 @@
 			</table>
 		</div>
 
-		<!-- Extensions section -->
+		<!-- Paid Extensions section -->
 		<div class="extensions-section">
-			<div class="extensions-title"><?php echo esc_html( 'Installed Extensions' ); ?></div>
+			<div class="extensions-title"><?php echo esc_html( 'Installed Paid Extensions' ); ?></div>
 			<ul class="extensions-list">
 				<?php foreach ( $premium_plugins as $plugin ) : ?>
 					<li>
 						<span class="extension-name"><?php echo esc_html( $plugin['name'] ); ?></span>
 						<?php echo esc_html( ' - v' . $plugin['version'] ); ?>
+
+						<?php if ( isset( $plugin['is_active'] ) ) : ?>
+							<?php if ( $plugin['is_active'] ) : ?>
+								<span class="badge badge-enabled">Active</span>
+							<?php else : ?>
+								<span class="badge badge-disabled">Inactive</span>
+							<?php endif; ?>
+						<?php endif; ?>
+
+						<?php if ( ! empty( $plugin['license_key'] ) ) : ?>
+							<br><small><?php echo esc_html( 'License: ' . $plugin['license_key'] ); ?></small>
+						<?php endif; ?>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		
+		<!-- Free Extensions section -->
+		<div class="extensions-section">
+			<div class="extensions-title"><?php echo esc_html( 'Installed Free Extensions' ); ?></div>
+			<ul class="extensions-list">
+				<?php foreach ( $free_extensions as $plugin ) : ?>
+					<li>
+						<span class="extension-name"><?php echo esc_html( $plugin['name'] ); ?></span>
+						<?php echo esc_html( ' - v' . $plugin['version'] ); ?>
+
+						<?php if ( isset( $plugin['is_active'] ) ) : ?>
+							<?php if ( $plugin['is_active'] ) : ?>
+								<span class="badge badge-enabled">Active</span>
+							<?php else : ?>
+								<span class="badge badge-disabled">Inactive</span>
+							<?php endif; ?>
+						<?php endif; ?>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		
+		<!-- Multilingual Plugins section -->
+		<div class="extensions-section">
+			<div class="extensions-title"><?php echo esc_html( 'Installed Multilingual Plugins' ); ?></div>
+			<ul class="extensions-list">
+				<?php foreach ( $multilingual_plugins as $plugin ) : ?>
+					<li>
+						<span class="extension-name"><?php echo esc_html( $plugin['name'] ); ?></span>
+						<?php echo esc_html( ' - v' . $plugin['version'] ); ?>
+
+						<?php if ( isset( $plugin['is_active'] ) ) : ?>
+							<?php if ( $plugin['is_active'] ) : ?>
+								<span class="badge badge-enabled">Active</span>
+							<?php else : ?>
+								<span class="badge badge-disabled">Inactive</span>
+							<?php endif; ?>
+						<?php endif; ?>
 					</li>
 				<?php endforeach; ?>
 			</ul>
@@ -165,6 +219,28 @@
 		<?php endif; ?>
 
 	</div>
+	
+	<?php if ( ! empty( $logs_data ) ) : ?>
+		<div class="section">
+			<div class="section-title"><?php echo esc_html( 'Recent WooCommerce Logs' ); ?></div>
+
+			<?php foreach ( $logs_data as $handle => $data ) : ?>
+				<div class="settings-group">
+					<div class="group-header">
+						<?php echo esc_html( strtoupper( str_replace( '-', ' ', $handle ) ) ); ?>
+						<small><?php echo esc_html( '(' . $data['file'] . ')' ); ?></small>
+					</div>
+
+					<?php if ( ! empty( $data['lines'] ) ) : ?>
+						<pre class="log-output"><?php echo esc_html( implode( "\n", $data['lines'] ) ); ?></pre>
+					<?php else : ?>
+						<p><em><?php echo esc_html( 'No recent entries found.' ); ?></em></p>
+					<?php endif; ?>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	<?php endif; ?>
+
 
 	<!-- Report Footer -->
 	<div class="footer">
