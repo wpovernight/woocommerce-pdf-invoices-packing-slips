@@ -1424,32 +1424,26 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_premium_plugins(): array {
-		$premium_plugins = apply_filters( 'wpo_wcpdf_premium_plugins', array(
-			'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php'             => 'wpo_wcpdf_pro_license',
-			'woocommerce-pdf-ips-templates/woocommerce-pdf-ips-templates.php' => 'wpo_wcpdf_templates_license',
-		) );
+		$premium_plugins = apply_filters(
+			'wpo_wcpdf_premium_plugins',
+			array(
+				'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php'             => 'wpo_wcpdf_pro_license',
+				'woocommerce-pdf-ips-templates/woocommerce-pdf-ips-templates.php' => 'wpo_wcpdf_templates_license',
+			)
+		);
 
-		$plugins           = array();
-		$installed_plugins = get_plugins();
-		$licenses          = get_option( 'wpocore_settings', array() );
+		// Get base data (name, version, is_active)
+		$plugin_files = array_keys( $premium_plugins );
+		$plugins      = wpo_ips_get_plugins_data( $plugin_files );
 
-		foreach ( $premium_plugins as $premium_plugin => $license_slug ) {
-			// Check if the plugin is installed.
-			if ( ! isset( $installed_plugins[ $premium_plugin ] ) ) {
-				continue;
-			}
+		// Add license keys
+		$licenses = get_option( 'wpocore_settings', array() );
 
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $premium_plugin );
-
-			if ( ! empty( $plugin_data ) ) {
-				$plugins[ $premium_plugin ] = array(
-					'name'        => $plugin_data['Name'],
-					'version'     => $plugin_data['Version'],
-					'is_active'   => is_plugin_active( $premium_plugin ),
-					'license_key' => $licenses[ $license_slug ] ?? '',
-				);
-			}
+		foreach ( $plugins as $plugin_file => &$data ) {
+			$license_slug        = $premium_plugins[ $plugin_file ] ?? '';
+			$data['license_key'] = $license_slug && isset( $licenses[ $license_slug ] ) ? $licenses[ $license_slug ] : '';
 		}
+		unset( $data ); // break the reference
 
 		return apply_filters( 'wpo_wcpdf_premium_plugins_data', $plugins );
 	}
@@ -2019,8 +2013,7 @@ class SettingsDebug {
 		$edi_settings       = get_option( 'wpo_ips_edi_settings', array() );
 		$documents_settings = array();
 		
-		$all_documents      = \WPO_WCPDF()->documents->get_documents( 'all' );
-		
+		$all_documents = \WPO_WCPDF()->documents->get_documents( 'all' );
 		if ( ! empty( $all_documents ) ) {
 			foreach ( $all_documents as $document ) {
 				$document_type                        = $document->get_type();
@@ -2059,41 +2052,26 @@ class SettingsDebug {
 	 * @return array
 	 */
 	private function get_free_extensions(): array {
-		$free_extensions = apply_filters( 'wpo_ips_free_extensions', array(
-			'woocommerce-pdf-ips-barcode-font/woocommerce-pdf-ips-barcode-font.php',
-			'woocommerce-pdf-ips-mpdf/wcpdf-mpdf.php',
-			'woocommerce-pdf-ips-mpdf-cjk/woocommerce-pdf-ips-cjk.php',
-			'woocommerce-pdf-ips-cancelled-credit-notes/woocommerce-pdf-ips-cancelled-credit-notes.php',
-			'woocommerce-pdf-ips-csv-exporter/woocommerce-pdf-ips-csv-exporter.php',
-			'woocommerce-pdf-ips-custom-font/woocommerce-pdf-ips-custom-font.php',
-			'woocommerce-pdf-ips-thai/woocommerce-pdf-ips-thai.php',
-			'woocommerce-pdf-ips-unicode/woocommerce-pdf-ips-unicode.php',
-			'wcpdf-taxes-summary/wcpdf-taxes-summary.php',
-			'wcpdf-shipping-and-fees-item/wcpdf-shipping-item.php',
-			'wcpdf-quotation/wcpdf-quotation.php',
-		) );
+		$free_extensions = apply_filters(
+			'wpo_ips_free_extensions',
+			array(
+				'woocommerce-pdf-ips-barcode-font/woocommerce-pdf-ips-barcode-font.php',
+				'woocommerce-pdf-ips-mpdf/wcpdf-mpdf.php',
+				'woocommerce-pdf-ips-mpdf-cjk/woocommerce-pdf-ips-cjk.php',
+				'woocommerce-pdf-ips-cancelled-credit-notes/woocommerce-pdf-ips-cancelled-credit-notes.php',
+				'woocommerce-pdf-ips-csv-exporter/woocommerce-pdf-ips-csv-exporter.php',
+				'woocommerce-pdf-ips-custom-font/woocommerce-pdf-ips-custom-font.php',
+				'woocommerce-pdf-ips-thai/woocommerce-pdf-ips-thai.php',
+				'woocommerce-pdf-ips-unicode/woocommerce-pdf-ips-unicode.php',
+				'wcpdf-taxes-summary/wcpdf-taxes-summary.php',
+				'wcpdf-shipping-and-fees-item/wcpdf-shipping-item.php',
+				'wcpdf-quotation/wcpdf-quotation.php',
+			)
+		);
 
-		$plugins           = array();
-		$installed_plugins = get_plugins();
+		$plugins_data = \wpo_ips_get_plugins_data( $free_extensions );
 
-		foreach ( $free_extensions as $extension ) {
-			// Check if the plugin is installed.
-			if ( ! isset( $installed_plugins[ $extension ] ) ) {
-				continue;
-			}
-
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $extension );
-
-			if ( ! empty( $plugin_data ) ) {
-				$plugins[ $extension ] = array(
-					'name'      => $plugin_data['Name'],
-					'version'   => $plugin_data['Version'],
-					'is_active' => is_plugin_active( $extension ),
-				);
-			}
-		}
-
-		return apply_filters( 'wpo_ips_free_extensions_data', $plugins );
+		return apply_filters( 'wpo_ips_free_extensions_data', $plugins_data );
 	}
 	
 	/**
@@ -2102,41 +2080,26 @@ class SettingsDebug {
 	 * @return array
 	 */
 	private function get_multilingual_plugins(): array {
-		$multilingual_plugins = apply_filters( 'wpo_ips_multilingual_plugins', array(
-			'wpml-media-translation/plugin.php',
-			'woocommerce-multilingual/wpml-woocommerce.php',
-			'sitepress-multilingual-cms/sitepress.php',
-			'wpml-string-translation/plugin.php',
-			'polylang/polylang.php',
-			'polylang-wc/polylang-wc.php',
-			'polylang-pro/polylang.php',
-			'translatepress-multilingual/index.php',
-			'weglot/weglot.php',
-			'gtranslate/gtranslate.php',
-			'loco-translate/loco.php',
-		) );
+		$multilingual_plugins = apply_filters(
+			'wpo_ips_multilingual_plugins',
+			array(
+				'wpml-media-translation/plugin.php',
+				'woocommerce-multilingual/wpml-woocommerce.php',
+				'sitepress-multilingual-cms/sitepress.php',
+				'wpml-string-translation/plugin.php',
+				'polylang/polylang.php',
+				'polylang-wc/polylang-wc.php',
+				'polylang-pro/polylang.php',
+				'translatepress-multilingual/index.php',
+				'weglot/weglot.php',
+				'gtranslate/gtranslate.php',
+				'loco-translate/loco.php',
+			)
+		);
 		
-		$plugins           = array();
-		$installed_plugins = get_plugins();
+		$plugins_data = \wpo_ips_get_plugins_data( $multilingual_plugins );
 
-		foreach ( $multilingual_plugins as $extension ) {
-			// Check if the plugin is installed.
-			if ( ! isset( $installed_plugins[ $extension ] ) ) {
-				continue;
-			}
-
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $extension );
-
-			if ( ! empty( $plugin_data ) ) {
-				$plugins[ $extension ] = array(
-					'name'      => $plugin_data['Name'],
-					'version'   => $plugin_data['Version'],
-					'is_active' => is_plugin_active( $extension ),
-				);
-			}
-		}
-
-		return apply_filters( 'wpo_ips_multilingual_plugins_data', $plugins );
+		return apply_filters( 'wpo_ips_multilingual_plugins_data', $plugins_data );
 	}
 	
 	/**

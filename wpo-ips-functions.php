@@ -1987,3 +1987,33 @@ function wpo_ips_format_report_setting_value( $value ): string {
 	// Numbers and everything else
 	return esc_html( (string) $value );
 }
+
+/**
+ * Build plugin data array from a list of plugin file paths.
+ *
+ * @param array $plugin_files Array of plugin file paths (e.g., 'plugin-folder/plugin-file.php').
+ * @return array
+ */
+function wpo_ips_get_plugins_data( array $plugin_files ): array {
+	$plugins           = array();
+	$installed_plugins = get_plugins();
+
+	foreach ( $plugin_files as $plugin_file ) {
+		// Check if the plugin is installed.
+		if ( ! isset( $installed_plugins[ $plugin_file ] ) ) {
+			continue;
+		}
+
+		$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $plugin_file );
+
+		if ( ! empty( $plugin_data ) ) {
+			$plugins[ $plugin_file ] = array(
+				'name'      => $plugin_data['Name'],
+				'version'   => $plugin_data['Version'],
+				'is_active' => is_plugin_active( $plugin_file ),
+			);
+		}
+	}
+
+	return $plugins;
+}
