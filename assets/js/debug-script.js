@@ -1,9 +1,16 @@
 jQuery( function( $ ) {
 
 	$( '#debug-tools .tool' ).on( 'click', 'input[type="submit"]', function( e ) {
+		let $form = $( this ).closest( 'form' );
+		let tool  = $form.find( 'input[name="debug_tool"]' ).val();
+
+		// Let plugin_report submit normally so the browser handles the file download
+		if ( 'plugin_report' === tool ) {
+			return; // no preventDefault, no AJAX
+		}
+
 		e.preventDefault();
-		let $form    = $( this ).closest( 'form' );
-		let tool     = $form.find( 'input[name="debug_tool"]' ).val();
+
 		let formData = new FormData( $form[0] );
 		formData.append( 'action', 'wpo_wcpdf_debug_tools' );
 		formData.append( 'nonce', wpo_wcpdf_debug.nonce );

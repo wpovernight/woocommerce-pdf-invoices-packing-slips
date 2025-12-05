@@ -43,12 +43,12 @@ class Settings {
 	}
 
 	public function __construct() {
-		$this->callbacks        = SettingsCallbacks::instance();
-		$this->general          = SettingsGeneral::instance();
-		$this->documents        = SettingsDocuments::instance();
-		$this->debug            = SettingsDebug::instance();
-		$this->edi              = SettingsEDI::instance();
-		$this->upgrade          = SettingsUpgrade::instance();
+		$this->callbacks = SettingsCallbacks::instance();
+		$this->general   = SettingsGeneral::instance();
+		$this->documents = SettingsDocuments::instance();
+		$this->debug     = SettingsDebug::instance();
+		$this->edi       = SettingsEDI::instance();
+		$this->upgrade   = SettingsUpgrade::instance();
 
 		$this->load_settings();
 
