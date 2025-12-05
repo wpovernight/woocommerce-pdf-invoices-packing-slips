@@ -1188,6 +1188,7 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_vat_id',        // Germanized Pro
 		'_shipping_vat_id',       // Germanized Pro (alternative)
 		'_billing_dic',           // EU/UK VAT Manager for WooCommerce
+		'_billing_eu_vat',        // WooCommerce Eu Vat & B2B (WCEV)
 	), $order );
 
 	$vat_number = null;
