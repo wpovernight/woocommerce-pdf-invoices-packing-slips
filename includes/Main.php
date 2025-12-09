@@ -611,12 +611,22 @@ class Main {
 	 */
 	private function load_template_functions() {
 		$template_path = '';
+
 		if ( isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) && ! empty( $_POST['data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			// parse form data
 			parse_str( wp_unslash( $_POST['data'] ), $form_data ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-			
-			$form_data     = stripslashes_deep( $form_data );
-			$template_path = sanitize_text_field( $form_data['wpo_wcpdf_settings_general']['template_path'] ?? '' );
+
+			$form_data   = stripslashes_deep( $form_data );
+			$selected_id = sanitize_text_field( $form_data['wpo_wcpdf_settings_general']['template_path'] ?? '' );
+
+			// only allow template ids that exist in our installed templates list
+			$installed_templates = array_keys( WPO_WCPDF()->settings->get_installed_templates_list() );
+			if ( in_array( $selected_id, $installed_templates, true ) ) {
+				$template_path = $selected_id;
+			} else {
+				// invalid or tampered value: fall back to default
+				$template_path = '';
+			}
 		}
 
 		$file = trailingslashit( WPO_WCPDF()->settings->get_template_path( $template_path ) ) . 'template-functions.php';
