@@ -623,9 +623,6 @@ class Main {
 			$installed_templates = array_keys( WPO_WCPDF()->settings->get_installed_templates_list() );
 			if ( in_array( $selected_id, $installed_templates, true ) ) {
 				$template_path = $selected_id;
-			} else {
-				// invalid or tampered value: fall back to default
-				$template_path = '';
 			}
 		}
 
