@@ -112,7 +112,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - New: Added WooCommerce and WordPress minimum version requirements to the system requirements table
 - New: Introduced an ink-saving mode option for the Simple template
 - New: Added support for the VAT Number meta key from the WooCommerce EU VAT & B2B plugin
-- Tweak: Sanitize `template_path` input in `load_template_functions()` to prevent unsafe path usage
+- Tweak: Validate `template_path` against installed templates list in `load_template_functions()`
 - Tweak: Moved description output before custom field rendering in the settings `select()` callback
 - Fix: Remove XML documents from settings export (no longer supported)
 - Fix: Updated documentation link in the E-Documents Tax Classification page
