@@ -1178,6 +1178,11 @@ class SettingsDebug {
 		$debug_settings    = WPO_WCPDF()->settings->debug_settings;
 		$filesystem_method = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' );
 		$filesystem_method = 'wp' === $filesystem_method && function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : $filesystem_method;
+		
+		// WP + Woo
+		$wp_version        = get_bloginfo( 'version' );
+		$woo_version       = defined( 'WC_VERSION' ) ? WC_VERSION : null;
+		$woo_hpos_enabled  = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled();
 
 		// WP + Woo
 		$wp_version        = get_bloginfo( 'version' );
