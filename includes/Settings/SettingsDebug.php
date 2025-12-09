@@ -800,15 +800,7 @@ class SettingsDebug {
 				$title = $document_title;
 			}
 
-			foreach ( $document->output_formats as $output_format ) {
-				$slug = $document->get_type();
-				
-				if ( 'pdf' !== $output_format ) {
-					$slug .= "_{$output_format}";
-				}
-				
-				$setting_types[ $slug ] = strtoupper( $output_format ) . ' ' .  $title;
-			}
+			$setting_types[ $document->get_type() ] = $title;
 		}
 
 		return apply_filters( 'wpo_wcpdf_setting_types', $setting_types );
@@ -1184,6 +1176,11 @@ class SettingsDebug {
 		$debug_settings    = WPO_WCPDF()->settings->debug_settings;
 		$filesystem_method = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' );
 		$filesystem_method = 'wp' === $filesystem_method && function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : $filesystem_method;
+		
+		// WP + Woo
+		$wp_version        = get_bloginfo( 'version' );
+		$woo_version       = defined( 'WC_VERSION' ) ? WC_VERSION : null;
+		$woo_hpos_enabled  = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled();
 
 		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
@@ -1200,8 +1197,35 @@ class SettingsDebug {
 		$fileinfo          = extension_loaded( 'fileinfo' );
 
 		$server_configs = array(
+			'WordPress version' => array(
+				'required' => sprintf(
+					/* translators: %s dependency min version */
+					__( '%s or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+					WPO_WCPDF()->version_wp
+				),
+				'value'    => $wp_version,
+				'result'   => WPO_WCPDF()->is_dependency_version_supported( 'wp' ),
+			),
+			'WooCommerce version' => array(
+				'required' => sprintf(
+					/* translators: %s dependency min version */
+					__( '%s or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+					WPO_WCPDF()->version_woo
+				),
+				'value'    => $woo_version,
+				'result'   => WPO_WCPDF()->is_dependency_version_supported( 'woo' ),
+			),
+			'WooCommerce HPOS' => array(
+				'required' => __( 'Recommended', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => $woo_hpos_enabled ? __( 'Enabled', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Disabled', 'woocommerce-pdf-invoices-packing-slips' ),
+				'result'   => true,
+			),
 			'PHP version' => array(
-				'required' => __( '7.4 or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+				'required' => sprintf(
+					/* translators: %s dependency min version */
+					__( '%s or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+					WPO_WCPDF()->version_php
+				),
 				'value'    => PHP_VERSION,
 				'result'   => WPO_WCPDF()->is_dependency_version_supported( 'php' ),
 			),
