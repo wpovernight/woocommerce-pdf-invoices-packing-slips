@@ -756,10 +756,14 @@ class Frontend {
 	/**
 	 * Display EDI Peppol fields on the Classic Checkout page.
 	 *
-	 * @param array $fields Checkout fields.
+	 * @param mixed $fields Checkout fields.
 	 * @return array Modified checkout fields with Peppol fields added.
 	 */
-	public function edi_peppol_display_classic_checkout_fields( array $fields ): array {
+	public function edi_peppol_display_classic_checkout_fields( $fields ): array {
+		if ( ! is_array( $fields ) ) {
+			$fields = array();
+		}
+	
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return $fields;
 		}
