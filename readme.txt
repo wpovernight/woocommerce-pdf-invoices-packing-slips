@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 5.2.0-rc.2
+Stable tag: 5.2.1-i1374.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,20 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.2.0 (2025-12-09) =
+- New: Added WooCommerce and WordPress minimum version requirements to the system requirements table
+- New: Introduced an ink-saving mode option for the Simple template
+- New: Added support for the VAT Number meta key from the WooCommerce EU VAT & B2B plugin
+- Tweak: Validate `template_path` against installed templates list in `load_template_functions()`
+- Tweak: Moved description output before custom field rendering in the settings `select()` callback
+- Fix: Remove XML documents from settings export (no longer supported)
+- Fix: Updated documentation link in the E-Documents Tax Classification page
+- Fix: Prevented fatal error during checkout validation when hook arguments are invalid
+- Fix: Resolved fatal error caused by an invalid option type when loading debug settings
+- Fix: Added fallback for `wc_string_to_bool()` in `unstable_option_announcement_notice()` to prevent a fatal error when WooCommerce is inactive
+- Fix: Header logo not displaying when using remote image URLs
+- Translations: Updated translation template (POT)
 
 = 5.1.0 (2025-11-25) =
 - New: Add setting to validate customer Peppol Endpoint ID during checkout

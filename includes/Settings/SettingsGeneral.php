@@ -84,7 +84,7 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
-					'options_callback' => array( $this, 'get_installed_templates_list' ),
+					'options_callback' => array( WPO_WCPDF()->settings, 'get_installed_templates_list' ),
 					'description'      => sprintf(
 						/* translators: 1: plugin template path, 2: theme template path */
 						_n(
@@ -540,37 +540,6 @@ class SettingsGeneral {
 				}
 			}
 		}
-	}
-
-	public function get_installed_templates_list() {
-		$installed_templates = WPO_WCPDF()->settings->get_installed_templates();
-		$template_list = array();
-		foreach ( $installed_templates as $path => $template_id ) {
-			$template_name = basename( $template_id );
-			$group         = dirname( $template_id );
-
-			// check if this is an extension template
-			if ( false !== strpos( $group, 'extension::' ) ) {
-				$extension = explode( '::', $group );
-				$group     = 'extension';
-			}
-
-			switch ( $group ) {
-				case 'default':
-				case 'premium_plugin':
-					// no suffix
-					break;
-				case 'extension':
-					$template_name = sprintf( '%s (%s) [%s]', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ), $extension[1] );
-					break;
-				case 'theme':
-				default:
-					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
-					break;
-			}
-			$template_list[ $template_id ] = $template_name;
-		}
-		return $template_list;
 	}
 
 	/**
