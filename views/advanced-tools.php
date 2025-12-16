@@ -6,17 +6,19 @@
 		<!-- plugin_report -->
 		<div class="tool plugin-report">
 			<h4><span class="dashicons dashicons-sos"></span><?php esc_html_e( 'Download plugin report', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+
 			<p><?php printf(
 				/* translators: support email link */
 				esc_html__( 'Download a report with plugin, environment, and store information that you can attach to support requests made to %s.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'<a href="mailto:support@wpovernight.com">support@wpovernight.com</a>'
 			); ?></p>
 
-			<p><?php printf(
-				/* translators: %s: plugin link */
-				wp_kses_post( __( 'If you prefer, you can also create a temporary login link for our support team using the free plugin %s.', 'woocommerce-pdf-invoices-packing-slips' ) ),
-				'<a href="https://wordpress.org/plugins/temporary-login-without-password/" target="_blank" rel="noopener noreferrer"><strong>Temporary Login Without Password</strong></a>'
-			); ?></p>
+			<p>
+				<label>
+					<input type="checkbox" id="wpo_ips_include_sensitive" />
+					<?php esc_html_e( 'Include sensitive data in the report (license keys, logs, user name and email).', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</label>
+			</p>
 
 			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-ajax.php?action=wpo_ips_plugin_report' ), 'wpo_ips_plugin_report', 'nonce' ) ); ?>" class="button button-primary">
 				<?php esc_html_e( 'Download report', 'woocommerce-pdf-invoices-packing-slips' ); ?>

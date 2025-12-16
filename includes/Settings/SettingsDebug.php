@@ -1990,6 +1990,10 @@ class SettingsDebug {
 		}
 
 		check_ajax_referer( 'wpo_ips_plugin_report', 'nonce' );
+		
+		$include_sensitive    = isset( $_GET['include_sensitive'] )
+			? filter_var( wp_unslash( $_GET['include_sensitive'] ), FILTER_VALIDATE_BOOLEAN )
+			: false;
 	
 		$report_title         = 'PDF Invoices & Packing Slips for WooCommerce - Report';
 		$premium_plugins      = $this->get_premium_plugins();
@@ -2113,7 +2117,7 @@ class SettingsDebug {
 	 * @param int $limit Number of lines per log file.
 	 * @return array
 	 */
-	protected function get_recent_logs( int $limit = 200 ): array {
+	protected function get_recent_logs( int $limit = 100 ): array {
 		if ( ! defined( 'WC_LOG_DIR' ) || ! is_dir( WC_LOG_DIR ) ) {
 			return array();
 		}

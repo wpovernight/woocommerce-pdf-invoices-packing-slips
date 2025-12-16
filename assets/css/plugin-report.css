@@ -180,6 +180,13 @@ table {
 	min-width: 46px;
 }
 
+/* Log Output */
+.log-output {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+}
+
 /* Footer */
 .footer {
 	margin-top: 15px;
