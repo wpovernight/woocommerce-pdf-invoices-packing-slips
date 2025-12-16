@@ -1183,11 +1183,6 @@ class SettingsDebug {
 		$wp_version        = get_bloginfo( 'version' );
 		$woo_version       = defined( 'WC_VERSION' ) ? WC_VERSION : null;
 		$woo_hpos_enabled  = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled();
-
-		// WP + Woo
-		$wp_version        = get_bloginfo( 'version' );
-		$woo_version       = defined( 'WC_VERSION' ) ? WC_VERSION : null;
-		$woo_hpos_enabled  = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled();
 		
 		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
@@ -2002,9 +1997,9 @@ class SettingsDebug {
 		$plugin_version       = \WPO_WCPDF()->version;
 		$store_url            = get_site_url();
 		$report_date          = gmdate( 'Y-m-d H:i:s' );
-		$report_user          = wp_get_current_user();
+		$report_user          = $include_sensitive ? wp_get_current_user() : null;
 		$server_configs       = $this->get_server_config();
-		$dir_permissions      = $this->get_directory_permissions();
+		$dir_permissions      = $include_sensitive ? $this->get_directory_permissions() : array();
 		$yearly_reset         = $this->get_yearly_reset_schedule();
 		
 		// Load CSS file contents
@@ -2031,10 +2026,10 @@ class SettingsDebug {
 		}
 		
 		// Logs
-		$logs_data = $this->get_recent_logs();
+		$logs_data = $include_sensitive ? $this->get_recent_logs() : array();
 		
 		// Extensions Settings
-		$extensions_settings = apply_filters( 'wpo_ips_get_extensions_settings_for_report', array() );
+		$extensions_settings = apply_filters( 'wpo_ips_get_extensions_settings_for_report', array(), $include_sensitive );
 		
 		ob_start();
 		include \WPO_WCPDF()->plugin_path() . '/views/plugin-report.php';

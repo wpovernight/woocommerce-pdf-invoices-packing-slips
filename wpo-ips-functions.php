@@ -1946,7 +1946,7 @@ function wpo_ips_format_report_setting_value( $value ): string {
 				$html .= '<div class="config-required"><strong>Required:</strong> ' . $value['required'] . '</div>';
 			}
 
-			if ( isset( $value['value'] ) && '' !== $value['value'] && null !== $value['value'] ) {
+			if ( isset( $value['value'] ) && '' !== $value['value'] ) {
 				$html .= '<div class="config-value"><strong>Value:</strong> ' . wpo_ips_format_report_setting_value( $value['value'] ) . '</div>';
 			}
 
