@@ -1989,6 +1989,9 @@ class SettingsDebug {
 		$include_sensitive    = isset( $_GET['include_sensitive'] )
 			? filter_var( wp_unslash( $_GET['include_sensitive'] ), FILTER_VALIDATE_BOOLEAN )
 			: false;
+		$output_html          = isset( $_GET['output_html'] )
+			? filter_var( wp_unslash( $_GET['output_html'] ), FILTER_VALIDATE_BOOLEAN )
+			: false;
 	
 		$report_title         = 'PDF Invoices & Packing Slips for WooCommerce - Report';
 		$premium_plugins      = $this->get_premium_plugins();
@@ -2034,6 +2037,11 @@ class SettingsDebug {
 		ob_start();
 		include \WPO_WCPDF()->plugin_path() . '/views/plugin-report.php';
 		$report_html = ob_get_clean();
+		
+		if ( $output_html ) {
+			echo $report_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			die();
+		}
 
 		$pdf_settings = array(
 			'paper_size'		=> 'A4',

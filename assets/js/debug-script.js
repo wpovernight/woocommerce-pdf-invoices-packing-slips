@@ -86,11 +86,12 @@ jQuery( function( $ ) {
 		}
 	}
 	
-	// plugin report confirm when including sensitive data
+	// plugin report confirm when including sensitive data or outputting html
 	$( '#debug-tools .tool.plugin-report' ).on( 'click', 'a.button', function( e ) {
 		let $button            = $( this );
 		let $tool              = $button.closest( '.tool' );
 		let $include_sensitive = $tool.find( '#wpo_ips_include_sensitive' );
+		let $output_html       = $tool.find( '#wpo_ips_output_html' );
 		let base_href          = $button.data( 'base-href' );
 
 		if ( ! base_href ) {
@@ -98,20 +99,27 @@ jQuery( function( $ ) {
 			$button.data( 'base-href', base_href );
 		}
 
+		let href = base_href;
+
 		if ( $include_sensitive.length && true === $include_sensitive.prop( 'checked' ) ) {
 			if ( ! window.confirm( wpo_wcpdf_debug.confirm_plugin_report_sensitive ) ) {
 				e.preventDefault();
 				return false;
 			}
 
-			let href = base_href;
 			href += ( href.indexOf( '?' ) === -1 ) ? '?' : '&';
 			href += 'include_sensitive=1';
-
-			$button.attr( 'href', href );
-		} else {
-			$button.attr( 'href', base_href );
 		}
+
+		if ( $output_html.length && true === $output_html.prop( 'checked' ) ) {
+			href += ( href.indexOf( '?' ) === -1 ) ? '?' : '&';
+			href += 'output_html=1';
+			$button.attr( 'target', '_blank' );
+		} else {
+			$button.removeAttr( 'target' );
+		}
+
+		$button.attr( 'href', href );
 	} );
 
 	// toggle custom redirect page
