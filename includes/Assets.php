@@ -294,13 +294,14 @@ class Assets {
 					'wpo-wcpdf-debug',
 					'wpo_wcpdf_debug',
 					array(
-						'ajaxurl'              => admin_url( 'admin-ajax.php' ),
-						'nonce'                => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
-						'download_label'       => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
-						'confirm_reset'        => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'select_document_type' => __( 'Please select a document type', 'woocommerce-pdf-invoices-packing-slips' ),
-						'forbidden'            => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'danger_zone'          => array(
+						'ajaxurl'                         => admin_url( 'admin-ajax.php' ),
+						'nonce'                           => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
+						'download_label'                  => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
+						'confirm_reset'                   => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'select_document_type'            => __( 'Please select a document type', 'woocommerce-pdf-invoices-packing-slips' ),
+						'forbidden'                       => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'confirm_plugin_report_sensitive' => __( 'The report may contain sensitive data such as license keys and log contents. Are you sure you want to include this information?', 'woocommerce-pdf-invoices-packing-slips' ),
+						'danger_zone'                     => array(
 							'enabled' => isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ? true : false,
 							'message' => sprintf(
 								/* translators: 1. open anchor tag, 2. close anchor tag */

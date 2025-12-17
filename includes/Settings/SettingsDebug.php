@@ -35,6 +35,8 @@ class SettingsDebug {
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
+		
+		add_action( 'wp_ajax_wpo_ips_plugin_report', array( $this, 'ajax_plugin_report' ) );
 	}
 
 	/**
@@ -1181,7 +1183,7 @@ class SettingsDebug {
 		$wp_version        = get_bloginfo( 'version' );
 		$woo_version       = defined( 'WC_VERSION' ) ? WC_VERSION : null;
 		$woo_hpos_enabled  = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled();
-
+		
 		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
 		$gmagick           = extension_loaded( 'gmagick' );
@@ -1422,30 +1424,26 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_premium_plugins(): array {
-		$premium_plugins = apply_filters( 'wpo_wcpdf_premium_plugins', array(
-			'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php',
-			'woocommerce-pdf-ips-templates/woocommerce-pdf-ips-templates.php',
-		) );
+		$premium_plugins = apply_filters(
+			'wpo_wcpdf_premium_plugins',
+			array(
+				'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php'             => 'wpo_wcpdf_pro_license',
+				'woocommerce-pdf-ips-templates/woocommerce-pdf-ips-templates.php' => 'wpo_wcpdf_templates_license',
+			)
+		);
 
-		$plugins = array();
-		$installed_plugins = get_plugins();
+		// Get base data (name, version, is_active)
+		$plugin_files = array_keys( $premium_plugins );
+		$plugins      = wpo_ips_get_plugins_data( $plugin_files );
 
-		foreach ( $premium_plugins as $premium_plugin ) {
-			// Check if the plugin is installed.
-			if ( ! isset( $installed_plugins[ $premium_plugin ] ) ) {
-				continue;
-			}
+		// Add license keys
+		$licenses = get_option( 'wpocore_settings', array() );
 
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $premium_plugin );
-
-			if ( ! empty( $plugin_data ) ) {
-				$plugins[ $premium_plugin ] = array(
-					'name'      => $plugin_data['Name'],
-					'version'   => $plugin_data['Version'],
-					'is_active' => is_plugin_active( $premium_plugin ),
-				);
-			}
+		foreach ( $plugins as $plugin_file => &$data ) {
+			$license_slug        = $premium_plugins[ $plugin_file ] ?? '';
+			$data['license_key'] = $license_slug && isset( $licenses[ $license_slug ] ) ? $licenses[ $license_slug ] : '';
 		}
+		unset( $data ); // break the reference
 
 		return apply_filters( 'wpo_wcpdf_premium_plugins_data', $plugins );
 	}
@@ -1974,6 +1972,202 @@ class SettingsDebug {
 	 */
 	public function run_unstable_version_check(): void {
 		wpo_wcpdf_get_latest_releases_from_github();
+	}
+	
+	/**
+	 * Generate and download the plugin report as a PDF.
+	 *
+	 * @return void
+	 */
+	public function ajax_plugin_report(): void {
+		if ( ! \WPO_WCPDF()->settings->user_can_manage_settings() ) {
+			wp_die( __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
+		check_ajax_referer( 'wpo_ips_plugin_report', 'nonce' );
+		
+		$include_sensitive    = isset( $_GET['include_sensitive'] )
+			? filter_var( wp_unslash( $_GET['include_sensitive'] ), FILTER_VALIDATE_BOOLEAN )
+			: false;
+		$output_html          = isset( $_GET['output_html'] )
+			? filter_var( wp_unslash( $_GET['output_html'] ), FILTER_VALIDATE_BOOLEAN )
+			: false;
+	
+		$report_title         = 'PDF Invoices & Packing Slips for WooCommerce - Report';
+		$premium_plugins      = $this->get_premium_plugins();
+		$free_extensions      = $this->get_free_extensions();
+		$multilingual_plugins = $this->get_multilingual_plugins();
+		$plugin_version       = \WPO_WCPDF()->version;
+		$store_url            = get_site_url();
+		$report_date          = gmdate( 'Y-m-d H:i:s' );
+		$report_user          = $include_sensitive ? wp_get_current_user() : null;
+		$server_configs       = $this->get_server_config();
+		$dir_permissions      = $include_sensitive ? $this->get_directory_permissions() : array();
+		$yearly_reset         = $this->get_yearly_reset_schedule();
+		
+		// Load CSS file contents
+		$report_css = '';
+		$suffix     = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$css_path   = \WPO_WCPDF()->plugin_path() . '/assets/css/plugin-report' . $suffix . '.css';
+
+		if ( \WPO_WCPDF()->file_system->exists( $css_path ) && \WPO_WCPDF()->file_system->is_readable( $css_path ) ) {
+			$report_css = \WPO_WCPDF()->file_system->get_contents( $css_path );
+		}
+		
+		// Load Settings
+		$general_settings   = get_option( 'wpo_wcpdf_settings_general', array() );
+		$debug_settings     = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$edi_settings       = get_option( 'wpo_ips_edi_settings', array() );
+		$documents_settings = array();
+		
+		$all_documents = \WPO_WCPDF()->documents->get_documents( 'all' );
+		if ( ! empty( $all_documents ) ) {
+			foreach ( $all_documents as $document ) {
+				$document_type                        = $document->get_type();
+				$documents_settings[ $document_type ] = \WPO_WCPDF()->settings->get_document_settings( $document_type, 'pdf' );
+			}
+		}
+		
+		// Logs
+		$logs_data = $include_sensitive ? $this->get_recent_logs() : array();
+		
+		// Extensions Settings
+		$extensions_settings = apply_filters( 'wpo_ips_get_extensions_settings_for_report', array(), $include_sensitive );
+		
+		ob_start();
+		include \WPO_WCPDF()->plugin_path() . '/views/plugin-report.php';
+		$report_html = ob_get_clean();
+		
+		if ( $output_html ) {
+			echo $report_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			die();
+		}
+
+		$pdf_settings = array(
+			'paper_size'		=> 'A4',
+			'paper_orientation'	=> 'portrait',
+			'font_subsetting'	=> false,
+		);
+		$pdf_maker = \wcpdf_get_pdf_maker( $report_html, $pdf_settings, $this );
+		$pdf       = $pdf_maker->output();
+		
+		$filename  = 'plugin-report-' . gmdate( 'Y-m-d' ) . '.pdf';
+		
+		\wcpdf_pdf_headers( $filename, 'download', $pdf );
+		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit();
+	}
+	
+	/**
+	 * Get the premium plugins data.
+	 *
+	 * @return array
+	 */
+	private function get_free_extensions(): array {
+		$free_extensions = apply_filters(
+			'wpo_ips_free_extensions',
+			array(
+				'woocommerce-pdf-ips-barcode-font/woocommerce-pdf-ips-barcode-font.php',
+				'woocommerce-pdf-ips-mpdf/wcpdf-mpdf.php',
+				'woocommerce-pdf-ips-mpdf-cjk/woocommerce-pdf-ips-cjk.php',
+				'woocommerce-pdf-ips-cancelled-credit-notes/woocommerce-pdf-ips-cancelled-credit-notes.php',
+				'woocommerce-pdf-ips-csv-exporter/woocommerce-pdf-ips-csv-exporter.php',
+				'woocommerce-pdf-ips-custom-font/woocommerce-pdf-ips-custom-font.php',
+				'woocommerce-pdf-ips-thai/woocommerce-pdf-ips-thai.php',
+				'woocommerce-pdf-ips-unicode/woocommerce-pdf-ips-unicode.php',
+				'wcpdf-taxes-summary/wcpdf-taxes-summary.php',
+				'wcpdf-shipping-and-fees-item/wcpdf-shipping-item.php',
+				'wcpdf-quotation/wcpdf-quotation.php',
+			)
+		);
+
+		$plugins_data = \wpo_ips_get_plugins_data( $free_extensions );
+
+		return apply_filters( 'wpo_ips_free_extensions_data', $plugins_data );
+	}
+	
+	/**
+	 * Get multilingual plugins data.
+	 *
+	 * @return array
+	 */
+	private function get_multilingual_plugins(): array {
+		$multilingual_plugins = apply_filters(
+			'wpo_ips_multilingual_plugins',
+			array(
+				'wpml-media-translation/plugin.php',
+				'woocommerce-multilingual/wpml-woocommerce.php',
+				'sitepress-multilingual-cms/sitepress.php',
+				'wpml-string-translation/plugin.php',
+				'polylang/polylang.php',
+				'polylang-wc/polylang-wc.php',
+				'polylang-pro/polylang.php',
+				'translatepress-multilingual/index.php',
+				'weglot/weglot.php',
+				'gtranslate/gtranslate.php',
+				'loco-translate/loco.php',
+			)
+		);
+		
+		$plugins_data = \wpo_ips_get_plugins_data( $multilingual_plugins );
+
+		return apply_filters( 'wpo_ips_multilingual_plugins_data', $plugins_data );
+	}
+	
+	/**
+	 * Get recent log excerpts for key handles.
+	 *
+	 * @param int $limit Number of lines per log file.
+	 * @return array
+	 */
+	protected function get_recent_logs( int $limit = 100 ): array {
+		if ( ! defined( 'WC_LOG_DIR' ) || ! is_dir( WC_LOG_DIR ) ) {
+			return array();
+		}
+
+		$handles = apply_filters( 'wpo_ips_log_handles', array(
+			'fatal-errors',
+			'wpo-wcpdf',
+			'wpo-ips-edi',
+			'wpo-ips-semaphore',
+		) );
+
+		$results = array();
+
+		foreach ( $handles as $handle ) {
+			$pattern = trailingslashit( WC_LOG_DIR ) . $handle . '-*.log';
+			$files   = glob( $pattern );
+
+			if ( empty( $files ) ) {
+				continue;
+			}
+
+			usort(
+				$files,
+				static function ( $a, $b ) {
+					return filemtime( $b ) <=> filemtime( $a );
+				}
+			);
+
+			$file  = $files[0];
+			$lines = @file( $file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
+
+			if ( ! is_array( $lines ) ) {
+				continue;
+			}
+
+			$total_lines = count( $lines );
+			if ( $limit > 0 && $total_lines > $limit ) {
+				$lines = array_slice( $lines, -$limit );
+			}
+
+			$results[ $handle ] = array(
+				'file'  => basename( $file ),
+				'lines' => $lines,
+			);
+		}
+
+		return $results;
 	}
 
 }

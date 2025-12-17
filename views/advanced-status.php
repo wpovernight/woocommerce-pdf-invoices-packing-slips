@@ -4,6 +4,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
+<div id="debug-tools">
+	<div class="wrapper">
+		<?php do_action( 'wpo_wcpdf_before_debug_tools', $this ); ?>
+		<!-- plugin_report -->
+		<div class="tool plugin-report">
+			<h4><span class="dashicons dashicons-sos"></span><?php esc_html_e( 'Download plugin report', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+
+			<p><?php printf(
+				/* translators: support email link */
+				esc_html__( 'Download a report with plugin, environment, and store information that you can attach to support requests made to %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<a href="mailto:support@wpovernight.com">support@wpovernight.com</a>'
+			); ?></p>
+
+			<p>
+				<label>
+					<input type="checkbox" id="wpo_ips_include_sensitive" />
+					<?php esc_html_e( 'Include sensitive data in the report (license keys, logs, user name and email, directory permissions).', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</label>
+			</p>
+
+			<p>
+				<label>
+					<input type="checkbox" id="wpo_ips_output_html" />
+					<?php esc_html_e( 'Output report as HTML instead of PDF.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</label>
+			</p>
+
+			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-ajax.php?action=wpo_ips_plugin_report' ), 'wpo_ips_plugin_report', 'nonce' ) ); ?>" class="button button-primary">
+				<?php esc_html_e( 'Download report', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</a>
+		</div>
+		<!-- /plugin_report -->
+	</div>
+</div>
+
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
 	<caption><?php esc_html_e( 'Installed Plugin Versions', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
 	<thead>
