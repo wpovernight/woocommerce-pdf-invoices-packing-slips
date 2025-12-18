@@ -95,7 +95,6 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 		$billing_company   = $order->get_billing_company();
 		$billing_name      = $order->get_formatted_billing_full_name();
 		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
-		$identifier        = $this->get_legal_identifier();
 
 		if ( empty( $registration_name ) ) {
 			wpo_ips_edi_log(
@@ -108,32 +107,37 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			return null;
 		}
 
-		if ( empty( $identifier['identifier'] ) || empty( $identifier['identifier_icd'] ) ) {
+		$values = array(
+			array(
+				'name'  => 'cbc:RegistrationName',
+				'value' => wpo_ips_edi_sanitize_string( $registration_name ),
+			),
+		);
+
+		$identifier = $this->get_legal_identifier();
+
+		// CompanyID is optional: add only when we have both identifier + scheme.
+		if ( ! empty( $identifier['identifier'] ) && ! empty( $identifier['identifier_icd'] ) ) {
+			$values[] = array(
+				'name'       => 'cbc:CompanyID',
+				'value'      => $identifier['identifier'],
+				'attributes' => array(
+					'schemeID' => $identifier['identifier_icd'],
+				),
+			);
+		} else {
 			wpo_ips_edi_log(
 				sprintf(
-					'UBL/Peppol PartyLegalEntity: Customer identifier is missing for customer in order ID %d.',
+					'UBL/Peppol PartyLegalEntity: Customer identifier missing (CompanyID omitted) for order ID %d.',
 					$this->document->order->get_id()
 				),
-				'error'
+				'notice'
 			);
-			return null;
 		}
 
 		$party_legal_entity = array(
 			'name'  => 'cac:PartyLegalEntity',
-			'value' => array(
-				array(
-					'name'  => 'cbc:RegistrationName',
-					'value' => wpo_ips_edi_sanitize_string( $registration_name ),
-				),
-				array(
-					'name'       => 'cbc:CompanyID',
-					'value'      => $identifier['identifier'],
-					'attributes' => array(
-						'schemeID' => $identifier['identifier_icd'],
-					),
-				),
-			),
+			'value' => $values,
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_customer_party_legal_entity', $party_legal_entity, $this );
