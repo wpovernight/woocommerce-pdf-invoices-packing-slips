@@ -98,27 +98,30 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			wpo_ips_edi_log( 'UBL/Peppol PartyLegalEntity: Company name is missing for supplier.', 'error' );
 			return null;
 		}
-		
-		if ( empty( $identifier['legal_identifier'] ) || empty( $identifier['legal_identifier_icd'] ) ) {
-			wpo_ips_edi_log( 'UBL/Peppol PartyLegalEntity: Legal Identifier is missing for supplier.', 'error' );
-			return null;
+
+		$values = array(
+			array(
+				'name'  => 'cbc:RegistrationName',
+				'value' => wpo_ips_edi_sanitize_string( $company ),
+			),
+		);
+
+		// CompanyID is optional here: include when available, but don't fail the invoice.
+		if ( ! empty( $identifier['legal_identifier'] ) && ! empty( $identifier['legal_identifier_icd'] ) ) {
+			$values[] = array(
+				'name'       => 'cbc:CompanyID',
+				'value'      => $identifier['legal_identifier'],
+				'attributes' => array(
+					'schemeID' => $identifier['legal_identifier_icd'],
+				),
+			);
+		} else {
+			wpo_ips_edi_log( 'UBL/Peppol PartyLegalEntity: Legal Identifier missing for supplier (CompanyID omitted).', 'warning' );
 		}
 
 		$party_legal_entity = array(
 			'name'  => 'cac:PartyLegalEntity',
-			'value' => array(
-				array(
-					'name'  => 'cbc:RegistrationName',
-					'value' => wpo_ips_edi_sanitize_string( $company ),
-				),
-				array(
-					'name'  => 'cbc:CompanyID',
-					'value' => $identifier['legal_identifier'],
-					'attributes' => array(
-						'schemeID' => $identifier['legal_identifier_icd'],
-					),
-				),
-			),
+			'value' => $values,
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_legal_entity', $party_legal_entity, $this );
