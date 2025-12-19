@@ -2053,6 +2053,11 @@ class Admin {
 				unset( $identifiers_data[ $key ] );
 			}
 		}
+		
+		// Do not display the Legal Identifier for now
+		if ( isset( $peppol_identifiers['peppol_legal_identifier'] ) ) {
+			unset( $peppol_identifiers['peppol_legal_identifier'] );
+		}
 		?>
 			<div class="edi-customer-identifiers">
 				<table class="widefat">

@@ -434,57 +434,58 @@ class Frontend {
 				</p>
 			<?php endif; ?>
 			
-			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-				<label for="peppol_legal_identifier"><?php esc_html_e( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-				<input type="text" class="woocommerce-Input input-text" name="peppol_legal_identifier" id="peppol_legal_identifier" value="<?php echo esc_attr( $legal_identifier_value ); ?>" />
+			<!-- We will hide the Legal Identifier for now, we could enable this later if we think we should display it -->
+			<!--<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+				<label for="peppol_legal_identifier"><?php //esc_html_e( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+				<input type="text" class="woocommerce-Input input-text" name="peppol_legal_identifier" id="peppol_legal_identifier" value="<?php //echo esc_attr( $legal_identifier_value ); ?>" />
 				<small>
 					<?php
-						$description = __( 'Specify the Peppol Legal Identifier.', 'woocommerce-pdf-invoices-packing-slips' );
+						// $description = __( 'Specify the Peppol Legal Identifier.', 'woocommerce-pdf-invoices-packing-slips' );
 
-						// Show example only in full mode
-						if ( 'select' !== $input_mode ) {
-							$description .= ' <em>' . esc_html__( 'Example: 0208:1234567890', 'woocommerce-pdf-invoices-packing-slips' ) . '</em>';
-						}
+						// // Show example only in full mode
+						// if ( 'select' !== $input_mode ) {
+						// 	$description .= ' <em>' . esc_html__( 'Example: 0208:1234567890', 'woocommerce-pdf-invoices-packing-slips' ) . '</em>';
+						// }
 
-						$description .= '<br>' . sprintf(
-							/* translators: %1$s: open link, %2$s: close link */
-							__( 'If you don\'t know the Identifier, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
-							'</a>'
-						);
+						// $description .= '<br>' . sprintf(
+						// 	/* translators: %1$s: open link, %2$s: close link */
+						// 	__( 'If you don\'t know the Identifier, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						// 	'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
+						// 	'</a>'
+						// );
 
-						echo wp_kses_post( $description );
+						// echo wp_kses_post( $description );
 					?>
 				</small>
-			</p>
+			</p>-->
 			
-			<?php if ( 'select' === $input_mode ) : ?>
-				<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-					<label for="peppol_legal_identifier_icd"><?php esc_html_e( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
+			<?php //if ( 'select' === $input_mode ) : ?>
+				<!--<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
+					<label for="peppol_legal_identifier_icd"><?php //esc_html_e( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 					<select name="peppol_legal_identifier_icd" id="peppol_legal_identifier_icd" class="woocommerce-Input input-select">
-						<option value=""><?php echo esc_html__( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...'; ?></option>
-						<?php foreach ( $icd_options as $code => $label ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $legal_identifier_icd, $code ); ?>>
-								<?php echo esc_html( $label ); ?>
+						<option value=""><?php //echo esc_html__( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...'; ?></option>
+						<?php //foreach ( $icd_options as $code => $label ) : ?>
+							<option value="<?php //echo esc_attr( $code ); ?>" <?php //selected( $legal_identifier_icd, $code ); ?>>
+								<?php //echo esc_html( $label ); ?>
 							</option>
-						<?php endforeach; ?>
+						<?php //endforeach; ?>
 					</select>
 					<small>
 						<?php
-							echo wp_kses_post( sprintf(
-								'%s<br>%s',
-								__( 'Specify the Peppol Legal Identifier Scheme (ICD) for the Identifier above.', 'woocommerce-pdf-invoices-packing-slips' ),
-								sprintf(
-									/* translators: %1$s: open link anchor, %2$s: close link anchor */
-									__( 'For detailed information on each Identification Code (ICD), see the %1$sofficial Peppol ICD list%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-									'<a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/ICD/" target="_blank">',
-									'</a>'
-								)
-							) );
+							// echo wp_kses_post( sprintf(
+							// 	'%s<br>%s',
+							// 	__( 'Specify the Peppol Legal Identifier Scheme (ICD) for the Identifier above.', 'woocommerce-pdf-invoices-packing-slips' ),
+							// 	sprintf(
+							// 		/* translators: %1$s: open link anchor, %2$s: close link anchor */
+							// 		__( 'For detailed information on each Identification Code (ICD), see the %1$sofficial Peppol ICD list%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+							// 		'<a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/ICD/" target="_blank">',
+							// 		'</a>'
+							// 	)
+							// ) );
 						?>
 					</small>
-				</p>
-			<?php endif; ?>
+				</p>-->
+			<?php //endif; ?>
 			
 			<p>
 				<input type="hidden" name="wc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wpo_ips_edi_user_save_peppol_settings' ) ); ?>">
