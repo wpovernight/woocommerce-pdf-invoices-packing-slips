@@ -116,9 +116,9 @@ function wcpdf_ubl_headers( $filename, $size ): void {
  * @param array              $data
  * @return void
  * 
- * @deprecated 5.4.0 Use wpo_ips_edi_maybe_save_order_peppol_data() instead.
+ * @deprecated 5.3.1 Use wpo_ips_edi_maybe_save_order_peppol_data() instead.
  */
 function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $order, array $data = array() ): void {
-	_deprecated_function( __FUNCTION__, '5.4.0', 'wpo_ips_edi_maybe_save_order_peppol_data' );
+	_deprecated_function( __FUNCTION__, '5.3.1', 'wpo_ips_edi_maybe_save_order_peppol_data' );
 	wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
 }
