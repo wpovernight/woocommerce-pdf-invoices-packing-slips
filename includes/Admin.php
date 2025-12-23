@@ -929,7 +929,7 @@ class Admin {
 		}
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
-		wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
+		wpo_ips_edi_maybe_save_order_peppol_data( $order, $values );
 
 		wp_send_json_success( array(
 			'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -2134,7 +2134,7 @@ class Admin {
 							?>
 						</tbody>
 						<tfoot>
-							<tr><td colspan="2" class="scheme-required"><?php esc_html_e( 'Both fields require a scheme (e.g. "0208:").', 'woocommerce-pdf-invoices-packing-slips' ); ?></td></tr>
+							<tr><td colspan="2" class="scheme-required"><?php esc_html_e( 'The identifier must be in "scheme:value" format (for example 0088:123456789).', 'woocommerce-pdf-invoices-packing-slips' ); ?></td></tr>
 							<tr>
 								<td colspan="2">
 									<a href="#" class="button button-primary" data-order_id="<?php echo absint( $order->get_id() ); ?>"><?php esc_html_e( 'Save', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>

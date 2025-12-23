@@ -84,8 +84,8 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
-					'options_callback' => array( $this, 'get_installed_templates_list' ),
-					'description' => sprintf(
+					'options_callback' => array( WPO_WCPDF()->settings, 'get_installed_templates_list' ),
+					'description'      => sprintf(
 						/* translators: 1: plugin template path, 2: theme template path */
 						_n(
 							'Want to use your own template? Copy the file from %1$s to your (child) theme in %2$s to customize it.',
@@ -97,6 +97,22 @@ class SettingsGeneral {
 						'<code>' . esc_html( $theme_template_path ) . '</code>'
 					) . $this->render_missing_template_files_notice( $missing_template_files ),
 				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'template_ink_saving',
+				'title'    => __( 'Ink saving mode', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => 'template_ink_saving',
+					'description'       => __( 'Apply ink-saving styles for this template, replacing dark backgrounds and colors with lighter alternatives.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[template_path]',
+						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_ink_saving_supported_templates', array( 'default/Simple' ) ) ),
+					),
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -526,37 +542,6 @@ class SettingsGeneral {
 		}
 	}
 
-	public function get_installed_templates_list() {
-		$installed_templates = WPO_WCPDF()->settings->get_installed_templates();
-		$template_list = array();
-		foreach ( $installed_templates as $path => $template_id ) {
-			$template_name = basename( $template_id );
-			$group         = dirname( $template_id );
-
-			// check if this is an extension template
-			if ( false !== strpos( $group, 'extension::' ) ) {
-				$extension = explode( '::', $group );
-				$group     = 'extension';
-			}
-
-			switch ( $group ) {
-				case 'default':
-				case 'premium_plugin':
-					// no suffix
-					break;
-				case 'extension':
-					$template_name = sprintf( '%s (%s) [%s]', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ), $extension[1] );
-					break;
-				case 'theme':
-				default:
-					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
-					break;
-			}
-			$template_list[ $template_id ] = $template_name;
-		}
-		return $template_list;
-	}
-
 	/**
 	 * Get the settings categories.
 	 *
@@ -570,6 +555,7 @@ class SettingsGeneral {
 					'download_display',
 					'paper_size',
 					'template_path',
+					'template_ink_saving',
 					'test_mode',
 				),
 			),

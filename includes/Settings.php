@@ -43,16 +43,14 @@ class Settings {
 	}
 
 	public function __construct() {
-		$this->callbacks        = SettingsCallbacks::instance();
-		$this->general          = SettingsGeneral::instance();
-		$this->documents        = SettingsDocuments::instance();
-		$this->debug            = SettingsDebug::instance();
-		$this->edi              = SettingsEDI::instance();
-		$this->upgrade          = SettingsUpgrade::instance();
+		$this->callbacks = SettingsCallbacks::instance();
+		$this->general   = SettingsGeneral::instance();
+		$this->documents = SettingsDocuments::instance();
+		$this->debug     = SettingsDebug::instance();
+		$this->edi       = SettingsEDI::instance();
+		$this->upgrade   = SettingsUpgrade::instance();
 
-		$this->general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
-		$this->edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
+		$this->load_settings();
 
 		// Settings menu item
 		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
@@ -211,10 +209,9 @@ class Settings {
 	}
 
 	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
-		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-		$close_preview  = isset( $debug_settings['disable_preview'] );
-
-		if ( $close_preview ) {
+		$this->load_settings();
+		
+		if ( isset( $this->debug_settings['disable_preview'] ) ) {
 			foreach ( $settings_tabs as $tab_key => &$tab ) {
 				if ( is_array( $tab ) && ! empty( $tab['preview_states'] ) ) {
 					$tab['preview_states'] = 1;
@@ -298,8 +295,7 @@ class Settings {
 					}
 
 					// reload settings
-					$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
-					$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
+					$this->load_settings();
 
 					do_action( 'wpo_wcpdf_preview_after_reload_settings' );
 				}
@@ -589,15 +585,58 @@ class Settings {
 		}
 		return $output_mode;
 	}
+	
+	/**
+	 * Get installed templates list as options.
+	 *
+	 * @return array
+	 */
+	public function get_installed_templates_list(): array {
+		$installed_templates = $this->get_installed_templates();
+		$template_list       = array();
+		
+		foreach ( $installed_templates as $path => $template_id ) {
+			$template_name = basename( $template_id );
+			$group         = dirname( $template_id );
 
-	public function get_template_path() {
+			// check if this is an extension template
+			if ( false !== strpos( $group, 'extension::' ) ) {
+				$extension = explode( '::', $group );
+				$group     = 'extension';
+			}
+
+			switch ( $group ) {
+				case 'default':
+				case 'premium_plugin':
+					// no suffix
+					break;
+				case 'extension':
+					$template_name = sprintf( '%s (%s) [%s]', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ), $extension[1] );
+					break;
+				case 'theme':
+				default:
+					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
+					break;
+			}
+			
+			$template_list[ $template_id ] = $template_name;
+		}
+		
+		return $template_list;
+	}
+
+	public function get_template_path( string $template_path = '' ) {
+		$selected_template = $template_path
+			? sanitize_text_field( $template_path )
+			: ( $this->general_settings['template_path'] ?? '' );
+		
 		// return default path if no template selected
-		if ( empty( $this->general_settings['template_path'] ) ) {
+		if ( empty( $selected_template ) ) {
 			return wp_normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
 		}
 
 		$installed_templates = $this->get_installed_templates();
-		$selected_template = $this->general_settings['template_path'];
+		
 		if ( in_array( $selected_template, $installed_templates ) ) {
 			return array_search( $selected_template, $installed_templates );
 		} else {
@@ -1235,6 +1274,21 @@ class Settings {
 		}
 
 		return $modified_settings_fields;
+	}
+	
+	/**
+	 * Initializes settings by loading them from the database.
+	 *
+	 * @return void
+	 */
+	private function load_settings(): void {
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
+
+		$this->general_settings = is_array( $general_settings ) ? $general_settings : array();
+		$this->debug_settings   = is_array( $debug_settings )   ? $debug_settings   : array();
+		$this->edi_settings     = is_array( $edi_settings )     ? $edi_settings     : array();
 	}
 
 	/**

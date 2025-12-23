@@ -520,6 +520,14 @@ class SettingsCallbacks {
 			$this->output_action_button( $action_button, $id );
 			echo '</div>';
 		}
+		
+		// output description.
+		if ( ! empty( $description ) ) {
+			printf(
+				'<p class="description">%s</p>',
+				wp_kses_post( $description )
+			);
+		}
 
 		if ( ! empty( $custom ) ) {
 			printf(
@@ -555,14 +563,6 @@ class SettingsCallbacks {
 					} );
 				</script>
 			<?php
-		}
-
-		// output description.
-		if ( ! empty( $description ) ) {
-			printf(
-				'<p class="description">%s</p>',
-				wp_kses_post( $description )
-			);
 		}
 	}
 

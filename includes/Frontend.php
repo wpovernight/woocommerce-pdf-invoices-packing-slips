@@ -32,22 +32,22 @@ class Frontend {
 		// PDF download link on My Account page
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 ); // needs to be triggered later because of Jetpack query string: https://github.com/Automattic/jetpack/blob/1a062c5388083c7f15b9a3e82e61fde838e83047/projects/plugins/jetpack/modules/woocommerce-analytics/classes/class-jetpack-woocommerce-analytics-my-account.php#L235
 		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
-		
+
 		// REST API
 		add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 ); // support for legacy WC REST API
 		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
-		
+
 		// Shortcodes
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
-		
+
 		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'edi_peppol_account_menu_item' ), 10, 2 );
 		add_action( 'template_redirect', array( $this, 'edi_save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'edi_peppol_settings_account_page' ) );
 		add_rewrite_endpoint( 'peppol', EP_PAGES );
-		
+
 		// Peppol Checkout
 		if ( wpo_wcpdf_checkout_is_block() ) {
 			$this->edi_peppol_display_checkout_block_fields();
@@ -107,7 +107,7 @@ class Frontend {
 					'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
 					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice )
 				);
-				
+
 				if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
 					$actions[ $document_type . '_xml' ] = array(
 						'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml', 'my-account' => 'true' ) ),
@@ -122,16 +122,16 @@ class Frontend {
 
 	/**
 	 * Open link links in a new browser tab/window on the My Account and Thank You (Order Received) pages
-	 * 
+	 *
 	 * @return void
 	 */
 	public function open_my_account_link_on_new_tab(): void {
 		$is_account        = function_exists( 'is_account_page' )        && is_account_page();
 		$is_order_received = function_exists( 'is_order_received_page' ) && is_order_received_page();
-		
+
 		if ( $is_account || $is_order_received ) {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-			
+
 			if ( isset( $general_settings['download_display'] ) && 'display' === $general_settings['download_display'] ) {
 				$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 				$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
@@ -292,7 +292,7 @@ class Frontend {
 	 * Document objects are created in order to check for existence and retrieve data,
 	 * but we don't want to store the settings for uninitialized documents.
 	 * Only use in frontend/backed (page requests), otherwise settings will never be stored!
-	 * 
+	 *
 	 * @return void
 	 */
 	public function disable_storing_document_settings(): void {
@@ -302,7 +302,7 @@ class Frontend {
 	/**
 	 * Restore the original document settings storing behavior.
 	 * This should be called after disabling storing settings to avoid affecting other parts of the code.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function restore_storing_document_settings(): void {
@@ -311,16 +311,16 @@ class Frontend {
 
 	/**
 	 * Callback function to return false, used to disable storing document settings.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function return_false(): bool {
 		return false;
 	}
-	
+
 	/**
 	 * Add EDI Peppol Settings user account menu item
-	 * 
+	 *
 	 * @param array $items
 	 * @param array $endpoints
 	 * @return array
@@ -337,10 +337,10 @@ class Frontend {
 			+ array( 'peppol' => 'Peppol' )
 			+ array_slice( $items, $position, null, true );
 	}
-	
+
 	/**
 	 * Add EDI Peppol Settings to user account page.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function edi_peppol_settings_account_page(): void {
@@ -352,31 +352,21 @@ class Frontend {
 		$user_id                = get_current_user_id();
 		$endpoint_id            = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
 		$endpoint_eas           = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-		$legal_identifier       = (string) get_user_meta( $user_id, 'peppol_legal_identifier', true );
-		$legal_identifier_icd   = (string) get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
-		
+
 		$input_mode             = wpo_ips_edi_peppol_identifier_input_mode();
 		$endpoint_id_value      = $endpoint_id;
-		$legal_identifier_value = $legal_identifier;
 		$eas_options            = array();
-		$icd_options            = array();
-		
+
 		// In "full" mode we show scheme:identifier directly in the text inputs.
 		if ( 'full' === $input_mode ) {
 			if ( '' !== $endpoint_eas && '' !== $endpoint_id ) {
 				$endpoint_id_value = "{$endpoint_eas}:{$endpoint_id}";
 			}
-			if ( '' !== $legal_identifier_icd && '' !== $legal_identifier ) {
-				$legal_identifier_value = "{$legal_identifier_icd}:{$legal_identifier}";
-			}
-		
+
 		// In "select" mode we show the scheme in a dropdown and the identifier in a separate text input.
 		} elseif ( 'select' === $input_mode ) {
 			foreach ( EN16931::get_eas() as $code => $label ) {
 				$eas_options[ $code ] = "[$code] $label";
-			}
-			foreach ( EN16931::get_icd() as $code => $label ) {
-				$icd_options[ $code ] = "[$code] $label";
 			}
 		}
 		?>
@@ -405,7 +395,7 @@ class Frontend {
 					?>
 				</small>
 			</p>
-			
+
 			<?php if ( 'select' === $input_mode ) : ?>
 				<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 					<label for="peppol_endpoint_eas"><?php esc_html_e( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
@@ -434,58 +424,6 @@ class Frontend {
 				</p>
 			<?php endif; ?>
 			
-			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-				<label for="peppol_legal_identifier"><?php esc_html_e( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-				<input type="text" class="woocommerce-Input input-text" name="peppol_legal_identifier" id="peppol_legal_identifier" value="<?php echo esc_attr( $legal_identifier_value ); ?>" />
-				<small>
-					<?php
-						$description = __( 'Specify the Peppol Legal Identifier.', 'woocommerce-pdf-invoices-packing-slips' );
-
-						// Show example only in full mode
-						if ( 'select' !== $input_mode ) {
-							$description .= ' <em>' . esc_html__( 'Example: 0208:1234567890', 'woocommerce-pdf-invoices-packing-slips' ) . '</em>';
-						}
-
-						$description .= '<br>' . sprintf(
-							/* translators: %1$s: open link, %2$s: close link */
-							__( 'If you don\'t know the Identifier, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
-							'</a>'
-						);
-
-						echo wp_kses_post( $description );
-					?>
-				</small>
-			</p>
-			
-			<?php if ( 'select' === $input_mode ) : ?>
-				<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-					<label for="peppol_legal_identifier_icd"><?php esc_html_e( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-					<select name="peppol_legal_identifier_icd" id="peppol_legal_identifier_icd" class="woocommerce-Input input-select">
-						<option value=""><?php echo esc_html__( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...'; ?></option>
-						<?php foreach ( $icd_options as $code => $label ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $legal_identifier_icd, $code ); ?>>
-								<?php echo esc_html( $label ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<small>
-						<?php
-							echo wp_kses_post( sprintf(
-								'%s<br>%s',
-								__( 'Specify the Peppol Legal Identifier Scheme (ICD) for the Identifier above.', 'woocommerce-pdf-invoices-packing-slips' ),
-								sprintf(
-									/* translators: %1$s: open link anchor, %2$s: close link anchor */
-									__( 'For detailed information on each Identification Code (ICD), see the %1$sofficial Peppol ICD list%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-									'<a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/ICD/" target="_blank">',
-									'</a>'
-								)
-							) );
-						?>
-					</small>
-				</p>
-			<?php endif; ?>
-			
 			<p>
 				<input type="hidden" name="wc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wpo_ips_edi_user_save_peppol_settings' ) ); ?>">
 				<button type="submit" name="save_peppol_settings" class="woocommerce-Button button"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
@@ -493,7 +431,7 @@ class Frontend {
 		</form>
 		<?php
 	}
-	
+
 	/**
 	 * Save EDI Peppol settings to user profile.
 	 *
@@ -504,7 +442,7 @@ class Frontend {
 		if ( empty( $request_method ) || 'POST' !== $request_method || ! isset( $_POST['save_peppol_settings'] ) ) {
 			return;
 		}
-		
+
 		// Validate nonce and auth
 		$nonce = isset( $_POST['wc_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['wc_nonce'] ) ) : '';
 		if ( ! is_user_logged_in() || ! wp_verify_nonce( $nonce, 'wpo_ips_edi_user_save_peppol_settings' ) ) {
@@ -512,20 +450,20 @@ class Frontend {
 			wp_safe_redirect( wc_get_account_endpoint_url( 'peppol' ) );
 			exit;
 		}
-		
+
 		$request = stripslashes_deep( $_POST );
 		$user_id = get_current_user_id();
-		
+
 		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
-		
+
 		wc_add_notice( __( 'Peppol settings saved.', 'woocommerce-pdf-invoices-packing-slips' ), 'success' );
 		wp_safe_redirect( wc_get_account_endpoint_url( 'peppol' ) );
 		exit;
 	}
-	
+
 	/**
 	 * Display EDI Peppol fields in the Checkout Block.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function edi_peppol_display_checkout_block_fields(): void {
@@ -581,52 +519,8 @@ class Frontend {
 				)
 			);
 		}
-
-		// // We chose not to display the Legal Identifier at Checkout; it's only shown in My Account for now. This may change later.
-		// woocommerce_register_additional_checkout_field(
-		// 	array(
-		// 		'id'                => 'wpo-ips-edi/peppol-legal-identifier',
-		// 		'label'             => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-		// 		'location'          => 'order',
-		// 		'type'              => 'text',
-		// 		'sanitize_callback' => function ( $val ) {
-		// 			return preg_replace( '/\s+/', '', trim( (string) $val ) );
-		// 		},
-		// 		'validate_callback' => function ( $val ) use ( $input_mode ) {
-		// 			if ( 'full' === $input_mode && false === strpos( $val, ':' ) ) {
-		// 				return new \WP_Error( 'invalid_legal_id', __( 'Use scheme:identifier format.', 'woocommerce-pdf-invoices-packing-slips' ) );
-		// 			}
-		// 			return true;
-		// 		},
-		// 	)
-		// );
-
-		// if ( 'select' === $input_mode ) {
-		// 	woocommerce_register_additional_checkout_field(
-		// 		array(
-		// 			'id'       => 'wpo-ips-edi/peppol-legal-identifier-icd',
-		// 			'label'    => __( 'Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
-		// 			'location' => 'order',
-		// 			'type'     => 'select',
-		// 			'options'  => array_map(
-		// 				static fn ( $code, $label ) => array(
-		// 					'value' => $code,
-		// 					'label' => "[$code] $label",
-		// 				),
-		// 				array_keys( EN16931::get_icd() ),
-		// 				EN16931::get_icd()
-		// 			),
-		// 			'validate_callback' => function ( $val ) {
-		// 				if ( $val && ! isset( EN16931::get_icd()[ $val ] ) ) {
-		// 					return new \WP_Error( 'invalid_icd', __( 'Invalid Legal Identifier Scheme.', 'woocommerce-pdf-invoices-packing-slips' ) );
-		// 				}
-		// 				return true;
-		// 			},
-		// 		)
-		// 	);
-		// }
 	}
-	
+
 	/**
 	 * Set default values for EDI Peppol fields in the Checkout Block.
 	 *
@@ -636,15 +530,13 @@ class Frontend {
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
-			// 'wpo-ips-edi/peppol-legal-identifier',
-			// 'wpo-ips-edi/peppol-legal-identifier-icd',
 		);
-		
+
 		foreach ( $fields as $field ) {
 			add_filter( "woocommerce_get_default_value_for_{$field}", array( $this, 'edi_peppol_prefill_checkout_block_field_from_user_meta' ), 10, 3 );
 		}
 	}
-	
+
 	/**
 	 * Provide a default value for the Checkout Block additional field
 	 * using the value we store in user meta.
@@ -677,18 +569,13 @@ class Frontend {
 					$eas = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
 					return ( '' !== $eas && '' !== $id ) ? "{$eas}:{$id}" : (string) $value;
 				}
-				// case 'peppol_legal_identifier': {
-				// 	$id  = (string) get_user_meta( $user_id, 'peppol_legal_identifier', true );
-				// 	$icd = (string) get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
-				// 	return ( '' !== $icd && '' !== $id ) ? "{$icd}:{$id}" : (string) $value;
-				// }
 			}
 		}
-		
+
 		// For other fields, just return the user meta value.
 		return (string) get_user_meta( $user_id, $meta_key, true );
 	}
-	
+
 	/**
 	 * Save EDI Peppol fields from Checkout Block.
 	 *
@@ -706,35 +593,29 @@ class Frontend {
 		$allowed = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
-			// 'wpo-ips-edi/peppol-legal-identifier',
-			// 'wpo-ips-edi/peppol-legal-identifier-icd',
 		);
-		
+
 		if ( ! in_array( $key, $allowed, true ) ) {
 			return;
 		}
 
 		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
 		$value    = trim( sanitize_text_field( wp_unslash( $value ) ) );
-		
-		if ( $wc_object instanceof \WC_Order ) {
-			wpo_ips_edi_maybe_save_order_customer_peppol_data( $wc_object );
-		}
 
 		$customer_id = is_callable( array( $wc_object, 'get_customer_id' ) )
 			? absint( $wc_object->get_customer_id() )
 			: 0;
-			
-		if ( empty( $customer_id ) ) {
-			return;
-		}
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, array( $meta_key => $value ) );
+		
+		if ( $wc_object instanceof \WC_Order ) {
+			wpo_ips_edi_maybe_save_order_peppol_data( $wc_object, array( $meta_key => $value ) );
+		}
 	}
-	
+
 	/**
 	 * Remove EDI Peppol fields from order meta after checkout.
-	 * 
+	 *
 	 * @param \WC_Abstract_Order $order
 	 * @return void
 	 */
@@ -742,24 +623,26 @@ class Frontend {
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
-			// 'wpo-ips-edi/peppol-legal-identifier',
-			// 'wpo-ips-edi/peppol-legal-identifier-icd',
 		);
-		
+
 		foreach ( $fields as $field ) {
 			$order->delete_meta_data( '_wc_other/' . $field );
 		}
-		
+
 		$order->save_meta_data();
 	}
-	
+
 	/**
 	 * Display EDI Peppol fields on the Classic Checkout page.
 	 *
-	 * @param array $fields Checkout fields.
+	 * @param mixed $fields Checkout fields.
 	 * @return array Modified checkout fields with Peppol fields added.
 	 */
-	public function edi_peppol_display_classic_checkout_fields( array $fields ): array {
+	public function edi_peppol_display_classic_checkout_fields( $fields ): array {
+		if ( ! is_array( $fields ) ) {
+			$fields = array();
+		}
+
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return $fields;
 		}
@@ -797,37 +680,12 @@ class Frontend {
 			);
 		}
 
-		// // We chose not to display the Legal Identifier at Checkout; it's only shown in My Account for now. This may change later.
-		// $peppol_fields['peppol_legal_identifier'] = array(
-		// 	'type'        => 'text',
-		// 	'label'       => __( 'Peppol Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-		// 	'required'    => false,
-		// 	'class'       => array( 'form-row-wide' ),
-		// 	'placeholder' => $placeholder_legal,
-		// );
-
-		// if ( 'select' === $input_mode ) {
-		// 	$peppol_fields['peppol_legal_identifier_icd'] = array(
-		// 		'type'        => 'select',
-		// 		'label'       => __( 'Peppol Legal Identifier Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
-		// 		'required'    => false,
-		// 		'class'       => array( 'form-row-wide' ),
-		// 		'options'     => ( function () {
-		// 			$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
-		// 			foreach ( EN16931::get_icd() as $code => $label ) {
-		// 				$options[ $code ] = "[$code] $label";
-		// 			}
-		// 			return $options;
-		// 		} )(),
-		// 	);
-		// }
-
 		// Prepend Peppol fields before existing 'order' fields
 		$fields['order'] = $peppol_fields + ( $fields['order'] ?? array() );
 
 		return $fields;
 	}
-	
+
 	/**
 	 * Set EDI Peppol fields values in the Classic Checkout page.
 	 *
@@ -839,8 +697,6 @@ class Frontend {
 		if ( ! in_array( $input, array(
 			'peppol_endpoint_id',
 			'peppol_endpoint_eas',
-			// 'peppol_legal_identifier',
-			// 'peppol_legal_identifier_icd',
 		), true ) ) {
 			return $value;
 		}
@@ -850,10 +706,8 @@ class Frontend {
 			return $value;
 		}
 
-		$endpoint_id          = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
-		$endpoint_eas         = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-		// $legal_identifier     = (string) get_user_meta( $user_id, 'peppol_legal_identifier', true );
-		// $legal_identifier_icd = (string) get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
+		$endpoint_id  = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
+		$endpoint_eas = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
 
 		$input_mode = wpo_ips_edi_peppol_identifier_input_mode();
 
@@ -865,31 +719,24 @@ class Frontend {
 				return $endpoint_id;
 			case 'peppol_endpoint_eas':
 				return $endpoint_eas;
-			// case 'peppol_legal_identifier':
-			// 	if ( 'full' === $input_mode && '' !== $legal_identifier_icd && '' !== $legal_identifier ) {
-			// 		return "{$legal_identifier_icd}:{$legal_identifier}";
-			// 	}
-			// 	return $legal_identifier;
-			// case 'peppol_legal_identifier_icd':
-			// 	return $legal_identifier_icd;
 		}
 
 		return $value;
 	}
-	
+
 	/**
 	 * Validate Peppol Endpoint / Legal‑ID pairs after WooCommerce
 	 * has normalised and sanitised all checkout data.
 	 *
-	 * @param array    $data   All posted checkout fields.
-	 * @param WP_Error $errors Errors object to add validation errors to.
+	 * @param array $data   All posted checkout fields.
+	 * @param mixed $errors Errors object to add validation errors to.
 	 * @return void
 	 */
-	public function edi_peppol_validate_classic_checkout_field_values( array $data, \WP_Error $errors ): void {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
+	public function edi_peppol_validate_classic_checkout_field_values( array $data, $errors ): void {
+		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) || ! $errors instanceof \WP_Error ) {
 			return;
 		}
-		
+
 		// Endpoint ID
 		if ( ! empty( $data['peppol_endpoint_id'] ) ) {
 			$result = $this->peppol_validate_identifier_value( $data['peppol_endpoint_id'] );
@@ -903,7 +750,7 @@ class Frontend {
 			}
 		}
 	}
-	
+
 	/**
 	 * Save EDI Peppol fields from Classic Checkout page.
 	 *
@@ -919,26 +766,20 @@ class Frontend {
 		if ( ! isset( $data['peppol_endpoint_id'] ) ) {
 			return; // No Peppol data submitted
 		}
-		
-		// if ( ! isset( $data['peppol_legal_identifier'] ) ) {
-		// 	return; // No Peppol data submitted
-		// }
 
 		$order = wc_get_order( $order_id );
-		
+
 		if ( empty( $order ) ) {
 			return;
 		}
-		
+
 		$user_id = absint( $order->get_customer_id() );
-		
-		if ( empty( $user_id ) ) {
-			return;
-		}
-		
+
 		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $data );
+		
+		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
 	}
-	
+
 	/**
 	 * Validate a Peppol identifier value.
 	 *
@@ -1067,7 +908,7 @@ class Frontend {
 			$message
 		);
 	}
-	
+
 	/**
 	 * Query the Peppol Directory for an endpoint.
 	 *
@@ -1166,7 +1007,7 @@ class Frontend {
 			),
 		);
 	}
-	
+
 	/**
 	 * Perform a Peppol Directory request using the generic "q" parameter.
 	 *
@@ -1226,7 +1067,7 @@ class Frontend {
 
 		return $data;
 	}
-	
+
 	/**
 	 * Render Peppol Directory matches as a simple text list.
 	 *
@@ -1258,7 +1099,7 @@ class Frontend {
 					$scheme = $match['scheme'] ?? '';
 					$value  = $match['value']  ?? '';
 					$name   = $match['name']   ?? '';
-				
+
 					$identifier = ! empty( $scheme )
 						? "$scheme:$value"
 						: $value;
@@ -1284,7 +1125,7 @@ class Frontend {
 
 		return (string) ob_get_clean();
 	}
-	
+
 }
 
 endif; // class_exists

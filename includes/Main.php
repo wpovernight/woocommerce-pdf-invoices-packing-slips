@@ -2,6 +2,7 @@
 namespace WPO\IPS;
 
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
+use WPO\IPS\Documents\OrderDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -71,6 +72,9 @@ class Main {
 
 		// apply header logo height
 		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
+		
+		// set ink saving mode
+		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_ink_saving_styles' ), 10, 2 );
 
 		// show notice of missing required directories
 		add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
@@ -606,7 +610,23 @@ class Main {
 	 * Include template specific custom functions
 	 */
 	private function load_template_functions() {
-		$file = trailingslashit( WPO_WCPDF()->settings->get_template_path() ) . 'template-functions.php';
+		$template_path = '';
+
+		if ( isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) && ! empty( $_POST['data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// parse form data
+			parse_str( wp_unslash( $_POST['data'] ), $form_data ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+
+			$form_data   = stripslashes_deep( $form_data );
+			$selected_id = sanitize_text_field( $form_data['wpo_wcpdf_settings_general']['template_path'] ?? '' );
+
+			// only allow template ids that exist in our installed templates list
+			$installed_templates = array_keys( WPO_WCPDF()->settings->get_installed_templates_list() );
+			if ( in_array( $selected_id, $installed_templates, true ) ) {
+				$template_path = $selected_id;
+			}
+		}
+
+		$file = trailingslashit( WPO_WCPDF()->settings->get_template_path( $template_path ) ) . 'template-functions.php';
 		if ( WPO_WCPDF()->file_system->exists( $file ) ) {
 			$loaded = @include_once( $file );
 			if ( $loaded === false ) {
@@ -2005,6 +2025,44 @@ class Main {
 
 			echo wp_kses_post( apply_filters( 'wpo_wcpdf_add_document_download_link_to_email', $document_link, $document, $order, $sent_to_admin, $plain_text, $email ) );
 		}
+	}
+	
+	/**
+	 * Apply ink-saving styles to supported templates when the feature is enabled.
+	 *
+	 * @param string        $css
+	 * @param OrderDocument $document
+	 * @return string
+	 */
+	public function apply_ink_saving_styles( string $css, OrderDocument $document ): string {
+		$settings = WPO_WCPDF()->settings->general_settings ?? array();
+
+		$ink_saving_enabled = ! empty( $settings['template_ink_saving'] );
+		$current_template   = $settings['template_path'] ?? '';
+
+		$supported_templates = apply_filters(
+			'wpo_ips_ink_saving_supported_templates',
+			array( 'default/Simple' )
+		);
+
+		// Bail if feature is disabled or template not supported.
+		if ( ! $ink_saving_enabled || ! in_array( $current_template, $supported_templates, true ) ) {
+			return $css;
+		}
+
+		// Let templates provide their own ink-saving CSS.
+		$ink_saving_css = apply_filters(
+			'wpo_ips_ink_saving_css',
+			'',
+			$document,
+			$current_template
+		);
+
+		if ( ! empty( trim( $ink_saving_css ) ) ) {
+			$css .= "\n\n" . $ink_saving_css . "\n";
+		}
+
+		return $css;
 	}
 
 }
