@@ -431,7 +431,7 @@ class ThirdPartyPlugins {
 	}
 
 	/**
-	 * Register payment reminder email templates and create them for the Smart Reminder Email plugin for the first time.z
+	 * Register payment reminder email templates and create them for the Smart Reminder Email plugin for the first time.
 	 *
 	 * @return void
 	 */
@@ -448,7 +448,7 @@ class ThirdPartyPlugins {
 	 * @return bool
 	 */
 	private function is_smart_reminder_email_supported(): bool {
-		return function_exists( 'WPO_WCSRE' ) && version_compare( WPO_WCSRE()->version, '2.8.1-beta-1', '>=' );
+		return function_exists( 'WPO_WCSRE' ) && version_compare( \WPO_WCSRE()->version, '2.8.1-beta-1', '>=' ); // ToDo: update version when stable release is out.
 	}
 
 	/**
@@ -465,22 +465,48 @@ class ThirdPartyPlugins {
 			/* translators: Order number */
 			__( 'This is to inform you that the payment for Order #%s is still pending beyond the due date.' ), '{order_number}'
 		);
-		$admin_content      = apply_filters( 'wpo_wcpdf_payment_reminder_admin_email_content', $admin_content );
-		$admin_trigger_days = apply_filters( 'wpo_wcpdf_payment_reminder_admin_email_trigger_days', array( $due_date_days + 7 ) ); // Default to one week after the due date.
+		$admin_content      = apply_filters( 'wpo_ips_payment_reminder_admin_email_content', $admin_content );
+		$admin_trigger_days = apply_filters( 'wpo_ips_payment_reminder_admin_email_trigger_days', array( $due_date_days + 7 ) ); // Default to one week after the due date.
 		$this->register_payment_reminder_email_template( $admin_content, true, $admin_trigger_days );
 
 		// Register payment reminder email for customer.
-		$customer_content      = sprintf(
-			/* translators: 1: First name, 2: Last name, 3: Order number, 4, 5: HTML anchor tag */
-			__( 'Dear %1$s %2$s,<br><br>This is a gentle reminder that payment for your order #%3$s is still pending.<br><br>To complete the payment, please use the following link: %4$sPay the order%5$s. We kindly ask that you process the payment at your earliest convenience.<br><br>Best regards' ),
+		$greeting = sprintf(
+			/* translators: 1: First name, 2: Last name */
+			__( 'Dear %1$s %2$s,', 'woocommerce-pdf-invoices-packing-slips' ),
 			'{billing_first_name}',
-			'{billing_last_name}',
-			'{order_number}',
-			'<a href="{payment_url}">',
-			'</a>'
+			'{billing_last_name}'
 		);
-		$customer_content      = apply_filters( 'wpo_wcpdf_payment_reminder_customer_email_content', $customer_content );
-		$customer_trigger_days = apply_filters( 'wpo_wcpdf_payment_reminder_customer_email_trigger_days', array( $due_date_days - 2, $due_date_days + 7 ) ); // Default to two days before and seven days after the due date.
+
+		$message_body = sprintf(
+			/* translators: %s: Order number */
+			__( 'This is a gentle reminder that payment for your order #%s is still pending.', 'woocommerce-pdf-invoices-packing-slips' ),
+			'{order_number}'
+		);
+
+		$payment_link = '<a href="{payment_url}">' . __( 'Pay the order', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>';
+		$call_to_action = sprintf(
+			/* translators: %s: Payment link */
+			__( 'To complete the payment, please use the following link: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+			$payment_link
+		);
+
+		$reminder = __( 'We kindly ask that you process the payment at your earliest convenience.', 'woocommerce-pdf-invoices-packing-slips' );
+		$closing  = __( 'Best regards', 'woocommerce-pdf-invoices-packing-slips' );
+
+		$customer_content = implode(
+			'<br><br>',
+			array( $greeting, $message_body, $call_to_action, $reminder, $closing )
+		);
+		$customer_content = apply_filters( 'wpo_ips_payment_reminder_customer_email_content', $customer_content );
+
+		$customer_trigger_days = apply_filters(
+			'wpo_ips_payment_reminder_customer_email_trigger_days',
+			// Default to two days before and seven days after the due date.
+			array(
+				$due_date_days - 2,
+				$due_date_days + 7
+			)
+		);
 		$this->register_payment_reminder_email_template( $customer_content, false, $customer_trigger_days );
 	}
 
@@ -493,15 +519,19 @@ class ThirdPartyPlugins {
 		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
 
 		// Only proceed if the due date is defined and valid.
-		if ( empty( $invoice_settings['due_date'] ) || empty( $invoice_settings['due_date_days'] ) || $invoice_settings['due_date'] < 1 ) {
+		if (
+			empty( $invoice_settings['due_date'] ) ||
+			empty( $invoice_settings['due_date_days'] ) ||
+			$invoice_settings['due_date'] < 1
+		) {
 			return;
 		}
 
 		// Create emails only if they haven't been generated before.
-		if ( ! get_option( 'wpo_wcpdf_payment_reminder_emails_generated', false ) ) {
+		if ( ! get_option( 'wpo_ips_payment_reminder_emails_generated', false ) ) {
 			WPO_WCSRE()->email_templates->create_email( 'admin_payment_reminder' );
 			WPO_WCSRE()->email_templates->create_email( 'customer_payment_reminder' );
-			update_option( 'wpo_wcpdf_payment_reminder_emails_generated', true );
+			update_option( 'wpo_ips_payment_reminder_emails_generated', true );
 		}
 	}
 
@@ -526,7 +556,9 @@ class ThirdPartyPlugins {
 		}
 
 		// Prepare post data.
-		$post_title = $to_admin ? __( 'Admin Payment Reminder', 'wpo_wcsre' ) : __( 'Customer Payment Reminder', 'wpo_wcsre' );
+		$post_title = $to_admin
+			? __( 'Admin Payment Reminder', 'woocommerce-pdf-invoices-packing-slips' )
+			: __( 'Customer Payment Reminder', 'woocommerce-pdf-invoices-packing-slips' );
 		$post_data  = array(
 			'post_title'   => $post_title,
 			'post_content' => $content,
@@ -535,8 +567,8 @@ class ThirdPartyPlugins {
 
 		// Prepare meta data.
 		$meta_data = array(
-			'_subject' => 'Payment Reminder',
-			'_heading' => 'Payment Reminder',
+			'_subject' => __( 'Payment Reminder', 'woocommerce-pdf-invoices-packing-slips' ),
+			'_heading' => __( 'Payment Reminder', 'woocommerce-pdf-invoices-packing-slips' ),
 			'_to' => $to_admin ? 'admin' : 'customer',
 		);
 
@@ -547,7 +579,11 @@ class ThirdPartyPlugins {
 			return array(
 				'id'           => \WPO_WCSRE()->functions->get_new_trigger_id(),
 				'send'         => array(
-					'title'                  => sprintf( __( '%d Days Reminder', '' ), $days ),
+					'title'                  => sprintf(
+						/** translators: %d Days Reminder */
+						__( '%d Days Reminder', 'woocommerce-pdf-invoices-packing-slips' ),
+						$days
+					),
 					'after_status_count'     => (string) $days,
 					'after_status_time_unit' => 'days',
 					'after_status'           => 'invoice-creation'

@@ -349,7 +349,7 @@ class Invoice extends OrderDocumentMethods {
 								sprintf(
 									'<a class="button button-secondary submit wpo-button" href="%s">%s</a> %s',
 									esc_url( add_query_arg( array( 'post_type' => 'wc_reminder_email', 'generate_template' => array( 'admin-payment-reminder','customer-payment-reminder' ) ), admin_url( 'edit.php' ) ) ),
-									__( 'Create payment reminders' ),
+									__( 'Create payment reminders', 'woocommerce-pdf-invoices-packing-slips' ),
 									sprintf(
 										/* translators: %s: Plugin name */
 										__( 'with one click using %s!', 'woocommerce-pdf-invoices-packing-slips' ),
