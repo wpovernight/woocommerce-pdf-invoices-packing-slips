@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.3.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.3.1-beta.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-12-22T08:31:28+00:00\n"
+"POT-Creation-Date: 2025-12-23T10:42:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2310,12 +2310,12 @@ msgid "Displayed in the document!"
 msgstr ""
 
 #: includes/Admin.php:1390
-#: includes/Frontend.php:492
+#: includes/Frontend.php:429
 msgid "Save changes"
 msgstr ""
 
 #: includes/Admin.php:1391
-#: includes/Admin.php:2146
+#: includes/Admin.php:2141
 msgid "Cancel"
 msgstr ""
 
@@ -2407,64 +2407,65 @@ msgstr ""
 msgid "XML %s"
 msgstr ""
 
-#: includes/Admin.php:2066
+#: includes/Admin.php:2061
 msgid "Identifier"
 msgstr ""
 
-#: includes/Admin.php:2068
+#: includes/Admin.php:2063
 #: includes/Assets.php:97
 msgid "Show"
 msgstr ""
 
-#: includes/Admin.php:2083
-#: includes/Admin.php:2126
+#: includes/Admin.php:2078
+#: includes/Admin.php:2121
 #: includes/Assets.php:338
 #: includes/Settings/SettingsEDI.php:686
 msgid "Missing"
 msgstr ""
 
-#: includes/Admin.php:2084
-#: includes/Admin.php:2127
+#: includes/Admin.php:2079
+#: includes/Admin.php:2122
 #: includes/Assets.php:339
 #: includes/Settings/SettingsEDI.php:687
 msgid "Optional"
 msgstr ""
 
-#: includes/Admin.php:2094
+#: includes/Admin.php:2089
 #: includes/Settings/SettingsEDI.php:695
 msgid "VAT number is missing the country prefix"
 msgstr ""
 
-#: includes/Admin.php:2109
+#: includes/Admin.php:2104
 msgid "Peppol"
 msgstr ""
 
-#: includes/Admin.php:2111
+#: includes/Admin.php:2106
 msgid "Edit"
 msgstr ""
 
-#: includes/Admin.php:2142
-msgid "Both fields require a scheme (e.g. \"0208:\")."
+#: includes/Admin.php:2137
+#: includes/Frontend.php:812
+msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
 msgstr ""
 
-#: includes/Admin.php:2145
+#: includes/Admin.php:2140
 #: includes/Settings/SettingsCallbacks.php:913
 msgid "Save"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:2185
+#: includes/Admin.php:2180
 #, php-format
 msgid "Editing of %s number and date is currently disabled."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name
-#: includes/Admin.php:2190
+#: includes/Admin.php:2185
 #, php-format
 msgid "If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s."
 msgstr ""
 
-#: includes/Admin.php:2193
+#: includes/Admin.php:2188
 #: includes/Settings/SettingsDebug.php:947
 msgid "Enable document data editing"
 msgstr ""
@@ -3148,40 +3149,40 @@ msgstr ""
 msgid "Peppol is not available."
 msgstr ""
 
-#: includes/Frontend.php:384
+#: includes/Frontend.php:374
 msgid "Peppol Settings"
 msgstr ""
 
-#: includes/Frontend.php:386
-#: includes/Frontend.php:542
-#: includes/Frontend.php:783
+#: includes/Frontend.php:376
+#: includes/Frontend.php:479
+#: includes/Frontend.php:661
 #: includes/Settings/SettingsEDI.php:209
 msgid "Peppol Endpoint ID"
 msgstr ""
 
-#: includes/Frontend.php:390
+#: includes/Frontend.php:380
 msgid "Specify the Peppol Endpoint ID."
 msgstr ""
 
-#: includes/Frontend.php:394
+#: includes/Frontend.php:384
 msgid "Example: 0088:123456789"
 msgstr ""
 
 #. translators: %1$s: open link anchor, %2$s: close link anchor
-#: includes/Frontend.php:399
+#: includes/Frontend.php:389
 #: includes/Settings/SettingsEDI.php:217
 #, php-format
 msgid "If you don't know the ID, you can search for it in the %1$sPeppol Directory%2$s."
 msgstr ""
 
-#: includes/Frontend.php:411
-#: includes/Frontend.php:792
+#: includes/Frontend.php:401
+#: includes/Frontend.php:670
 #: includes/Settings/SettingsEDI.php:238
 msgid "Peppol Endpoint Scheme (EAS)"
 msgstr ""
 
-#: includes/Frontend.php:413
-#: includes/Frontend.php:796
+#: includes/Frontend.php:403
+#: includes/Frontend.php:674
 #: includes/Settings/SettingsEDI.php:242
 #: includes/Settings/SettingsEDI.php:278
 #: includes/Settings/SettingsEDI.php:312
@@ -3191,84 +3192,80 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
-#: includes/Frontend.php:424
+#: includes/Frontend.php:414
 msgid "Specify the Electronic Address Scheme (EAS) for the Endpoint above."
 msgstr ""
 
 #. translators: %1$s: open link anchor, %2$s: close link anchor
-#: includes/Frontend.php:427
+#: includes/Frontend.php:417
 #: includes/Settings/SettingsEDI.php:253
 #, php-format
 msgid "For more information on each Endpoint Address Scheme (EAS), refer to the %1$sofficial Peppol EAS list%2$s."
 msgstr ""
 
-#: includes/Frontend.php:512
+#: includes/Frontend.php:449
 msgid "Peppol settings could not be saved. Please try again."
 msgstr ""
 
-#: includes/Frontend.php:522
+#: includes/Frontend.php:459
 msgid "Peppol settings saved."
 msgstr ""
 
-#: includes/Frontend.php:565
+#: includes/Frontend.php:502
 msgid "Endpoint Scheme (EAS)"
 msgstr ""
 
-#: includes/Frontend.php:578
+#: includes/Frontend.php:515
 msgid "Invalid Endpoint Scheme."
 msgstr ""
 
-#: includes/Frontend.php:976
-msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
-msgstr ""
-
-#: includes/Frontend.php:990
-#: includes/Frontend.php:1088
+#: includes/Frontend.php:826
+#: includes/Frontend.php:924
 msgid "Peppol Endpoint ID is empty."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: includes/Frontend.php:1012
+#: includes/Frontend.php:848
 #, php-format
 msgid "The identifier \"%1$s\" was found without a scheme. Please enter it in \"scheme:value\" format. You can search for the correct scheme and identifier in the %2$s."
 msgstr ""
 
-#: includes/Frontend.php:1017
-#: includes/Frontend.php:1043
-#: includes/Frontend.php:1066
+#: includes/Frontend.php:853
+#: includes/Frontend.php:879
+#: includes/Frontend.php:902
 msgid "Peppol Directory"
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: includes/Frontend.php:1038
+#: includes/Frontend.php:874
 #, php-format
 msgid "No Peppol participant was found for \"%1$s\". Please confirm the scheme and identifier in the %2$s."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: includes/Frontend.php:1061
+#: includes/Frontend.php:897
 #, php-format
 msgid "We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the %2$s. Below are participants found for this identifier value:"
 msgstr ""
 
 #. translators: %s: error message
-#: includes/Frontend.php:1203
+#: includes/Frontend.php:1039
 #, php-format
 msgid "Peppol Directory request failed: %s"
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: includes/Frontend.php:1217
+#: includes/Frontend.php:1053
 #, php-format
 msgid "Peppol Directory returned an unexpected status code: %d"
 msgstr ""
 
-#: includes/Frontend.php:1228
+#: includes/Frontend.php:1064
 msgid "Peppol Directory returned an invalid JSON response."
 msgstr ""
 
 #. translators: %s: endpoint ID
-#: includes/Frontend.php:1254
+#: includes/Frontend.php:1090
 #, php-format
 msgid "We found the following participant(s) related to \"%s\":"
 msgstr ""
@@ -4438,8 +4435,8 @@ msgid "Postcode / ZIP"
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:953
-#: wpo-ips-functions-edi.php:565
-#: wpo-ips-functions-edi.php:659
+#: wpo-ips-functions-edi.php:585
+#: wpo-ips-functions-edi.php:679
 msgid "City"
 msgstr ""
 
@@ -5938,62 +5935,58 @@ msgstr ""
 msgid "Hide this version"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:550
-#: wpo-ips-functions-edi.php:644
+#: wpo-ips-functions-edi.php:570
+#: wpo-ips-functions-edi.php:664
 msgid "Name"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:555
-msgid "Street address"
-msgstr ""
-
-#: wpo-ips-functions-edi.php:560
-#: wpo-ips-functions-edi.php:654
-msgid "Postcode"
-msgstr ""
-
-#: wpo-ips-functions-edi.php:570
-#: wpo-ips-functions-edi.php:664
-msgid "State"
-msgstr ""
-
 #: wpo-ips-functions-edi.php:575
-#: wpo-ips-functions-edi.php:669
-msgid "Country Code"
+msgid "Street address"
 msgstr ""
 
 #: wpo-ips-functions-edi.php:580
 #: wpo-ips-functions-edi.php:674
-msgid "VAT number"
-msgstr ""
-
-#: wpo-ips-functions-edi.php:585
-msgid "Registration number"
+msgid "Postcode"
 msgstr ""
 
 #: wpo-ips-functions-edi.php:590
-#: wpo-ips-functions-edi.php:679
+#: wpo-ips-functions-edi.php:684
+msgid "State"
+msgstr ""
+
+#: wpo-ips-functions-edi.php:595
+#: wpo-ips-functions-edi.php:689
+msgid "Country Code"
+msgstr ""
+
+#: wpo-ips-functions-edi.php:600
+#: wpo-ips-functions-edi.php:694
+msgid "VAT number"
+msgstr ""
+
+#: wpo-ips-functions-edi.php:605
+msgid "Registration number"
+msgstr ""
+
+#: wpo-ips-functions-edi.php:610
+#: wpo-ips-functions-edi.php:699
 msgid "Email"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:611
+#: wpo-ips-functions-edi.php:631
 msgid "PEPPOL Endpoint ID"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:619
+#: wpo-ips-functions-edi.php:639
 msgid "PEPPOL Legal Identifier"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:649
+#: wpo-ips-functions-edi.php:669
 msgid "Address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:709
+#: wpo-ips-functions-edi.php:719
 msgid "Endpoint ID"
-msgstr ""
-
-#: wpo-ips-functions-edi.php:717
-msgid "Legal Identifier"
 msgstr ""
 
 #: wpo-ips-functions.php:363
