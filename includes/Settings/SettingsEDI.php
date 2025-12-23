@@ -564,7 +564,7 @@ class SettingsEDI {
 	 */
 	public function save_taxes_on_checkout( int $order_id, array $posted_data, \WC_Order $order ): void {
 		wpo_ips_edi_save_order_taxes( $order );
-		wpo_ips_edi_maybe_save_order_customer_peppol_data( $order );
+		wpo_ips_edi_maybe_save_order_peppol_data( $order, $posted_data );
 	}
 
 	/**
