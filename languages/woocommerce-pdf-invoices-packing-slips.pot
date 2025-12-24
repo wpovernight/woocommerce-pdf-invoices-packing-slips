@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.3.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-12-23T10:55:16+00:00\n"
+"POT-Creation-Date: 2025-12-24T11:55:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -3186,7 +3186,7 @@ msgstr ""
 #: includes/Settings/SettingsEDI.php:242
 #: includes/Settings/SettingsEDI.php:278
 #: includes/Settings/SettingsEDI.php:312
-#: includes/Settings/SettingsEDI.php:1115
+#: includes/Settings/SettingsEDI.php:1116
 #: views/advanced-tools.php:273
 #: views/advanced-tools.php:321
 msgid "Select"
@@ -4464,17 +4464,24 @@ msgstr ""
 msgid "Send your documents through supported delivery networks directly from the plugin."
 msgstr ""
 
-#. translators: %1$s: open link anchor, %2$s: close link anchor
-#: includes/Settings/SettingsEDI.php:1055
-#, php-format
-msgid "This feature will be available soon. If you'd like to learn more or request early access, please %1$scontact us%2$s."
+#: includes/Settings/SettingsEDI.php:1051
+msgid "Network Products"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1092
+#: includes/Settings/SettingsEDI.php:1057
+msgid "Peppol is a network for electronic document exchange, enabling businesses to send and receive electronic invoices and other documents securely and efficiently."
+msgstr ""
+
+#: includes/Settings/SettingsEDI.php:1058
+#: views/upgrade-table.php:159
+msgid "Buy now"
+msgstr ""
+
+#: includes/Settings/SettingsEDI.php:1093
 msgid "Default"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1103
+#: includes/Settings/SettingsEDI.php:1104
 msgid "None"
 msgstr ""
 
@@ -5839,10 +5846,6 @@ msgstr ""
 
 #: views/upgrade-table.php:143
 msgid "Visit shop"
-msgstr ""
-
-#: views/upgrade-table.php:159
-msgid "Buy now"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag, 3. Woo version
