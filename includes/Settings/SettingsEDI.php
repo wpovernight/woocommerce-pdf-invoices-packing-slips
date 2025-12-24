@@ -1047,17 +1047,18 @@ class SettingsEDI {
 		ob_start();
 		?>
 		<p><?php esc_html_e( 'Send your documents through supported delivery networks directly from the plugin.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-		<div class="notice notice-info inline">
-			<p>
-				<?php
-					printf(
-						/* translators: %1$s: open link anchor, %2$s: close link anchor */
-						esc_html__( 'This feature will be available soon. If you\'d like to learn more or request early access, please %1$scontact us%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="https://wpovernight.com/contact/" target="_blank" rel="noopener noreferrer">',
-						'</a>'
-					);
-				?>
-			</p>
+		<div id="plugin-recommendations">
+			<h1><?php esc_html_e( 'Network Products', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
+			<div class="card-container">
+				<div class="recommendation-card">
+					<img src="<?php echo WPO_WCPDF()->plugin_url() . '/assets/images/wpo-ips-edocs-network-peppol-400x400.jpg' ?>" alt="Peppol">
+					<div class="card-content">
+						<h5>Peppol</h5>
+						<p><?php esc_html_e( 'Peppol is a network for electronic document exchange, enabling businesses to send and receive electronic invoices and other documents securely and efficiently.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
+						<?php printf( '<a class="upgrade_button" target="_blank" href="%s">%s</a>', esc_url( 'https://wpovernight.com/downloads/woocommerce-edocuments-peppol/?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=peppol-network-cross' ), esc_html__( 'Buy now', 'woocommerce-pdf-invoices-packing-slips' ) ); ?>
+					</div>
+				</div>
+			</div>
 		</div>
 		<?php
 		echo apply_filters( 'wpo_ips_edi_settings_output_network_html', ob_get_clean(), $this ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

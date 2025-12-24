@@ -1433,17 +1433,17 @@ sup.wcpdf_pro {
 
 /* Upgrade tab */
 
-div.upgrade-table-description {
+#plugin-recommendations {
 	padding: 0 0 3em 1em;
 }
 
-div.upgrade-table-description h1 {
+#plugin-recommendations h1 {
 	font-family: serif;
 	letter-spacing: -1px;
 	font-size: 3em;
 }
 
-div.upgrade-table-description p {
+#plugin-recommendations p {
 	font-size: 1.1em;
 }
 
@@ -1520,6 +1520,7 @@ div.upgrade-table-description a,
 #plugin-recommendations a.upgrade_button {
 	display: inline-block;
 	background: white;
+	color: #6e1edc;
 	padding: 1em 3em 1em 2em;
 	border-radius: 12px;
 	border: 1px solid #6e1edc;
