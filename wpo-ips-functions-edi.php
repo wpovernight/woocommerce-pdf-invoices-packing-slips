@@ -116,43 +116,63 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 }
 
 /**
- * Maybe save EDI order customer Peppol data.
+ * Maybe save EDI order Peppol data.
  *
  * @param \WC_Abstract_Order $order
+ * @param array              $data
  * @return void
  */
-function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $order ): void {
+function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, array $data = array() ): void {
 	if ( ! wpo_ips_edi_peppol_is_available() ) {
 		return; // only save for Peppol formats
 	}
+	
+	$identifier     = '';
+	$scheme         = '';
+	$save_meta_data = false;
 
-	$user_id = $order->get_customer_id();
+	if ( ! empty( $data ) ) {
+		$mode   = wpo_ips_edi_peppol_identifier_input_mode();
+		$raw    = trim( sanitize_text_field( wp_unslash( $data['peppol_endpoint_id'] ?? '' ) ) );
+		$scheme = $identifier = '';
 
-	if ( empty( $user_id ) ) {
+		// Determine parts
+		if ( 'full' === $mode && false !== strpos( $raw, ':' ) ) {
+			[ $scheme, $identifier ] = array_map(
+				'trim',
+				explode( ':', $raw, 2 ) + array( '', '' )
+			);
+
+		// Select mode, plain identifier
+		} else {
+			$identifier = $raw;
+		}
+	}
+	
+	if ( empty( $identifier ) || empty( $scheme ) ) {
+		$user_id = $order->get_customer_id();
+		if ( empty( $user_id ) ) {
+			return;
+		}
+
+		$identifier = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+		$scheme     = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
+	}
+
+	if ( ! empty( $identifier ) ) {
+		$order->update_meta_data( '_peppol_endpoint_id', $identifier );
+		$save_meta_data = true;
+	}
+
+	if ( ! empty( $scheme ) ) {
+		$order->update_meta_data( '_peppol_endpoint_eas', $scheme );
+		$save_meta_data = true;
+	}
+
+	if ( ! $save_meta_data ) {
 		return;
 	}
-
-	$endpoint_id             = get_user_meta( $user_id, 'peppol_endpoint_id', true );
-	$endpoint_scheme         = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-	$legal_identifier        = get_user_meta( $user_id, 'peppol_legal_identifier', true );
-	$legal_identifier_scheme = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
-
-	if ( ! empty( $endpoint_id ) ) {
-		$order->update_meta_data( '_peppol_endpoint_id', $endpoint_id );
-	}
-
-	if ( ! empty( $endpoint_scheme ) ) {
-		$order->update_meta_data( '_peppol_endpoint_eas', $endpoint_scheme );
-	}
-
-	if ( ! empty( $legal_identifier ) ) {
-		$order->update_meta_data( '_peppol_legal_identifier', $legal_identifier );
-	}
-
-	if ( ! empty( $legal_identifier_scheme ) ) {
-		$order->update_meta_data( '_peppol_legal_identifier_icd', $legal_identifier_scheme );
-	}
-
+	
 	$order->save_meta_data();
 }
 
@@ -602,7 +622,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 		$legal_identifier_value  = $legal_identifier && ! empty( $data[ $language ][ $legal_identifier ]['value'] )
 			? $data[ $language ][ $legal_identifier ]['value']
 			: '';
-			
+
 		if ( 'vat_number' === $legal_identifier && wpo_ips_edi_vat_number_has_country_prefix( $legal_identifier_value ) ) {
 			$legal_identifier_value = substr( $legal_identifier_value, 2 );
 		}
@@ -683,11 +703,9 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 	);
 
 	if ( wpo_ips_edi_peppol_is_available() ) {
-		$user_id                 = $order->get_customer_id();
-		$endpoint_id             = $order->get_meta( '_peppol_endpoint_id' );
-		$endpoint_scheme         = $order->get_meta( '_peppol_endpoint_eas' );
-		$legal_identifier        = $order->get_meta( '_peppol_legal_identifier' );
-		$legal_identifier_scheme = $order->get_meta( '_peppol_legal_identifier_icd' );
+		$user_id         = $order->get_customer_id();
+		$endpoint_id     = $order->get_meta( '_peppol_endpoint_id' );
+		$endpoint_scheme = $order->get_meta( '_peppol_endpoint_eas' );
 
 		if ( empty( $endpoint_id ) && $user_id ) {
 			$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
@@ -697,27 +715,11 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 			$endpoint_scheme = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
 		}
 
-		if ( empty( $legal_identifier ) && $user_id ) {
-			$legal_identifier = get_user_meta( $user_id, 'peppol_legal_identifier', true );
-		}
-
-		if ( empty( $legal_identifier_scheme ) && $user_id ) {
-			$legal_identifier_scheme = get_user_meta( $user_id, 'peppol_legal_identifier_icd', true );
-		}
-
 		$data['peppol_endpoint_id'] = array(
 			'label'    => __( 'Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'    => ! empty( $endpoint_scheme ) && ! empty( $endpoint_id )
 				? sprintf( '%s:%s', $endpoint_scheme, $endpoint_id )
 				: ( ! empty( $endpoint_id ) ? $endpoint_id : '' ),
-			'required' => true,
-		);
-
-		$data['peppol_legal_identifier'] = array(
-			'label'    => __( 'Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier )
-				? sprintf( '%s:%s', $legal_identifier_scheme, $legal_identifier )
-				: ( ! empty( $legal_identifier ) ? $legal_identifier : '' ),
 			'required' => true,
 		);
 	}
@@ -777,8 +779,10 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
 
 	// [ text‑field , scheme‑field ]
 	$pairs = array(
-		array( 'peppol_endpoint_id',      'peppol_endpoint_eas' ),
-		array( 'peppol_legal_identifier', 'peppol_legal_identifier_icd' ),
+		array(
+			'peppol_endpoint_id',
+			'peppol_endpoint_eas',
+		),
 	);
 
 	foreach ( $pairs as list( $id_key, $scheme_key ) ) {

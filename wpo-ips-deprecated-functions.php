@@ -108,3 +108,16 @@ function wcpdf_ubl_headers( $filename, $size ): void {
 	_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_edi_file_headers' );
 	wpo_ips_edi_file_headers( $filename, $size );
 }
+
+/**
+ * Save order Peppol data
+ * 
+ * @param \WC_Abstract_Order $order
+ * @return void
+ * 
+ * @deprecated 5.3.1 Use wpo_ips_edi_maybe_save_order_peppol_data() instead.
+ */
+function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $order ): void {
+	_deprecated_function( __FUNCTION__, '5.3.1', 'wpo_ips_edi_maybe_save_order_peppol_data' );
+	wpo_ips_edi_maybe_save_order_peppol_data( $order );
+}
