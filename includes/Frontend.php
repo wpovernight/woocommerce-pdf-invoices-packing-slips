@@ -865,7 +865,7 @@ class Frontend {
 		
 		wp_enqueue_script(
 			'wpo-ips-peppol-checkout',
-			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-checkout-toggle' . $suffix . '.js',
+			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-classic-checkout' . $suffix . '.js',
 			array( 'jquery' ),
 			WPO_WCPDF_VERSION,
 			true
