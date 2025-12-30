@@ -718,7 +718,7 @@ class Frontend {
 		// Endpoint ID
 		$peppol_fields['peppol_endpoint_id'] = array(
 			'type'        => 'text',
-			'label'       => __( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
+			'label'       => __( 'Peppol identifier', 'woocommerce-pdf-invoices-packing-slips' ),
 			'required'    => false,
 			'class'       => array( 'form-row-wide', 'wpo-ips-peppol-conditional' ),
 			'placeholder' => $placeholder_endpoint,
