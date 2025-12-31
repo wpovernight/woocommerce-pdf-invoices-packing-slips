@@ -472,10 +472,11 @@ class Frontend {
 			return;
 		}
 
-		$input_mode = wpo_ips_edi_peppol_identifier_input_mode();
-		$conditional_hidden = array();
+		$input_mode          = wpo_ips_edi_peppol_identifier_input_mode();
+		$conditional_hidden  = array();
+		$use_checkout_toggle = $this->peppol_checkout_toggle_enabled();
 		
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) ) {
+		if ( $use_checkout_toggle && defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) ) {
 			$toggle_id = 'wpo-ips-edi/peppol-invoice';
 
 			woocommerce_register_additional_checkout_field(
@@ -493,23 +494,22 @@ class Frontend {
 				)
 			);
 
-			if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) ) {
-				$conditional_hidden = array(
-					'checkout' => array(
-						'properties' => array(
-							'additional_fields' => array(
-								'properties' => array(
-									$toggle_id => array(
-										'not' => array(
-											'const' => true,
-										),
+			// @link https://developer.woocommerce.com/docs/block-development/tutorials/how-to-conditional-additional-fields/
+			$conditional_hidden = array(
+				'checkout' => array(
+					'properties' => array(
+						'additional_fields' => array(
+							'properties' => array(
+								$toggle_id => array(
+									'not' => array(
+										'const' => true,
 									),
 								),
 							),
 						),
 					),
-				);
-			}
+				),
+			);
 		}
 
 		$args = array(
@@ -570,10 +570,13 @@ class Frontend {
 	 */
 	public function edi_peppol_set_checkout_block_fields_value(): void {
 		$fields = array(
-			'wpo-ips-edi/peppol-invoice',
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
 		);
+
+		if ( $this->peppol_checkout_toggle_enabled() ) {
+			array_unshift( $fields, 'wpo-ips-edi/peppol-invoice' );
+		}
 
 		foreach ( $fields as $field ) {
 			add_filter( "woocommerce_get_default_value_for_{$field}", array( $this, 'edi_peppol_prefill_checkout_block_field_from_user_meta' ), 10, 3 );
@@ -707,20 +710,26 @@ class Frontend {
 
 		$peppol_fields = array();
 
-		// Toggle
-		$peppol_fields['peppol_invoice'] = array(
-			'type'     => 'checkbox',
-			'label'    => __( 'I need a Peppol invoice (business purchase)', 'woocommerce-pdf-invoices-packing-slips' ),
-			'required' => false,
-			'class'    => array( 'form-row-wide' ),
-		);
+		// Toggle (only when enabled in settings).
+		if ( $this->peppol_checkout_toggle_enabled() ) {
+			$peppol_fields['peppol_invoice'] = array(
+				'type'     => 'checkbox',
+				'label'    => __( 'I need a Peppol invoice (business purchase)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'required' => false,
+				'class'    => array( 'form-row-wide' ),
+			);
+		}
+
+		$conditional_class = $this->peppol_checkout_toggle_enabled()
+			? array( 'form-row-wide', 'wpo-ips-peppol-conditional' )
+			: array( 'form-row-wide' );
 
 		// Endpoint ID
 		$peppol_fields['peppol_endpoint_id'] = array(
 			'type'        => 'text',
 			'label'       => __( 'Peppol identifier', 'woocommerce-pdf-invoices-packing-slips' ),
 			'required'    => false,
-			'class'       => array( 'form-row-wide', 'wpo-ips-peppol-conditional' ),
+			'class'       => $conditional_class,
 			'placeholder' => $placeholder_endpoint,
 		);
 
@@ -729,7 +738,7 @@ class Frontend {
 				'type'     => 'select',
 				'label'    => __( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'required' => false,
-				'class'    => array( 'form-row-wide', 'wpo-ips-peppol-conditional' ),
+				'class'    => $conditional_class,
 				'options'  => ( function () {
 					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
 					foreach ( EN16931::get_eas() as $code => $label ) {
@@ -759,6 +768,10 @@ class Frontend {
 			'peppol_endpoint_id',
 			'peppol_endpoint_eas',
 		), true ) ) {
+			return $value;
+		}
+		
+		if ( 'peppol_invoice' === $input && ! $this->peppol_checkout_toggle_enabled() ) {
 			return $value;
 		}
 
@@ -826,7 +839,8 @@ class Frontend {
 			return;
 		}
 
-		$wants_peppol = ! empty( $data['peppol_invoice'] );
+		$use_toggle   = $this->peppol_checkout_toggle_enabled();
+		$wants_peppol = $use_toggle ? ! empty( $data['peppol_invoice'] ) : ! empty( $data['peppol_endpoint_id'] );
 
 		if ( ! $wants_peppol ) {
 			return;
@@ -853,6 +867,10 @@ class Frontend {
 	 * @return void
 	 */
 	public function edi_peppol_enqueue_classic_checkout_script(): void {
+		if ( ! $this->peppol_checkout_toggle_enabled() ) {
+			return;
+		}
+
 		if (
 			! function_exists( 'is_checkout' ) ||
 			! is_checkout() ||
@@ -870,6 +888,15 @@ class Frontend {
 			WPO_WCPDF_VERSION,
 			true
 		);
+	}
+	
+	/**
+	 * Whether the Peppol invoice toggle should be shown on Checkout.
+	 *
+	 * @return bool
+	 */
+	private function peppol_checkout_toggle_enabled(): bool {
+		return (bool) wpo_ips_edi_get_settings( 'peppol_endpoint_id_checkout_toggle' );
 	}
 
 	/**
@@ -1188,13 +1215,12 @@ class Frontend {
 		<ul class="wpo-ips-edi-peppol-directory-result-list">
 			<?php foreach ( $matches as $match ) : ?>
 				<?php
-					$scheme = $match['scheme'] ?? '';
-					$value  = $match['value']  ?? '';
-					$name   = $match['name']   ?? '';
+					$name        = isset( $match['name'] ) ? (string) $match['name'] : '';
+					$value       = isset( $match['value'] ) ? (string) $match['value'] : '';
+					$identifiers = ( ! empty( $match['identifiers'] ) && is_array( $match['identifiers'] ) ) ? $match['identifiers'] : array();
 
-					$identifier = ! empty( $scheme )
-						? "$scheme:$value"
-						: $value;
+					// Prefer the participantID value, fall back to the first identifier.
+					$identifier = ( '' !== $value ) ? $value : ( ( ! empty( $identifiers ) ) ? (string) reset( $identifiers ) : '' );
 
 					if ( '' !== $name && '' !== $identifier ) {
 						$item = sprintf( '%1$s (%2$s)', $name, $identifier );
