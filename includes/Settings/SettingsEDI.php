@@ -383,6 +383,32 @@ class SettingsEDI {
 		);
 		
 		// Peppol specific field
+		if ( ! wpo_wcpdf_checkout_is_block() || ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) ) ) {
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'peppol_endpoint_id_checkout_toggle',
+				'title'    => '',
+				'callback' => 'checkbox',
+				'section'  => $section,
+				'args'     => array(
+					'title'       => __( 'Show Endpoint ID only for business purchases', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name' => $option_name,
+					'id'          => 'peppol_endpoint_id_checkout_toggle',
+					'description' => sprintf(
+						/* translators: %s: toggle label */
+						__( 'When enabled, the customer Peppol Endpoint ID field is only shown after selecting "%s". When disabled, the field is always visible at checkout.', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'I need a Peppol invoice (business purchase)', 'woocommerce-pdf-invoices-packing-slips' )
+					),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[ubl_format]',
+						'data-show_for_option_values' => wp_json_encode( array( 'peppol-bis-3p0' ) ),
+						'data-keep_current_value'     => true,
+					),
+				),
+			);
+		}
+		
+		// Peppol specific field
 		$settings_fields[] = array(
 			'type'     => 'setting',
 			'id'       => 'peppol_directory_validation',
@@ -394,7 +420,7 @@ class SettingsEDI {
 				'option_name' => $option_name,
 				'id'          => 'peppol_directory_validation',
 				'description' => __(
-					'When enabled, the customer Peppol Endpoint ID entered at checkout is validated against the Peppol Directory. If no matching participant is found, an error is shown so the value can be corrected.',
+					'When enabled, the customer Peppol Endpoint ID entered at checkout or in the My Account area is validated against the Peppol Directory. If no matching participant is found, an error is shown so the value can be corrected.',
 					'woocommerce-pdf-invoices-packing-slips'
 				),
 				'custom_attributes' => array(
