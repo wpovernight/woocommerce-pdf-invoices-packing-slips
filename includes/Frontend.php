@@ -453,6 +453,17 @@ class Frontend {
 		}
 
 		$request = stripslashes_deep( $_POST );
+		
+		// Maybe validate
+		if ( ! empty( $request['peppol_endpoint_id'] ) ) {
+			$result = $this->peppol_validate_identifier_value( $request['peppol_endpoint_id'] );
+
+			if ( is_wp_error( $result ) ) {
+				wc_add_notice( $result->get_error_message(), 'error' );
+				return;
+			}
+		}
+		
 		$user_id = get_current_user_id();
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );

@@ -420,7 +420,7 @@ class SettingsEDI {
 				'option_name' => $option_name,
 				'id'          => 'peppol_directory_validation',
 				'description' => __(
-					'When enabled, the customer Peppol Endpoint ID entered at checkout is validated against the Peppol Directory. If no matching participant is found, an error is shown so the value can be corrected.',
+					'When enabled, the customer Peppol Endpoint ID entered at checkout or in the My Account area is validated against the Peppol Directory. If no matching participant is found, an error is shown so the value can be corrected.',
 					'woocommerce-pdf-invoices-packing-slips'
 				),
 				'custom_attributes' => array(
