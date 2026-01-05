@@ -773,9 +773,11 @@ class Frontend {
 			return;
 		}
 
-		$user_id = absint( $order->get_customer_id() );
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
+			? absint( $order->get_customer_id() )
+			: 0;
 
-		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $data );
+		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $data );
 		
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
 	}
