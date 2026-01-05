@@ -95,15 +95,17 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	 */
 	private function get_endpoint(): ?array {
 		$order        = \wpo_ips_edi_get_parent_order( $this->document->order );
-		$user_id      = $order->get_customer_id();
 		$endpoint_id  = $order->get_meta( '_peppol_endpoint_id' );
 		$endpoint_eas = $order->get_meta( '_peppol_endpoint_eas' );
+		$customer_id  = is_callable( array( $order, 'get_customer_id' ) )
+			? $order->get_customer_id()
+			: 0;
 
-		if ( empty( $endpoint_id ) && $user_id ) {
-			$endpoint_id = get_user_meta( $user_id, 'peppol_endpoint_id', true );
+		if ( empty( $endpoint_id ) && $customer_id > 0 ) {
+			$endpoint_id = get_user_meta( $customer_id, 'peppol_endpoint_id', true );
 		}
-		if ( empty( $endpoint_eas ) && $user_id ) {
-			$endpoint_eas = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
+		if ( empty( $endpoint_eas ) && $customer_id > 0 ) {
+			$endpoint_eas = get_user_meta( $customer_id, 'peppol_endpoint_eas', true );
 		}
 
 		if ( empty( $endpoint_id ) || empty( $endpoint_eas ) ) {

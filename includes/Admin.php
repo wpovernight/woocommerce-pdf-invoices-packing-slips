@@ -922,13 +922,8 @@ class Admin {
 			? $order->get_customer_id()
 			: 0;
 
-		if ( empty( $customer_id ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'Customer ID is missing.', 'woocommerce-pdf-invoices-packing-slips' )
-			) );
-		}
-
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
+
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $values );
 
 		wp_send_json_success( array(

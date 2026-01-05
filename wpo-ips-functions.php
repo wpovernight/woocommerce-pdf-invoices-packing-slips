@@ -1144,9 +1144,11 @@ function wpo_wcpdf_order_is_vat_exempt( \WC_Abstract_Order $order ): bool {
 
 	// Fallback to customer VAT exemption if order is not exempt
 	if ( ! $is_vat_exempt && apply_filters( 'wpo_wcpdf_order_vat_exempt_fallback_to_customer', true, $order ) ) {
-		$customer_id = $order->get_customer_id();
+		$customer_id  = is_callable( array( $order, 'get_customer_id' ) )
+			? $order->get_customer_id()
+			: 0;
 
-		if ( $customer_id ) {
+		if ( $customer_id > 0 ) {
 			$customer      = new \WC_Customer( $customer_id );
 			$is_vat_exempt = $customer->is_vat_exempt();
 		}
