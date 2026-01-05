@@ -150,13 +150,16 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 	}
 	
 	if ( empty( $identifier ) || empty( $scheme ) ) {
-		$user_id = $order->get_customer_id();
-		if ( empty( $user_id ) ) {
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
+			? $order->get_customer_id()
+			: 0;
+			
+		if ( $customer_id <= 0 ) {
 			return;
 		}
 
-		$identifier = get_user_meta( $user_id, 'peppol_endpoint_id', true );
-		$scheme     = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
+		$identifier = get_user_meta( $customer_id, 'peppol_endpoint_id', true );
+		$scheme     = get_user_meta( $customer_id, 'peppol_endpoint_eas', true );
 	}
 
 	if ( ! empty( $identifier ) ) {
@@ -775,6 +778,10 @@ function wpo_ips_edi_peppol_identifier_input_mode(): string {
  * @param array $request $_POST / REST payload.
  */
 function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $request ): void {
+	if ( $user_id <= 0 ) {
+		return;
+	}
+	
 	$mode = wpo_ips_edi_peppol_identifier_input_mode();
 
 	// [ text‑field , scheme‑field ]
