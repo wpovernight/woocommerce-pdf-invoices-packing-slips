@@ -258,7 +258,7 @@ jQuery( function( $ ) {
 			url:    wpo_wcpdf_ajax.ajaxurl,
 			method: 'POST',
 			data: {
-				action:   'wpo_wcpdf_preview_formatted_number',
+				action:   'wpo_wcpdf_invoice_number_changed',
 				security: wpo_wcpdf_ajax.nonce,
 				prefix:   prefix,
 				suffix:   suffix,
@@ -268,17 +268,26 @@ jQuery( function( $ ) {
 				order_id: orderId,
 			},
 			success: function( response ) {
-				if ( response.success && response.data.formatted ) {
-					let $preview = $table.find( '.formatted-number' );
-					let current  = $preview.data( 'current' );
-					let updated  = response.data.formatted;
+				if ( response.success ) {
+					if ( response.data.formatted ) {
+						let $preview = $table.find('.formatted-number');
+						let current = $preview.data('current');
+						let updated = response.data.formatted;
 
-					$preview.val( updated );
+						$preview.val(updated);
 
-					if ( current !== updated ) {
-						$preview.addClass( 'changed' );
-					} else {
-						$preview.removeClass( 'changed' );
+						if (current !== updated) {
+							$preview.addClass('changed');
+						} else {
+							$preview.removeClass('changed');
+						}
+					}
+
+					$table.find( '.number-in-use-warning' ).remove();
+					if ( response.data.number_in_use ) {
+						$table.find( '.number-in-use-warning' ).remove();
+						$table.find( 'input[name$="_number_plain"]' )
+							.after( '<p class="number-in-use-warning">' + response.data.number_in_use + '</p>' );
 					}
 				}
 			},
@@ -361,7 +370,7 @@ jQuery( function( $ ) {
 					const val = row.find( 'td.edit input[type="text"]' ).val();
 					row.find( 'td.display' ).text( val || '—' );
 				} );
-				
+
 				$table.removeClass( 'is-editing' );
 
 				const msg = ( response && response.data && response.data.message ) || wpo_wcpdf_ajax.saved;

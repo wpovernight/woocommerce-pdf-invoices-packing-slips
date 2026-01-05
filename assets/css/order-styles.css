@@ -373,6 +373,12 @@ ul.wpo-ips-edi-actions > li {
 	background-color: #fff3cd;
 }
 
+.number-in-use-warning {
+	color: #987900;
+	font-weight: bold;
+	font-size: 0.8em;
+}
+
 @media screen and (max-width: 782px) {
 
 	.wp-list-table .column-pdf_invoice_number, .wp-list-table tr:not(.inline-edit-row):not(.no-items) td.column-pdf_invoice_number:not(.check-column) {

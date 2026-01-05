@@ -68,7 +68,7 @@ class Admin {
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_crud_document' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_preview_formatted_number', array( $this, 'ajax_preview_formatted_number' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_invoice_number_changed', array( $this, 'ajax_invoice_number_changed' ) );
 		add_action( 'wp_ajax_wpo_ips_edi_save_order_customer_peppol_identifiers', array( $this, 'ajax_edi_save_order_customer_peppol_identifiers' ) );
 
 		// document actions
@@ -708,27 +708,27 @@ class Admin {
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
 			$document_type  = $document->get_type();
-			
+
 			if ( 'credit-note' === $document_type && $order instanceof \WC_Order ) {
 				$refunds = $order->get_refunds();
 				if ( empty( $refunds ) ) {
 					continue;
 				}
-				
+
 				foreach ( $refunds as $refund ) {
 					if ( ! $refund instanceof \WC_Order_Refund ) {
 						continue;
 					}
-					
+
 					$xml_action = $this->get_order_meta_box_document_xml_action( $document_type, $refund );
-					
+
 					if ( ! empty( $xml_action ) ) {
 						$meta_box_actions[ $document_type . '::' . $refund->get_id() ] = $xml_action;
 					}
 				}
 			} else {
 				$xml_action = $this->get_order_meta_box_document_xml_action( $document_type, $order );
-				
+
 				if ( ! empty( $xml_action ) ) {
 					$meta_box_actions[ $document_type . '::' . $order->get_id() ] = $xml_action;
 				}
@@ -743,7 +743,7 @@ class Admin {
 
 		// Peppol specific
 		echo $this->get_order_meta_box_peppol_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		
+
 		if ( count( $meta_box_actions ) > 0 ) :
 		?>
 		<div class="edi-order-actions">
@@ -752,7 +752,7 @@ class Admin {
 					<tr>
 						<td>XML</td>
 						<td><?php esc_html_e( 'Actions', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-					</tr>	
+					</tr>
 				</thead>
 				<tbody>
 					<?php
@@ -1741,11 +1741,11 @@ class Admin {
 	}
 
 	/**
-	 * AJAX handler to preview a formatted number
+	 * AJAX handler for invoice number change.
 	 *
 	 * @return void
 	 */
-	public function ajax_preview_formatted_number(): void {
+	public function ajax_invoice_number_changed(): void {
 		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
@@ -1780,7 +1780,13 @@ class Admin {
 
 		$formatted = wpo_wcpdf_format_document_number( $plain, $prefix, $suffix, $padding, $document, $order );
 
-		wp_send_json_success( array( 'formatted' => $formatted ) );
+		$response = array( 'formatted' => $formatted );
+
+		if ( wcpdf_get_document_by_number( $plain, $document_type ) ) {
+			$response['number_in_use'] = __( 'Warning: This number is already in use by another document.', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
+		wp_send_json_success( $response );
 	}
 
 	/**
@@ -1983,7 +1989,7 @@ class Admin {
 
 		$query->set( 'orderby', $this->is_invoice_number_numeric() ? 'meta_value_num' : 'meta_value' );
 	}
-	
+
 	/**
 	 * Get XML document action for order meta box
 	 *
@@ -1997,15 +2003,15 @@ class Admin {
 		if ( ! $document || ! $document->exists() ) {
 			return array();
 		}
-		
+
 		$is_refund_order  = is_a( $order, 'WC_Order_Refund' );
 		$document_url     = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
 		$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 		$class            = array( $document_type, 'xml', 'exists' );
-		
+
 		$number_instance  = $document->get_number();
 		$number_formatted = ! empty( $number_instance ) ? $number_instance->get_formatted() : '';
-		
+
 		$xml_title        = sprintf(
 			'%s %s<br><span class="order-id">%s: %d</span>',
 			$document_title,
@@ -2013,7 +2019,7 @@ class Admin {
 			$is_refund_order ? __( 'RFND', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'ORD', 'woocommerce-pdf-invoices-packing-slips' ),
 			$order->get_id()
 		);
-		
+
 		return array(
 			'url'    => $document_url,
 			'alt'    => sprintf(
@@ -2027,7 +2033,7 @@ class Admin {
 			'target' => '_blank',
 		);
 	}
-	
+
 	/**
 	 * Get Peppol identifiers to display for the order
 	 *
@@ -2038,7 +2044,7 @@ class Admin {
 		if ( ! wpo_ips_edi_peppol_is_available() ) {
 			return;
 		}
-		
+
 		$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
 		$peppol_identifiers = array();
 
