@@ -181,6 +181,46 @@ class FileSystem {
 			$this->wp_filesystem->put_contents( $filename, $contents, $mode ) :
 			( $this->suppress_errors ? @file_put_contents( $filename, $contents ) : file_put_contents( $filename, $contents ) );
 	}
+	
+	/**
+	 * Output a file directly to the response.
+	 *
+	 * @param string $filename
+	 * @return bool
+	 */
+	public function output_file( string $filename ): bool {
+		if ( empty( $filename ) ) {
+			return false;
+		}
+
+		// WP_Filesystem_Direct doesn't provide a streaming API, so fall back to get_contents().
+		if ( $this->is_wp_filesystem() ) {
+			$contents = $this->wp_filesystem->get_contents( $filename );
+			if ( false === $contents ) {
+				return false;
+			}
+
+			echo $contents; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			return true;
+		}
+
+		$handle = $this->suppress_errors ? @fopen( $filename, 'rb' ) : fopen( $filename, 'rb' );
+		if ( false === $handle ) {
+			return false;
+		}
+
+		while ( ! feof( $handle ) ) {
+			$buffer = fread( $handle, 8192 );
+			if ( false === $buffer ) {
+				fclose( $handle );
+				return false;
+			}
+			echo $buffer; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+
+		fclose( $handle );
+		return true;
+	}
 
 	/**
 	 * Check if file exists
