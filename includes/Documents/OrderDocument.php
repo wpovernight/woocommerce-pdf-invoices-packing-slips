@@ -1702,11 +1702,20 @@ abstract class OrderDocument {
 
 		wpo_ips_edi_file_headers( $quoted, $size );
 
-		ob_clean();
-		flush();
+		// Disable output compression.
+		@ini_set( 'zlib.output_compression', 'Off' );
+
+		// Clear all output buffers to prevent stray bytes/newlines before the XML declaration.
+		while ( ob_get_level() ) {
+			ob_end_clean();
+		}
 
 		if ( WPO_WCPDF()->file_system->exists( $filename_or_contents ) ) {
-			echo WPO_WCPDF()->file_system->get_contents( $filename_or_contents ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$sent = WPO_WCPDF()->file_system->output_file( $filename_or_contents );
+			if ( false === $sent ) {
+				wcpdf_log_error( sprintf( 'Could not output XML file (%s)', $filename_or_contents ), 'critical' );
+			}
+
 			wp_delete_file( $filename_or_contents );
 		}
 

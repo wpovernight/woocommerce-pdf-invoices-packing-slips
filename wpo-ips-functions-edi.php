@@ -319,10 +319,9 @@ function wpo_ips_edi_file_headers( string $filename, $size ): void {
 	$charset = apply_filters( 'wpo_ips_edi_file_header_content_type_charset', 'UTF-8' );
 
 	header( 'Content-Description: File Transfer' );
-	header( 'Content-Type: text/xml; charset=' . $charset );
+	header( 'Content-Type: application/xml; charset=' . $charset );
 	header( 'Content-Disposition: attachment; filename=' . $filename );
 	header( 'Content-Transfer-Encoding: binary' );
-	header( 'Connection: Keep-Alive' );
 	header( 'Expires: 0' );
 	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 	header( 'Pragma: public' );
