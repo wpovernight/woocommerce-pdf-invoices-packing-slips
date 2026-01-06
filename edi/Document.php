@@ -267,16 +267,13 @@ class Document {
 			$type  = $item->get_type();
 			$taxes = $item->get_taxes();
 
-			// Choose the correct tax bucket and the ex-tax base for aggregation.
-			if ( 'line_item' === $type ) {
-				$bucket        = 'subtotal';
-				$line_total_ex = (float) $item->get_subtotal();
-			} else {
-				$bucket        = 'total';
-				$line_total_ex = (float) $item->get_total();
-			}
+			// For EN16931/Peppol VAT breakdown rules we need the taxable base AFTER discounts.
+			$bucket        = 'total';
+			$line_total_ex = (float) $item->get_total();
 
 			$rows = ( isset( $taxes[ $bucket ] ) && is_array( $taxes[ $bucket ] ) ) ? $taxes[ $bucket ] : array();
+
+			// Nothing taxable on this item.
 			if ( empty( $rows ) ) {
 				continue;
 			}
@@ -324,7 +321,7 @@ class Document {
 					continue;
 				}
 
-				// we use the tax total from the tax item because this
+				// We use the tax total from the tax item because this
 				// takes into account possible line item rounding settings as well
 				// we still apply rounding on the total (for non-checkout orders)
 				$order_tax_data[ $tax_data_key ]['total_tax'] = wc_round_tax_total( $tax_item['tax_amount'] ) + wc_round_tax_total( $tax_item['shipping_tax_amount'] );
@@ -371,6 +368,10 @@ class Document {
 
 				$name = ! empty( $tax_item['label'] ) ? $tax_item['label'] : $tax_item['name'];
 			}
+
+			// Normalize tiny float residue and keep numbers as numbers.
+			$order_tax_data[ $tax_data_key ]['total_ex']   = (float) wc_format_decimal( $order_tax_data[ $tax_data_key ]['total_ex'] ?? 0.0, 2, false );
+			$order_tax_data[ $tax_data_key ]['total_tax']  = (float) wc_format_decimal( $order_tax_data[ $tax_data_key ]['total_tax'] ?? 0.0, 2, false );
 
 			$order_tax_data[ $tax_data_key ]['percentage'] = $percentage;
 			$order_tax_data[ $tax_data_key ]['category']   = $category;
