@@ -50,15 +50,29 @@ class LineHandler extends AbstractUblHandler {
 
 			// Price parts
 			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon_lines );
+			
+			// Round gross/net units first (numeric), then derive discount, then recompute net.
+			$gross_unit_f = (float) $this->format_decimal( $parts['gross_unit'], 2 );
+			$net_unit_f   = (float) $this->format_decimal( $parts['net_unit'],   2 );
 
-			$gross_unit    = $this->format_decimal( $parts['gross_unit'], 2 );
-			$net_unit      = $this->format_decimal( $parts['net_unit'],   2 );
-			$unit_discount = max( 0.0, $this->format_decimal( $parts['gross_unit'] - $parts['net_unit'], 2 ) );
+			$unit_discount_f = $gross_unit_f - $net_unit_f;
+			if ( $unit_discount_f < 0 ) {
+				$unit_discount_f = 0.0;
+			}
+
+			$unit_discount_f = (float) $this->format_decimal( $unit_discount_f, 2 );
+
+			// Recompute net from gross - discount to guarantee equality in XML.
+			$net_unit_f = $gross_unit_f - $unit_discount_f;
+
+			$gross_unit    = $this->format_decimal( $gross_unit_f, 2 );
+			$net_unit      = $this->format_decimal( $net_unit_f,   2 );
+			$unit_discount = $this->format_decimal( $unit_discount_f, 2 );
 
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => $this->format_decimal( abs( $parts['net_unit'] ) ),
+					'value'      => $net_unit,
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
@@ -83,7 +97,7 @@ class LineHandler extends AbstractUblHandler {
 						),
 						array(
 							'name'       => 'cbc:Amount',
-							'value'      => $this->format_decimal( $unit_discount ),
+							'value'      => $unit_discount,
 							'attributes' => array(
 								'currencyID' => $currency,
 							),

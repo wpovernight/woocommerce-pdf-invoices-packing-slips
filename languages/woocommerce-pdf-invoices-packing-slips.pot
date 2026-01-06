@@ -1,15 +1,15 @@
-# Copyright (C) 2025 WP Overnight
+# Copyright (C) 2026 WP Overnight
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.4.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.4.1-beta.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-12-24T11:55:30+00:00\n"
+"POT-Creation-Date: 2026-01-06T08:49:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -1997,7 +1997,7 @@ msgid "Mutually defined"
 msgstr ""
 
 #. Translators: %s is the coupon code applied to the discount.
-#: edi/Syntaxes/Ubl/Handlers/LineHandler.php:226
+#: edi/Syntaxes/Ubl/Handlers/LineHandler.php:240
 #, php-format
 msgid "Discount %s"
 msgstr ""
@@ -2063,7 +2063,7 @@ msgid "I am the wizard"
 msgstr ""
 
 #: includes/Admin.php:361
-#: includes/Admin.php:1937
+#: includes/Admin.php:1932
 #: includes/Assets.php:367
 #: includes/Documents/Invoice.php:359
 #: includes/Main.php:1352
@@ -2157,7 +2157,7 @@ msgid "Download %s"
 msgstr ""
 
 #: includes/Admin.php:899
-#: includes/Admin.php:1755
+#: includes/Admin.php:1750
 msgid "Invalid security token."
 msgstr ""
 
@@ -2169,303 +2169,299 @@ msgstr ""
 msgid "Order not found."
 msgstr ""
 
-#: includes/Admin.php:927
-msgid "Customer ID is missing."
-msgstr ""
-
-#: includes/Admin.php:935
+#: includes/Admin.php:930
 msgid "Peppol identifiers saved successfully."
 msgstr ""
 
-#: includes/Admin.php:952
+#: includes/Admin.php:947
 msgid "Invoice number:"
 msgstr ""
 
-#: includes/Admin.php:955
+#: includes/Admin.php:950
 msgid "Invoice date:"
 msgstr ""
 
-#: includes/Admin.php:958
+#: includes/Admin.php:953
 msgid "Invoice display date:"
 msgstr ""
 
-#: includes/Admin.php:961
+#: includes/Admin.php:956
 msgid "Invoice created via:"
 msgstr ""
 
-#: includes/Admin.php:964
+#: includes/Admin.php:959
 msgid "Notes (displayed in the invoice):"
 msgstr ""
 
-#: includes/Admin.php:1193
+#: includes/Admin.php:1188
 msgid "View more details"
 msgstr ""
 
-#: includes/Admin.php:1194
+#: includes/Admin.php:1189
 msgid "Hide details"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:1205
+#: includes/Admin.php:1200
 #, php-format
 msgid "Set %s number & date"
 msgstr ""
 
-#: includes/Admin.php:1214
+#: includes/Admin.php:1209
 msgid "You do not have sufficient permissions to edit this document."
 msgstr ""
 
-#: includes/Admin.php:1227
+#: includes/Admin.php:1222
 msgid "Number prefix"
 msgstr ""
 
-#: includes/Admin.php:1231
+#: includes/Admin.php:1226
 #: includes/Documents/Invoice.php:395
 msgid "If set, this value will be used as number prefix."
 msgstr ""
 
 #. translators: 1. document slug, 2-3 placeholders
-#: includes/Admin.php:1234
-#: includes/Admin.php:1254
+#: includes/Admin.php:1229
+#: includes/Admin.php:1249
 #: includes/Documents/Invoice.php:397
 #: includes/Documents/Invoice.php:406
 #, php-format
 msgid "You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively."
 msgstr ""
 
-#: includes/Admin.php:1247
+#: includes/Admin.php:1242
 msgid "Number suffix"
 msgstr ""
 
-#: includes/Admin.php:1251
+#: includes/Admin.php:1246
 #: includes/Documents/Invoice.php:404
 msgid "If set, this value will be used as number suffix."
 msgstr ""
 
-#: includes/Admin.php:1267
+#: includes/Admin.php:1262
 msgid "Number padding"
 msgstr ""
 
 #. translators: %1$s: code, %2$s: document title, %3$s: number, %4$s: padded number
-#: includes/Admin.php:1271
+#: includes/Admin.php:1266
 #, php-format
 msgid "Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
-#: includes/Admin.php:1287
+#: includes/Admin.php:1282
 #: includes/Documents/Invoice.php:420
 #, php-format
 msgid "For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article: %1$sNumber format explained%2$s"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1301
+#: includes/Admin.php:1296
 #, php-format
 msgid "%s number"
 msgstr ""
 
-#: includes/Admin.php:1309
+#: includes/Admin.php:1304
 msgid "Formatted number"
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
-#: includes/Admin.php:1316
+#: includes/Admin.php:1311
 #, php-format
 msgid "Manually changing the document's plain number also requires updating the next document number in the %1$sdocument settings%2$s."
 msgstr ""
 
-#: includes/Admin.php:1320
+#: includes/Admin.php:1315
 msgid "Please note that changing the document number may create gaps in the numbering sequence."
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1333
+#: includes/Admin.php:1328
 #, php-format
 msgid "%s date"
 msgstr ""
 
-#: includes/Admin.php:1341
+#: includes/Admin.php:1336
 msgid "Hour"
 msgstr ""
 
-#: includes/Admin.php:1342
+#: includes/Admin.php:1337
 msgid "h"
 msgstr ""
 
-#: includes/Admin.php:1345
+#: includes/Admin.php:1340
 msgid "Minute"
 msgstr ""
 
-#: includes/Admin.php:1346
+#: includes/Admin.php:1341
 msgid "m"
 msgstr ""
 
-#: includes/Admin.php:1372
+#: includes/Admin.php:1367
 msgid "Notes"
 msgstr ""
 
-#: includes/Admin.php:1377
+#: includes/Admin.php:1372
 msgid "Displayed in the document!"
 msgstr ""
 
-#: includes/Admin.php:1390
+#: includes/Admin.php:1385
 #: includes/Frontend.php:429
 msgid "Save changes"
 msgstr ""
 
-#: includes/Admin.php:1391
-#: includes/Admin.php:2141
+#: includes/Admin.php:1386
+#: includes/Admin.php:2136
 msgid "Cancel"
 msgstr ""
 
 #. translators: %s: email title
-#: includes/Admin.php:1531
+#: includes/Admin.php:1526
 #, php-format
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/Admin.php:1579
+#: includes/Admin.php:1574
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/Admin.php:1587
+#: includes/Admin.php:1582
 msgid "Bad action!"
 msgstr ""
 
-#: includes/Admin.php:1593
+#: includes/Admin.php:1588
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/Admin.php:1599
+#: includes/Admin.php:1594
 msgid "No permissions!"
 msgstr ""
 
-#: includes/Admin.php:1625
+#: includes/Admin.php:1620
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/Admin.php:1626
+#: includes/Admin.php:1621
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/Admin.php:1629
+#: includes/Admin.php:1624
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/Admin.php:1630
+#: includes/Admin.php:1625
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/Admin.php:1633
+#: includes/Admin.php:1628
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/Admin.php:1634
+#: includes/Admin.php:1629
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/Admin.php:1694
+#: includes/Admin.php:1689
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/Admin.php:1708
+#: includes/Admin.php:1703
 msgid "Document is empty."
 msgstr ""
 
-#: includes/Admin.php:1739
+#: includes/Admin.php:1734
 msgid "DEBUG output enabled"
 msgstr ""
 
-#: includes/Admin.php:1767
+#: includes/Admin.php:1762
 msgid "Invalid order ID."
 msgstr ""
 
-#: includes/Admin.php:1773
+#: includes/Admin.php:1768
 msgid "Invalid order."
 msgstr ""
 
-#: includes/Admin.php:1777
+#: includes/Admin.php:1772
 msgid "Invalid document type."
 msgstr ""
 
-#: includes/Admin.php:1783
+#: includes/Admin.php:1778
 msgid "Invalid document."
 msgstr ""
 
-#: includes/Admin.php:2018
+#: includes/Admin.php:2013
 msgid "RFND"
 msgstr ""
 
-#: includes/Admin.php:2018
+#: includes/Admin.php:2013
 msgid "ORD"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:2026
+#: includes/Admin.php:2021
 #, php-format
 msgid "XML %s"
 msgstr ""
 
-#: includes/Admin.php:2061
+#: includes/Admin.php:2056
 msgid "Identifier"
 msgstr ""
 
-#: includes/Admin.php:2063
+#: includes/Admin.php:2058
 #: includes/Assets.php:97
 msgid "Show"
 msgstr ""
 
-#: includes/Admin.php:2078
-#: includes/Admin.php:2121
+#: includes/Admin.php:2073
+#: includes/Admin.php:2116
 #: includes/Assets.php:338
 #: includes/Settings/SettingsEDI.php:686
 msgid "Missing"
 msgstr ""
 
-#: includes/Admin.php:2079
-#: includes/Admin.php:2122
+#: includes/Admin.php:2074
+#: includes/Admin.php:2117
 #: includes/Assets.php:339
 #: includes/Settings/SettingsEDI.php:687
 msgid "Optional"
 msgstr ""
 
-#: includes/Admin.php:2089
+#: includes/Admin.php:2084
 #: includes/Settings/SettingsEDI.php:695
 msgid "VAT number is missing the country prefix"
 msgstr ""
 
-#: includes/Admin.php:2104
+#: includes/Admin.php:2099
 msgid "Peppol"
 msgstr ""
 
-#: includes/Admin.php:2106
+#: includes/Admin.php:2101
 msgid "Edit"
 msgstr ""
 
-#: includes/Admin.php:2137
-#: includes/Frontend.php:812
+#: includes/Admin.php:2132
+#: includes/Frontend.php:814
 msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
 msgstr ""
 
-#: includes/Admin.php:2140
+#: includes/Admin.php:2135
 #: includes/Settings/SettingsCallbacks.php:913
 msgid "Save"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:2180
+#: includes/Admin.php:2175
 #, php-format
 msgid "Editing of %s number and date is currently disabled."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name
-#: includes/Admin.php:2185
+#: includes/Admin.php:2180
 #, php-format
 msgid "If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s."
 msgstr ""
 
-#: includes/Admin.php:2188
+#: includes/Admin.php:2183
 #: includes/Settings/SettingsDebug.php:947
 msgid "Enable document data editing"
 msgstr ""
@@ -3219,53 +3215,53 @@ msgstr ""
 msgid "Invalid Endpoint Scheme."
 msgstr ""
 
-#: includes/Frontend.php:826
-#: includes/Frontend.php:924
+#: includes/Frontend.php:828
+#: includes/Frontend.php:926
 msgid "Peppol Endpoint ID is empty."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: includes/Frontend.php:848
+#: includes/Frontend.php:850
 #, php-format
 msgid "The identifier \"%1$s\" was found without a scheme. Please enter it in \"scheme:value\" format. You can search for the correct scheme and identifier in the %2$s."
 msgstr ""
 
-#: includes/Frontend.php:853
-#: includes/Frontend.php:879
-#: includes/Frontend.php:902
+#: includes/Frontend.php:855
+#: includes/Frontend.php:881
+#: includes/Frontend.php:904
 msgid "Peppol Directory"
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: includes/Frontend.php:874
+#: includes/Frontend.php:876
 #, php-format
 msgid "No Peppol participant was found for \"%1$s\". Please confirm the scheme and identifier in the %2$s."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: includes/Frontend.php:897
+#: includes/Frontend.php:899
 #, php-format
 msgid "We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the %2$s. Below are participants found for this identifier value:"
 msgstr ""
 
 #. translators: %s: error message
-#: includes/Frontend.php:1039
+#: includes/Frontend.php:1041
 #, php-format
 msgid "Peppol Directory request failed: %s"
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: includes/Frontend.php:1053
+#: includes/Frontend.php:1055
 #, php-format
 msgid "Peppol Directory returned an unexpected status code: %d"
 msgstr ""
 
-#: includes/Frontend.php:1064
+#: includes/Frontend.php:1066
 msgid "Peppol Directory returned an invalid JSON response."
 msgstr ""
 
 #. translators: %s: endpoint ID
-#: includes/Frontend.php:1090
+#: includes/Frontend.php:1092
 #, php-format
 msgid "We found the following participant(s) related to \"%s\":"
 msgstr ""
@@ -4435,8 +4431,8 @@ msgid "Postcode / ZIP"
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:953
-#: wpo-ips-functions-edi.php:585
-#: wpo-ips-functions-edi.php:679
+#: wpo-ips-functions-edi.php:588
+#: wpo-ips-functions-edi.php:682
 msgid "City"
 msgstr ""
 
@@ -5938,57 +5934,57 @@ msgstr ""
 msgid "Hide this version"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:570
-#: wpo-ips-functions-edi.php:664
+#: wpo-ips-functions-edi.php:573
+#: wpo-ips-functions-edi.php:667
 msgid "Name"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:575
+#: wpo-ips-functions-edi.php:578
 msgid "Street address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:580
-#: wpo-ips-functions-edi.php:674
+#: wpo-ips-functions-edi.php:583
+#: wpo-ips-functions-edi.php:677
 msgid "Postcode"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:590
-#: wpo-ips-functions-edi.php:684
+#: wpo-ips-functions-edi.php:593
+#: wpo-ips-functions-edi.php:687
 msgid "State"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:595
-#: wpo-ips-functions-edi.php:689
+#: wpo-ips-functions-edi.php:598
+#: wpo-ips-functions-edi.php:692
 msgid "Country Code"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:600
-#: wpo-ips-functions-edi.php:694
+#: wpo-ips-functions-edi.php:603
+#: wpo-ips-functions-edi.php:697
 msgid "VAT number"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:605
+#: wpo-ips-functions-edi.php:608
 msgid "Registration number"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:610
-#: wpo-ips-functions-edi.php:699
+#: wpo-ips-functions-edi.php:613
+#: wpo-ips-functions-edi.php:702
 msgid "Email"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:631
+#: wpo-ips-functions-edi.php:634
 msgid "PEPPOL Endpoint ID"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:639
+#: wpo-ips-functions-edi.php:642
 msgid "PEPPOL Legal Identifier"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:669
+#: wpo-ips-functions-edi.php:672
 msgid "Address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:719
+#: wpo-ips-functions-edi.php:722
 msgid "Endpoint ID"
 msgstr ""
 
