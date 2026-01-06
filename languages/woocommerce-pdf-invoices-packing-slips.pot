@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.5.0-beta.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.5.0-beta.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-06T13:59:36+00:00\n"
+"POT-Creation-Date: 2026-01-06T14:12:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -3055,11 +3055,11 @@ msgstr ""
 msgid "Customer Notes:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1836
+#: includes/Documents/OrderDocument.php:1845
 msgid "Admin email"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1839
+#: includes/Documents/OrderDocument.php:1848
 msgid "Manual email"
 msgstr ""
 
@@ -4456,8 +4456,8 @@ msgid "Postcode / ZIP"
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:982
-#: wpo-ips-functions-edi.php:588
-#: wpo-ips-functions-edi.php:682
+#: wpo-ips-functions-edi.php:587
+#: wpo-ips-functions-edi.php:681
 msgid "City"
 msgstr ""
 
@@ -5959,57 +5959,57 @@ msgstr ""
 msgid "Hide this version"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:573
-#: wpo-ips-functions-edi.php:667
+#: wpo-ips-functions-edi.php:572
+#: wpo-ips-functions-edi.php:666
 msgid "Name"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:578
+#: wpo-ips-functions-edi.php:577
 msgid "Street address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:583
-#: wpo-ips-functions-edi.php:677
+#: wpo-ips-functions-edi.php:582
+#: wpo-ips-functions-edi.php:676
 msgid "Postcode"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:593
-#: wpo-ips-functions-edi.php:687
+#: wpo-ips-functions-edi.php:592
+#: wpo-ips-functions-edi.php:686
 msgid "State"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:598
-#: wpo-ips-functions-edi.php:692
+#: wpo-ips-functions-edi.php:597
+#: wpo-ips-functions-edi.php:691
 msgid "Country Code"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:603
-#: wpo-ips-functions-edi.php:697
+#: wpo-ips-functions-edi.php:602
+#: wpo-ips-functions-edi.php:696
 msgid "VAT number"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:608
+#: wpo-ips-functions-edi.php:607
 msgid "Registration number"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:613
-#: wpo-ips-functions-edi.php:702
+#: wpo-ips-functions-edi.php:612
+#: wpo-ips-functions-edi.php:701
 msgid "Email"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:634
+#: wpo-ips-functions-edi.php:633
 msgid "PEPPOL Endpoint ID"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:642
+#: wpo-ips-functions-edi.php:641
 msgid "PEPPOL Legal Identifier"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:672
+#: wpo-ips-functions-edi.php:671
 msgid "Address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:722
+#: wpo-ips-functions-edi.php:721
 msgid "Endpoint ID"
 msgstr ""
 
