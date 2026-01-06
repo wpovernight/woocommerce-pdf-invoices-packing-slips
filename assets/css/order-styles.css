@@ -166,6 +166,7 @@ ul.wpo-ips-edi-actions > li {
 #wpo_ips-edi-box .edi-order-actions table th:last-child,
 #wpo_ips-edi-box .edi-order-actions table td:last-child {
 	text-align: right;
+	white-space: nowrap;
 }
 
 #wpo_ips-edi-box .inside > .edi-order-actions .xml {
@@ -176,7 +177,7 @@ ul.wpo-ips-edi-actions > li {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	clear: both;
+	clear: none;
 }
 
 #wpo_ips-edi-box .inside > .edi-order-actions .xml .dashicons {
