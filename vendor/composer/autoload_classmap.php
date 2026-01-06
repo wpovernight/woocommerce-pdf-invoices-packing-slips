@@ -30,6 +30,7 @@ return array(
     'WPO\\IPS\\EDI\\Interfaces\\FormatInterface' => $baseDir . '/edi/Interfaces/FormatInterface.php',
     'WPO\\IPS\\EDI\\Interfaces\\HandlerInterface' => $baseDir . '/edi/Interfaces/HandlerInterface.php',
     'WPO\\IPS\\EDI\\Interfaces\\HybridFormatInterface' => $baseDir . '/edi/Interfaces/HybridFormatInterface.php',
+    'WPO\\IPS\\EDI\\Peppol' => $baseDir . '/edi/Peppol.php',
     'WPO\\IPS\\EDI\\SabreBuilder' => $baseDir . '/edi/SabreBuilder.php',
     'WPO\\IPS\\EDI\\Standards\\EN16931' => $baseDir . '/edi/Standards/EN16931.php',
     'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Abstracts\\AbstractCiiFormat' => $baseDir . '/edi/Syntaxes/Cii/Abstracts/AbstractCiiFormat.php',

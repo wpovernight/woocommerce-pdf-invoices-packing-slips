@@ -176,6 +176,9 @@ class WPO_WCPDF {
 		$this->frontend            = \WPO\IPS\Frontend::instance();
 		$this->install             = \WPO\IPS\Install::instance();
 		$this->font_synchronizer   = \WPO\IPS\FontSynchronizer::instance();
+		
+		// EDI classes
+		\WPO\IPS\EDI\Peppol::instance();
 	}
 
 	/**

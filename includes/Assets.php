@@ -197,6 +197,8 @@ class Assets {
 						// general
 						'download_display',
 						'test_mode',
+						'checkout_field_enable',
+						'checkout_field_label',
 						// document
 						'enabled',
 						'archive_pdf',

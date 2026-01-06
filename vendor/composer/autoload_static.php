@@ -68,6 +68,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\EDI\\Interfaces\\FormatInterface' => __DIR__ . '/../..' . '/edi/Interfaces/FormatInterface.php',
         'WPO\\IPS\\EDI\\Interfaces\\HandlerInterface' => __DIR__ . '/../..' . '/edi/Interfaces/HandlerInterface.php',
         'WPO\\IPS\\EDI\\Interfaces\\HybridFormatInterface' => __DIR__ . '/../..' . '/edi/Interfaces/HybridFormatInterface.php',
+        'WPO\\IPS\\EDI\\Peppol' => __DIR__ . '/../..' . '/edi/Peppol.php',
         'WPO\\IPS\\EDI\\SabreBuilder' => __DIR__ . '/../..' . '/edi/SabreBuilder.php',
         'WPO\\IPS\\EDI\\Standards\\EN16931' => __DIR__ . '/../..' . '/edi/Standards/EN16931.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Abstracts\\AbstractCiiFormat' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Abstracts/AbstractCiiFormat.php',

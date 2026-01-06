@@ -461,6 +461,43 @@ class SettingsGeneral {
 					'translatable' => true,
 				)
 			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_enable',
+				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_enable',
+					'description' => __( 'Enable an optional custom field at checkout to collect customer identification data, such as tax IDs, company registration numbers, purchase order numbers, or internal customer references.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_label',
+				'title'    => __( 'Label', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_label',
+					'default'     => __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'The label for the optional custom field displayed at checkout.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_as_vat_number',
+				'title'    => __( 'Treat as VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_as_vat_number',
+					'description' => __( 'When enabled, the checkout field is treated as a VAT number and may be used for VAT-specific logic such as validation, display, or integrations.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
 		);
 
 		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
@@ -550,7 +587,7 @@ class SettingsGeneral {
 	public function get_settings_categories(): array {
 		$settings_categories = array(
 			'display' => array(
-				'title' => __( 'Display Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Display Settings', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'download_display',
 					'paper_size',
@@ -560,7 +597,7 @@ class SettingsGeneral {
 				),
 			),
 			'shop_information' => array(
-				'title' => __( 'Shop Information', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Shop Information', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'header_logo',
 					'header_logo_height',
@@ -580,13 +617,21 @@ class SettingsGeneral {
 				)
 			),
 			'advanced_formatting' => array(
-				'title' => __( 'Advanced Formatting', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Advanced Formatting', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'font_subsetting',
 					'currency_font',
 					'extra_1',
 					'extra_2',
 					'extra_3',
+				)
+			),
+			'checkout_field' => array(
+				'title'   => __( 'Checkout Field', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'checkout_field_enable',
+					'checkout_field_label',
+					'checkout_field_as_vat_number',
 				)
 			),
 		);
