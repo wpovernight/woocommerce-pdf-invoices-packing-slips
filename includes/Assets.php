@@ -199,6 +199,7 @@ class Assets {
 						'test_mode',
 						'checkout_field_enable',
 						'checkout_field_label',
+						'checkout_field_as_vat_number',
 						// document
 						'enabled',
 						'archive_pdf',
