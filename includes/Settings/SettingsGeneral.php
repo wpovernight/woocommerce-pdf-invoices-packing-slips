@@ -52,6 +52,14 @@ class SettingsGeneral {
 		$requires_pro           = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 		$states                 = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
 		$missing_template_files = $this->get_missing_template_files();
+		$has_vat_plugin_active  = \wpo_ips_has_vat_plugin_active();
+		$vat_plugin_notice      = '';
+
+		if ( $has_vat_plugin_active ) {
+			$vat_plugin_notice = '<div class="notice notice-info inline notice-wpo"><p>'
+				. esc_html__( 'A VAT plugin is currently active. This option is disabled to avoid conflicts and duplicate VAT fields at checkout.', 'woocommerce-pdf-invoices-packing-slips' )
+				. '</p></div>';
+		}
 
 		$settings_fields = array(
 			array(
@@ -495,11 +503,13 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'checkout_field_as_vat_number',
+					'disabled'    => $has_vat_plugin_active,
+					'value'       => $has_vat_plugin_active ? false : $this->get_setting( 'checkout_field_as_vat_number' ),
 					'description' => sprintf(
 						/* translators: %s: WooCommerce EU VAT Compliance plugin link */
 						__( 'When enabled, the checkout field is treated as a VAT number and may be used for basic VAT-related logic. Avoid enabling this option if you are already using a third-party VAT plugin, as it may result in duplicate or conflicting VAT fields. For advanced VAT validation, reporting, and full compliance with EU VAT rules, we recommend using %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="https://wpovernight.com/downloads/woocommerce-eu-vat-compliance/?utm_medium=plugin&utm_source=ips&utm_campaign=general-tab&utm_content=woocommerce-eu-vat-compliance-cross" target="_blank" rel="noopener noreferrer">WooCommerce EU VAT Compliance</a>'
-					),
+						'<a href="https://wpovernight.com/downloads/woocommerce-eu-vat-compliance/?utm_medium=plugin&utm_source=ips&utm_campaign=general-tab&utm_content=woocommerce-eu-vat-compliance-cross" target="_blank" rel="noopener noreferrer">WooCommerce EU VAT Compliance</a>',
+					) . $vat_plugin_notice,
 				),
 			),
 		);

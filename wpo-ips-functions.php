@@ -2020,3 +2020,48 @@ function wpo_ips_get_plugins_data( array $plugin_files ): array {
 
 	return $plugins;
 }
+
+/**
+ * Check whether a VAT plugin is active.
+ *
+ * @return bool
+ */
+function wpo_ips_has_vat_plugin_active(): bool {
+	$detectors = apply_filters(
+		'wpo_ips_vat_plugin_detectors',
+		array(
+			'woocommerce_eu_vat_compliance' => static function () {
+				return class_exists( 'WC_EU_VAT_Compliance' );
+			},
+
+			'eu_vat_for_woocommerce' => static function () {
+				return defined( 'ALG_WC_EU_VAT_FILE' )
+					|| class_exists( 'Alg_WC_EU_VAT' );
+			},
+
+			'aelia_eu_vat_assistant' => static function () {
+				return class_exists( 'Aelia_WC_EU_VAT_Assistant_RequirementsChecks' )
+					|| class_exists( 'WC_Aelia_EU_VAT_Assistant' )
+					|| isset( $GLOBALS['wc-aelia-eu-vat-assistant'] );
+			},
+
+			'eu_vat_guard_for_woocommerce' => static function () {
+				return defined( 'EU_VAT_GUARD_PLUGIN_FILE' )
+					|| class_exists( 'Stormlabs\\EUVATGuard\\VAT_Guard' )
+					|| class_exists( 'EU_VAT_Guard' );
+			},
+		)
+	);
+
+	if ( ! is_array( $detectors ) ) {
+		return false;
+	}
+
+	foreach ( $detectors as $detector ) {
+		if ( $detector() ) {
+			return true;
+		}
+	}
+
+	return false;
+}

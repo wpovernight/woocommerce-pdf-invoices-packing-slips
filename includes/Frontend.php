@@ -671,7 +671,18 @@ class Frontend {
 	 * @return bool
 	 */
 	private function checkout_field_is_vat_number(): bool {
-		return ! empty( WPO_WCPDF()->settings->general_settings['checkout_field_as_vat_number'] ?? '' );
+		$enabled = ! empty( WPO_WCPDF()->settings->general_settings['checkout_field_as_vat_number'] ?? '' );
+
+		if ( ! $enabled ) {
+			return false;
+		}
+
+		// Prevent conflicts with VAT plugins.
+		if ( \wpo_ips_has_vat_plugin_active() ) {
+			return false;
+		}
+
+		return true;
 	}
 	
 	/**
