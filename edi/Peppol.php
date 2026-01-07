@@ -7,7 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-if ( ! class_exists( '\\WPO\\IPS\\Peppol' ) ) :
+if ( ! class_exists( '\\WPO\\IPS\\EDI\\Peppol' ) ) :
 
 class Peppol {
 
@@ -48,16 +48,6 @@ class Peppol {
 			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'peppol_save_classic_checkout_fields' ), 10, 2 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_classic_checkout_script' ), 20 );
 		}
-	}
-	
-
-	/**
-	 * Callback function to return false, used to disable storing document settings.
-	 *
-	 * @return bool
-	 */
-	public function return_false(): bool {
-		return false;
 	}
 
 	/**
@@ -142,7 +132,7 @@ class Peppol {
 				<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
 					<label for="peppol_endpoint_eas"><?php esc_html_e( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 					<select name="peppol_endpoint_eas" id="peppol_endpoint_eas" class="woocommerce-Input input-select">
-						<option value=""><?php esc_html_e( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...'; ?></option>
+						<option value=""><?php echo esc_html__( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...'; ?></option>
 						<?php foreach ( $eas_options as $code => $label ) : ?>
 							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $endpoint_eas, $code ); ?>>
 								<?php echo esc_html( $label ); ?>
@@ -351,9 +341,7 @@ class Peppol {
 
 		// Auto-enable toggle if we already have a stored identifier.
 		if ( 'peppol_invoice' === $meta_key ) {
-			$id  = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
-			$eas = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-
+			$id             = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
 			$has_identifier = ( '' !== $id );
 
 			return $has_identifier ? '1' : '';
@@ -589,8 +577,6 @@ class Peppol {
 
 		$has_company = ! empty( $data['billing_company'] );
 		$has_id      = ! empty( $data['peppol_endpoint_id'] );
-
-		$wants_peppol = false;
 
 		if ( 'toggle' === $visibility_mode ) {
 			$wants_peppol = ! empty( $data['peppol_invoice'] ) && $has_id;

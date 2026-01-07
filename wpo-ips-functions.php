@@ -2058,7 +2058,14 @@ function wpo_ips_has_vat_plugin_active(): bool {
 	}
 
 	foreach ( $detectors as $detector ) {
-		if ( $detector() ) {
+		if ( ! is_callable( $detector ) ) {
+			continue;
+		}
+
+		$result = $detector();
+
+		// Allow bool true, non-empty string, non-empty array, etc.
+		if ( ! empty( $result ) ) {
 			return true;
 		}
 	}

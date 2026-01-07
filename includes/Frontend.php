@@ -297,7 +297,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function disable_storing_document_settings(): void {
-		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+		add_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
 	}
 
 	/**
@@ -307,16 +307,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function restore_storing_document_settings(): void {
-		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
-	}
-
-	/**
-	 * Callback function to return false, used to disable storing document settings.
-	 *
-	 * @return bool
-	 */
-	public function return_false(): bool {
-		return false;
+		remove_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
 	}
 	
 	/**
@@ -349,7 +340,7 @@ class Frontend {
 					return ( $result instanceof \WP_Error ) ? $result : true;
 				}
 
-				$result = $this->checkout_field_validate_vat_number_value( $val );
+				$result = apply_filters( 'wpo_ips_checkout_field_validate', $this->checkout_field_validate_vat_number_value( $val ), $val );
 				return ( $result instanceof \WP_Error ) ? $result : true;
 			},
 		);
@@ -610,7 +601,7 @@ class Frontend {
 	 * @param \WC_Order $order
 	 * @return void
 	 */
-	public function checkout_field_display_admin_billing( $order ): void {
+	public function checkout_field_display_admin_billing( \WC_Order $order ): void {
 		if ( ! $order instanceof \WC_Order ) {
 			return;
 		}
@@ -638,7 +629,8 @@ class Frontend {
 	 * @return bool
 	 */
 	private function checkout_field_is_enabled(): bool {
-		return ! empty( WPO_WCPDF()->settings->general_settings['checkout_field_enable'] ?? '' );
+		$settings = WPO_WCPDF()->settings->general_settings;
+		return ! empty( $settings->get_setting( 'checkout_field_enable' ) ?? '' );
 	}
 
 	/**
@@ -649,7 +641,7 @@ class Frontend {
 	private function checkout_field_get_label(): string {
 		$default  = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
 		$settings = WPO_WCPDF()->settings->general_settings;
-		$label    = $settings['checkout_field_label'] ?? '';
+		$label    = $settings->get_setting( 'checkout_field_label' ) ?? '';
 
 		// If the value is stored as an array, use the default key.
 		if ( is_array( $label ) ) {
@@ -671,7 +663,8 @@ class Frontend {
 	 * @return bool
 	 */
 	private function checkout_field_is_vat_number(): bool {
-		$enabled = ! empty( WPO_WCPDF()->settings->general_settings['checkout_field_as_vat_number'] ?? '' );
+		$settings = WPO_WCPDF()->settings->general_settings;
+		$enabled  = ! empty( $settings->get_setting( 'checkout_field_as_vat_number' ) ?? '' );
 
 		if ( ! $enabled ) {
 			return false;
