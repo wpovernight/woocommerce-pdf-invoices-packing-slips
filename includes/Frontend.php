@@ -609,10 +609,6 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_display_admin_billing( \WC_Order $order ): void {
-		if ( ! $order instanceof \WC_Order ) {
-			return;
-		}
-
 		// If your setting disables the field, don't show it.
 		if ( ! $this->checkout_field_is_enabled() ) {
 			return;
@@ -762,7 +758,7 @@ class Frontend {
 		}
 
 		$general_settings = WPO_WCPDF()->settings->general;
-		return ! empty( $general_settings->get_setting( 'checkout_field_enable_my_account' ) ?? '' );
+		return ! empty( $general_settings->get_setting( 'checkout_field_enable_my_account' ) );
 	}
 
 	/**
@@ -773,14 +769,7 @@ class Frontend {
 	private function checkout_field_get_label(): string {
 		$default          = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
 		$general_settings = WPO_WCPDF()->settings->general;
-		$label            = $general_settings->get_setting( 'checkout_field_label' ) ?? '';
-
-		// If the value is stored as an array, use the default key.
-		if ( is_array( $label ) ) {
-			$label = $label['default'] ?? '';
-		}
-
-		$label = trim( (string) $label );
+		$label            = trim( $general_settings->get_setting( 'checkout_field_label' ) );
 
 		if ( '' === $label ) {
 			$label = $default;
@@ -796,7 +785,7 @@ class Frontend {
 	 */
 	private function checkout_field_is_vat_number(): bool {
 		$general_settings = WPO_WCPDF()->settings->general;
-		$enabled          = ! empty( $general_settings->get_setting( 'checkout_field_as_vat_number' ) ?? '' );
+		$enabled          = ! empty( $general_settings->get_setting( 'checkout_field_as_vat_number' ) );
 
 		if ( ! $enabled ) {
 			return false;
