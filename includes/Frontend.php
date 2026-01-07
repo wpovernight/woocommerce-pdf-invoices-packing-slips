@@ -629,8 +629,8 @@ class Frontend {
 	 * @return bool
 	 */
 	private function checkout_field_is_enabled(): bool {
-		$settings = WPO_WCPDF()->settings->general_settings;
-		return ! empty( $settings->get_setting( 'checkout_field_enable' ) ?? '' );
+		$general_settings = WPO_WCPDF()->settings->general;
+		return ! empty( $general_settings->get_setting( 'checkout_field_enable' ) ?? '' );
 	}
 
 	/**
@@ -639,9 +639,9 @@ class Frontend {
 	 * @return string
 	 */
 	private function checkout_field_get_label(): string {
-		$default  = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
-		$settings = WPO_WCPDF()->settings->general_settings;
-		$label    = $settings->get_setting( 'checkout_field_label' ) ?? '';
+		$default          = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
+		$general_settings = WPO_WCPDF()->settings->general;
+		$label            = $general_settings->get_setting( 'checkout_field_label' ) ?? '';
 
 		// If the value is stored as an array, use the default key.
 		if ( is_array( $label ) ) {
@@ -663,8 +663,8 @@ class Frontend {
 	 * @return bool
 	 */
 	private function checkout_field_is_vat_number(): bool {
-		$settings = WPO_WCPDF()->settings->general_settings;
-		$enabled  = ! empty( $settings->get_setting( 'checkout_field_as_vat_number' ) ?? '' );
+		$general_settings = WPO_WCPDF()->settings->general;
+		$enabled          = ! empty( $general_settings->get_setting( 'checkout_field_as_vat_number' ) ?? '' );
 
 		if ( ! $enabled ) {
 			return false;
