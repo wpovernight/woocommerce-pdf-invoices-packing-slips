@@ -60,6 +60,13 @@ class Frontend {
 			}
 			
 			add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
+			
+			// My Account (Account details).
+			if ( $this->checkout_field_is_my_account_enabled() ) {
+				add_action( 'woocommerce_edit_account_form', array( $this, 'account_details_display_checkout_field' ), 20 );
+				add_filter( 'woocommerce_save_account_details_errors', array( $this, 'account_details_validate_checkout_field' ), 20, 2 );
+				add_action( 'woocommerce_save_account_details', array( $this, 'account_details_save_checkout_field' ), 20, 1 );
+			}
 		}
 	}
 
@@ -624,6 +631,117 @@ class Frontend {
 	}
 	
 	/**
+	 * Display the optional checkout field in My Account > Account details.
+	 *
+	 * @return void
+	 */
+	public function account_details_display_checkout_field(): void {
+		if ( ! $this->checkout_field_is_my_account_enabled() ) {
+			return;
+		}
+
+		$user_id = get_current_user_id();
+		if ( ! $user_id ) {
+			return;
+		}
+
+		$key   = 'wpo_ips_checkout_field';
+		$value = (string) get_user_meta( $user_id, $key, true );
+		$value = (string) apply_filters( 'wpo_ips_checkout_field_default_value', $value, $value, 'my-account', null );
+
+		$label       = $this->checkout_field_get_label();
+		$description = '';
+
+		if ( $this->checkout_field_is_vat_number() ) {
+			$description = __( 'Please include the country prefix (for example NL123456789).', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
+		echo '<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">';
+		echo '<label for="' . esc_attr( $key ) . '">' . esc_html( $label ) . '</label>';
+		echo '<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="' . esc_attr( $key ) . '" id="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '" />';
+		if ( '' !== $description ) {
+			echo '<span class="description">' . esc_html( $description ) . '</span>';
+		}
+		echo '</p>';
+	}
+
+	/**
+	 * Validate the My Account field.
+	 *
+	 * @param \WP_Error $errors
+	 * @param \WP_User  $user
+	 * @return \WP_Error
+	 */
+	public function account_details_validate_checkout_field( \WP_Error $errors, $user ): \WP_Error {
+		if ( ! $this->checkout_field_is_my_account_enabled() ) {
+			return $errors;
+		}
+
+		$key = 'wpo_ips_checkout_field';
+
+		// Field is optional: if missing, don't block save.
+		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return $errors;
+		}
+
+		$raw = (string) wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$val = sanitize_text_field( $raw );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		if ( '' === trim( $val ) ) {
+			return $errors;
+		}
+
+		// VAT mode.
+		if ( $this->checkout_field_is_vat_number() ) {
+			$result = $this->checkout_field_validate_vat_number_value( $val );
+
+			if ( $result instanceof \WP_Error ) {
+				$errors->add( $result->get_error_code(), $result->get_error_message() );
+			}
+
+			return $errors;
+		}
+
+		// Non-VAT mode: keep your flexible validation hook.
+		$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
+		if ( $result instanceof \WP_Error ) {
+			$errors->add( $result->get_error_code(), $result->get_error_message() );
+		}
+
+		return $errors;
+	}
+
+	/**
+	 * Save the My Account field (user meta only).
+	 *
+	 * @param int $user_id
+	 * @return void
+	 */
+	public function account_details_save_checkout_field( int $user_id ): void {
+		if ( ! $this->checkout_field_is_my_account_enabled() ) {
+			return;
+		}
+
+		$key = 'wpo_ips_checkout_field';
+
+		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// If the field isn't present in the form submission, do nothing.
+			return;
+		}
+
+		$raw = (string) wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$val = sanitize_text_field( $raw );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		if ( '' === trim( $val ) ) {
+			delete_user_meta( $user_id, $key );
+		} else {
+			update_user_meta( $user_id, $key, $val );
+		}
+	}
+	
+	/**
 	 * Check if the checkout field is enabled in settings.
 	 *
 	 * @return bool
@@ -631,6 +749,20 @@ class Frontend {
 	private function checkout_field_is_enabled(): bool {
 		$general_settings = WPO_WCPDF()->settings->general;
 		return ! empty( $general_settings->get_setting( 'checkout_field_enable' ) ?? '' );
+	}
+	
+	/**
+	 * Check if the My Account field is enabled in settings.
+	 *
+	 * @return bool
+	 */
+	private function checkout_field_is_my_account_enabled(): bool {
+		if ( ! $this->checkout_field_is_enabled() ) {
+			return false;
+		}
+
+		$general_settings = WPO_WCPDF()->settings->general;
+		return ! empty( $general_settings->get_setting( 'checkout_field_enable_my_account' ) ?? '' );
 	}
 
 	/**

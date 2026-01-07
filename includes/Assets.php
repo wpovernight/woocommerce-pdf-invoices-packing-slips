@@ -200,6 +200,7 @@ class Assets {
 						'checkout_field_enable',
 						'checkout_field_label',
 						'checkout_field_as_vat_number',
+						'checkout_field_enable_my_account',
 						// document
 						'enabled',
 						'archive_pdf',

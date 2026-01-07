@@ -512,6 +512,18 @@ class SettingsGeneral {
 					) . $vat_plugin_notice,
 				),
 			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_enable_my_account',
+				'title'    => __( 'Editable in My Account', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_enable_my_account',
+					'description' => __( 'Allow customers to edit the custom checkout field on their account details page. The value is saved to the customer profile and used for future checkouts only.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
 		);
 
 		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
@@ -646,6 +658,7 @@ class SettingsGeneral {
 					'checkout_field_enable',
 					'checkout_field_label',
 					'checkout_field_as_vat_number',
+					'checkout_field_enable_my_account',
 				)
 			),
 		);
