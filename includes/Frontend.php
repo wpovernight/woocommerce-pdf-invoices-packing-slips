@@ -1,8 +1,6 @@
 <?php
 namespace WPO\IPS;
 
-use WPO\IPS\EDI\Standards\EN16931;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -41,25 +39,34 @@ class Frontend {
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
+		
+		// Optional Checkout field (General Settings).
+		if ( $this->checkout_field_is_enabled() ) {
+			if ( wpo_wcpdf_checkout_is_block() ) {
+				$this->checkout_field_display_checkout_block_field();
+				$this->checkout_field_set_checkout_block_field_value();
 
-		// Peppol My Account
-		add_filter( 'woocommerce_account_menu_items', array( $this, 'edi_peppol_account_menu_item' ), 10, 2 );
-		add_action( 'template_redirect', array( $this, 'edi_save_peppol_settings' ) );
-		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'edi_peppol_settings_account_page' ) );
-		add_rewrite_endpoint( 'peppol', EP_PAGES );
-
-		// Peppol Checkout
-		if ( wpo_wcpdf_checkout_is_block() ) {
-			$this->edi_peppol_display_checkout_block_fields();
-			$this->edi_peppol_set_checkout_block_fields_value();
-			add_action( 'woocommerce_set_additional_field_value', array( $this, 'edi_peppol_save_checkout_block_fields' ), 10, 4 );
-			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'edi_peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
-		} else {
-			add_filter( 'woocommerce_checkout_fields', array( $this, 'edi_peppol_display_classic_checkout_fields' ), 10, 1 );
-			add_filter( 'woocommerce_checkout_get_value', array( $this, 'edi_peppol_set_classic_checkout_fields_value' ), 10, 2 );
-			add_action( 'woocommerce_after_checkout_validation', array( $this, 'edi_peppol_validate_classic_checkout_field_values' ), 10, 2 );
-			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'edi_peppol_save_classic_checkout_fields' ), 10, 2 );
-			add_action( 'wp_enqueue_scripts', array( $this, 'edi_peppol_enqueue_classic_checkout_script' ), 20 );
+				add_action( 'woocommerce_set_additional_field_value', array( $this, 'checkout_field_save_checkout_block_field' ), 10, 4 );
+				add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'checkout_field_remove_order_checkout_block_field_meta' ), 10, 1 );
+			} else {
+				add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_display_classic_checkout_field' ), 10, 1 );
+				add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
+				add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
+				add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
+			}
+			
+			if ( $this->checkout_field_is_vat_number() ) {
+				add_filter( 'wpo_wcpdf_order_customer_vat_number_meta_keys', array( $this, 'checkout_field_add_vat_meta_key' ), 10, 2 );
+			}
+			
+			add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
+			
+			// My Account (Account details).
+			if ( $this->checkout_field_is_my_account_enabled() ) {
+				add_action( 'woocommerce_edit_account_form', array( $this, 'account_details_display_checkout_field' ), 20 );
+				add_filter( 'woocommerce_save_account_details_errors', array( $this, 'account_details_validate_checkout_field' ), 20, 2 );
+				add_action( 'woocommerce_save_account_details', array( $this, 'account_details_save_checkout_field' ), 20, 1 );
+			}
 		}
 	}
 
@@ -297,7 +304,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function disable_storing_document_settings(): void {
-		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+		add_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
 	}
 
 	/**
@@ -307,334 +314,81 @@ class Frontend {
 	 * @return void
 	 */
 	public function restore_storing_document_settings(): void {
-		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+		remove_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
 	}
-
+	
 	/**
-	 * Callback function to return false, used to disable storing document settings.
-	 *
-	 * @return bool
-	 */
-	public function return_false(): bool {
-		return false;
-	}
-
-	/**
-	 * Add EDI Peppol Settings user account menu item
-	 *
-	 * @param array $items
-	 * @param array $endpoints
-	 * @return array
-	 */
-	public function edi_peppol_account_menu_item( array $items, array $endpoints ): array {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'my_account' ) ) {
-			return $items;
-		}
-
-		$last_key = array_key_last( $items );
-		$position = array_search( $last_key, array_keys( $items ), true );
-
-		return array_slice( $items, 0, $position, true )
-			+ array( 'peppol' => 'Peppol' )
-			+ array_slice( $items, $position, null, true );
-	}
-
-	/**
-	 * Add EDI Peppol Settings to user account page.
+	 * Display optional checkout field in the Checkout Block.
 	 *
 	 * @return void
 	 */
-	public function edi_peppol_settings_account_page(): void {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'my_account' ) ) {
-			echo '<p>' . esc_html__( 'Peppol is not available.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
+	public function checkout_field_display_checkout_block_field(): void {
+		if ( ! $this->checkout_field_is_enabled() ) {
 			return;
 		}
 
-		$user_id                = get_current_user_id();
-		$endpoint_id            = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
-		$endpoint_eas           = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
+		$field_id = 'wpo-ips/checkout-field';
 
-		$input_mode             = wpo_ips_edi_peppol_identifier_input_mode();
-		$endpoint_id_value      = $endpoint_id;
-		$eas_options            = array();
-
-		// In "full" mode we show scheme:identifier directly in the text inputs.
-		if ( 'full' === $input_mode ) {
-			if ( '' !== $endpoint_eas && '' !== $endpoint_id ) {
-				$endpoint_id_value = "{$endpoint_eas}:{$endpoint_id}";
-			}
-
-		// In "select" mode we show the scheme in a dropdown and the identifier in a separate text input.
-		} elseif ( 'select' === $input_mode ) {
-			foreach ( EN16931::get_eas() as $code => $label ) {
-				$eas_options[ $code ] = "[$code] $label";
-			}
-		}
-		?>
-		<form method="post">
-			<h3><?php esc_html_e( 'Peppol Settings', 'woocommerce-pdf-invoices-packing-slips' ); ?></h3>
-			<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-				<label for="peppol_endpoint_id"><?php esc_html_e( 'Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-				<input type="text" class="woocommerce-Input input-text" name="peppol_endpoint_id" id="peppol_endpoint_id" value="<?php echo esc_attr( $endpoint_id_value ); ?>" />
-				<small>
-					<?php
-						$description = __( 'Specify the Peppol Endpoint ID.', 'woocommerce-pdf-invoices-packing-slips' );
-
-						// Add example if using full mode
-						if ( 'select' !== $input_mode ) {
-							$description .= ' <em>' . esc_html__( 'Example: 0088:123456789', 'woocommerce-pdf-invoices-packing-slips' ) . '</em>';
-						}
-
-						$description .= '<br>' . sprintf(
-							/* translators: %1$s: open link anchor, %2$s: close link anchor */
-							__( 'If you don\'t know the ID, you can search for it in the %1$sPeppol Directory%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<a href="https://directory.peppol.eu/public" target="_blank" rel="noopener noreferrer">',
-							'</a>'
-						);
-
-						echo wp_kses_post( $description );
-					?>
-				</small>
-			</p>
-
-			<?php if ( 'select' === $input_mode ) : ?>
-				<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">
-					<label for="peppol_endpoint_eas"><?php esc_html_e( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
-					<select name="peppol_endpoint_eas" id="peppol_endpoint_eas" class="woocommerce-Input input-select">
-						<option value=""><?php esc_html_e( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...'; ?></option>
-						<?php foreach ( $eas_options as $code => $label ) : ?>
-							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $endpoint_eas, $code ); ?>>
-								<?php echo esc_html( $label ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-					<small>
-						<?php
-							echo wp_kses_post( sprintf(
-								'%s<br>%s',
-								__( 'Specify the Electronic Address Scheme (EAS) for the Endpoint above.', 'woocommerce-pdf-invoices-packing-slips' ),
-								sprintf(
-									/* translators: %1$s: open link anchor, %2$s: close link anchor */
-									__( 'For more information on each Endpoint Address Scheme (EAS), refer to the %1$sofficial Peppol EAS list%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-									'<a href="https://docs.peppol.eu/poacc/billing/3.0/codelist/eas/" target="_blank">',
-									'</a>'
-								)
-							) );
-						?>
-					</small>
-				</p>
-			<?php endif; ?>
-			
-			<p>
-				<input type="hidden" name="wc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wpo_ips_edi_user_save_peppol_settings' ) ); ?>">
-				<button type="submit" name="save_peppol_settings" class="woocommerce-Button button"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
-			</p>
-		</form>
-		<?php
-	}
-
-	/**
-	 * Save EDI Peppol settings to user profile.
-	 *
-	 * @return void
-	 */
-	public function edi_save_peppol_settings(): void {
-		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
-		if ( empty( $request_method ) || 'POST' !== $request_method || ! isset( $_POST['save_peppol_settings'] ) ) {
-			return;
-		}
-
-		// Validate nonce and auth
-		$nonce = isset( $_POST['wc_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['wc_nonce'] ) ) : '';
-		if ( ! is_user_logged_in() || ! wp_verify_nonce( $nonce, 'wpo_ips_edi_user_save_peppol_settings' ) ) {
-			wc_add_notice( __( 'Peppol settings could not be saved. Please try again.', 'woocommerce-pdf-invoices-packing-slips' ), 'error' );
-			wp_safe_redirect( wc_get_account_endpoint_url( 'peppol' ) );
-			exit;
-		}
-
-		$request = stripslashes_deep( $_POST );
-		
-		// Maybe validate
-		if ( ! empty( $request['peppol_endpoint_id'] ) ) {
-			$result = $this->peppol_validate_identifier_value( $request['peppol_endpoint_id'] );
-
-			if ( is_wp_error( $result ) ) {
-				wc_add_notice( $result->get_error_message(), 'error' );
-				return;
-			}
-		}
-		
-		$user_id = get_current_user_id();
-
-		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
-
-		wc_add_notice( __( 'Peppol settings saved.', 'woocommerce-pdf-invoices-packing-slips' ), 'success' );
-		wp_safe_redirect( wc_get_account_endpoint_url( 'peppol' ) );
-		exit;
-	}
-
-	/**
-	 * Display EDI Peppol fields in the Checkout Block.
-	 *
-	 * @return void
-	 */
-	public function edi_peppol_display_checkout_block_fields(): void {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
-			return;
-		}
-
-		$input_mode      = wpo_ips_edi_peppol_identifier_input_mode();
-		$visibility_mode = $this->peppol_checkout_visibility_mode();
-
-		$can_use_hidden = ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) );
-
-		// Register toggle field only when configured + supported.
-		if ( $can_use_hidden && 'toggle' === $visibility_mode ) {
-			woocommerce_register_additional_checkout_field(
-				array(
-					'id'       => 'wpo-ips-edi/peppol-invoice',
-					'label'    => __( 'I need a Peppol invoice (business purchase)', 'woocommerce-pdf-invoices-packing-slips' ),
-					'location' => 'order',
-					'type'     => 'checkbox',
-					'sanitize_callback' => static function ( $val ) {
-						return (bool) $val;
-					},
-					'validate_callback' => static function ( $val ) {
-						return true;
-					},
-				)
-			);
-		}
-
-		$conditional_hidden = ( $can_use_hidden ) ? $this->peppol_checkout_block_hidden_condition() : array();
-
-		// Endpoint ID
 		$args = array(
-			'id'                => 'wpo-ips-edi/peppol-endpoint-id',
-			'label'             => __( 'Peppol identifier', 'woocommerce-pdf-invoices-packing-slips' ),
+			'id'                => $field_id,
+			'label'             => $this->checkout_field_get_label(),
 			'location'          => 'order',
 			'type'              => 'text',
 			'sanitize_callback' => static function ( $val ) {
-				return preg_replace( '/\s+/', '', trim( (string) $val ) );
+				$val = sanitize_text_field( (string) $val );
+				return (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 			},
 			'validate_callback' => function ( $val ) {
-				$result = $this->peppol_validate_identifier_value( (string) $val );
-				return is_wp_error( $result ) ? $result : true;
+				$val = (string) $val;
+
+				// If not treated as VAT, keep the existing flexible hook.
+				if ( ! $this->checkout_field_is_vat_number() ) {
+					$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
+					return ( $result instanceof \WP_Error ) ? $result : true;
+				}
+
+				$result = apply_filters( 'wpo_ips_checkout_field_validate', $this->checkout_field_validate_vat_number_value( $val ), $val );
+				return ( $result instanceof \WP_Error ) ? $result : true;
 			},
 		);
 
-		if ( ! empty( $conditional_hidden ) ) {
-			$args['hidden'] = $conditional_hidden;
-		}
+		$args = apply_filters( 'wpo_ips_checkout_field_block_args', $args );
 
 		woocommerce_register_additional_checkout_field( $args );
-
-		// EAS
-		if ( 'select' === $input_mode ) {
-			$eas = EN16931::get_eas();
-
-			$args = array(
-				'id'       => 'wpo-ips-edi/peppol-endpoint-eas',
-				'label'    => __( 'Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'location' => 'order',
-				'type'     => 'select',
-				'options'  => array_map(
-					static fn ( $code, $label ) => array(
-						'value' => $code,
-						'label' => "[$code] $label",
-					),
-					array_keys( $eas ),
-					$eas
-				),
-				'validate_callback' => static function ( $val ) use ( $eas ) {
-					if ( $val && ! isset( $eas[ $val ] ) ) {
-						return new \WP_Error( 'invalid_eas', __( 'Invalid Endpoint Scheme.', 'woocommerce-pdf-invoices-packing-slips' ) );
-					}
-					return true;
-				},
-			);
-
-			if ( ! empty( $conditional_hidden ) ) {
-				$args['hidden'] = $conditional_hidden;
-			}
-
-			woocommerce_register_additional_checkout_field( $args );
-		}
 	}
-
+	
 	/**
-	 * Set default values for EDI Peppol fields in the Checkout Block.
+	 * Set default value for the optional checkout field in the Checkout Block.
 	 *
 	 * @return void
 	 */
-	public function edi_peppol_set_checkout_block_fields_value(): void {
-		$fields = array(
-			'wpo-ips-edi/peppol-endpoint-id',
-			'wpo-ips-edi/peppol-endpoint-eas',
+	public function checkout_field_set_checkout_block_field_value(): void {
+		$field_id = 'wpo-ips/checkout-field';
+
+		add_filter(
+			"woocommerce_get_default_value_for_{$field_id}",
+			static function ( $value, string $group, \WC_Data $wc_object ) {
+				// Our field is in 'order' location, so group is typically 'other'.
+				if ( ! $wc_object instanceof \WC_Customer ) {
+					return (string) $value;
+				}
+
+				$user_id = $wc_object->get_id();
+				if ( ! $user_id ) {
+					return (string) $value;
+				}
+
+				$stored = (string) get_user_meta( $user_id, 'wpo_ips_checkout_field', true );
+
+				return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, $group, $wc_object );
+			},
+			10,
+			3
 		);
-
-		$visibility_mode = $this->peppol_checkout_visibility_mode();
-		$can_use_hidden  = ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) );
-
-		if ( $can_use_hidden && 'toggle' === $visibility_mode ) {
-			array_unshift( $fields, 'wpo-ips-edi/peppol-invoice' );
-		}
-
-		foreach ( $fields as $field ) {
-			add_filter( "woocommerce_get_default_value_for_{$field}", array( $this, 'edi_peppol_prefill_checkout_block_field_from_user_meta' ), 10, 3 );
-		}
 	}
-
+	
 	/**
-	 * Provide a default value for the Checkout Block additional field
-	 * using the value we store in user meta.
-	 *
-	 * @param null     $value     Current default (usually empty).
-	 * @param string   $group     'billing' | 'shipping' | 'other'. Our field is in the 'order' location, so this will be 'other'.
-	 * @param \WC_Data $wc_object Object for which the default is being requested.
-	 *
-	 * @return string
-	 */
-	public function edi_peppol_prefill_checkout_block_field_from_user_meta( $value, string $group, \WC_Data $wc_object ): string {
-		if ( 'other' !== $group || ! $wc_object instanceof \WC_Customer ) {
-			return (string) $value;
-		}
-
-		$user_id = $wc_object->get_id();
-		if ( ! $user_id ) {
-			return (string) $value;
-		}
-
-		$key      = str_replace( 'woocommerce_get_default_value_for_', '', current_filter() );
-		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
-
-		// Auto-enable toggle if we already have a stored identifier.
-		if ( 'peppol_invoice' === $meta_key ) {
-			$id  = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
-			$eas = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-
-			$has_identifier = ( '' !== $id );
-
-			return $has_identifier ? '1' : '';
-		}
-
-		$input_mode = wpo_ips_edi_peppol_identifier_input_mode();
-
-		// If we’re in 'full' mode, compose scheme:identifier for the *text* fields.
-		if ( 'full' === $input_mode ) {
-			if ( 'peppol_endpoint_id' === $meta_key ) {
-				$id  = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
-				$eas = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
-				return ( '' !== $eas && '' !== $id ) ? "{$eas}:{$id}" : (string) $value;
-			}
-		}
-
-		// For other fields, just return the user meta value.
-		return (string) get_user_meta( $user_id, $meta_key, true );
-	}
-
-	/**
-	 * Save EDI Peppol fields from Checkout Block.
+	 * Save optional checkout field from the Checkout Block.
 	 *
 	 * @param string $key Field key.
 	 * @param mixed $value Field value.
@@ -642,141 +396,99 @@ class Frontend {
 	 * @param object $wc_object WC object (e.g. order).
 	 * @return void
 	 */
-	public function edi_peppol_save_checkout_block_fields( string $key, $value, string $group, object $wc_object ): void {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
+	public function checkout_field_save_checkout_block_field( string $key, $value, string $group, object $wc_object ): void {
+		if ( ! $this->checkout_field_is_enabled() ) {
 			return;
 		}
 
-		$allowed = array(
-			'wpo-ips-edi/peppol-endpoint-id',
-			'wpo-ips-edi/peppol-endpoint-eas',
-		);
+		$field_id = 'wpo-ips/checkout-field';
 
-		if ( ! in_array( $key, $allowed, true ) ) {
+		if ( $key !== $field_id ) {
 			return;
 		}
 
-		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
-		$value    = trim( sanitize_text_field( wp_unslash( $value ) ) );
+		if ( ! ( $wc_object instanceof \WC_Order ) ) {
+			return;
+		}
 
-		$customer_id = is_callable( array( $wc_object, 'get_customer_id' ) )
-			? absint( $wc_object->get_customer_id() )
-			: 0;
+		$val = sanitize_text_field( (string) wp_unslash( $value ) );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
-		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, array( $meta_key => $value ) );
-		
-		if ( $wc_object instanceof \WC_Order ) {
-			wpo_ips_edi_maybe_save_order_peppol_data( $wc_object, array( $meta_key => $value ) );
+		// Save on order.
+		$order_meta_key = '_wpo_ips_checkout_field';
+
+		if ( '' === trim( $val ) ) {
+			$wc_object->delete_meta_data( $order_meta_key );
+		} else {
+			$wc_object->update_meta_data( $order_meta_key, $val );
+		}
+
+		$wc_object->save_meta_data();
+
+		// Save on customer (if available).
+		$customer_id = is_callable( array( $wc_object, 'get_customer_id' ) ) ? absint( $wc_object->get_customer_id() ) : 0;
+		if ( $customer_id > 0 ) {
+			if ( '' === trim( $val ) ) {
+				delete_user_meta( $customer_id, 'wpo_ips_checkout_field' );
+			} else {
+				update_user_meta( $customer_id, 'wpo_ips_checkout_field', $val );
+			}
 		}
 	}
-
+	
 	/**
-	 * Remove EDI Peppol fields from order meta after checkout.
+	 * Remove optional checkout field from order meta after checkout.
 	 *
 	 * @param \WC_Abstract_Order $order
 	 * @return void
 	 */
-	public function edi_peppol_remove_order_checkout_block_fields_meta( \WC_Abstract_Order $order ): void {
-		$fields = array(
-			'wpo-ips-edi/peppol-endpoint-id',
-			'wpo-ips-edi/peppol-endpoint-eas',
-		);
+	public function checkout_field_remove_order_checkout_block_field_meta( \WC_Abstract_Order $order ): void {
+		$field_id = 'wpo-ips/checkout-field';
 
-		foreach ( $fields as $field ) {
-			$order->delete_meta_data( '_wc_other/' . $field );
-		}
-
+		$order->delete_meta_data( '_wc_other/' . $field_id );
 		$order->save_meta_data();
 	}
-
+	
 	/**
-	 * Display EDI Peppol fields on the Classic Checkout page.
+	 * Display optional checkout field in the Classic Checkout page.
 	 *
-	 * @param mixed $fields Checkout fields.
-	 * @return array Modified checkout fields with Peppol fields added.
+	 * @param mixed $fields
+	 * @return array
 	 */
-	public function edi_peppol_display_classic_checkout_fields( $fields ): array {
+	public function checkout_field_display_classic_checkout_field( $fields ): array {
 		if ( ! is_array( $fields ) ) {
 			$fields = array();
 		}
 
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
+		if ( ! $this->checkout_field_is_enabled() ) {
 			return $fields;
 		}
 
-		$input_mode       = wpo_ips_edi_peppol_identifier_input_mode();
-		$visibility_mode  = $this->peppol_checkout_visibility_mode();
+		$fields['order'] = $fields['order'] ?? array();
 
-		$placeholder_endpoint = ( 'select' !== $input_mode ) ? '0088:123456789' : '123456789';
+		$key = 'wpo_ips_checkout_field';
 
-		$peppol_fields = array();
-
-		// Toggle checkbox only in toggle mode.
-		if ( 'toggle' === $visibility_mode ) {
-			$peppol_fields['peppol_invoice'] = array(
-				'type'     => 'checkbox',
-				'label'    => __( 'I need a Peppol invoice (business purchase)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'required' => false,
-				'class'    => array( 'form-row-wide' ),
-			);
-		}
-
-		$conditional_class = array( 'form-row-wide' );
-
-		if ( 'toggle' === $visibility_mode ) {
-			$conditional_class[] = 'wpo-ips-peppol-conditional';
-		} elseif ( 'company' === $visibility_mode ) {
-			$conditional_class[] = 'wpo-ips-peppol-company-conditional';
-		}
-
-		$peppol_fields['peppol_endpoint_id'] = array(
-			'type'        => 'text',
-			'label'       => __( 'Peppol identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-			'required'    => false,
-			'class'       => $conditional_class,
-			'placeholder' => $placeholder_endpoint,
+		$args = array(
+			'type'     => 'text',
+			'label'    => $this->checkout_field_get_label(),
+			'required' => false,
+			'class'    => array( 'form-row-wide' ),
 		);
 
-		if ( 'select' === $input_mode ) {
-			$peppol_fields['peppol_endpoint_eas'] = array(
-				'type'     => 'select',
-				'label'    => __( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'required' => false,
-				'class'    => $conditional_class,
-				'options'  => ( function () {
-					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
-					foreach ( EN16931::get_eas() as $code => $label ) {
-						$options[ $code ] = "[$code] $label";
-					}
-					return $options;
-				} )(),
-			);
-		}
-
-		$fields['order'] = $peppol_fields + ( $fields['order'] ?? array() );
+		$fields['order'][ $key ] = apply_filters( 'wpo_ips_checkout_field_classic_args', $args );
 
 		return $fields;
 	}
-
+	
 	/**
-	 * Set EDI Peppol fields values in the Classic Checkout page.
+	 * Set default value for the optional checkout field in the Classic Checkout page.
 	 *
-	 * @param null $value Current value.
-	 * @param string $input Input name.
-	 * @return mixed Modified value.
+	 * @param mixed $value
+	 * @param string $input
+	 * @return mixed
 	 */
-	public function edi_peppol_set_classic_checkout_fields_value( $value, string $input ) {
-		if ( ! in_array( $input, array(
-			'peppol_invoice',
-			'peppol_endpoint_id',
-			'peppol_endpoint_eas',
-		), true ) ) {
-			return $value;
-		}
-
-		$visibility_mode = $this->peppol_checkout_visibility_mode();
-
-		if ( 'peppol_invoice' === $input && 'toggle' !== $visibility_mode ) {
+	public function checkout_field_set_classic_checkout_field_value( $value, string $input ) {
+		if ( 'wpo_ips_checkout_field' !== $input ) {
 			return $value;
 		}
 
@@ -785,82 +497,59 @@ class Frontend {
 			return $value;
 		}
 
-		$endpoint_id  = (string) get_user_meta( $user_id, 'peppol_endpoint_id', true );
-		$endpoint_eas = (string) get_user_meta( $user_id, 'peppol_endpoint_eas', true );
+		$stored = (string) get_user_meta( $user_id, 'wpo_ips_checkout_field', true );
 
-		$input_mode = wpo_ips_edi_peppol_identifier_input_mode();
-
-		switch ( $input ) {
-			case 'peppol_invoice':
-				return ( '' !== $endpoint_id ) ? '1' : '';
-			case 'peppol_endpoint_id':
-				if ( 'full' === $input_mode && '' !== $endpoint_eas && '' !== $endpoint_id ) {
-					return "{$endpoint_eas}:{$endpoint_id}";
-				}
-				return $endpoint_id;
-			case 'peppol_endpoint_eas':
-				return $endpoint_eas;
-		}
-
-		return $value;
+		return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, 'classic', null );
 	}
-
+	
 	/**
-	 * Validate Peppol Endpoint / Legal‑ID pairs after WooCommerce
-	 * has normalised and sanitised all checkout data.
+	 * Validate optional checkout field from the Classic Checkout page.
 	 *
-	 * @param array $data   All posted checkout fields.
-	 * @param mixed $errors Errors object to add validation errors to.
+	 * @param array $data
+	 * @param mixed $errors
 	 * @return void
 	 */
-	public function edi_peppol_validate_classic_checkout_field_values( array $data, $errors ): void {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) || ! $errors instanceof \WP_Error ) {
+	public function checkout_field_validate_classic_checkout_field_value( array $data, $errors ): void {
+		if ( ! $this->checkout_field_is_enabled() || ! $errors instanceof \WP_Error ) {
 			return;
 		}
 
-		// Endpoint ID
-		if ( ! empty( $data['peppol_endpoint_id'] ) ) {
-			$result = $this->peppol_validate_identifier_value( $data['peppol_endpoint_id'] );
+		$key = 'wpo_ips_checkout_field';
+		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
+		$val = sanitize_text_field( $raw );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+		
+		if ( '' === trim( $val ) ) {
+			return;
+		}
 
-			if ( is_wp_error( $result ) ) {
-				$errors->add(
-					$result->get_error_code(),
-					$result->get_error_message(),
-					array( 'id' => 'peppol_endpoint_id' )
-				);
+		if ( $this->checkout_field_is_vat_number() ) {
+			$result = $this->checkout_field_validate_vat_number_value( $val );
+
+			if ( $result instanceof \WP_Error ) {
+				$errors->add( $result->get_error_code(), $result->get_error_message(), array( 'id' => $key ) );
 			}
-		}
-	}
 
-	/**
-	 * Save EDI Peppol fields from Classic Checkout page.
-	 *
-	 * @param int $order_id Order ID.
-	 * @param array $data Checkout data.
-	 * @return void
-	 */
-	public function edi_peppol_save_classic_checkout_fields( int $order_id, array $data ): void {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
 
-		$visibility_mode = $this->peppol_checkout_visibility_mode();
+		// Non-VAT mode: keep existing flexibility.
+		$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
 
-		$has_company = ! empty( $data['billing_company'] );
-		$has_id      = ! empty( $data['peppol_endpoint_id'] );
-
-		$wants_peppol = false;
-
-		if ( 'toggle' === $visibility_mode ) {
-			$wants_peppol = ! empty( $data['peppol_invoice'] ) && $has_id;
-		} elseif ( 'company' === $visibility_mode ) {
-			$wants_peppol = $has_company && $has_id;
-		} else {
-			// always
-			$wants_peppol = $has_id;
+		if ( $result instanceof \WP_Error ) {
+			$errors->add( $result->get_error_code(), $result->get_error_message(), array( 'id' => $key ) );
 		}
-
-		if ( ! $wants_peppol ) {
+	}
+	
+	/**
+	 * Save optional checkout field from the Classic Checkout page.
+	 *
+	 * @param int $order_id
+	 * @param array $data
+	 * @return void
+	 */
+	public function checkout_field_save_classic_checkout_field( int $order_id, array $data ): void {
+		if ( ! $this->checkout_field_is_enabled() ) {
 			return;
 		}
 
@@ -869,462 +558,294 @@ class Frontend {
 			return;
 		}
 
-		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
-			? absint( $order->get_customer_id() )
-			: 0;
+		$key            = 'wpo_ips_checkout_field';
+		$order_meta_key = '_wpo_ips_checkout_field';
 
-		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $data );
+		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
+		$val = sanitize_text_field( $raw );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
-		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
+		// Order meta
+		if ( '' === trim( $val ) ) {
+			$order->delete_meta_data( $order_meta_key );
+		} else {
+			$order->update_meta_data( $order_meta_key, $val );
+		}
+		$order->save_meta_data();
+
+		// Customer meta (if available)
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) ) ? absint( $order->get_customer_id() ) : 0;
+		if ( $customer_id > 0 ) {
+			if ( '' === trim( $val ) ) {
+				delete_user_meta( $customer_id, 'wpo_ips_checkout_field' );
+			} else {
+				update_user_meta( $customer_id, 'wpo_ips_checkout_field', $val );
+			}
+		}
 	}
 	
 	/**
-	 * Enqueue Peppol script for Classic Checkout page.
+	 * Add our checkout field meta key to the list of VAT meta keys.
+	 *
+	 * @param array              $vat_meta_keys
+	 * @param \WC_Abstract_Order $order
+	 * @return array
+	 */
+	public function checkout_field_add_vat_meta_key( array $vat_meta_keys, \WC_Abstract_Order $order ): array {
+		$meta_key = '_wpo_ips_checkout_field';
+
+		// Prefer our value early (so it's picked before other plugins), but keep it safe.
+		if ( ! in_array( $meta_key, $vat_meta_keys, true ) ) {
+			array_unshift( $vat_meta_keys, $meta_key );
+		}
+
+		return $vat_meta_keys;
+	}
+	
+	/**
+	 * Display the optional checkout field under the Billing address in wp-admin.
+	 *
+	 * @param \WC_Order $order
+	 * @return void
+	 */
+	public function checkout_field_display_admin_billing( \WC_Order $order ): void {
+		// If your setting disables the field, don't show it.
+		if ( ! $this->checkout_field_is_enabled() ) {
+			return;
+		}
+
+		$value = (string) $order->get_meta( '_wpo_ips_checkout_field', true );
+		$value = trim( $value );
+
+		if ( '' === $value ) {
+			return;
+		}
+
+		$label = $this->checkout_field_get_label();
+
+		echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
+	}
+	
+	/**
+	 * Display the optional checkout field in My Account > Account details.
 	 *
 	 * @return void
 	 */
-	public function edi_peppol_enqueue_classic_checkout_script(): void {
-		$visibility_mode = $this->peppol_checkout_visibility_mode();
-
-		if ( 'always' === $visibility_mode ) {
+	public function account_details_display_checkout_field(): void {
+		if ( ! $this->checkout_field_is_my_account_enabled() ) {
 			return;
 		}
 
-		if (
-			! function_exists( 'is_checkout' ) ||
-			! is_checkout() ||
-			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' )
-		) {
+		$user_id = get_current_user_id();
+		if ( ! $user_id ) {
 			return;
 		}
 
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$key   = 'wpo_ips_checkout_field';
+		$value = (string) get_user_meta( $user_id, $key, true );
+		$value = (string) apply_filters( 'wpo_ips_checkout_field_default_value', $value, $value, 'my-account', null );
 
-		wp_enqueue_script(
-			'wpo-ips-peppol-checkout',
-			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-classic-checkout' . $suffix . '.js',
-			array( 'jquery' ),
-			WPO_WCPDF_VERSION,
-			true
-		);
+		$label       = $this->checkout_field_get_label();
+		$description = '';
 
-		wp_localize_script(
-			'wpo-ips-peppol-checkout',
-			'wpoIpsPeppol',
-			array(
-				'visibilityMode' => $visibility_mode, // always|toggle|company
-			)
-		);
+		if ( $this->checkout_field_is_vat_number() ) {
+			$description = __( 'Please include the country prefix (for example NL123456789).', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
+		echo '<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">';
+		echo '<label for="' . esc_attr( $key ) . '">' . esc_html( $label ) . '</label>';
+		echo '<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="' . esc_attr( $key ) . '" id="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '" />';
+		if ( '' !== $description ) {
+			echo '<span class="description">' . esc_html( $description ) . '</span>';
+		}
+		echo '</p>';
+	}
+
+	/**
+	 * Validate the My Account field.
+	 *
+	 * @param \WP_Error $errors
+	 * @param \WP_User  $user
+	 * @return \WP_Error
+	 */
+	public function account_details_validate_checkout_field( \WP_Error $errors, $user ): \WP_Error {
+		if ( ! $this->checkout_field_is_my_account_enabled() ) {
+			return $errors;
+		}
+
+		$key = 'wpo_ips_checkout_field';
+
+		// Field is optional: if missing, don't block save.
+		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return $errors;
+		}
+
+		$raw = (string) wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$val = sanitize_text_field( $raw );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		if ( '' === trim( $val ) ) {
+			return $errors;
+		}
+
+		// VAT mode.
+		if ( $this->checkout_field_is_vat_number() ) {
+			$result = $this->checkout_field_validate_vat_number_value( $val );
+
+			if ( $result instanceof \WP_Error ) {
+				$errors->add( $result->get_error_code(), $result->get_error_message() );
+			}
+
+			return $errors;
+		}
+
+		// Non-VAT mode: keep your flexible validation hook.
+		$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
+		if ( $result instanceof \WP_Error ) {
+			$errors->add( $result->get_error_code(), $result->get_error_message() );
+		}
+
+		return $errors;
+	}
+
+	/**
+	 * Save the My Account field (user meta only).
+	 *
+	 * @param int $user_id
+	 * @return void
+	 */
+	public function account_details_save_checkout_field( int $user_id ): void {
+		if ( ! $this->checkout_field_is_my_account_enabled() ) {
+			return;
+		}
+
+		$key = 'wpo_ips_checkout_field';
+
+		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// If the field isn't present in the form submission, do nothing.
+			return;
+		}
+
+		$raw = (string) wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$val = sanitize_text_field( $raw );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		if ( '' === trim( $val ) ) {
+			delete_user_meta( $user_id, $key );
+		} else {
+			update_user_meta( $user_id, $key, $val );
+		}
 	}
 	
 	/**
-	 * Get the configured visibility mode for the Peppol checkout fields.
+	 * Check if the checkout field is enabled in settings.
 	 *
-	 * @return string One of: 'always', 'toggle', 'company'.
+	 * @return bool
 	 */
-	private function peppol_checkout_visibility_mode(): string {
-		$visibility_mode = (string) wpo_ips_edi_get_settings( 'peppol_endpoint_id_checkout_visibility' );
-		$allowed         = array( 'always', 'toggle', 'company' );
-
-		if ( ! in_array( $visibility_mode, $allowed, true ) ) {
-			$visibility_mode = 'always';
-		}
-
-		return $visibility_mode;
+	private function checkout_field_is_enabled(): bool {
+		$general_settings = WPO_WCPDF()->settings->general;
+		return ! empty( $general_settings->get_setting( 'checkout_field_enable' ) ?? '' );
 	}
 	
 	/**
-	 * Build the Checkout Block "hidden" condition for the Peppol fields.
-	 * 
-	 * @link https://developer.woocommerce.com/docs/block-development/tutorials/how-to-conditional-additional-fields/
+	 * Check if the My Account field is enabled in settings.
 	 *
-	 * @return array
+	 * @return bool
 	 */
-	private function peppol_checkout_block_hidden_condition(): array {
-		$visibility_mode = $this->peppol_checkout_visibility_mode();
-
-		if ( 'toggle' === $visibility_mode ) {
-			return array(
-				'checkout' => array(
-					'properties' => array(
-						'additional_fields' => array(
-							'properties' => array(
-								'wpo-ips-edi/peppol-invoice' => array(
-									'not' => array(
-										'const' => true,
-									),
-								),
-							),
-						),
-					),
-				),
-			);
+	private function checkout_field_is_my_account_enabled(): bool {
+		if ( ! $this->checkout_field_is_enabled() ) {
+			return false;
 		}
 
-		if ( 'company' === $visibility_mode ) {
-			// Hide while company is empty.
-			return array(
-				'customer' => array(
-					'properties' => array(
-						'billing_address' => array(
-							'properties' => array(
-								'company' => array(
-									'maxLength' => 0,
-								),
-							),
-						),
-					),
-				),
-			);
-		}
-
-		// always
-		return array();
+		$general_settings = WPO_WCPDF()->settings->general;
+		return ! empty( $general_settings->get_setting( 'checkout_field_enable_my_account' ) );
 	}
 
 	/**
-	 * Validate a Peppol identifier value.
+	 * Get the checkout field label from settings.
 	 *
-	 * @param string $raw_value Raw user input.
-	 * @return true|\WP_Error True if valid or should be accepted, WP_Error if invalid.
+	 * @return string
 	 */
-	private function peppol_validate_identifier_value( string $raw_value ) {
-		$val = preg_replace( '/\s+/', '', trim( (string) $raw_value ) );
+	private function checkout_field_get_label(): string {
+		$default          = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
+		$general_settings = WPO_WCPDF()->settings->general;
+		$label            = trim( $general_settings->get_setting( 'checkout_field_label' ) );
 
-		// Let "required" or other validation handle this elsewhere.
-		if ( '' === $val ) {
-			return true;
+		if ( '' === $label ) {
+			$label = $default;
 		}
 
-		$input_mode               = wpo_ips_edi_peppol_identifier_input_mode();
-		$has_scheme               = ( false !== strpos( $val, ':' ) );
-		$use_directory_validation = (bool) wpo_ips_edi_get_settings( 'peppol_directory_validation' );
-		$directory_url            = 'https://directory.peppol.eu/';
+		return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
+	}
+	
+	/**
+	 * Check if the checkout field should be treated as a VAT number.
+	 *
+	 * @return bool
+	 */
+	private function checkout_field_is_vat_number(): bool {
+		$general_settings = WPO_WCPDF()->settings->general;
+		$enabled          = ! empty( $general_settings->get_setting( 'checkout_field_as_vat_number' ) );
 
-		// If input mode is not "full", we do not enforce "scheme:value" here.
-		if ( 'full' !== $input_mode ) {
-			return true;
+		if ( ! $enabled ) {
+			return false;
 		}
 
-		// Directory validation disabled
-		if ( ! $use_directory_validation ) {
-			if ( ! $has_scheme ) {
-				return new \WP_Error(
-					'peppol_format_invalid',
-					__( 'The identifier must be in "scheme:value" format (for example 0088:123456789).', 'woocommerce-pdf-invoices-packing-slips' )
-				);
-			}
-
-			return true;
+		// Prevent conflicts with VAT plugins.
+		if ( \wpo_ips_has_vat_plugin_active() ) {
+			return false;
 		}
 
-		// Directory validation enabled
-		$result = $this->peppol_directory_lookup( $val );
+		return true;
+	}
+	
+	/**
+	 * Validate the checkout field value when treated as a VAT number.
+	 *
+	 * @param string $raw_value
+	 * @return true|\WP_Error
+	 */
+	private function checkout_field_validate_vat_number_value( string $raw_value ) {
+		$vat = strtoupper( preg_replace( '/\s+/', '', trim( $raw_value ) ) );
 
-		if ( is_wp_error( $result ) ) {
-			if ( 'peppol_empty_endpoint' === $result->get_error_code() ) {
-				return new \WP_Error(
-					'peppol_empty_endpoint',
-					__( 'Peppol Endpoint ID is empty.', 'woocommerce-pdf-invoices-packing-slips' )
-				);
-			}
-
-			// Network/response errors: do not block checkout.
+		// Optional field: empty is always OK.
+		if ( '' === $vat ) {
 			return true;
 		}
-
-		$matches     = isset( $result['matches'] ) && is_array( $result['matches'] ) ? $result['matches'] : array();
-		$search_meta = isset( $result['search'] ) && is_array( $result['search'] ) ? $result['search'] : array();
-
-		$used_fallback = ! empty( $search_meta['used_fallback'] );
 
 		/**
-		 * No scheme provided (no ":").
+		 * Allow other code to normalize the VAT number before validation.
 		 *
-		 * We always warn that the scheme is required, but still show any found
-		 * participants as hints.
+		 * @param string $vat
+		 * @param string $raw_value
 		 */
-		if ( ! $has_scheme ) {
-			$message = sprintf(
-				/* translators: 1: entered identifier, 2: Peppol Directory URL */
-				__(
-					'The identifier "%1$s" was found without a scheme. Please enter it in "scheme:value" format. You can search for the correct scheme and identifier in the %2$s.',
-					'woocommerce-pdf-invoices-packing-slips'
-				),
-				esc_html( $val ),
-				'<a href="' . esc_url( $directory_url ) . '" target="_blank" rel="noopener noreferrer">' . __( 'Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+		$vat = (string) apply_filters( 'wpo_ips_checkout_field_vat_normalize', $vat, $raw_value );
+
+		// Must start with a valid country prefix.
+		if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat ) ) {
+			$error = new \WP_Error(
+				'invalid_vat_prefix',
+				__( 'Please enter a VAT number including a valid country prefix (for example PT123456789).', 'woocommerce-pdf-invoices-packing-slips' )
 			);
 
-			if ( ! empty( $matches ) ) {
-				$message .= $this->peppol_directory_render_matches_list( $matches, $val );
-			}
-
-			return new \WP_Error(
-				'peppol_directory_scheme_required',
-				$message
-			);
+			/**
+			 * Allow overriding the error returned by the base validation.
+			 *
+			 * @param \WP_Error $error
+			 * @param string   $vat
+			 */
+			return apply_filters( 'wpo_ips_checkout_field_vat_prefix_error', $error, $vat );
 		}
 
 		/**
-		 * Scheme + value provided.
+		 * Allow additional VAT checks (format, length, VIES, etc).
+		 * Return true to accept, or WP_Error to reject.
+		 *
+		 * @param true|\WP_Error $result
+		 * @param string         $vat
+		 * @param string         $raw_value
 		 */
-
-		// No matches at all (for full query and fallback).
-		if ( empty( $matches ) ) {
-			$message = sprintf(
-				/* translators: 1: entered identifier, 2: Peppol Directory URL */
-				__(
-					'No Peppol participant was found for "%1$s". Please confirm the scheme and identifier in the %2$s.',
-					'woocommerce-pdf-invoices-packing-slips'
-				),
-				esc_html( $val ),
-				'<a href="' . esc_url( $directory_url ) . '" target="_blank" rel="noopener noreferrer">' . __( 'Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
-			);
-
-			return new \WP_Error(
-				'peppol_directory_no_match',
-				$message
-			);
-		}
-
-		// If we did not use fallback, the full "scheme:value" query found matches, accept silently.
-		if ( ! $used_fallback ) {
-			return true;
-		}
-
-		// We used fallback (value-only), so "scheme:value" had no hits.
-		// Show alternatives based on value-only search and warn about possible wrong scheme.
-		$message  = sprintf(
-			/* translators: 1: entered identifier, 2: Peppol Directory URL */
-			__(
-				'We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the %2$s. Below are participants found for this identifier value:',
-				'woocommerce-pdf-invoices-packing-slips'
-			),
-			esc_html( $val ),
-			'<a href="' . esc_url( $directory_url ) . '" target="_blank" rel="noopener noreferrer">' . __( 'Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
-		);
-		$message .= $this->peppol_directory_render_matches_list( $matches, $val );
-
-		return new \WP_Error(
-			'peppol_directory_similar_found',
-			$message
-		);
-	}
-
-	/**
-	 * Query the Peppol Directory for an endpoint.
-	 *
-	 * @param string $endpoint_id
-	 * @return array|\WP_Error
-	 */
-	private function peppol_directory_lookup( string $endpoint_id ) {
-		$endpoint_id = trim( (string) $endpoint_id );
-
-		if ( '' === $endpoint_id ) {
-			return new \WP_Error(
-				'peppol_empty_endpoint',
-				__( 'Peppol Endpoint ID is empty.', 'woocommerce-pdf-invoices-packing-slips' )
-			);
-		}
-
-		$has_colon      = ( false !== strpos( $endpoint_id, ':' ) );
-		$primary_query  = $endpoint_id;
-		$fallback_query = '';
-		$used_fallback  = false;
-
-		// If we have "scheme:value", fallback query will be just "value".
-		if ( $has_colon ) {
-			list( , $fallback_query ) = explode( ':', $endpoint_id, 2 );
-			$fallback_query = trim( $fallback_query );
-		}
-
-		// First attempt: full query (can be scheme:value, value, or name).
-		$data = $this->peppol_directory_request( $primary_query );
-
-		if ( is_wp_error( $data ) ) {
-			return $data;
-		}
-
-		$matches = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
-
-		// Fallback: if we had "scheme:value" and got no matches, try "value" only.
-		if ( $has_colon && empty( $matches ) && '' !== $fallback_query ) {
-			$data = $this->peppol_directory_request( $fallback_query );
-
-			if ( is_wp_error( $data ) ) {
-				return $data;
-			}
-
-			$matches      = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
-			$used_fallback = true;
-		}
-
-		$normalized_matches = array();
-
-		foreach ( $matches as $match ) {
-			$participant_value = $match['participantID']['value'] ?? '';
-
-			$entity     = isset( $match['entities'][0] ) && is_array( $match['entities'][0] ) ? $match['entities'][0] : array();
-			$name_entry = isset( $entity['name'][0] )    && is_array( $entity['name'][0] )    ? $entity['name'][0]    : array();
-
-			$name     = $name_entry['name']     ?? '';
-			$language = $name_entry['language'] ?? '';
-			$country  = $entity['countryCode']  ?? '';
-			$reg_date = $entity['regDate']      ?? '';
-
-			// Collect all identifier values we can find (participant + entity identifiers).
-			$identifier_values = array();
-
-			if ( '' !== $participant_value ) {
-				$identifier_values[] = $participant_value;
-			}
-
-			if ( ! empty( $entity['identifiers'] ) && is_array( $entity['identifiers'] ) ) {
-				foreach ( $entity['identifiers'] as $identifier ) {
-					if ( ! empty( $identifier['value'] ) ) {
-						$identifier_values[] = $identifier['value'];
-					}
-				}
-			}
-
-			$identifier_values = array_values( array_unique( $identifier_values ) );
-
-			$normalized_matches[] = array(
-				'value'       => $participant_value,
-				'identifiers' => $identifier_values,
-				'name'        => $name,
-				'language'    => $language,
-				'country'     => $country,
-				'reg_date'    => $reg_date,
-			);
-		}
-
-		return array(
-			'total'   => isset( $data['total-result-count'] ) ? (int) $data['total-result-count'] : count( $normalized_matches ),
-			'matches' => $normalized_matches,
-			'search'  => array(
-				'query'          => $primary_query,
-				'fallback_query' => $fallback_query,
-				'used_fallback'  => $used_fallback,
-			),
-		);
-	}
-
-	/**
-	 * Perform a Peppol Directory request using the generic "q" parameter.
-	 *
-	 * @param string $query
-	 * @return array|\WP_Error
-	 */
-	private function peppol_directory_request( string $query ) {
-		$base_url = 'https://directory.peppol.eu/search/1.0/json';
-
-		$query_args = array(
-			'q'        => $query,
-			'beautify' => 'true',
-		);
-
-		$url = add_query_arg( $query_args, $base_url );
-
-		$response = wp_remote_get(
-			$url,
-			array(
-				'timeout' => 5,
-			)
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return new \WP_Error(
-				'peppol_directory_request_failed',
-				sprintf(
-					/* translators: %s: error message */
-					__( 'Peppol Directory request failed: %s', 'woocommerce-pdf-invoices-packing-slips' ),
-					$response->get_error_message()
-				)
-			);
-		}
-
-		$code = wp_remote_retrieve_response_code( $response );
-		$body = wp_remote_retrieve_body( $response );
-
-		if ( 200 !== $code ) {
-			return new \WP_Error(
-				'peppol_directory_unexpected_status',
-				sprintf(
-					/* translators: %d: HTTP status code */
-					__( 'Peppol Directory returned an unexpected status code: %d', 'woocommerce-pdf-invoices-packing-slips' ),
-					$code
-				)
-			);
-		}
-
-		$data = json_decode( $body, true );
-
-		if ( null === $data || ! is_array( $data ) ) {
-			return new \WP_Error(
-				'peppol_directory_invalid_response',
-				__( 'Peppol Directory returned an invalid JSON response.', 'woocommerce-pdf-invoices-packing-slips' )
-			);
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Render Peppol Directory matches as a simple text list.
-	 *
-	 * @param array  $matches
-	 * @param string $endpoint
-	 * @return string HTML string.
-	 */
-	private function peppol_directory_render_matches_list( array $matches, string $endpoint ): string {
-		if ( empty( $matches ) ) {
-			return '';
-		}
-
-		ob_start();
-		?>
-		<p style="margin-top:5px;">
-			<?php
-				echo esc_html(
-					sprintf(
-						/* translators: %s: endpoint ID */
-						__( 'We found the following participant(s) related to "%s":', 'woocommerce-pdf-invoices-packing-slips' ),
-						$endpoint
-					)
-				);
-			?>
-		</p>
-		<ul class="wpo-ips-edi-peppol-directory-result-list">
-			<?php foreach ( $matches as $match ) : ?>
-				<?php
-					$name        = isset( $match['name'] ) ? (string) $match['name'] : '';
-					$value       = isset( $match['value'] ) ? (string) $match['value'] : '';
-					$identifiers = ( ! empty( $match['identifiers'] ) && is_array( $match['identifiers'] ) ) ? $match['identifiers'] : array();
-
-					// Prefer the participantID value, fall back to the first identifier.
-					$identifier = ( '' !== $value ) ? $value : ( ( ! empty( $identifiers ) ) ? (string) reset( $identifiers ) : '' );
-
-					if ( '' !== $name && '' !== $identifier ) {
-						$item = sprintf( '%1$s (%2$s)', $name, $identifier );
-					} elseif ( '' !== $identifier ) {
-						$item = $identifier;
-					} elseif ( '' !== $name ) {
-						$item = $name;
-					} else {
-						$item = '';
-					}
-
-					if ( '' === $item ) {
-						continue;
-					}
-				?>
-				<li><?php echo esc_html( $item ); ?></li>
-			<?php endforeach; ?>
-		</ul>
-		<?php
-
-		return (string) ob_get_clean();
+		return apply_filters( 'wpo_ips_checkout_field_vat_validate', true, $vat, $raw_value );
 	}
 
 }
