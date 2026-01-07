@@ -139,13 +139,22 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 					<div class="doc-output-toggle-group">
 						<?php
 							foreach ( $document->output_formats as $document_output_format ) {
-								if ( 'xml' === $document_output_format && ( ! wpo_ips_edi_is_available() || ! wpo_ips_edi_preview_is_enabled() ) ) {
-									continue;
+								if ( 'xml' === $document_output_format ) {
+									if ( ! wpo_ips_edi_is_available() || ! wpo_ips_edi_preview_is_enabled() ) {
+										continue;
+									}
+									
+									$format           = wpo_ips_edi_get_current_format( true );
+									$format_doc_types = is_array( $format['documents'] ) ? array_keys( $format['documents'] ) : array();
+									
+									if ( ! in_array( $document_type, $format_doc_types, true ) ) {
+										continue;
+									}
 								}
 
-								$is_active = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats ) );
+								$is_active    = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats ) );
 								$active_class = $is_active ? 'active' : '';
-								$tab_title = strtoupper( esc_html( $document_output_format ) );
+								$tab_title    = strtoupper( esc_html( $document_output_format ) );
 
 								printf(
 									'<a href="%1$s" class="doc-output-toggle %2$s">%3$s</a>',
