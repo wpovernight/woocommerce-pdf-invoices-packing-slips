@@ -1638,7 +1638,7 @@ abstract class OrderDocument {
 		$args = $args + $default_args;
 
 		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ), array(
-				'order' => $this->order,
+				'order'    => $this->order,
 				'order_id' => $this->order_id,
 			)
 		);
