@@ -129,6 +129,10 @@ function wcpdf_get_bulk_actions() {
 
 	foreach ( $documents as $document ) {
 		foreach ( $document->output_formats as $output_format ) {
+			if ( 'xml' === $output_format && ! \wpo_ips_edi_is_available() ) {
+				continue;
+			}
+			
 			$slug = $document->get_type();
 			
 			if ( 'pdf' !== $output_format ) {
