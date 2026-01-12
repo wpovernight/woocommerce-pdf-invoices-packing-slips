@@ -50,7 +50,7 @@ class LineHandler extends AbstractUblHandler {
 
 			// Price parts
 			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon_lines );
-			
+
 			// Round gross/net units first (numeric), then derive discount, then recompute net.
 			$gross_unit_f = (float) $this->format_decimal( $parts['gross_unit'], 2 );
 			$net_unit_f   = (float) $this->format_decimal( $parts['net_unit'],   2 );
@@ -147,18 +147,16 @@ class LineHandler extends AbstractUblHandler {
 					}
 				}
 			}
-			
+
 			$quantity_value = $parts['qty'];
 
 			// For credit notes: quantity must carry the sign, price stays positive
 			if ( 'Credited' === $quantity_role && $parts['net_total'] < 0 ) {
 				$quantity_value = -abs( $quantity_value );
 			}
-			
-			// Recompute line net total from the rounded unit net price
-			$net_line_total_f = $net_unit_f * $quantity_value;
-			$net_line_total_f = (float) $this->format_decimal( $net_line_total_f, 2 );
-			$net_line_total   = $this->format_decimal( $net_line_total_f, 2 );
+
+			// Use Woo’s net_total for the line extension amount.
+			$net_line_total = $this->format_decimal( $parts['net_total'], 2 );
 
 			$line = array(
 				'name'  => "cac:{$root_element}Line",
@@ -194,11 +192,11 @@ class LineHandler extends AbstractUblHandler {
 
 			$data[] = apply_filters( 'wpo_ips_edi_ubl_line', $line, $data, $options, $item, $this );
 		}
-		
+
 		// Append coupon lines as negative lines
 		if ( $include_coupon_lines ) {
 			$coupons = $this->document->order->get_items( 'coupon' );
-			
+
 			if ( empty( $coupons ) ) {
 				return $data;
 			}
@@ -213,7 +211,7 @@ class LineHandler extends AbstractUblHandler {
 
 		return $data;
 	}
-	
+
 	/**
 	 * Create the Line array for a single coupon item.
 	 *
@@ -229,7 +227,7 @@ class LineHandler extends AbstractUblHandler {
 
 		$code              = method_exists( $coupon_item, 'get_code' ) ? $coupon_item->get_code() : '';
 		$discount_excl_tax = (float) $coupon_item->get_discount();
-		$net_total         = -1 * $this->format_decimal( $discount_excl_tax, 2 );
+		$net_total         = -1.0 * (float) $this->format_decimal( $discount_excl_tax, 2 );
 
 		if ( 0.0 === $net_total ) {
 			return null;
@@ -272,7 +270,7 @@ class LineHandler extends AbstractUblHandler {
 				),
 			),
 		);
-		
+
 		$root_element  = $this->document->get_root_element();
 		$quantity_role = $this->document->get_quantity_role();
 
@@ -331,7 +329,7 @@ class LineHandler extends AbstractUblHandler {
 				),
 			),
 		);
-		
+
 		return apply_filters( 'wpo_ips_edi_ubl_coupon_line', $line, $coupon_item, $this );
 	}
 
