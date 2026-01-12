@@ -135,6 +135,13 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 					}
 				}
 			}
+			
+			$quantity_value = $parts['qty'];
+			
+			// Recompute line net total from the rounded unit net price
+			$net_line_total_f = $net_unit_f * $quantity_value;
+			$net_line_total_f = (float) $this->format_decimal( $net_line_total_f, 2 );
+			$net_line_total   = $this->format_decimal( $net_line_total_f, 2 );
 
 			$line_item = array(
 				'name'  => 'ram:IncludedSupplyChainTradeLineItem',
@@ -166,7 +173,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'value' => array(
 							array(
 								'name'       => 'ram:BilledQuantity',
-								'value'      => $parts['qty'],
+								'value'      => $quantity_value,
 								'attributes' => array(
 									'unitCode' => 'C62',
 								),
@@ -183,7 +190,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 									'value' => array(
 										array(
 											'name'  => 'ram:LineTotalAmount',
-											'value' => $this->format_decimal( $parts['net_total'] ),
+											'value' => $net_line_total,
 										),
 									),
 								),

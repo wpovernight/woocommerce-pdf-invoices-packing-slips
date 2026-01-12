@@ -154,6 +154,11 @@ class LineHandler extends AbstractUblHandler {
 			if ( 'Credited' === $quantity_role && $parts['net_total'] < 0 ) {
 				$quantity_value = -abs( $quantity_value );
 			}
+			
+			// Recompute line net total from the rounded unit net price
+			$net_line_total_f = $net_unit_f * $quantity_value;
+			$net_line_total_f = (float) $this->format_decimal( $net_line_total_f, 2 );
+			$net_line_total   = $this->format_decimal( $net_line_total_f, 2 );
 
 			$line = array(
 				'name'  => "cac:{$root_element}Line",
@@ -171,7 +176,7 @@ class LineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
-						'value'      => $this->format_decimal( $parts['net_total'] ),
+						'value'      => $net_line_total,
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
