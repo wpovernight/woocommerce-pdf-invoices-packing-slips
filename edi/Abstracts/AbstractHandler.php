@@ -34,7 +34,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 	/**
 	 * Get the order customer VAT number.
-	 * 
+	 *
 	 * @param \WC_Order $order
 	 * @return string|null
 	 */
@@ -62,7 +62,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $general_settings->get_setting( $key, $language ) ?: '';
 	}
-	
+
 	/**
 	 * Returns the due date for the document.
 	 *
@@ -72,7 +72,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		$due_date = is_callable( array( $this->document->order_document, 'get_due_date' ) )
 			? $this->document->order_document->get_due_date()
 			: 0;
-			
+
 		return $this->normalize_date( $due_date, 'Y-m-d' );
 	}
 
@@ -443,7 +443,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
 	}
-	
+
 	/**
 	 * Get sum of line net amounts.
 	 *
@@ -453,34 +453,12 @@ abstract class AbstractHandler implements HandlerInterface {
 	protected function get_lines_net_total( \WC_Abstract_Order $order ): float {
 		$lines_net      = 0.0;
 		$include_coupon = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
-		$quantity_role  = $this->document->get_quantity_role();
 		$line_items     = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
 		foreach ( $line_items as $item ) {
-			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon );
-
-			// Round gross/net units first (numeric), then derive discount, then recompute net.
-			$gross_unit_f = (float) $this->format_decimal( $parts['gross_unit'], 2 );
-			$net_unit_f   = (float) $this->format_decimal( $parts['net_unit'],   2 );
-
-			$unit_discount_f = $gross_unit_f - $net_unit_f;
-			if ( $unit_discount_f < 0 ) {
-				$unit_discount_f = 0.0;
-			}
-			$unit_discount_f = (float) $this->format_decimal( $unit_discount_f, 2 );
-
-			// Recompute net from gross - discount to guarantee equality.
-			$net_unit_f = $gross_unit_f - $unit_discount_f;
-
-			$qty = $parts['qty'];
-			if ( 'Credited' === $quantity_role && $parts['net_total'] < 0 ) {
-				$qty = -abs( $qty );
-			}
-
-			$net_line_total_f = $net_unit_f * $qty;
-			$net_line_total_f = (float) $this->format_decimal( $net_line_total_f, 2 );
-
-			$lines_net += $net_line_total_f;
+			$parts           = $this->compute_item_price_parts( $item, (bool) $include_coupon );
+			$line_net_total  = (float) $this->format_decimal( $parts['net_total'], 2 );
+			$lines_net      += $line_net_total;
 		}
 
 		// If discounts are rendered as separate lines, include them as negative net amounts.
@@ -493,7 +471,7 @@ abstract class AbstractHandler implements HandlerInterface {
 				}
 
 				$discount_excl_tax = (float) $coupon_item->get_discount();
-				$net_total         = -1 * (float) $this->format_decimal( $discount_excl_tax, 2 );
+				$net_total         = -1.0 * (float) $this->format_decimal( $discount_excl_tax, 2 );
 
 				if ( 0.0 === $net_total ) {
 					continue;
@@ -693,5 +671,5 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $rows;
 	}
-	
+
 }
