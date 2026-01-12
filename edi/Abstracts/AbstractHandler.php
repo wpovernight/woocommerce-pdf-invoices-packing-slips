@@ -428,16 +428,82 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 		}
 
+		// Sum of line net amounts.
+		$lines_net = $this->get_lines_net_total( $order );
+
 		$totals = compact(
 			'total_exc_tax',
 			'total_inc_tax',
 			'total_tax',
 			'prepaid_amount',
 			'rounding_diff',
-			'payable_amount'
+			'payable_amount',
+			'lines_net'
 		);
 
 		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
+	}
+	
+	/**
+	 * Get sum of line net amounts.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return float
+	 */
+	protected function get_lines_net_total( \WC_Abstract_Order $order ): float {
+		$lines_net      = 0.0;
+		$include_coupon = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
+		$quantity_role  = $this->document->get_quantity_role();
+		$line_items     = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+
+		foreach ( $line_items as $item ) {
+			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon );
+
+			// Round gross/net units first (numeric), then derive discount, then recompute net.
+			$gross_unit_f = (float) $this->format_decimal( $parts['gross_unit'], 2 );
+			$net_unit_f   = (float) $this->format_decimal( $parts['net_unit'],   2 );
+
+			$unit_discount_f = $gross_unit_f - $net_unit_f;
+			if ( $unit_discount_f < 0 ) {
+				$unit_discount_f = 0.0;
+			}
+			$unit_discount_f = (float) $this->format_decimal( $unit_discount_f, 2 );
+
+			// Recompute net from gross - discount to guarantee equality.
+			$net_unit_f = $gross_unit_f - $unit_discount_f;
+
+			$qty = $parts['qty'];
+			if ( 'Credited' === $quantity_role && $parts['net_total'] < 0 ) {
+				$qty = -abs( $qty );
+			}
+
+			$net_line_total_f = $net_unit_f * $qty;
+			$net_line_total_f = (float) $this->format_decimal( $net_line_total_f, 2 );
+
+			$lines_net += $net_line_total_f;
+		}
+
+		// If discounts are rendered as separate lines, include them as negative net amounts.
+		if ( $include_coupon ) {
+			$coupons = $order->get_items( 'coupon' );
+
+			foreach ( $coupons as $coupon_item ) {
+				if ( ! is_object( $coupon_item ) || ! method_exists( $coupon_item, 'get_discount' ) ) {
+					continue;
+				}
+
+				$discount_excl_tax = (float) $coupon_item->get_discount();
+				$net_total         = -1 * (float) $this->format_decimal( $discount_excl_tax, 2 );
+
+				if ( 0.0 === $net_total ) {
+					continue;
+				}
+
+				$lines_net += $net_total;
+			}
+		}
+
+		return (float) $this->format_decimal( $lines_net, 2 );
 	}
 
 	/**
