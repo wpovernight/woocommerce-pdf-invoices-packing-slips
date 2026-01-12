@@ -135,12 +135,11 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 					}
 				}
 			}
-			
+
 			$quantity_value = $parts['qty'];
-			
-			// Recompute line net total from the rounded unit net price
-			$net_line_total_f = $net_unit_f * $quantity_value;
-			$net_line_total_f = (float) $this->format_decimal( $net_line_total_f, 2 );
+
+			// Use Woo’s net_total for the line total amount.
+			$net_line_total_f = (float) $this->format_decimal( $parts['net_total'], 2 );
 			$net_line_total   = $this->format_decimal( $net_line_total_f, 2 );
 
 			$line_item = array(
