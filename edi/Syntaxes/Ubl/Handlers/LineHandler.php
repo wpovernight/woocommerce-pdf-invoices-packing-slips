@@ -86,6 +86,28 @@ class LineHandler extends AbstractUblHandler {
 				),
 			);
 
+			/**
+			* NOTE ABOUT DISABLING cac:Price/cac:AllowanceCharge FOR PEPPOL
+			*
+			* We intentionally do not emit price-level AllowanceCharge elements for Peppol BIS invoices.
+			*
+			* Reason: While BT-147 (Item price discount) and BT-148 (Gross price) are optional in EN16931,
+			* the Peppol validator interprets cac:Price/cac:AllowanceCharge as a line-level allowance and
+			* applies BR-24 and BR-42 rules. This caused the validator to:
+			*
+			*   - subtract the discount again from the already-net PriceAmount, and
+			*   - require a reason code (BT-139/BT-140) for each price allowance,
+			*
+			* resulting in validation failures and incorrect recalculated line totals.
+			*
+			* To avoid double-discounting and maintain correct monetary values, we emit only:
+			*
+			*   PriceAmount (net unit price) + LineExtensionAmount (net line amount)
+			*
+			* This is fully compliant with Peppol BIS Billing 3.0 since BT-147/BT-148 are optional.
+			*
+			* If explicit gross/discount information is needed in the future, this can be reintroduced.
+			*/
 			// Only show AllowanceCharge when there is a discount at price level (already reflected in net price)
 			// if ( $unit_discount > 0 ) {
 			// 	$price_value[] = array(
