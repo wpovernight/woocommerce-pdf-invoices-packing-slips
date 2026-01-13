@@ -392,21 +392,23 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function get_order_payment_totals( \WC_Abstract_Order $order ): array {
-		$total         = $order->get_total();
-		$total_tax_raw = $order->get_total_tax();
-		$total_inc_tax = $total;
+		$order_total   = (float) $order->get_total();
+		$total_tax_raw = (float) $order->get_total_tax();
 
-		// VAT total
-		$total_tax = wc_round_tax_total( $total_tax_raw );
-
-		// Invoice line net amount
+		// Invoice line net amounts
 		$lines_net = $this->get_lines_net_total( $order );
 
 		// Invoice total amount without VAT
 		$total_exc_tax = $lines_net;
 
-		// Rounding difference
-		$rounding_diff = wc_round_tax_total( $total_inc_tax - ( $total_exc_tax + $total_tax ) );
+		// Invoice total VAT amount (rounded)
+		$total_tax = wc_round_tax_total( $total_tax_raw );
+
+		// Invoice total amount with VAT
+		$total_inc_tax = (float) $this->format_decimal( $total_exc_tax + $total_tax, 2 );
+
+		// PayableRoundingAmount = Woo total - Invoice total amount with VAT
+		$rounding_diff = wc_round_tax_total( $order_total - $total_inc_tax );
 
 		// Config / inputs.
 		$has_due_days   = ! empty( $this->get_due_date_days() );
@@ -428,33 +430,26 @@ abstract class AbstractHandler implements HandlerInterface {
 			);
 			wpo_ips_edi_log(
 				'Rounding difference detected for order #' . $order->get_id() . ': ' .
-				'total_inc_tax=' . $total_inc_tax . ', total_exc_tax=' . $total_exc_tax .
-				', total_tax=' . $total_tax . ', rounding_diff=' . $rounding_diff,
+				'order_total=' . $order_total . ', total_inc_tax=' . $total_inc_tax .
+				', total_exc_tax=' . $total_exc_tax . ', total_tax=' . $total_tax .
+				', rounding_diff=' . $rounding_diff,
 				'warning'
 			);
 		}
+
+		// Gross invoice amount including rounding (should equal Woo order total).
+		$gross_total = (float) $this->format_decimal( $total_inc_tax + $rounding_diff, 2 );
 
 		// Default rule:
 		// - If there's NO due date AND no explicit prepaid set, treat as fully prepaid (paid on issue).
 		// - Otherwise, use the provided prepaid (or 0) and compute payable normally.
 		if ( $prepaid_amount <= 0.0 && ! $has_due_days ) {
 			// Fully prepaid by default.
-			$prepaid_amount = $total_inc_tax;
-
-			// Absorb rounding diff into prepaid so payable stays 0.00.
-			if ( $rounding_is_significant ) {
-				$prepaid_amount += $rounding_diff;
-			}
-
+			$prepaid_amount = $gross_total;
 			$payable_amount = 0.0;
 		} else {
 			// Not fully prepaid; customer owes the remainder.
-			$payable_amount = $total_inc_tax - $prepaid_amount;
-
-			// Apply rounding diff to payable to reconcile to grand total.
-			if ( $rounding_is_significant ) {
-				$payable_amount += $rounding_diff;
-			}
+			$payable_amount = $gross_total - $prepaid_amount;
 		}
 
 		$totals = compact(
