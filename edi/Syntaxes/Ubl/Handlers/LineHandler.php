@@ -87,31 +87,31 @@ class LineHandler extends AbstractUblHandler {
 			);
 
 			// Only show AllowanceCharge when there is a discount at price level
-			if ( $unit_discount > 0 ) {
-				$price_value[] = array(
-					'name'  => 'cac:AllowanceCharge',
-					'value' => array(
-						array(
-							'name'  => 'cbc:ChargeIndicator',
-							'value' => 'false',
-						),
-						array(
-							'name'       => 'cbc:Amount',
-							'value'      => $unit_discount,
-							'attributes' => array(
-								'currencyID' => $currency,
-							),
-						),
-						array(
-							'name'       => 'cbc:BaseAmount',
-							'value'      => $gross_unit,
-							'attributes' => array(
-								'currencyID' => $currency,
-							),
-						),
-					),
-				);
-			}
+			// if ( $unit_discount > 0 ) {
+			// 	$price_value[] = array(
+			// 		'name'  => 'cac:AllowanceCharge',
+			// 		'value' => array(
+			// 			array(
+			// 				'name'  => 'cbc:ChargeIndicator',
+			// 				'value' => 'false',
+			// 			),
+			// 			array(
+			// 				'name'       => 'cbc:Amount',
+			// 				'value'      => $unit_discount,
+			// 				'attributes' => array(
+			// 					'currencyID' => $currency,
+			// 				),
+			// 			),
+			// 			array(
+			// 				'name'       => 'cbc:BaseAmount',
+			// 				'value'      => $gross_unit,
+			// 				'attributes' => array(
+			// 					'currencyID' => $currency,
+			// 				),
+			// 			),
+			// 		),
+			// 	);
+			// }
 
 			// Build base Item node
 			$item_value = array(
