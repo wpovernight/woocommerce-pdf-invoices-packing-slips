@@ -390,12 +390,18 @@ abstract class AbstractHandler implements HandlerInterface {
 	protected function get_order_payment_totals( \WC_Abstract_Order $order ): array {
 		$total         = $order->get_total();
 		$total_tax_raw = $order->get_total_tax();
-		$total_exc_tax = $total - $total_tax_raw;
 		$total_inc_tax = $total;
-		$currency      = $order->get_currency();
 
-		// Tax rounding.
-		$total_tax     = wc_round_tax_total( $total_tax_raw );
+		// VAT total
+		$total_tax = wc_round_tax_total( $total_tax_raw );
+
+		// Invoice line net amount
+		$lines_net = $this->get_lines_net_total( $order );
+
+		// Invoice total amount without VAT
+		$total_exc_tax = $lines_net;
+
+		// Rounding difference
 		$rounding_diff = wc_round_tax_total( $total_inc_tax - ( $total_exc_tax + $total_tax ) );
 
 		// Config / inputs.
@@ -404,6 +410,25 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		// Threshold for treating rounding diff as significant.
 		$rounding_is_significant = ( abs( $rounding_diff ) >= 0.01 );
+		
+		if ( $rounding_is_significant ) {
+			do_action(
+				'wpo_ips_edi_rounding_mismatch',
+				$order,
+				$lines_net,
+				$total_exc_tax,
+				$total_tax,
+				$total_inc_tax,
+				$rounding_diff,
+				$this
+			);
+			wpo_ips_edi_log(
+				'Rounding difference detected for order #' . $order->get_id() . ': ' .
+				'total_inc_tax=' . $total_inc_tax . ', total_exc_tax=' . $total_exc_tax .
+				', total_tax=' . $total_tax . ', rounding_diff=' . $rounding_diff,
+				'warning'
+			);
+		}
 
 		// Default rule:
 		// - If there's NO due date AND no explicit prepaid set, treat as fully prepaid (paid on issue).
@@ -427,9 +452,6 @@ abstract class AbstractHandler implements HandlerInterface {
 				$payable_amount += $rounding_diff;
 			}
 		}
-
-		// Sum of line net amounts.
-		$lines_net = $this->get_lines_net_total( $order );
 
 		$totals = compact(
 			'total_exc_tax',
