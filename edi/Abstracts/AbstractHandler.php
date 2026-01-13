@@ -418,16 +418,6 @@ abstract class AbstractHandler implements HandlerInterface {
 		$rounding_is_significant = ( abs( $rounding_diff ) >= 0.01 );
 		
 		if ( $rounding_is_significant ) {
-			do_action(
-				'wpo_ips_edi_rounding_mismatch',
-				$order,
-				$lines_net,
-				$total_exc_tax,
-				$total_tax,
-				$total_inc_tax,
-				$rounding_diff,
-				$this
-			);
 			wpo_ips_edi_log(
 				'Rounding difference detected for order #' . $order->get_id() . ': ' .
 				'order_total=' . $order_total . ', total_inc_tax=' . $total_inc_tax .

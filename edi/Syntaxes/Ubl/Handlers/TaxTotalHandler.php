@@ -18,18 +18,30 @@ class TaxTotalHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$tax_reasons      = EN16931::get_vatex();
-		$currency         = $this->document->order->get_currency();
+		$tax_reasons = EN16931::get_vatex();
+		$currency    = $this->document->order->get_currency();
 
 		// Group tax data by rate, category, reason, and scheme
 		$grouped_tax_data = $this->get_grouped_order_tax_data();
-		
-		// Format grouped tax data into UBL structure
-		$formatted_tax_array = array_map( function( $item ) use ( $tax_reasons, $currency ) {
+
+		// Internal sums for consistency checks.
+		$sum_taxable = 0.0;
+		$sum_tax     = 0.0;
+
+		$formatted_tax_array = array();
+
+		foreach ( $grouped_tax_data as $item ) {
 			$item_tax_percentage = (float) ( $item['percentage']            ?? 0        );
 			$item_tax_category   = strtoupper( (string) ( $item['category'] ?? ''     ) );
 			$item_tax_reason_key = strtoupper( (string) ( $item['reason']   ?? 'NONE' ) );
 			$item_tax_scheme     = strtoupper( (string) ( $item['scheme']   ?? 'VAT'  ) );
+
+			$taxable_raw = (float) ( $item['total_ex']  ?? 0 );
+			$tax_raw     = (float) ( $item['total_tax'] ?? 0 );
+
+			// Sum before formatting to keep math precise, then round tax.
+			$sum_taxable += $taxable_raw;
+			$sum_tax     += wc_round_tax_total( $tax_raw );
 
 			$tax_category = array(
 				array(
@@ -69,19 +81,21 @@ class TaxTotalHandler extends AbstractUblHandler {
 				),
 			);
 
-			return array(
+			$formatted_tax_array[] = array(
 				'name'  => 'cac:TaxSubtotal',
 				'value' => array(
 					array(
+						// TaxableAmount = base amount for this rate
 						'name'       => 'cbc:TaxableAmount',
-						'value'      => $this->format_decimal( wc_round_tax_total( (float) ( $item['total_ex']  ?? 0 ) ) ),
+						'value'      => $this->format_decimal( $taxable_raw ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
 					),
 					array(
+						// TaxAmount = VAT for this rate (rounded as tax)
 						'name'       => 'cbc:TaxAmount',
-						'value'      => $this->format_decimal( wc_round_tax_total( (float) ( $item['total_tax'] ?? 0 ) ) ),
+						'value'      => $this->format_decimal( wc_round_tax_total( $tax_raw ) ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
@@ -92,7 +106,30 @@ class TaxTotalHandler extends AbstractUblHandler {
 					),
 				),
 			);
-		}, $grouped_tax_data );
+		}
+
+		// Overall tax total = sum of TaxAmount in subtotals.
+		$total_tax = wc_round_tax_total( $sum_tax );
+
+		// Consistency check with lines net total.
+		$lines_net           = $this->get_lines_net_total( $this->document->order );
+		$taxable_sum_rounded = (float) $this->format_decimal( $sum_taxable );
+		$lines_net_rounded   = (float) $this->format_decimal( $lines_net );
+
+		$diff = $taxable_sum_rounded - $lines_net_rounded;
+
+		if ( abs( $diff ) >= 0.01 ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'Tax subtotal taxable sum mismatch for order #%d: sum_taxable=%s, lines_net=%s, diff=%s',
+					$this->document->order->get_id(),
+					$taxable_sum_rounded,
+					$lines_net_rounded,
+					$this->format_decimal( $diff )
+				),
+				'warning'
+			);
+		}
 
 		$tax_total = array(
 			'name'  => 'cac:TaxTotal',
@@ -100,7 +137,7 @@ class TaxTotalHandler extends AbstractUblHandler {
 				array(
 					array(
 						'name'       => 'cbc:TaxAmount',
-						'value'      => $this->format_decimal( wc_round_tax_total( $this->document->order->get_total_tax() ) ),
+						'value'      => $this->format_decimal( $total_tax ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
