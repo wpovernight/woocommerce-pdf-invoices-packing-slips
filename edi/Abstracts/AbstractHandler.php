@@ -236,10 +236,14 @@ abstract class AbstractHandler implements HandlerInterface {
 		if ( empty( $order_tax_data ) ) {
 			$order_tax_data = array(
 				0 => array(
-					'total_ex'  => $this->document->order->get_total(),
-					'total_tax' => 0,
-					'items'     => array(),
-					'name'      => '',
+					'total_ex'   => $this->document->order->get_total(),
+					'total_tax'  => 0,
+					'items'      => array(),
+					'name'       => '',
+					'percentage' => 0,
+					'category'   => 'Z',
+					'reason'     => 'NONE',
+					'scheme'     => 'VAT',
 				),
 			);
 		}
