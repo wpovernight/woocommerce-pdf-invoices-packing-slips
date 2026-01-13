@@ -34,7 +34,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 	/**
 	 * Get the order customer VAT number.
-	 * 
+	 *
 	 * @param \WC_Order $order
 	 * @return string|null
 	 */
@@ -62,7 +62,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $general_settings->get_setting( $key, $language ) ?: '';
 	}
-	
+
 	/**
 	 * Returns the due date for the document.
 	 *
@@ -72,7 +72,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		$due_date = is_callable( array( $this->document->order_document, 'get_due_date' ) )
 			? $this->document->order_document->get_due_date()
 			: 0;
-			
+
 		return $this->normalize_date( $due_date, 'Y-m-d' );
 	}
 
@@ -428,16 +428,60 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 		}
 
+		// Sum of line net amounts.
+		$lines_net = $this->get_lines_net_total( $order );
+
 		$totals = compact(
 			'total_exc_tax',
 			'total_inc_tax',
 			'total_tax',
 			'prepaid_amount',
 			'rounding_diff',
-			'payable_amount'
+			'payable_amount',
+			'lines_net'
 		);
 
 		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
+	}
+
+	/**
+	 * Get sum of line net amounts.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return float
+	 */
+	protected function get_lines_net_total( \WC_Abstract_Order $order ): float {
+		$lines_net      = 0.0;
+		$include_coupon = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
+		$line_items     = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+
+		foreach ( $line_items as $item ) {
+			$parts           = $this->compute_item_price_parts( $item, (bool) $include_coupon );
+			$line_net_total  = (float) $this->format_decimal( $parts['net_total'], 2 );
+			$lines_net      += $line_net_total;
+		}
+
+		// If discounts are rendered as separate lines, include them as negative net amounts.
+		if ( $include_coupon ) {
+			$coupons = $order->get_items( 'coupon' );
+
+			foreach ( $coupons as $coupon_item ) {
+				if ( ! is_object( $coupon_item ) || ! method_exists( $coupon_item, 'get_discount' ) ) {
+					continue;
+				}
+
+				$discount_excl_tax = (float) $coupon_item->get_discount();
+				$net_total         = -1.0 * (float) $this->format_decimal( $discount_excl_tax, 2 );
+
+				if ( 0.0 === $net_total ) {
+					continue;
+				}
+
+				$lines_net += $net_total;
+			}
+		}
+
+		return (float) $this->format_decimal( $lines_net, 2 );
 	}
 
 	/**
@@ -627,5 +671,5 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $rows;
 	}
-	
+
 }
