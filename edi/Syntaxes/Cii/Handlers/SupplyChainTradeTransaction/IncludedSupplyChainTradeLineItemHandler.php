@@ -79,31 +79,31 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 				),
 			);
 
-			// Only products can have a price-level discount
-			if ( $unit_discount > 0 && is_a( $item, 'WC_Order_Item_Product' ) ) {
-				$price_children[] = array(
-					'name'  => 'ram:AppliedTradeAllowanceCharge',
-					'value' => array(
-						array(
-							'name'  => 'ram:ChargeIndicator',
-							'value' => array(
-								array(
-									'name'  => 'udt:Indicator',
-									'value' => 'false'
-								),
-							),
-						),
-						array(
-							'name'  => 'ram:ActualAmount',
-							'value' => $unit_discount,
-						),
-						array(
-							'name'  => 'ram:BasisAmount',
-							'value' => $gross_unit,
-						),
-					),
-				);
-			}
+			// Only products can have a price-level discount (already reflected in net price)
+			// if ( $unit_discount > 0 && is_a( $item, 'WC_Order_Item_Product' ) ) {
+			// 	$price_children[] = array(
+			// 		'name'  => 'ram:AppliedTradeAllowanceCharge',
+			// 		'value' => array(
+			// 			array(
+			// 				'name'  => 'ram:ChargeIndicator',
+			// 				'value' => array(
+			// 					array(
+			// 						'name'  => 'udt:Indicator',
+			// 						'value' => 'false'
+			// 					),
+			// 				),
+			// 			),
+			// 			array(
+			// 				'name'  => 'ram:ActualAmount',
+			// 				'value' => $unit_discount,
+			// 			),
+			// 			array(
+			// 				'name'  => 'ram:BasisAmount',
+			// 				'value' => $gross_unit,
+			// 			),
+			// 		),
+			// 	);
+			// }
 
 			// Build SpecifiedTradeProduct
 			$product_value = array(

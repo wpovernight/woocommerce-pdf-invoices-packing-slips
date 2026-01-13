@@ -86,7 +86,7 @@ class LineHandler extends AbstractUblHandler {
 				),
 			);
 
-			// Only show AllowanceCharge when there is a discount at price level
+			// Only show AllowanceCharge when there is a discount at price level (already reflected in net price)
 			// if ( $unit_discount > 0 ) {
 			// 	$price_value[] = array(
 			// 		'name'  => 'cac:AllowanceCharge',
