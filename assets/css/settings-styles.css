@@ -885,6 +885,35 @@ button.button-edi-save-taxes {
 	padding: 0 6px;
 }
 
+#wpo-wcpdf-preview-wrapper .preview-document {
+	padding: 2em 0 0 0;
+	box-sizing: border-box;
+	position: sticky;
+	top: 2.4em;
+	flex: 0 0 60%;
+	min-width: 0;
+	overflow-x: hidden;
+}
+
+#wpo-wcpdf-preview-wrapper .preview {
+	min-width: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#wpo-wcpdf-preview-wrapper .preview pre[class*="language-"] {
+	margin: 0;
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: auto;
+	white-space: pre;
+}
+
+#wpo-wcpdf-preview-wrapper .preview canvas {
+	display: block;
+	max-width: 100%;
+}
+
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar {
 	flex: 0 0 100%;
 }
@@ -912,14 +941,6 @@ button.button-edi-save-taxes {
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-from-preview-state="full"] .sidebar {
 	transition-delay: .4s;
-}
-
-#wpo-wcpdf-preview-wrapper .preview-document {
-	padding: 2em 0 0 0;
-	box-sizing: border-box;
-	position: sticky;
-	top: 2.4em;
-	flex: 0 0 60%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .preview-document {
