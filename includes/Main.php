@@ -73,8 +73,8 @@ class Main {
 		// apply header logo height
 		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
 		
-		// set ink saving mode
-		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_ink_saving_styles' ), 10, 2 );
+		// apply template styles
+		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_template_styles' ), 9, 2 );
 
 		// show notice of missing required directories
 		add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
@@ -2028,38 +2028,78 @@ class Main {
 	}
 	
 	/**
-	 * Apply ink-saving styles to supported templates when the feature is enabled.
+	 * Apply template style features (ink saving, main color, etc.) to supported templates.
 	 *
 	 * @param string        $css
 	 * @param OrderDocument $document
 	 * @return string
 	 */
-	public function apply_ink_saving_styles( string $css, OrderDocument $document ): string {
-		$settings = WPO_WCPDF()->settings->general_settings ?? array();
+	public function apply_template_styles( string $css, OrderDocument $document ): string {
+		$settings         = WPO_WCPDF()->settings->general_settings ?? array();
+		$current_template = $settings['template_path'] ?? '';
 
-		$ink_saving_enabled = ! empty( $settings['template_ink_saving'] );
-		$current_template   = $settings['template_path'] ?? '';
-
-		$supported_templates = apply_filters(
-			'wpo_ips_ink_saving_supported_templates',
-			array( 'default/Simple' )
+		$features = apply_filters(
+			'wpo_ips_template_style_features',
+			array(
+				'ink_saving' => array(
+					'enabled'                    => ! empty( $settings['template_ink_saving'] ),
+					'value'                      => ! empty( $settings['template_ink_saving'] ),
+					'supported_templates_filter' => 'wpo_ips_ink_saving_supported_templates',
+					'css_filter'                 => 'wpo_ips_ink_saving_css',
+				),
+				'main_color' => array(
+					'enabled'                    => ! empty( $settings['template_main_color'] ),
+					'value'                      => $settings['template_main_color'] ?? '',
+					'supported_templates_filter' => 'wpo_ips_main_color_supported_templates',
+					'css_filter'                 => 'wpo_ips_main_color_css',
+				),
+			),
+			$settings,
+			$document
 		);
 
-		// Bail if feature is disabled or template not supported.
-		if ( ! $ink_saving_enabled || ! in_array( $current_template, $supported_templates, true ) ) {
+		if ( empty( $current_template ) || empty( $features ) || ! is_array( $features ) ) {
 			return $css;
 		}
 
-		// Let templates provide their own ink-saving CSS.
-		$ink_saving_css = apply_filters(
-			'wpo_ips_ink_saving_css',
-			'',
-			$document,
-			$current_template
-		);
+		foreach ( $features as $feature_key => $feature ) {
+			$enabled                    = ! empty( $feature['enabled'] );
+			$feature_value              = $feature['value'] ?? null;
+			$supported_templates_filter = $feature['supported_templates_filter'] ?? '';
+			$css_filter                 = $feature['css_filter'] ?? '';
 
-		if ( ! empty( trim( $ink_saving_css ) ) ) {
-			$css .= "\n\n" . $ink_saving_css . "\n";
+			if ( ! $enabled || empty( $supported_templates_filter ) || empty( $css_filter ) ) {
+				continue;
+			}
+
+			$supported_templates = apply_filters(
+				$supported_templates_filter,
+				array( 'default/Simple' ),
+				$document,
+				$current_template,
+				$feature_key,
+				$feature_value,
+				$settings
+			);
+
+			if ( empty( $supported_templates ) || ! in_array( $current_template, $supported_templates, true ) ) {
+				continue;
+			}
+
+			// Let each feature provide its own CSS.
+			$feature_css = apply_filters(
+				$css_filter,
+				'',
+				$document,
+				$current_template,
+				$feature_key,
+				$feature_value,
+				$settings
+			);
+
+			if ( ! empty( trim( $feature_css ) ) ) {
+				$css .= "\n\n" . $feature_css . "\n";
+			}
 		}
 
 		return $css;
