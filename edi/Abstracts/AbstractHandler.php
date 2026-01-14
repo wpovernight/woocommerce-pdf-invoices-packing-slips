@@ -238,7 +238,6 @@ abstract class AbstractHandler implements HandlerInterface {
 		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $order );
 
 		foreach ( $line_items as $item ) {
-			// Net total for this line (same logic as InvoiceLine).
 			$parts      = $this->compute_item_price_parts( $item, false );
 			$net_total  = (float) $parts['net_total'];
 
