@@ -229,75 +229,87 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function get_grouped_order_tax_data(): array {
-		$grouped_tax_data = array();
-		$order_tax_data   = $this->document->order_tax_data;
+		$order       = $this->document->order;
+		$groups      = array();
+		$line_items  = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
-		// Fallback if no tax data is available
-		if ( empty( $order_tax_data ) ) {
-			$order_tax_data = array(
-				0 => array(
-					'total_ex'   => $this->document->order->get_total(),
-					'total_tax'  => 0,
-					'items'      => array(),
-					'name'       => '',
-					'percentage' => 0,
-					'category'   => 'Z',
-					'reason'     => 'NONE',
-					'scheme'     => 'VAT',
-				),
-			);
-		}
+		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
+		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order );
+		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $order );
 
-		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
-		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $this->document->order );
-		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order );
+		foreach ( $line_items as $item ) {
+			$parts     = $this->compute_item_price_parts( $item, false );
+			$net_total = (float) $this->format_decimal( $parts['net_total'], 2 );
 
-		foreach ( $order_tax_data as $item ) {
-			$percentage = (float) ( $item['percentage'] ?? 0 );
-			$category   = strtoupper( trim( (string) ( $item['category'] ?? $order_category ) ) );
-			$reason     = strtoupper( trim( (string) ( $item['reason']   ?? $order_reason   ) ) );
-			$scheme     = strtoupper( trim( (string) ( $item['scheme']   ?? $order_scheme   ) ) );
-
-			if ( '' === $reason || 'NONE' === $reason ) {
-				$reason = 'NONE';
+			// Skip zero-value lines.
+			if ( 0.0 === $net_total ) {
+				continue;
 			}
+
+			// Tax meta (scheme, category, percentage).
+			$tax_meta   = $this->resolve_item_tax_meta( $item );
+			$percentage = (float) $tax_meta['percentage'];
+			$category   = strtoupper( trim( (string) ( $tax_meta['category'] ?? $order_category ) ) );
+			$scheme     = strtoupper( trim( (string) ( $tax_meta['scheme']   ?? $order_scheme   ) ) );
 
 			if ( '' === $scheme ) {
 				$scheme = 'VAT';
 			}
-
 			if ( '' === $category ) {
 				$category = ( 0.0 === $percentage ) ? 'Z' : 'S';
 			}
 
+			// Reason: from fallback only, or NONE.
+			$reason = strtoupper( trim( (string) $order_reason ) );
+			if ( '' === $reason || 'NONE' === $reason ) {
+				$reason = 'NONE';
+			}
+
 			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
 
-			$line_total_ex  = (float) ( $item['total_ex']  ?? 0 );
-			$line_total_tax = (float) ( $item['total_tax'] ?? 0 );
-
-			if ( ! isset( $grouped_tax_data[ $key ] ) ) {
-				$grouped_tax_data[ $key ] = $item;
-
-				// Ensure required keys exist with proper types
-				$grouped_tax_data[ $key ]['percentage'] = $percentage;
-				$grouped_tax_data[ $key ]['category']   = $category;
-				$grouped_tax_data[ $key ]['reason']     = $reason;
-				$grouped_tax_data[ $key ]['scheme']     = $scheme;
-				$grouped_tax_data[ $key ]['total_ex']   = $line_total_ex;
-				$grouped_tax_data[ $key ]['total_tax']  = $line_total_tax;
-			} else {
-				$grouped_tax_data[ $key ]['total_ex']  = ( $grouped_tax_data[ $key ]['total_ex']  ?? 0.0 ) + $line_total_ex;
-				$grouped_tax_data[ $key ]['total_tax'] = ( $grouped_tax_data[ $key ]['total_tax'] ?? 0.0 ) + $line_total_tax;
+			// Item tax = sum of item tax rows (matching Woo's own storage).
+			$item_tax_rows = $this->get_item_tax_rows( $item );
+			$item_tax      = 0.0;
+			foreach ( $item_tax_rows as $tax_amt ) {
+				if ( is_numeric( $tax_amt ) ) {
+					$item_tax += (float) $tax_amt;
+				}
 			}
+
+			if ( ! isset( $groups[ $key ] ) ) {
+				$groups[ $key ] = array(
+					'total_ex'   => 0.0,
+					'total_tax'  => 0.0,
+					'percentage' => $percentage,
+					'category'   => $category,
+					'reason'     => $reason,
+					'scheme'     => $scheme,
+					'name'       => '',
+				);
+			}
+
+			$groups[ $key ]['total_ex']  += $net_total;
+			$groups[ $key ]['total_tax'] += $item_tax;
 		}
 
-		// Ensure Z group is consolidated and correct before returning
-		$grouped_tax_data = $this->ensure_one_tax_z_group( $grouped_tax_data );
+		// No tax lines at all: one Z group with whole net.
+		if ( empty( $groups ) ) {
+			$lines_net = $this->get_lines_net_total( $order );
 
-		// Reindex so callers always get a numeric array
-		$grouped_tax_data = array_values( $grouped_tax_data );
+			$groups['0|Z|NONE|VAT'] = array(
+				'total_ex'   => $lines_net,
+				'total_tax'  => 0.0,
+				'percentage' => 0.0,
+				'category'   => 'Z',
+				'reason'     => 'NONE',
+				'scheme'     => 'VAT',
+				'name'       => '',
+			);
+		}
 
-		return apply_filters( 'wpo_ips_edi_order_tax_data', $grouped_tax_data, $this );
+		$groups = array_values( $groups );
+
+		return apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
 	}
 
 	/**
