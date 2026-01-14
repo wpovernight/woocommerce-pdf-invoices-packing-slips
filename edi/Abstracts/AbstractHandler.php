@@ -224,8 +224,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get grouped order tax data by rate, category, reason, and scheme,
-	 * derived directly from order items (same source as InvoiceLine).
+	 * Get grouped order tax data by rate, category, reason, and scheme.
 	 *
 	 * @return array
 	 */
