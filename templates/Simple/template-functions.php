@@ -20,9 +20,9 @@ add_filter( 'wpo_ips_template_style_features_css', function( $css, $document, $c
 		return $css;
 	}
 
-	$ink_saving_enabled = ! empty( $features['ink_saving']['enabled'] ) && ! empty( $features['ink_saving']['value'] );
-	$color_enabled      = ! empty( $features['color']['enabled'] ) && ! empty( $features['color']['value'] );
-	$color              = $color_enabled ? $features['color']['value'] : '';
+	$ink_saving_enabled = ! empty( $features['ink_saving']['enabled'] );
+	$color_enabled      = ! empty( $features['color']['enabled'] );
+	$color              = $color_enabled && isset( $features['color']['value'] ) ? $features['color']['value'] : '';
 
 	// Nothing to do.
 	if ( ! $ink_saving_enabled && ! $color_enabled ) {
