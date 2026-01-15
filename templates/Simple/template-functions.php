@@ -56,7 +56,6 @@ add_filter( 'wpo_ips_template_style_features_css', function( $css, $document, $c
 			.notes-totals .totals tfoot tr.order_total td {
 				border-top: .8pt solid {$border};
 				border-bottom: .8pt solid {$border};
-				color: {$text};
 			}
 		";
 
@@ -85,7 +84,6 @@ add_filter( 'wpo_ips_template_style_features_css', function( $css, $document, $c
 			.notes-totals .totals tfoot tr.order_total td {
 				border-top: 0.8pt solid {$color};
 				border-bottom: 0.8pt solid {$color};
-				color: {$color};
 			}
 		";
 	}
