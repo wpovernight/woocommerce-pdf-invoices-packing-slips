@@ -74,7 +74,7 @@ class Main {
 		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
 		
 		// apply template styles
-		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_template_styles' ), 9, 2 );
+		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_template_style_features' ), 9, 2 );
 
 		// show notice of missing required directories
 		add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
@@ -2034,7 +2034,7 @@ class Main {
 	 * @param OrderDocument $document
 	 * @return string
 	 */
-	public function apply_template_styles( string $css, OrderDocument $document ): string {
+	public function apply_template_style_features( string $css, OrderDocument $document ): string {
 		$settings         = WPO_WCPDF()->settings->general_settings ?? array();
 		$current_template = $settings['template_path'] ?? '';
 
@@ -2045,13 +2045,11 @@ class Main {
 					'enabled'                    => ! empty( $settings['template_ink_saving'] ),
 					'value'                      => ! empty( $settings['template_ink_saving'] ),
 					'supported_templates_filter' => 'wpo_ips_ink_saving_supported_templates',
-					'css_filter'                 => 'wpo_ips_ink_saving_css',
 				),
-				'main_color' => array(
-					'enabled'                    => ! empty( $settings['template_main_color'] ),
-					'value'                      => $settings['template_main_color'] ?? '',
-					'supported_templates_filter' => 'wpo_ips_main_color_supported_templates',
-					'css_filter'                 => 'wpo_ips_main_color_css',
+				'color' => array(
+					'enabled'                    => ! empty( $settings['template_color'] ),
+					'value'                      => $settings['template_color'] ?? '',
+					'supported_templates_filter' => 'wpo_ips_color_supported_templates',
 				),
 			),
 			$settings,
@@ -2062,44 +2060,60 @@ class Main {
 			return $css;
 		}
 
-		foreach ( $features as $feature_key => $feature ) {
+		// Resolve per-feature template support.
+		foreach ( $features as $feature_key => &$feature ) {
 			$enabled                    = ! empty( $feature['enabled'] );
 			$feature_value              = $feature['value'] ?? null;
 			$supported_templates_filter = $feature['supported_templates_filter'] ?? '';
-			$css_filter                 = $feature['css_filter'] ?? '';
 
-			if ( ! $enabled || empty( $supported_templates_filter ) || empty( $css_filter ) ) {
+			if ( ! $enabled ) {
+				$feature['enabled'] = false;
 				continue;
 			}
 
-			$supported_templates = apply_filters(
-				$supported_templates_filter,
-				array( 'default/Simple' ),
-				$document,
-				$current_template,
-				$feature_key,
-				$feature_value,
-				$settings
-			);
+			if ( ! empty( $supported_templates_filter ) ) {
+				$supported_templates = apply_filters(
+					$supported_templates_filter,
+					array( 'default/Simple' ),
+					$document,
+					$current_template,
+					$feature_key,
+					$feature_value,
+					$settings
+				);
 
-			if ( empty( $supported_templates ) || ! in_array( $current_template, $supported_templates, true ) ) {
-				continue;
+				if ( empty( $supported_templates ) || ! in_array( $current_template, $supported_templates, true ) ) {
+					$feature['enabled'] = false;
+					continue;
+				}
 			}
+		}
+		unset( $feature );
 
-			// Let each feature provide its own CSS.
-			$feature_css = apply_filters(
-				$css_filter,
-				'',
-				$document,
-				$current_template,
-				$feature_key,
-				$feature_value,
-				$settings
-			);
-
-			if ( ! empty( trim( $feature_css ) ) ) {
-				$css .= "\n\n" . $feature_css . "\n";
+		// Keep only enabled features.
+		$enabled_features = array_filter(
+			$features,
+			static function( $feature ) {
+				return ! empty( $feature['enabled'] );
 			}
+		);
+
+		if ( empty( $enabled_features ) ) {
+			return $css;
+		}
+
+		// Single CSS hook: templates see all enabled features at once.
+		$template_css = apply_filters(
+			'wpo_ips_template_style_features_css',
+			'',
+			$document,
+			$current_template,
+			$enabled_features,
+			$settings
+		);
+
+		if ( ! empty( trim( $template_css ) ) ) {
+			$css .= "\n\n" . $template_css . "\n";
 		}
 
 		return $css;

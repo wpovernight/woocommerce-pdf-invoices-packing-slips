@@ -2076,3 +2076,26 @@ function wpo_ips_has_vat_plugin_active(): bool {
 
 	return false;
 }
+
+/**
+ * Determine if a hex color is light.
+ *
+ * @param string $hex Hex color code (e.g., '#FFFFFF' or 'FFF').
+ * @return bool True if the color is light, false otherwise.
+ */
+function wpo_ips_is_light_color( string $hex ): bool {
+	$hex = ltrim( $hex, '#' );
+
+	if ( strlen( $hex ) === 3 ) {
+		$hex = $hex[0].$hex[0] . $hex[1].$hex[1] . $hex[2].$hex[2];
+	}
+
+	$r = hexdec( substr( $hex, 0, 2 ) );
+	$g = hexdec( substr( $hex, 2, 2 ) );
+	$b = hexdec( substr( $hex, 4, 2 ) );
+
+	// Relative luminance formula (W3C)
+	$brightness = ( $r * 299 + $g * 587 + $b * 114 ) / 1000;
+
+	return $brightness > 155;
+}
