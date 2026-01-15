@@ -36,12 +36,14 @@ class TaxTotalHandler extends AbstractUblHandler {
 			$item_tax_reason_key = strtoupper( (string) ( $item['reason']   ?? 'NONE' ) );
 			$item_tax_scheme     = strtoupper( (string) ( $item['scheme']   ?? 'VAT'  ) );
 
-			$taxable_raw = (float) ( $item['total_ex']  ?? 0 );
-			$tax_raw     = (float) ( $item['total_tax'] ?? 0 );
+			$taxable_raw = (float) ( $item['total_ex'] ?? 0 );
 
-			// Sum before formatting to keep math precise, then round tax.
+			// Calculate tax for this group
+			$tax_calc = wc_round_tax_total( $taxable_raw * $item_tax_percentage / 100 );
+
+			// Internal sums for consistency checks.
 			$sum_taxable += $taxable_raw;
-			$sum_tax     += wc_round_tax_total( $tax_raw );
+			$sum_tax     += $tax_calc;
 
 			$tax_category = array(
 				array(
@@ -85,7 +87,6 @@ class TaxTotalHandler extends AbstractUblHandler {
 				'name'  => 'cac:TaxSubtotal',
 				'value' => array(
 					array(
-						// TaxableAmount = base amount for this rate
 						'name'       => 'cbc:TaxableAmount',
 						'value'      => $this->format_decimal( $taxable_raw ),
 						'attributes' => array(
@@ -93,9 +94,8 @@ class TaxTotalHandler extends AbstractUblHandler {
 						),
 					),
 					array(
-						// TaxAmount = VAT for this rate (rounded as tax)
 						'name'       => 'cbc:TaxAmount',
-						'value'      => $this->format_decimal( wc_round_tax_total( $tax_raw ) ),
+						'value'      => $this->format_decimal( $tax_calc ),
 						'attributes' => array(
 							'currencyID' => $currency,
 						),

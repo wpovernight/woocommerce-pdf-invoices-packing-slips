@@ -416,17 +416,21 @@ abstract class AbstractHandler implements HandlerInterface {
 		$total_tax_raw = 0.0;
 
 		foreach ( $grouped_tax_data as $g ) {
-			$ex_base = (float) ( $g['total_ex']  ?? 0 );
-			$tax_raw = (float) ( $g['total_tax'] ?? 0 );
+			$ex_base = (float) ( $g['total_ex']   ?? 0 );
+			$rate    = (float) ( $g['percentage'] ?? 0 );
 
+			// Sum taxable base
 			$total_exc_raw += $ex_base;
-			$total_tax_raw += wc_round_tax_total( $tax_raw );
+
+			// Tax per category = base × rate / 100, rounded as tax.
+			$tax_calc       = wc_round_tax_total( $ex_base * $rate / 100 );
+			$total_tax_raw += $tax_calc;
 		}
 
 		// Invoice total amount without VAT.
 		$total_exc_tax = (float) $this->format_decimal( $total_exc_raw, 2 );
 
-		// Invoice total VAT amount (sum of rounded group tax).
+		// Invoice total VAT amount (sum of category tax).
 		$total_tax = (float) $this->format_decimal( $total_tax_raw, 2 );
 
 		// Invoice total amount with VAT = total_exc_tax + total_tax.
@@ -472,7 +476,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			);
 		}
 
-		// Gross invoice amount including rounding.
+		// Gross invoice amount including rounding (should equal Woo order total).
 		$gross_total = (float) $this->format_decimal( $total_inc_tax + $rounding_diff, 2 );
 
 		// Default rule:
