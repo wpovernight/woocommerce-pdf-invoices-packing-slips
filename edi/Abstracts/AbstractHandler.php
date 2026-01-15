@@ -34,7 +34,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 	/**
 	 * Get the order customer VAT number.
-	 * 
+	 *
 	 * @param \WC_Order $order
 	 * @return string|null
 	 */
@@ -62,7 +62,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $general_settings->get_setting( $key, $language ) ?: '';
 	}
-	
+
 	/**
 	 * Returns the due date for the document.
 	 *
@@ -72,7 +72,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		$due_date = is_callable( array( $this->document->order_document, 'get_due_date' ) )
 			? $this->document->order_document->get_due_date()
 			: 0;
-			
+
 		return $this->normalize_date( $due_date, 'Y-m-d' );
 	}
 
@@ -229,71 +229,93 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function get_grouped_order_tax_data(): array {
-		$grouped_tax_data = array();
-		$order_tax_data   = $this->document->order_tax_data;
+		$order      = $this->document->order;
+		$groups     = array();
+		$line_items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
-		// Fallback if no tax data is available
-		if ( empty( $order_tax_data ) ) {
-			$order_tax_data = array(
-				0 => array(
-					'total_ex'  => $this->document->order->get_total(),
-					'total_tax' => 0,
-					'items'     => array(),
-					'name'      => '',
-				),
-			);
-		}
+		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
+		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order );
+		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $order );
 
-		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $this->document->order );
-		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $this->document->order );
-		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $this->document->order );
+		foreach ( $line_items as $item ) {
+			$parts     = $this->compute_item_price_parts( $item, false );
+			$net_total = (float) $this->format_decimal( $parts['net_total'], 2 );
 
-		foreach ( $order_tax_data as $item ) {
-			$percentage = (float) ( $item['percentage'] ?? 0 );
-			$category   = strtoupper( trim( (string) ( $item['category'] ?? $order_category ) ) );
-			$reason     = strtoupper( trim( (string) ( $item['reason']   ?? $order_reason   ) ) );
-			$scheme     = strtoupper( trim( (string) ( $item['scheme']   ?? $order_scheme   ) ) );
-
-			if ( '' === $reason || 'NONE' === $reason ) {
-				$reason = 'NONE';
+			// Skip zero-value lines for grouping; Z group will be enforced separately.
+			if ( 0.0 === $net_total ) {
+				continue;
 			}
+
+			// Tax meta (scheme, category, percentage).
+			$tax_meta   = $this->resolve_item_tax_meta( $item );
+			$percentage = (float) $tax_meta['percentage'];
+			$category   = strtoupper( trim( (string) ( $tax_meta['category'] ?? $order_category ) ) );
+			$scheme     = strtoupper( trim( (string) ( $tax_meta['scheme']   ?? $order_scheme   ) ) );
 
 			if ( '' === $scheme ) {
 				$scheme = 'VAT';
 			}
-
+			
 			if ( '' === $category ) {
 				$category = ( 0.0 === $percentage ) ? 'Z' : 'S';
 			}
 
+			// Reason: from fallback only, or NONE.
+			$reason = strtoupper( trim( (string) $order_reason ) );
+			if ( '' === $reason || 'NONE' === $reason ) {
+				$reason = 'NONE';
+			}
+
 			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
 
-			$line_total_ex  = (float) ( $item['total_ex']  ?? 0 );
-			$line_total_tax = (float) ( $item['total_tax'] ?? 0 );
-
-			if ( ! isset( $grouped_tax_data[ $key ] ) ) {
-				$grouped_tax_data[ $key ] = $item;
-
-				// Ensure required keys exist with proper types
-				$grouped_tax_data[ $key ]['percentage'] = $percentage;
-				$grouped_tax_data[ $key ]['category']   = $category;
-				$grouped_tax_data[ $key ]['reason']     = $reason;
-				$grouped_tax_data[ $key ]['scheme']     = $scheme;
-				$grouped_tax_data[ $key ]['total_ex']   = $line_total_ex;
-				$grouped_tax_data[ $key ]['total_tax']  = $line_total_tax;
-			} else {
-				$grouped_tax_data[ $key ]['total_ex']  = ( $grouped_tax_data[ $key ]['total_ex']  ?? 0.0 ) + $line_total_ex;
-				$grouped_tax_data[ $key ]['total_tax'] = ( $grouped_tax_data[ $key ]['total_tax'] ?? 0.0 ) + $line_total_tax;
+			// Item tax = sum of item tax rows (matching Woo's own storage).
+			$item_tax_rows = $this->get_item_tax_rows( $item );
+			$item_tax      = 0.0;
+			
+			foreach ( $item_tax_rows as $tax_amt ) {
+				if ( is_numeric( $tax_amt ) ) {
+					$item_tax += (float) $tax_amt;
+				}
 			}
+
+			if ( ! isset( $groups[ $key ] ) ) {
+				$groups[ $key ] = array(
+					'total_ex'   => 0.0,
+					'total_tax'  => 0.0,
+					'percentage' => $percentage,
+					'category'   => $category,
+					'reason'     => $reason,
+					'scheme'     => $scheme,
+					'name'       => '',
+				);
+			}
+
+			$groups[ $key ]['total_ex']  += $net_total;
+			$groups[ $key ]['total_tax'] += $item_tax;
 		}
 
-		// Ensure Z group is consolidated and correct before returning
-		$grouped_tax_data = $this->ensure_one_tax_z_group( $grouped_tax_data );
+		// No tax lines at all: one Z group with whole net.
+		if ( empty( $groups ) ) {
+			$lines_net = $this->get_lines_net_total( $order );
 
-		// Reindex so callers always get a numeric array
-		$grouped_tax_data = array_values( $grouped_tax_data );
+			$groups['0|Z|NONE|VAT'] = array(
+				'total_ex'   => $lines_net,
+				'total_tax'  => 0.0,
+				'percentage' => 0.0,
+				'category'   => 'Z',
+				'reason'     => 'NONE',
+				'scheme'     => 'VAT',
+				'name'       => '',
+			);
+		}
 
-		return apply_filters( 'wpo_ips_edi_order_tax_data', $grouped_tax_data, $this );
+		// Enforce exactly one Z group if needed.
+		$groups = $this->ensure_one_tax_z_group( $groups );
+
+		// Reindex so callers get a numeric array.
+		$groups = array_values( $groups );
+
+		return apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
 	}
 
 	/**
@@ -388,15 +410,50 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function get_order_payment_totals( \WC_Abstract_Order $order ): array {
-		$total         = $order->get_total();
-		$total_tax_raw = $order->get_total_tax();
-		$total_exc_tax = $total - $total_tax_raw;
-		$total_inc_tax = $total;
-		$currency      = $order->get_currency();
+		$grouped_tax_data = $this->get_grouped_order_tax_data();
 
-		// Tax rounding.
-		$total_tax     = wc_round_tax_total( $total_tax_raw );
-		$rounding_diff = wc_round_tax_total( $total_inc_tax - ( $total_exc_tax + $total_tax ) );
+		$total_exc_raw = 0.0;
+		$total_tax_raw = 0.0;
+
+		foreach ( $grouped_tax_data as $g ) {
+			$ex_base = (float) ( $g['total_ex']  ?? 0 );
+			$tax_raw = (float) ( $g['total_tax'] ?? 0 );
+
+			$total_exc_raw += $ex_base;
+			$total_tax_raw += wc_round_tax_total( $tax_raw );
+		}
+
+		// Invoice total amount without VAT.
+		$total_exc_tax = (float) $this->format_decimal( $total_exc_raw, 2 );
+
+		// Invoice total VAT amount (sum of rounded group tax).
+		$total_tax = (float) $this->format_decimal( $total_tax_raw, 2 );
+
+		// Invoice total amount with VAT = total_exc_tax + total_tax.
+		$total_inc_tax = (float) $this->format_decimal( $total_exc_tax + $total_tax, 2 );
+
+		// For diagnostics also compute invoice line net sum.
+		$lines_net         = (float) $this->get_lines_net_total( $order );
+		$lines_net_rounded = (float) $this->format_decimal( $lines_net, 2 );
+
+		// Log if base of groups and base from lines differ materially.
+		$base_diff = $total_exc_tax - $lines_net_rounded;
+		if ( abs( $base_diff ) >= 0.01 ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'Base mismatch for order #%d: grouped_ex=%s, lines_net=%s, diff=%s',
+					$order->get_id(),
+					$this->format_decimal( $total_exc_tax ),
+					$this->format_decimal( $lines_net_rounded ),
+					$this->format_decimal( $base_diff )
+				),
+				'warning'
+			);
+		}
+
+		// Reconcile to WooCommerce order total.
+		$order_total   = (float) $order->get_total();
+		$rounding_diff = wc_round_tax_total( $order_total - $total_inc_tax );
 
 		// Config / inputs.
 		$has_due_days   = ! empty( $this->get_due_date_days() );
@@ -404,28 +461,30 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		// Threshold for treating rounding diff as significant.
 		$rounding_is_significant = ( abs( $rounding_diff ) >= 0.01 );
+		
+		if ( $rounding_is_significant ) {
+			wpo_ips_edi_log(
+				'Rounding difference detected for order #' . $order->get_id() . ': ' .
+				'order_total=' . $order_total . ', total_inc_tax=' . $total_inc_tax .
+				', total_exc_tax=' . $total_exc_tax . ', total_tax=' . $total_tax .
+				', rounding_diff=' . $rounding_diff,
+				'warning'
+			);
+		}
+
+		// Gross invoice amount including rounding.
+		$gross_total = (float) $this->format_decimal( $total_inc_tax + $rounding_diff, 2 );
 
 		// Default rule:
 		// - If there's NO due date AND no explicit prepaid set, treat as fully prepaid (paid on issue).
 		// - Otherwise, use the provided prepaid (or 0) and compute payable normally.
 		if ( $prepaid_amount <= 0.0 && ! $has_due_days ) {
 			// Fully prepaid by default.
-			$prepaid_amount = $total_inc_tax;
-
-			// Absorb rounding diff into prepaid so payable stays 0.00.
-			if ( $rounding_is_significant ) {
-				$prepaid_amount += $rounding_diff;
-			}
-
+			$prepaid_amount = $gross_total;
 			$payable_amount = 0.0;
 		} else {
 			// Not fully prepaid; customer owes the remainder.
-			$payable_amount = $total_inc_tax - $prepaid_amount;
-
-			// Apply rounding diff to payable to reconcile to grand total.
-			if ( $rounding_is_significant ) {
-				$payable_amount += $rounding_diff;
-			}
+			$payable_amount = $gross_total - $prepaid_amount;
 		}
 
 		$totals = compact(
@@ -434,10 +493,51 @@ abstract class AbstractHandler implements HandlerInterface {
 			'total_tax',
 			'prepaid_amount',
 			'rounding_diff',
-			'payable_amount'
+			'payable_amount',
+			'lines_net'
 		);
 
 		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
+	}
+
+	/**
+	 * Get sum of line net amounts (excl. VAT).
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return float
+	 */
+	protected function get_lines_net_total( \WC_Abstract_Order $order ): float {
+		$lines_net      = 0.0;
+		$include_coupon = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
+		$line_items     = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+
+		foreach ( $line_items as $item ) {
+			$parts           = $this->compute_item_price_parts( $item, (bool) $include_coupon );
+			$line_net_total  = (float) $this->format_decimal( $parts['net_total'], 2 );
+			$lines_net      += $line_net_total;
+		}
+
+		// If discounts are rendered as separate lines, include them as negative net amounts.
+		if ( $include_coupon ) {
+			$coupons = $order->get_items( 'coupon' );
+
+			foreach ( $coupons as $coupon_item ) {
+				if ( ! is_object( $coupon_item ) || ! method_exists( $coupon_item, 'get_discount' ) ) {
+					continue;
+				}
+
+				$discount_excl_tax = (float) $coupon_item->get_discount();
+				$net_total         = -1.0 * (float) $this->format_decimal( $discount_excl_tax, 2 );
+
+				if ( 0.0 === $net_total ) {
+					continue;
+				}
+
+				$lines_net += $net_total;
+			}
+		}
+
+		return (float) $this->format_decimal( $lines_net, 2 );
 	}
 
 	/**
@@ -627,5 +727,5 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $rows;
 	}
-	
+
 }

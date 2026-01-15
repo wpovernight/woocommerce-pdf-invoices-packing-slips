@@ -50,7 +50,7 @@ class LineHandler extends AbstractUblHandler {
 
 			// Price parts
 			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon_lines );
-			
+
 			// Round gross/net units first (numeric), then derive discount, then recompute net.
 			$gross_unit_f = (float) $this->format_decimal( $parts['gross_unit'], 2 );
 			$net_unit_f   = (float) $this->format_decimal( $parts['net_unit'],   2 );
@@ -86,32 +86,54 @@ class LineHandler extends AbstractUblHandler {
 				),
 			);
 
-			// Only show AllowanceCharge when there is a discount at price level
-			if ( $unit_discount > 0 ) {
-				$price_value[] = array(
-					'name'  => 'cac:AllowanceCharge',
-					'value' => array(
-						array(
-							'name'  => 'cbc:ChargeIndicator',
-							'value' => 'false',
-						),
-						array(
-							'name'       => 'cbc:Amount',
-							'value'      => $unit_discount,
-							'attributes' => array(
-								'currencyID' => $currency,
-							),
-						),
-						array(
-							'name'       => 'cbc:BaseAmount',
-							'value'      => $gross_unit,
-							'attributes' => array(
-								'currencyID' => $currency,
-							),
-						),
-					),
-				);
-			}
+			/**
+			* NOTE ABOUT DISABLING cac:Price/cac:AllowanceCharge FOR PEPPOL
+			*
+			* We intentionally do not emit price-level AllowanceCharge elements for Peppol BIS invoices.
+			*
+			* Reason: While BT-147 (Item price discount) and BT-148 (Gross price) are optional in EN16931,
+			* the Peppol validator interprets cac:Price/cac:AllowanceCharge as a line-level allowance and
+			* applies BR-24 and BR-42 rules. This caused the validator to:
+			*
+			*   - subtract the discount again from the already-net PriceAmount, and
+			*   - require a reason code (BT-139/BT-140) for each price allowance,
+			*
+			* resulting in validation failures and incorrect recalculated line totals.
+			*
+			* To avoid double-discounting and maintain correct monetary values, we emit only:
+			*
+			*   PriceAmount (net unit price) + LineExtensionAmount (net line amount)
+			*
+			* This is fully compliant with Peppol BIS Billing 3.0 since BT-147/BT-148 are optional.
+			*
+			* If explicit gross/discount information is needed in the future, this can be reintroduced.
+			*/
+			// Only show AllowanceCharge when there is a discount at price level (already reflected in net price)
+			// if ( $unit_discount > 0 ) {
+			// 	$price_value[] = array(
+			// 		'name'  => 'cac:AllowanceCharge',
+			// 		'value' => array(
+			// 			array(
+			// 				'name'  => 'cbc:ChargeIndicator',
+			// 				'value' => 'false',
+			// 			),
+			// 			array(
+			// 				'name'       => 'cbc:Amount',
+			// 				'value'      => $unit_discount,
+			// 				'attributes' => array(
+			// 					'currencyID' => $currency,
+			// 				),
+			// 			),
+			// 			array(
+			// 				'name'       => 'cbc:BaseAmount',
+			// 				'value'      => $gross_unit,
+			// 				'attributes' => array(
+			// 					'currencyID' => $currency,
+			// 				),
+			// 			),
+			// 		),
+			// 	);
+			// }
 
 			// Build base Item node
 			$item_value = array(
@@ -147,13 +169,16 @@ class LineHandler extends AbstractUblHandler {
 					}
 				}
 			}
-			
+
 			$quantity_value = $parts['qty'];
 
 			// For credit notes: quantity must carry the sign, price stays positive
 			if ( 'Credited' === $quantity_role && $parts['net_total'] < 0 ) {
 				$quantity_value = -abs( $quantity_value );
 			}
+
+			// Use Woo’s net_total for the line extension amount.
+			$net_line_total = $this->format_decimal( $parts['net_total'], 2 );
 
 			$line = array(
 				'name'  => "cac:{$root_element}Line",
@@ -171,7 +196,7 @@ class LineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
-						'value'      => $this->format_decimal( $parts['net_total'] ),
+						'value'      => $net_line_total,
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
@@ -189,11 +214,11 @@ class LineHandler extends AbstractUblHandler {
 
 			$data[] = apply_filters( 'wpo_ips_edi_ubl_line', $line, $data, $options, $item, $this );
 		}
-		
+
 		// Append coupon lines as negative lines
 		if ( $include_coupon_lines ) {
 			$coupons = $this->document->order->get_items( 'coupon' );
-			
+
 			if ( empty( $coupons ) ) {
 				return $data;
 			}
@@ -208,7 +233,7 @@ class LineHandler extends AbstractUblHandler {
 
 		return $data;
 	}
-	
+
 	/**
 	 * Create the Line array for a single coupon item.
 	 *
@@ -224,7 +249,7 @@ class LineHandler extends AbstractUblHandler {
 
 		$code              = method_exists( $coupon_item, 'get_code' ) ? $coupon_item->get_code() : '';
 		$discount_excl_tax = (float) $coupon_item->get_discount();
-		$net_total         = -1 * $this->format_decimal( $discount_excl_tax, 2 );
+		$net_total         = -1.0 * (float) $this->format_decimal( $discount_excl_tax, 2 );
 
 		if ( 0.0 === $net_total ) {
 			return null;
@@ -267,7 +292,7 @@ class LineHandler extends AbstractUblHandler {
 				),
 			),
 		);
-		
+
 		$root_element  = $this->document->get_root_element();
 		$quantity_role = $this->document->get_quantity_role();
 
@@ -326,7 +351,7 @@ class LineHandler extends AbstractUblHandler {
 				),
 			),
 		);
-		
+
 		return apply_filters( 'wpo_ips_edi_ubl_coupon_line', $line, $coupon_item, $this );
 	}
 
