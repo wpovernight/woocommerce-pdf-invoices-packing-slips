@@ -2038,57 +2038,32 @@ class Main {
 		$settings         = WPO_WCPDF()->settings->general_settings ?? array();
 		$current_template = $settings['template_path'] ?? '';
 
+		if ( empty( $current_template ) ) {
+			return $css;
+		}
+
 		$features = apply_filters(
 			'wpo_ips_template_style_features',
 			array(
 				'ink_saving' => array(
-					'enabled'                    => ! empty( $settings['template_ink_saving'] ),
-					'value'                      => ! empty( $settings['template_ink_saving'] ),
-					'supported_templates_filter' => 'wpo_ips_ink_saving_supported_templates',
+					'setting_id' => 'template_ink_saving',
+					'enabled'    => ! empty( $settings['template_ink_saving'] ),
+					'value'      => ! empty( $settings['template_ink_saving'] ),
 				),
 				'color' => array(
-					'enabled'                    => ! empty( $settings['template_color'] ),
-					'value'                      => $settings['template_color'] ?? '',
-					'supported_templates_filter' => 'wpo_ips_color_supported_templates',
+					'setting_id' => 'template_color',
+					'enabled'    => ! empty( $settings['template_color'] ),
+					'value'      => $settings['template_color'] ?? '',
 				),
 			),
 			$settings,
-			$document
+			$document,
+			$current_template
 		);
 
-		if ( empty( $current_template ) || empty( $features ) || ! is_array( $features ) ) {
+		if ( empty( $features ) || ! is_array( $features ) ) {
 			return $css;
 		}
-
-		// Resolve per-feature template support.
-		foreach ( $features as $feature_key => &$feature ) {
-			$enabled                    = ! empty( $feature['enabled'] );
-			$feature_value              = $feature['value'] ?? null;
-			$supported_templates_filter = $feature['supported_templates_filter'] ?? '';
-
-			if ( ! $enabled ) {
-				$feature['enabled'] = false;
-				continue;
-			}
-
-			if ( ! empty( $supported_templates_filter ) ) {
-				$supported_templates = apply_filters(
-					$supported_templates_filter,
-					array( 'default/Simple' ),
-					$document,
-					$current_template,
-					$feature_key,
-					$feature_value,
-					$settings
-				);
-
-				if ( empty( $supported_templates ) || ! in_array( $current_template, $supported_templates, true ) ) {
-					$feature['enabled'] = false;
-					continue;
-				}
-			}
-		}
-		unset( $feature );
 
 		// Keep only enabled features.
 		$enabled_features = array_filter(
@@ -2102,7 +2077,6 @@ class Main {
 			return $css;
 		}
 
-		// Single CSS hook: templates see all enabled features at once.
 		$template_css = apply_filters(
 			'wpo_ips_template_style_features_css',
 			'',

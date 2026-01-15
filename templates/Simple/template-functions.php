@@ -5,15 +5,10 @@
  */
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-add_filter( 'wpo_ips_ink_saving_supported_templates', function( $templates ) {
+add_filter( 'wpo_ips_template_style_feature_supported_templates', function( $templates, $feature_name ) {
 	$templates[] = 'default/Simple';
 	return $templates;
-}, 9, 1 );
-
-add_filter( 'wpo_ips_color_supported_templates', function( $templates ) {
-	$templates[] = 'default/Simple';
-	return $templates;
-}, 9, 1 );
+}, 9, 2 );
 
 add_filter( 'wpo_ips_template_style_features_css', function( $css, $document, $current_template, $features, $settings ) {
 	if ( 'default/Simple' !== $current_template ) {

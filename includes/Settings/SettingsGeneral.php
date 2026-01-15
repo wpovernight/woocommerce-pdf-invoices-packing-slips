@@ -122,7 +122,7 @@ class SettingsGeneral {
 					'description'       => __( 'Sets the primary color used across supported templates.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'custom_attributes' => array(
 						'data-show_for_option_name'   => $option_name . '[template_path]',
-						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_color_supported_templates', array( 'default/Simple' ) ) ),
+						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_template_style_feature_supported_templates', array( 'default/Simple' ), 'template_color' ) ),
 					),
 				),
 			),
@@ -138,7 +138,7 @@ class SettingsGeneral {
 					'description'       => __( 'Apply ink-saving styles for this template, replacing dark backgrounds and colors with lighter alternatives.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'custom_attributes' => array(
 						'data-show_for_option_name'   => $option_name . '[template_path]',
-						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_ink_saving_supported_templates', array( 'default/Simple' ) ) ),
+						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_template_style_feature_supported_templates', array( 'default/Simple' ), 'template_ink_saving' ) ),
 					),
 				),
 			),
