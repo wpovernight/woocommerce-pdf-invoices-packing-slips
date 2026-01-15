@@ -229,9 +229,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function get_grouped_order_tax_data(): array {
-		$order       = $this->document->order;
-		$groups      = array();
-		$line_items  = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
+		$order      = $this->document->order;
+		$groups     = array();
+		$line_items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
 		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
 		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order );
@@ -241,7 +241,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$parts     = $this->compute_item_price_parts( $item, false );
 			$net_total = (float) $this->format_decimal( $parts['net_total'], 2 );
 
-			// Skip zero-value lines.
+			// Skip zero-value lines for grouping; Z group will be enforced separately.
 			if ( 0.0 === $net_total ) {
 				continue;
 			}
@@ -255,6 +255,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			if ( '' === $scheme ) {
 				$scheme = 'VAT';
 			}
+			
 			if ( '' === $category ) {
 				$category = ( 0.0 === $percentage ) ? 'Z' : 'S';
 			}
@@ -270,6 +271,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			// Item tax = sum of item tax rows (matching Woo's own storage).
 			$item_tax_rows = $this->get_item_tax_rows( $item );
 			$item_tax      = 0.0;
+			
 			foreach ( $item_tax_rows as $tax_amt ) {
 				if ( is_numeric( $tax_amt ) ) {
 					$item_tax += (float) $tax_amt;
@@ -307,6 +309,10 @@ abstract class AbstractHandler implements HandlerInterface {
 			);
 		}
 
+		// Enforce exactly one Z group if needed.
+		$groups = $this->ensure_one_tax_z_group( $groups );
+
+		// Reindex so callers get a numeric array.
 		$groups = array_values( $groups );
 
 		return apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
@@ -404,22 +410,49 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function get_order_payment_totals( \WC_Abstract_Order $order ): array {
-		$order_total   = (float) $order->get_total();
-		$total_tax_raw = (float) $order->get_total_tax();
+		$grouped_tax_data = $this->get_grouped_order_tax_data();
 
-		// Invoice line net amounts
-		$lines_net = $this->get_lines_net_total( $order );
+		$total_exc_raw = 0.0;
+		$total_tax_raw = 0.0;
 
-		// Invoice total amount without VAT
-		$total_exc_tax = $lines_net;
+		foreach ( $grouped_tax_data as $g ) {
+			$ex_base = (float) ( $g['total_ex']  ?? 0 );
+			$tax_raw = (float) ( $g['total_tax'] ?? 0 );
 
-		// Invoice total VAT amount (rounded)
-		$total_tax = wc_round_tax_total( $total_tax_raw );
+			$total_exc_raw += $ex_base;
+			$total_tax_raw += wc_round_tax_total( $tax_raw );
+		}
 
-		// Invoice total amount with VAT
+		// Invoice total amount without VAT.
+		$total_exc_tax = (float) $this->format_decimal( $total_exc_raw, 2 );
+
+		// Invoice total VAT amount (sum of rounded group tax).
+		$total_tax = (float) $this->format_decimal( $total_tax_raw, 2 );
+
+		// Invoice total amount with VAT = total_exc_tax + total_tax.
 		$total_inc_tax = (float) $this->format_decimal( $total_exc_tax + $total_tax, 2 );
 
-		// PayableRoundingAmount = Woo total - Invoice total amount with VAT
+		// For diagnostics also compute invoice line net sum.
+		$lines_net         = (float) $this->get_lines_net_total( $order );
+		$lines_net_rounded = (float) $this->format_decimal( $lines_net, 2 );
+
+		// Log if base of groups and base from lines differ materially.
+		$base_diff = $total_exc_tax - $lines_net_rounded;
+		if ( abs( $base_diff ) >= 0.01 ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'Base mismatch for order #%d: grouped_ex=%s, lines_net=%s, diff=%s',
+					$order->get_id(),
+					$this->format_decimal( $total_exc_tax ),
+					$this->format_decimal( $lines_net_rounded ),
+					$this->format_decimal( $base_diff )
+				),
+				'warning'
+			);
+		}
+
+		// Reconcile to WooCommerce order total.
+		$order_total   = (float) $order->get_total();
 		$rounding_diff = wc_round_tax_total( $order_total - $total_inc_tax );
 
 		// Config / inputs.
@@ -439,7 +472,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			);
 		}
 
-		// Gross invoice amount including rounding (should equal Woo order total).
+		// Gross invoice amount including rounding.
 		$gross_total = (float) $this->format_decimal( $total_inc_tax + $rounding_diff, 2 );
 
 		// Default rule:
@@ -468,7 +501,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get sum of line net amounts.
+	 * Get sum of line net amounts (excl. VAT).
 	 *
 	 * @param \WC_Abstract_Order $order
 	 * @return float
