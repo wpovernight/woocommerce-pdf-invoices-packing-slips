@@ -108,6 +108,26 @@ class SettingsGeneral {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'template_color',
+				'title'    => __( 'Template color', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => 'template_color',
+					'size'              => '5',
+					'type'              => 'color',
+					'default'           => apply_filters( 'wpo_ips_template_color_default', '#000000' ),
+					'current'           => apply_filters( 'wpo_ips_template_color_current', $this->get_setting( 'template_color' ) ),
+					'description'       => __( 'Sets the primary color used across supported templates.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[template_path]',
+						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_template_style_feature_supported_templates', array( 'default/Simple' ), 'template_color' ) ),
+					),
+				),
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'template_ink_saving',
 				'title'    => __( 'Ink saving mode', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
@@ -118,7 +138,7 @@ class SettingsGeneral {
 					'description'       => __( 'Apply ink-saving styles for this template, replacing dark backgrounds and colors with lighter alternatives.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'custom_attributes' => array(
 						'data-show_for_option_name'   => $option_name . '[template_path]',
-						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_ink_saving_supported_templates', array( 'default/Simple' ) ) ),
+						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_template_style_feature_supported_templates', array( 'default/Simple' ), 'template_ink_saving' ) ),
 					),
 				),
 			),
@@ -618,6 +638,7 @@ class SettingsGeneral {
 					'download_display',
 					'paper_size',
 					'template_path',
+					'template_color',
 					'template_ink_saving',
 					'test_mode',
 				),
