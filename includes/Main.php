@@ -72,7 +72,7 @@ class Main {
 
 		// apply header logo height
 		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
-		
+
 		// apply template styles
 		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_template_style_features' ), 9, 2 );
 
@@ -334,7 +334,7 @@ class Main {
 
 	/**
 	 * Load and generate the template output with ajax
-	 * 
+	 *
 	 * @return void
 	 */
 	public function generate_document_ajax(): void {
@@ -558,10 +558,10 @@ class Main {
 		}
 		exit;
 	}
-	
+
 	/**
 	 * AJAX handler to get refund order IDs from given order IDs
-	 * 
+	 *
 	 * @return void
 	 */
 	public function get_refund_order_ids_ajax(): void {
@@ -1132,12 +1132,12 @@ class Main {
 		if ( isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$filters = $this->pdf_currency_filters( $filters );
 		}
-		
+
 		// Only apply these fixes if the default PDF maker is used
 		if ( wcpdf_pdf_maker_is_default() ) {
 			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_code' ), 10001, 2 );
 		}
-		
+
 		return $filters;
 	}
 
@@ -2026,7 +2026,7 @@ class Main {
 			echo wp_kses_post( apply_filters( 'wpo_wcpdf_add_document_download_link_to_email', $document_link, $document, $order, $sent_to_admin, $plain_text, $email ) );
 		}
 	}
-	
+
 	/**
 	 * Apply template style features (ink saving, main color, etc.) to supported templates.
 	 *
@@ -2045,15 +2045,13 @@ class Main {
 		$features = apply_filters(
 			'wpo_ips_template_style_features',
 			array(
-				'ink_saving' => array(
-					'setting_id' => 'template_ink_saving',
-					'enabled'    => ! empty( $settings['template_ink_saving'] ),
-					'value'      => ! empty( $settings['template_ink_saving'] ),
+				'template_ink_saving' => array(
+					'enabled' => ! empty( $settings['template_ink_saving'] ),
+					'value'   => ! empty( $settings['template_ink_saving'] ),
 				),
-				'color' => array(
-					'setting_id' => 'template_color',
-					'enabled'    => ! empty( $settings['template_color'] ),
-					'value'      => $settings['template_color'] ?? '',
+				'template_color' => array(
+					'enabled' => ! empty( $settings['template_color'] ),
+					'value'   => $settings['template_color'] ?? '',
 				),
 			),
 			$settings,
