@@ -37,8 +37,10 @@ The following free extensions are available to add additional features to the pl
 In addition to this, we offer several premium extensions:
 
 - Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox, Google Drive & more with [PDF Invoices & Packing Slips for WooCommerce Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
-- Automatically send new orders or packing slips to your printer as soon as the customer orders! [WooCommerce Automatic Order Printing](https://www.simbahosting.co.uk/s3/product/woocommerce-printnode-automatic-order-printing/?affiliates=2) (from our partners at Simba Hosting)
 - Get the complete feature set, including **Professional**, **Premium Templates**, and additional features with the [WooCommerce PDF Invoices & Packing Slips Plus Bundle](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)
+- Add Peppol network delivery for WooCommerce invoices and credit notes right inside your invoicing workflow. [eDocuments for WooCommerce: Peppol](https://wpovernight.com/downloads/woocommerce-edocuments-peppol/)
+- Automatically send new orders or packing slips to your printer as soon as the customer orders! [WooCommerce Automatic Order Printing (PrintNode)](https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode/)
+- Enable EU VAT number collection, automatic validation and reverse-charge logic right in your WooCommerce store. [WooCommerce European (EU/UK/Norway/Switzerland) VAT Compliance](https://wpovernight.com/downloads/woocommerce-eu-vat-compliance/)
 
 = Fully customizable =
 In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS-based templates that allow for customization & full control over the PDF output. Copy the templates to your theme folder and you don't have to worry that your customizations will be overwritten when you update the plugin.
