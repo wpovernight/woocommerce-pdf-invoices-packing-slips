@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 5.5.0-rc.7
+Stable tag: 5.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,21 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.5.0 (2026-01-19) =
+- New: Add reference to Peppol extension in readme
+- New: Added configurable custom field to checkout
+- New: Peppol Checkout Field improvements
+- Tweak: Normalize Shop VAT and CoC settings to avoid invalid formatted values
+- Fix: UBL Tax total rounding issues
+- Fix: UBL tax grouping and monetary totals consistency
+- Fix: XML preview overflowing horizontally when PDF is embedded
+- Fix: Hide XML bulk actions when E-Documents feature is disabled
+- Fix: Hide XML preview button for unsupported document types
+- Fix: Prevent extra output in individual XML invoice downloads
+- Fix: Item price allowance rounding in UBL and CII
+- Fix: Backend saving of Peppol Endpoint ID for guest orders
+- Translations: Updated translation template (POT)
 
 = 5.4.0 (2025-12-24) =
 - New: Added Peppol Network cross-sell to E-Documents Network settings
