@@ -72,7 +72,7 @@ class LineHandler extends AbstractUblHandler {
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => $net_unit,
+					'value'      => abs( $net_unit ),
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
