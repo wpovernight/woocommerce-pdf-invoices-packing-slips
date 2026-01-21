@@ -505,12 +505,16 @@ class Frontend {
 	/**
 	 * Validate optional checkout field from the Classic Checkout page.
 	 *
-	 * @param array $data
+	 * @param mixed $data
 	 * @param mixed $errors
 	 * @return void
 	 */
-	public function checkout_field_validate_classic_checkout_field_value( array $data, $errors ): void {
+	public function checkout_field_validate_classic_checkout_field_value( $data, $errors ): void {
 		if ( ! $this->checkout_field_is_enabled() || ! $errors instanceof \WP_Error ) {
+			return;
+		}
+		
+		if ( ! is_array( $data ) ) {
 			return;
 		}
 

@@ -538,12 +538,16 @@ class Peppol {
 	 * Validate Peppol Endpoint / Legal‑ID pairs after WooCommerce
 	 * has normalised and sanitised all checkout data.
 	 *
-	 * @param array $data   All posted checkout fields.
+	 * @param mixed $data   All posted checkout fields.
 	 * @param mixed $errors Errors object to add validation errors to.
 	 * @return void
 	 */
-	public function peppol_validate_classic_checkout_field_values( array $data, $errors ): void {
+	public function peppol_validate_classic_checkout_field_values( $data, $errors ): void {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) || ! $errors instanceof \WP_Error ) {
+			return;
+		}
+		
+		if ( ! is_array( $data ) ) {
 			return;
 		}
 
