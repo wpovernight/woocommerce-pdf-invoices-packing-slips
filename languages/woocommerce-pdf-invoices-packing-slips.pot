@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.5.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.6.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-19T09:41:57+00:00\n"
+"POT-Creation-Date: 2026-01-21T11:54:25+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -129,58 +129,58 @@ msgstr ""
 msgid "Invalid Endpoint Scheme."
 msgstr ""
 
-#: edi/Peppol.php:741
+#: edi/Peppol.php:745
 #: includes/Admin.php:2132
 msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
 msgstr ""
 
-#: edi/Peppol.php:755
-#: edi/Peppol.php:853
+#: edi/Peppol.php:759
+#: edi/Peppol.php:857
 msgid "Peppol Endpoint ID is empty."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:777
+#: edi/Peppol.php:781
 #, php-format
 msgid "The identifier \"%1$s\" was found without a scheme. Please enter it in \"scheme:value\" format. You can search for the correct scheme and identifier in the %2$s."
 msgstr ""
 
-#: edi/Peppol.php:782
-#: edi/Peppol.php:808
-#: edi/Peppol.php:831
+#: edi/Peppol.php:786
+#: edi/Peppol.php:812
+#: edi/Peppol.php:835
 msgid "Peppol Directory"
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:803
+#: edi/Peppol.php:807
 #, php-format
 msgid "No Peppol participant was found for \"%1$s\". Please confirm the scheme and identifier in the %2$s."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:826
+#: edi/Peppol.php:830
 #, php-format
 msgid "We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the %2$s. Below are participants found for this identifier value:"
 msgstr ""
 
 #. translators: %s: error message
-#: edi/Peppol.php:968
+#: edi/Peppol.php:972
 #, php-format
 msgid "Peppol Directory request failed: %s"
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: edi/Peppol.php:982
+#: edi/Peppol.php:986
 #, php-format
 msgid "Peppol Directory returned an unexpected status code: %d"
 msgstr ""
 
-#: edi/Peppol.php:993
+#: edi/Peppol.php:997
 msgid "Peppol Directory returned an invalid JSON response."
 msgstr ""
 
 #. translators: %s: endpoint ID
-#: edi/Peppol.php:1019
+#: edi/Peppol.php:1023
 #, php-format
 msgid "We found the following participant(s) related to \"%s\":"
 msgstr ""
@@ -2140,7 +2140,7 @@ msgid "Mutually defined"
 msgstr ""
 
 #. Translators: %s is the coupon code applied to the discount.
-#: edi/Syntaxes/Ubl/Handlers/LineHandler.php:265
+#: edi/Syntaxes/Ubl/Handlers/LineHandler.php:273
 #, php-format
 msgid "Discount %s"
 msgstr ""
@@ -3276,16 +3276,16 @@ msgstr ""
 msgid "Download %s (PDF)"
 msgstr ""
 
-#: includes/Frontend.php:652
+#: includes/Frontend.php:656
 msgid "Please include the country prefix (for example NL123456789)."
 msgstr ""
 
-#: includes/Frontend.php:770
+#: includes/Frontend.php:774
 #: includes/Settings/SettingsGeneral.php:493
 msgid "Customer identification"
 msgstr ""
 
-#: includes/Frontend.php:828
+#: includes/Frontend.php:832
 msgid "Please enter a VAT number including a valid country prefix (for example PT123456789)."
 msgstr ""
 
