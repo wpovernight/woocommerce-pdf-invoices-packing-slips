@@ -138,8 +138,8 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 
 			$quantity_value = $parts['qty'];
 
-			// Use Woo’s net_total for the line total amount.
-			$net_line_total_f = (float) $this->format_decimal( $parts['net_total'], 2 );
+			// Compute line net amount from the same unit price we emit in ChargeAmount
+			$net_line_total_f = (float) $this->format_decimal( $net_unit_f * $quantity_value, 2 );
 			$net_line_total   = $this->format_decimal( $net_line_total_f, 2 );
 
 			$line_item = array(
