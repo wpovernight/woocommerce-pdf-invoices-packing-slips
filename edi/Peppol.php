@@ -712,6 +712,34 @@ class Peppol {
 		// always
 		return array();
 	}
+	
+	/**
+	 * Build the Checkout Block "autofill" condition for the Peppol field.
+	 *
+	 * @param string $vat_field_id VAT field ID.
+	 * @param string $country_code Country code.
+	 * @return array
+	 */
+	private function peppol_checkout_block_autofill_condition( string $vat_field_id, string $country_code ): array {
+		return array(
+			'customer' => array(
+				'properties' => array(
+					'billing_address' => array(
+						'properties' => array(
+							'country' => array(
+								'const' => $country_code,
+							),
+							$vat_field_id => array(
+								'not' => array(
+									'maxLength' => 0,
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+	}
 
 	/**
 	 * Validate a Peppol identifier value.
@@ -1056,6 +1084,18 @@ class Peppol {
 		<?php
 
 		return (string) ob_get_clean();
+	}
+	
+	/**
+	 * Get the field id that contains the VAT number in the Checkout.
+	 *
+	 * @return string
+	 */
+	private function get_vat_checkout_field_id(): string {
+		return (string) apply_filters(
+			'wpo_ips_edi_peppol_vat_field_id',
+			'wpo-ips/checkout-field'
+		);
 	}
 
 }
