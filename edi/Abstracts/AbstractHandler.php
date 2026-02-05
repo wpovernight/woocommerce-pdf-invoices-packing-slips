@@ -107,6 +107,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 
 		$mapping = apply_filters( 'wpo_ips_edi_payment_means_code_mapping', array(
+			'cheque'  => '20', // Cheque
 			'bacs'    => '58', // SEPA Credit Transfer
 			'paypal'  => '68', // Online payment
 			'stripe'  => '54', // Credit card
@@ -141,9 +142,10 @@ abstract class AbstractHandler implements HandlerInterface {
 			case 'stripe':
 				$data['transaction_id'] = $order->get_meta( '_stripe_source_id', true );
 				break;
+				
 		}
 
-		return $data;
+		return apply_filters( 'wpo_ips_edi_payment_means_data', $data, $method_id, $order, $this );
 	}
 
 	/**
