@@ -1,5 +1,5 @@
 ( function () {
-	
+
 	const CONFIG         = window.wpoIpsPeppol || {};
 	const LOCK_COUNTRIES = Array.isArray( CONFIG.countries )
 		? CONFIG.countries.map( ( c ) => String( c ).toUpperCase() )
@@ -7,8 +7,11 @@
 
 	const DEBUG = !!CONFIG.debug;
 
-	const COUNTRY_SELECTOR          = '#billing-country, select[name="billing_country"]';
+	const COUNTRY_SELECTOR          = '#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select';
 	const VAT_SELECTOR              = CONFIG.vat_field_selector;
+	const VAT_MAPPINGS              = CONFIG.vat_mappings && typeof CONFIG.vat_mappings === 'object'
+		? CONFIG.vat_mappings
+		: {};
 	const ENDPOINT_WRAPPER_SELECTOR = '.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id';
 	const ENDPOINT_SELECTOR         = ENDPOINT_WRAPPER_SELECTOR + ' input';
 
@@ -21,9 +24,86 @@
 		return el ? String( el.value || '' ).trim() : '';
 	}
 
-	function isLockCountry() {
-		const country = getValue( COUNTRY_SELECTOR ).toUpperCase();
-		return LOCK_COUNTRIES.includes( country );
+	function getBillingCountry() {
+		try {
+			const cart = window.wp?.data?.select?.( 'wc/store/cart' );
+			if ( cart && typeof cart.getCustomerData === 'function' ) {
+				const data = cart.getCustomerData() || {};
+
+				const country =
+					data.billingAddress?.country
+					|| data.billing_address?.country
+					|| data.customer?.billingAddress?.country
+					|| data.customer?.billing_address?.country;
+
+				if ( country ) {
+					return String( country ).trim();
+				}
+			}
+		} catch ( e ) {
+			// ignore
+		}
+
+		// Fallback to DOM.
+		return getValue( COUNTRY_SELECTOR );
+	}
+
+	function isLockCountry( country ) {
+		const c = String( country || '' ).toUpperCase();
+		return LOCK_COUNTRIES.includes( c );
+	}
+
+	function normalizeVat( vat ) {
+		return String( vat || '' )
+			.replace( /\s+/g, '' )
+			.toUpperCase()
+			.trim();
+	}
+
+	function computeEndpointFromVat( country, vatValue ) {
+		const map = VAT_MAPPINGS[country];
+		if ( ! map ) return '';
+
+		const vat = normalizeVat( vatValue );
+
+		// If mapping provides a regex, validate against it.
+		if ( map.vat_regex ) {
+			try {
+				const re = new RegExp( String( map.vat_regex ).replace( /^\/|\/[gimuy]*$/g, '' ) );
+				if ( ! re.test( vat ) ) return '';
+			} catch ( e ) {
+				// Invalid regex config: fail closed (no autofill).
+				return '';
+			}
+		}
+
+		// If mapping wants digits-only of a given length (example: BE).
+		if ( map.vat_digits ) {
+			const digits = vat.replace( /^[A-Z]{2}/, '' ).replace( /\D+/g, '' );
+			if ( digits.length !== Number( map.vat_digits ) ) return '';
+			if ( ! map.eas ) return '';
+			return String( map.eas ) + ':' + digits;
+		}
+
+		// Fallback: if it provides a simple "prefix" to prepend.
+		if ( map.prefix ) {
+			return String( map.prefix ) + vat;
+		}
+
+		// No known strategy.
+		return '';
+	}
+
+	function setFieldValue( el, value ) {
+		if ( ! el ) return false;
+
+		const newVal = String( value ?? '' );
+		if ( String( el.value ?? '' ) === newVal ) return true;
+
+		el.value = newVal;
+		el.dispatchEvent( new Event( 'input', { bubbles: true } ) );
+		el.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+		return true;
 	}
 
 	// Manual override flag (session only).
@@ -85,7 +165,7 @@
 		}
 
 		if ( link ) return link;
-		
+
 		link             = document.createElement( 'a' );
 		link.href        = '#';
 		link.className   = 'wpo-ips-override';
@@ -130,21 +210,30 @@
 
 		const wrapper  = document.querySelector( ENDPOINT_WRAPPER_SELECTOR );
 		const endpoint = document.querySelector( ENDPOINT_SELECTOR );
-		
+
 		if ( ! endpoint ) return;
 
-		const country = getValue( COUNTRY_SELECTOR ).toUpperCase();
+		const country  = getBillingCountry().toUpperCase();
 		const vatValue = getValue( VAT_SELECTOR );
-		
-		// Reset manual override when country/VAT changes, so it "follows the flow".
+
+		// Reset manual override when VAT/country changes.
 		if ( country !== lastCountry || vatValue !== lastVat ) {
 			manualOverride = false;
 			lastCountry    = country;
 			lastVat        = vatValue;
 		}
 
-		const shouldLockByRule = isLockCountry() && vatValue !== '';
+		const shouldLockByRule = isLockCountry( country ) && vatValue !== '';
 		const locked           = shouldLockByRule && ! manualOverride;
+
+		// Autofill.
+		const computedEndpoint = ( vatValue !== '' )
+			? computeEndpointFromVat( country, vatValue )
+			: '';
+
+		if ( shouldLockByRule && ! manualOverride && computedEndpoint ) {
+			setFieldValue( endpoint, computedEndpoint );
+		}
 
 		// Only skip if state and element are unchanged.
 		if ( locked === lastLocked && endpoint === lastEndpointEl ) return;
@@ -168,13 +257,13 @@
 
 	function scheduleApply( source ) {
 		if ( scheduled ) return;
-		
+
 		scheduled = true;
 		requestAnimationFrame( () => applyLockState( source ) );
 	}
 
 	const root =
-		document.querySelector( '#order-fields')
+		document.querySelector( '#order-fields' )
 		|| document.querySelector( '.wc-block-checkout' )
 		|| document.documentElement;
 
@@ -185,8 +274,13 @@
 		if ( e.target?.matches( COUNTRY_SELECTOR ) || e.target?.matches( VAT_SELECTOR ) ) {
 			scheduleApply( 'input' );
 		}
-	});
+	} );
+
+	// Subscribe to Blocks store changes.
+	if ( window.wp?.data?.subscribe ) {
+		window.wp.data.subscribe( () => scheduleApply( 'store' ) );
+	}
 
 	scheduleApply( 'init' );
-	
+
 } )();

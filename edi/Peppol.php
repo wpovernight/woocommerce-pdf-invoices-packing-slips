@@ -156,7 +156,7 @@ class Peppol {
 					</small>
 				</p>
 			<?php endif; ?>
-			
+
 			<p>
 				<input type="hidden" name="wc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wpo_ips_edi_user_save_peppol_settings' ) ); ?>">
 				<button type="submit" name="save_peppol_settings" class="woocommerce-Button button"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
@@ -185,7 +185,7 @@ class Peppol {
 		}
 
 		$request = stripslashes_deep( $_POST );
-		
+
 		// Maybe validate
 		if ( ! empty( $request['peppol_endpoint_id'] ) ) {
 			$result = $this->peppol_validate_identifier_value( $request['peppol_endpoint_id'] );
@@ -195,7 +195,7 @@ class Peppol {
 				return;
 			}
 		}
-		
+
 		$user_id = get_current_user_id();
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
@@ -645,7 +645,7 @@ class Peppol {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) || ! $errors instanceof \WP_Error ) {
 			return;
 		}
-		
+
 		if ( ! is_array( $data ) ) {
 			return;
 		}
@@ -707,7 +707,7 @@ class Peppol {
 
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
 	}
-	
+
 	/**
 	 * Enqueue Peppol script for Classic Checkout page.
 	 *
@@ -746,7 +746,7 @@ class Peppol {
 			)
 		);
 	}
-	
+
 	/**
 	 * Enqueue Peppol script for Block Checkout page.
 	 *
@@ -771,15 +771,16 @@ class Peppol {
 			WPO_WCPDF_VERSION,
 			true
 		);
-		
+
 		$mappings      = wpo_ips_edi_get_peppol_vat_mappings();
 		$country_codes = array_keys( $mappings );
-		
+
 		wp_localize_script(
 			'wpo-ips-peppol-block-checkout',
 			'wpoIpsPeppol',
 			array(
 				'countries'          => $country_codes,
+				'vat_mappings'       => $mappings,
 				'debug'              => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'vat_field_selector' => apply_filters(
 					'wpo_ips_edi_peppol_vat_field_selector',
@@ -789,7 +790,7 @@ class Peppol {
 			)
 		);
 	}
-	
+
 	/**
 	 * Get the configured visibility mode for the Peppol checkout fields.
 	 *
@@ -805,10 +806,10 @@ class Peppol {
 
 		return $visibility_mode;
 	}
-	
+
 	/**
 	 * Build the Checkout Block "hidden" condition for the Peppol fields.
-	 * 
+	 *
 	 * @link https://developer.woocommerce.com/docs/block-development/tutorials/how-to-conditional-additional-fields/
 	 *
 	 * @return array
@@ -865,7 +866,7 @@ class Peppol {
 			'anyOf' => array( $base_hidden, $extra_hidden ),
 		);
 	}
-	
+
 	/**
 	 * Build the Checkout Block "autofill" condition for the Peppol field.
 	 *
@@ -1244,7 +1245,7 @@ class Peppol {
 
 		return (string) ob_get_clean();
 	}
-	
+
 	/**
 	 * Get the field id that contains the VAT number in the Checkout.
 	 *
@@ -1256,7 +1257,7 @@ class Peppol {
 			'wpo-ips/checkout-field'
 		);
 	}
-	
+
 	/**
 	 * Meta key flag used to indicate manual override of endpoint fields.
 	 */
