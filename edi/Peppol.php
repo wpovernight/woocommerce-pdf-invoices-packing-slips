@@ -41,6 +41,7 @@ class Peppol {
 			$this->peppol_set_checkout_block_fields_value();
 			add_action( 'woocommerce_set_additional_field_value', array( $this, 'peppol_save_checkout_block_fields' ), 10, 4 );
 			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
+			add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_block_checkout_script' ), 20 );
 		} else {
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );
@@ -742,6 +743,49 @@ class Peppol {
 			'wpoIpsPeppol',
 			array(
 				'visibilityMode' => $visibility_mode, // always|toggle|company
+			)
+		);
+	}
+	
+	/**
+	 * Enqueue Peppol script for Block Checkout page.
+	 *
+	 * @return void
+	 */
+	public function peppol_enqueue_block_checkout_script(): void {
+		if (
+			! function_exists( 'is_checkout' ) ||
+			! is_checkout() ||
+			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' )
+		) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'wpo-ips-peppol-block-checkout',
+			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-block-checkout.js',
+			array(
+				'wp-data',
+				'wp-dom-ready',
+			),
+			WPO_WCPDF_VERSION,
+			true
+		);
+		
+		$mappings      = wpo_ips_edi_get_peppol_vat_mappings();
+		$country_codes = array_keys( $mappings );
+		
+		wp_localize_script(
+			'wpo-ips-peppol-block-checkout',
+			'wpoIpsPeppol',
+			array(
+				'countries'          => $country_codes,
+				'debug'              => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'vat_field_selector' => apply_filters(
+					'wpo_ips_edi_peppol_vat_field_selector',
+					'.wc-block-components-address-form__wpo-ips-checkout-field input' // Defaults to our own General Checkout Field
+				),
+				'override_link_text' => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
 	}
