@@ -730,7 +730,7 @@ class Peppol {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_enqueue_script(
-			'wpo-ips-peppol-checkout',
+			'wpo-ips-peppol-classic-checkout',
 			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-classic-checkout' . $suffix . '.js',
 			array( 'jquery' ),
 			WPO_WCPDF_VERSION,
@@ -738,7 +738,7 @@ class Peppol {
 		);
 
 		wp_localize_script(
-			'wpo-ips-peppol-checkout',
+			'wpo-ips-peppol-classic-checkout',
 			'wpoIpsPeppol',
 			array(
 				'visibilityMode' => $visibility_mode, // always|toggle|company
