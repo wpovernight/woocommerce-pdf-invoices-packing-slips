@@ -41,6 +41,7 @@ class Peppol {
 			$this->peppol_set_checkout_block_fields_value();
 			add_action( 'woocommerce_set_additional_field_value', array( $this, 'peppol_save_checkout_block_fields' ), 10, 4 );
 			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
+			add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_block_checkout_script' ), 20 );
 		} else {
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );
@@ -155,7 +156,7 @@ class Peppol {
 					</small>
 				</p>
 			<?php endif; ?>
-			
+
 			<p>
 				<input type="hidden" name="wc_nonce" value="<?php echo esc_attr( wp_create_nonce( 'wpo_ips_edi_user_save_peppol_settings' ) ); ?>">
 				<button type="submit" name="save_peppol_settings" class="woocommerce-Button button"><?php esc_html_e( 'Save changes', 'woocommerce-pdf-invoices-packing-slips' ); ?></button>
@@ -184,7 +185,7 @@ class Peppol {
 		}
 
 		$request = stripslashes_deep( $_POST );
-		
+
 		// Maybe validate
 		if ( ! empty( $request['peppol_endpoint_id'] ) ) {
 			$result = $this->peppol_validate_identifier_value( $request['peppol_endpoint_id'] );
@@ -194,7 +195,7 @@ class Peppol {
 				return;
 			}
 		}
-		
+
 		$user_id = get_current_user_id();
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
@@ -237,7 +238,17 @@ class Peppol {
 			);
 		}
 
-		$conditional_hidden = ( $can_use_hidden ) ? $this->peppol_checkout_block_hidden_condition() : array();
+		$conditional_hidden = array();
+
+		if ( $can_use_hidden ) {
+			$extra_hidden = array();
+			$vat_field_id = $this->get_vat_checkout_field_id();
+			$extra_hidden = array(
+				'not' => $this->peppol_checkout_block_autofill_condition( $vat_field_id ),
+			);
+
+			$conditional_hidden = $this->peppol_checkout_block_hidden_condition( $extra_hidden );
+		}
 
 		// Endpoint ID
 		$args = array(
@@ -363,12 +374,12 @@ class Peppol {
 	}
 
 	/**
-	 * Save EDI Peppol fields from Checkout Block.
+	 * Save EDI Peppol fields from Checkout Block + automation.
 	 *
-	 * @param string $key Field key.
-	 * @param mixed $value Field value.
-	 * @param string $group Group name.
-	 * @param object $wc_object WC object (e.g. order).
+	 * @param string $key
+	 * @param mixed  $value
+	 * @param string $group
+	 * @param object $wc_object WC object (WC_Order or WC_Customer depending on context)
 	 * @return void
 	 */
 	public function peppol_save_checkout_block_fields( string $key, $value, string $group, object $wc_object ): void {
@@ -376,26 +387,114 @@ class Peppol {
 			return;
 		}
 
-		$allowed = array(
-			'wpo-ips-edi/peppol-endpoint-id',
-			'wpo-ips-edi/peppol-endpoint-eas',
-		);
+		$endpoint_id_key  = 'wpo-ips-edi/peppol-endpoint-id';
+		$endpoint_eas_key = 'wpo-ips-edi/peppol-endpoint-eas';
+		$vat_key          = $this->get_vat_checkout_field_id();
 
-		if ( ! in_array( $key, $allowed, true ) ) {
+		$is_endpoint_field = in_array( $key, array( $endpoint_id_key, $endpoint_eas_key ), true );
+		$is_vat_field      = ( $key === $vat_key );
+
+		// Ignore unrelated fields early.
+		if ( ! $is_endpoint_field && ! $is_vat_field ) {
 			return;
 		}
 
-		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
-		$value    = trim( sanitize_text_field( wp_unslash( $value ) ) );
+		// Normalize incoming value.
+		$value = is_scalar( $value ) ? (string) $value : '';
+		$value = trim( sanitize_text_field( wp_unslash( $value ) ) );
 
-		$customer_id = is_callable( array( $wc_object, 'get_customer_id' ) )
-			? absint( $wc_object->get_customer_id() )
-			: 0;
+		$order = ( $wc_object instanceof \WC_Order ) ? $wc_object : null;
 
-		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, array( $meta_key => $value ) );
-		
-		if ( $wc_object instanceof \WC_Order ) {
-			wpo_ips_edi_maybe_save_order_peppol_data( $wc_object, array( $meta_key => $value ) );
+		$customer_id = 0;
+		if ( is_callable( array( $wc_object, 'get_customer_id' ) ) ) {
+			$customer_id = absint( $wc_object->get_customer_id() );
+		} elseif ( $order instanceof \WC_Order ) {
+			$customer_id = absint( $order->get_customer_id() );
+		}
+
+		// Read billing country (best effort; prefer order if present).
+		$billing_country = '';
+		if ( $order instanceof \WC_Order ) {
+			$billing_country = (string) $order->get_billing_country();
+		} elseif ( is_callable( array( $wc_object, 'get_billing_country' ) ) ) {
+			$billing_country = (string) $wc_object->get_billing_country();
+		} elseif ( WC()->customer ) {
+			$billing_country = (string) WC()->customer->get_billing_country();
+		}
+		$billing_country = strtoupper( trim( $billing_country ) );
+
+		/**
+		 * User manually edits endpoint fields => treat as override and save.
+		 *
+		 * Important: avoid marking as overridden during our own autofill writes.
+		 * We use a filter as a lightweight "guard" so this method stays self-contained.
+		 */
+		$is_autofill_write = (bool) apply_filters( 'wpo_ips_edi_peppol_is_endpoint_autofill_write', false, $key, $group, $wc_object );
+
+		if ( $is_endpoint_field ) {
+			$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
+
+			// If user typed something, mark overridden. If they cleared it, allow automation again.
+			if ( ! $is_autofill_write ) {
+				$this->set_endpoint_overridden( $customer_id, $value !== '', $order );
+			}
+
+			wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, array( $meta_key => $value ) );
+
+			if ( $order instanceof \WC_Order ) {
+				wpo_ips_edi_maybe_save_order_peppol_data( $order, array( $meta_key => $value ) );
+			}
+
+			return;
+		}
+
+		/**
+		 * VAT field saved => try automation.
+		 */
+		if ( $is_vat_field ) {
+			// Only for Belgium (for now).
+			if ( 'BE' !== $billing_country ) {
+				return;
+			}
+
+			// Only when not empty (no VAT validation here).
+			if ( '' === $value ) {
+				return;
+			}
+
+			// Respect manual override.
+			if ( $this->is_endpoint_overridden( $customer_id, $order ) ) {
+				return;
+			}
+
+			$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $value );
+			if ( empty( $result['endpoint_id'] ) || empty( $result['eas'] ) ) {
+				return;
+			}
+
+			$data = array(
+				'peppol_endpoint_id'  => (string) $result['endpoint_id'],
+				'peppol_endpoint_eas' => (string) $result['eas'],
+			);
+
+			// Guard flag for downstream endpoint-field saves triggered by our own writes.
+			add_filter(
+				'wpo_ips_edi_peppol_is_endpoint_autofill_write',
+				'__return_true',
+				1000
+			);
+
+			wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $data );
+
+			if ( $order instanceof \WC_Order ) {
+				wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
+			}
+
+			remove_filter(
+				'wpo_ips_edi_peppol_is_endpoint_autofill_write',
+				'__return_true',
+				1000
+			);
 		}
 	}
 
@@ -546,7 +645,7 @@ class Peppol {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) || ! $errors instanceof \WP_Error ) {
 			return;
 		}
-		
+
 		if ( ! is_array( $data ) ) {
 			return;
 		}
@@ -608,7 +707,7 @@ class Peppol {
 
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
 	}
-	
+
 	/**
 	 * Enqueue Peppol script for Classic Checkout page.
 	 *
@@ -632,7 +731,7 @@ class Peppol {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_enqueue_script(
-			'wpo-ips-peppol-checkout',
+			'wpo-ips-peppol-classic-checkout',
 			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-classic-checkout' . $suffix . '.js',
 			array( 'jquery' ),
 			WPO_WCPDF_VERSION,
@@ -640,14 +739,58 @@ class Peppol {
 		);
 
 		wp_localize_script(
-			'wpo-ips-peppol-checkout',
+			'wpo-ips-peppol-classic-checkout',
 			'wpoIpsPeppol',
 			array(
 				'visibilityMode' => $visibility_mode, // always|toggle|company
 			)
 		);
 	}
-	
+
+	/**
+	 * Enqueue Peppol script for Block Checkout page.
+	 *
+	 * @return void
+	 */
+	public function peppol_enqueue_block_checkout_script(): void {
+		if (
+			! function_exists( 'is_checkout' ) ||
+			! is_checkout() ||
+			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' )
+		) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'wpo-ips-peppol-block-checkout',
+			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-block-checkout.js',
+			array(
+				'wp-data',
+				'wp-dom-ready',
+			),
+			WPO_WCPDF_VERSION,
+			true
+		);
+
+		$mappings      = wpo_ips_edi_get_peppol_vat_mappings();
+		$country_codes = array_keys( $mappings );
+
+		wp_localize_script(
+			'wpo-ips-peppol-block-checkout',
+			'wpoIpsPeppol',
+			array(
+				'countries'          => $country_codes,
+				'vat_mappings'       => $mappings,
+				'debug'              => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'vat_field_selector' => apply_filters(
+					'wpo_ips_edi_peppol_vat_field_selector',
+					'.wc-block-components-address-form__wpo-ips-checkout-field input' // Defaults to our own General Checkout Field
+				),
+				'override_link_text' => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
+	}
+
 	/**
 	 * Get the configured visibility mode for the Peppol checkout fields.
 	 *
@@ -663,19 +806,21 @@ class Peppol {
 
 		return $visibility_mode;
 	}
-	
+
 	/**
 	 * Build the Checkout Block "hidden" condition for the Peppol fields.
-	 * 
+	 *
 	 * @link https://developer.woocommerce.com/docs/block-development/tutorials/how-to-conditional-additional-fields/
 	 *
 	 * @return array
 	 */
-	private function peppol_checkout_block_hidden_condition(): array {
+	private function peppol_checkout_block_hidden_condition( array $extra_hidden = array() ): array {
 		$visibility_mode = $this->peppol_checkout_visibility_mode();
 
+		$base_hidden = array();
+
 		if ( 'toggle' === $visibility_mode ) {
-			return array(
+			$base_hidden = array(
 				'checkout' => array(
 					'properties' => array(
 						'additional_fields' => array(
@@ -690,11 +835,8 @@ class Peppol {
 					),
 				),
 			);
-		}
-
-		if ( 'company' === $visibility_mode ) {
-			// Hide while company is empty.
-			return array(
+		} elseif ( 'company' === $visibility_mode ) {
+			$base_hidden = array(
 				'customer' => array(
 					'properties' => array(
 						'billing_address' => array(
@@ -709,8 +851,54 @@ class Peppol {
 			);
 		}
 
-		// always
-		return array();
+		// No extra rule? Keep old behavior.
+		if ( empty( $extra_hidden ) ) {
+			return $base_hidden;
+		}
+
+		// If base is empty, just return extra.
+		if ( empty( $base_hidden ) ) {
+			return $extra_hidden;
+		}
+
+		// Merge as OR: hide if base hides OR extra hides.
+		return array(
+			'anyOf' => array( $base_hidden, $extra_hidden ),
+		);
+	}
+
+	/**
+	 * Build the Checkout Block "autofill" condition for the Peppol field.
+	 *
+	 * @param string $vat_field_id
+	 * @return array
+	 */
+	private function peppol_checkout_block_autofill_condition( string $vat_field_id ): array {
+		$mappings      = wpo_ips_edi_get_peppol_vat_mappings();
+		$country_codes = array_keys( $mappings );
+
+		if ( empty( $country_codes ) ) {
+			return array();
+		}
+
+		return array(
+			'customer' => array(
+				'properties' => array(
+					'billing_address' => array(
+						'properties' => array(
+							'country' => array(
+								'enum' => $country_codes,
+							),
+							$vat_field_id => array(
+								'not' => array(
+									'maxLength' => 0,
+								),
+							),
+						),
+					),
+				),
+			),
+		);
 	}
 
 	/**
@@ -1056,6 +1244,68 @@ class Peppol {
 		<?php
 
 		return (string) ob_get_clean();
+	}
+
+	/**
+	 * Get the field id that contains the VAT number in the Checkout.
+	 *
+	 * @return string
+	 */
+	private function get_vat_checkout_field_id(): string {
+		return (string) apply_filters(
+			'wpo_ips_edi_peppol_vat_field_id',
+			'wpo-ips/checkout-field'
+		);
+	}
+
+	/**
+	 * Meta key flag used to indicate manual override of endpoint fields.
+	 */
+	private function get_endpoint_overridden_meta_key(): string {
+		return '_wpo_ips_edi_peppol_endpoint_overridden';
+	}
+
+	/**
+	 * Check if the endpoint fields have been manually overridden by the user.
+	 *
+	 * @param int $customer_id
+	 * @param \WC_Order|null $order
+	 * @return bool
+	 */
+	private function is_endpoint_overridden( int $customer_id, ?\WC_Order $order = null ): bool {
+		$flag_key = $this->get_endpoint_overridden_meta_key();
+
+		if ( $order instanceof \WC_Order ) {
+			return (bool) $order->get_meta( $flag_key, true );
+		}
+
+		return $customer_id > 0 ? (bool) get_user_meta( $customer_id, $flag_key, true ) : false;
+	}
+
+	/**
+	 * Set or clear the manual override flag for endpoint fields.
+	 *
+	 * @param int $customer_id
+	 * @param bool $overridden
+	 * @param \WC_Order|null $order
+	 * @return void
+	 */
+	private function set_endpoint_overridden( int $customer_id, bool $overridden, ?\WC_Order $order = null ): void {
+		$flag_key = $this->get_endpoint_overridden_meta_key();
+		$value    = $overridden ? '1' : '';
+
+		if ( $order instanceof \WC_Order ) {
+			$order->update_meta_data( $flag_key, $value );
+			// Don't call save() here.
+		}
+
+		if ( $customer_id > 0 ) {
+			if ( $overridden ) {
+				update_user_meta( $customer_id, $flag_key, $value );
+			} else {
+				delete_user_meta( $customer_id, $flag_key );
+			}
+		}
 	}
 
 }
