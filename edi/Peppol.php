@@ -243,7 +243,7 @@ class Peppol {
 			$extra_hidden = array();
 			$vat_field_id = $this->get_vat_checkout_field_id();
 			$extra_hidden = array(
-				'not' => $this->peppol_checkout_block_autofill_condition( $vat_field_id, 'BE' ),
+				'not' => $this->peppol_checkout_block_autofill_condition( $vat_field_id ),
 			);
 
 			$conditional_hidden = $this->peppol_checkout_block_hidden_condition( $extra_hidden );
@@ -825,18 +825,24 @@ class Peppol {
 	/**
 	 * Build the Checkout Block "autofill" condition for the Peppol field.
 	 *
-	 * @param string $vat_field_id VAT field ID.
-	 * @param string $country_code Country code.
+	 * @param string $vat_field_id
 	 * @return array
 	 */
-	private function peppol_checkout_block_autofill_condition( string $vat_field_id, string $country_code ): array {
+	private function peppol_checkout_block_autofill_condition( string $vat_field_id ): array {
+		$mappings      = wpo_ips_edi_get_peppol_vat_mappings();
+		$country_codes = array_keys( $mappings );
+
+		if ( empty( $country_codes ) ) {
+			return array();
+		}
+
 		return array(
 			'customer' => array(
 				'properties' => array(
 					'billing_address' => array(
 						'properties' => array(
 							'country' => array(
-								'const' => $country_code,
+								'enum' => $country_codes,
 							),
 							$vat_field_id => array(
 								'not' => array(
