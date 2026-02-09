@@ -761,6 +761,13 @@ class Peppol {
 		) {
 			return;
 		}
+		
+		wp_enqueue_style(
+			'wpo-ips-peppol-block-checkout-styles',
+			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-block-checkout.css',
+			array(),
+			WPO_WCPDF_VERSION
+		);
 
 		wp_enqueue_script(
 			'wpo-ips-peppol-block-checkout',
@@ -782,9 +789,17 @@ class Peppol {
 			array(
 				'countries'          => $country_codes,
 				'debug'              => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'billing_country_selector' => apply_filters(
+					'wpo_ips_edi_peppol_billing_country_selector',
+					'#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select'
+				),
 				'vat_field_selector' => apply_filters(
 					'wpo_ips_edi_peppol_vat_field_selector',
 					'.wc-block-components-address-form__wpo-ips-checkout-field input' // Defaults to our own General Checkout Field
+				),
+				'peppol_input_wrapper_selector' => apply_filters(
+					'wpo_ips_edi_peppol_input_wrapper_selector',
+					'.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id'
 				),
 				'override_link_text' => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)

@@ -1,0 +1,28 @@
+/* Locked look */
+.wpo-is-locked {
+	opacity: 0.75;
+	cursor: not-allowed;
+}
+
+/* Make wrapper look disabled */
+.wpo-ips-locked-wrap {
+	opacity: 0.75;
+}
+
+.wpo-ips-locked-wrap input {
+	background: rgba(0, 0, 0, 0.04);
+}
+
+/* Override link */
+.wpo-ips-override {
+	display: block;
+	margin-top: 6px;
+	font-size: 12px;
+	text-decoration: underline;
+	cursor: pointer;
+	user-select: none;
+}
+
+.wpo-ips-override:hover {
+	text-decoration: none;
+}

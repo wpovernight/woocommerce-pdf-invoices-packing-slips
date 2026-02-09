@@ -7,9 +7,9 @@
 
 	const DEBUG                     = !!CONFIG.debug;
 
-	const COUNTRY_SELECTOR          = '#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select';
+	const COUNTRY_SELECTOR          = CONFIG.billing_country_selector;
 	const VAT_SELECTOR              = CONFIG.vat_field_selector;
-	const ENDPOINT_WRAPPER_SELECTOR = '.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id';
+	const ENDPOINT_WRAPPER_SELECTOR = CONFIG.peppol_input_wrapper_selector;
 	const ENDPOINT_SELECTOR         = ENDPOINT_WRAPPER_SELECTOR + ' input';
 
 	const LOOKUP_PATH               = '/wpo-ips/v1/peppol-endpoint';
@@ -121,42 +121,6 @@
 	let lastLocked     = null;
 	let lastEndpointEl = null;
 	let scheduled      = false;
-
-	function ensureStyles() {
-		if ( document.getElementById( 'wpo-ips-peppol-lock-styles' ) ) return;
-
-		const style       = document.createElement( 'style' );
-		style.id          = 'wpo-ips-peppol-lock-styles';
-		style.textContent = `
-			/* Locked look */
-			.wpo-is-locked {
-				opacity: 0.75;
-				cursor: not-allowed;
-			}
-
-			/* Make wrapper look disabled (Blocks uses wrapper divs) */
-			.wpo-ips-locked-wrap {
-				opacity: 0.75;
-			}
-			.wpo-ips-locked-wrap input {
-				background: rgba(0,0,0,0.04);
-			}
-
-			/* Override link */
-			.wpo-ips-override {
-				display: block;
-				margin-top: 6px;
-				font-size: 12px;
-				text-decoration: underline;
-				cursor: pointer;
-				user-select: none;
-			}
-			.wpo-ips-override:hover {
-				text-decoration: none;
-			}
-		`;
-		document.head.appendChild( style );
-	}
 
 	function ensureOverrideLink( wrapper, endpointInput, locked ) {
 		if ( ! wrapper ) return;
@@ -272,8 +236,6 @@
 
 	function applyLockState( source = 'unknown' ) {
 		scheduled = false;
-
-		ensureStyles();
 
 		const wrapper  = document.querySelector( ENDPOINT_WRAPPER_SELECTOR );
 		const endpoint = document.querySelector( ENDPOINT_SELECTOR );
