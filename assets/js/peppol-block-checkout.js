@@ -111,7 +111,8 @@
 	let endpointLookupLast  = null;
 
 	// Manual override flag (session only).
-	let manualOverride = false;
+	let manualOverride      = false;
+	let manualOverrideValue = '';
 
 	// Reset override when VAT/country changes.
 	let lastVat     = null;
@@ -182,7 +183,8 @@
 			const preservedValue = endpointInput ? String( endpointInput.value || '' ) : '';
 
 			// One-way override: unlock until VAT/country changes again.
-			manualOverride = true;
+			manualOverride      = true;
+			manualOverrideValue = preservedValue;
 
 			applyLockState( 'override-click' );
 
@@ -215,6 +217,59 @@
 		}
 	}
 
+	function bindManualOverridePersistence( endpoint ) {
+		if ( ! endpoint || endpoint.__wpoPeppolManualBound ) return;
+
+		endpoint.__wpoPeppolManualBound = true;
+
+		function captureCurrentValue() {
+			// Keep the most recent user value, even if Blocks clears the input later.
+			const current = String( endpoint.value || '' );
+			if ( current ) {
+				manualOverrideValue = current;
+			}
+		}
+
+		// Keep our local value updated when user edits.
+		endpoint.addEventListener( 'input', () => {
+			if ( manualOverride ) {
+				manualOverrideValue = String( endpoint.value || '' );
+			}
+		} );
+
+		// Capture value BEFORE focus (Blocks/React may clear on focus).
+		endpoint.addEventListener( 'pointerdown', () => {
+			if ( manualOverride ) {
+				captureCurrentValue();
+			}
+		} );
+
+		// Fallback for browsers without pointer events.
+		endpoint.addEventListener( 'mousedown', () => {
+			if ( manualOverride ) {
+				captureCurrentValue();
+			}
+		} );
+
+		// React can wipe value on focus; restore on next frames.
+		endpoint.addEventListener( 'focus', () => {
+			if ( manualOverride && manualOverrideValue ) {
+				reapplyValueAfterUnlock( endpoint, manualOverrideValue );
+			}
+		} );
+
+		// React/store sync can wipe value after blur; restore on next frames.
+		endpoint.addEventListener( 'blur', () => {
+			if ( manualOverride ) {
+				captureCurrentValue();
+
+				if ( manualOverrideValue ) {
+					reapplyValueAfterUnlock( endpoint, manualOverrideValue );
+				}
+			}
+		} );
+	}
+
 	function applyLockState( source = 'unknown' ) {
 		scheduled = false;
 
@@ -225,14 +280,18 @@
 
 		if ( ! endpoint ) return;
 
+		// Make manual override value persist across React re-renders.
+		bindManualOverridePersistence( endpoint );
+
 		const country  = getBillingCountry().toUpperCase();
 		const vatValue = getValue( VAT_SELECTOR );
 
 		// Reset manual override when VAT/country changes.
 		if ( country !== lastCountry || vatValue !== lastVat ) {
-			manualOverride = false;
-			lastCountry    = country;
-			lastVat        = vatValue;
+			manualOverride      = false;
+			manualOverrideValue = '';
+			lastCountry         = country;
+			lastVat             = vatValue;
 
 			// Reset lookup cache when inputs change.
 			endpointLookupLast = null;
@@ -241,7 +300,7 @@
 		const shouldLockByRule = isLockCountry( country ) && vatValue !== '';
 		const locked           = shouldLockByRule && ! manualOverride;
 
-		// Autofill: request "eas:endpoint" from backend based on VAT.
+		// Autofill: request endpoint from backend based on VAT.
 		if ( shouldLockByRule && ! manualOverride && vatValue !== '' ) {
 			const vat = normalizeVat( vatValue );
 			const key = country + '|' + vat;
@@ -292,6 +351,7 @@
 			locked,
 			manualOverride,
 			lastValue: endpointLookupLast ? endpointLookupLast.value : '',
+			manualOverrideValue,
 		} );
 	}
 
