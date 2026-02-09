@@ -1,21 +1,18 @@
 ( function () {
 
-	const CONFIG         = window.wpoIpsPeppol || {};
-	const LOCK_COUNTRIES = Array.isArray( CONFIG.countries )
+	const CONFIG                    = window.wpoIpsPeppol || {};
+	const LOCK_COUNTRIES            = Array.isArray( CONFIG.countries )
 		? CONFIG.countries.map( ( c ) => String( c ).toUpperCase() )
 		: [];
 
-	const DEBUG = !!CONFIG.debug;
+	const DEBUG                     = !!CONFIG.debug;
 
 	const COUNTRY_SELECTOR          = '#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select';
 	const VAT_SELECTOR              = CONFIG.vat_field_selector;
-		? CONFIG.vat_mappings
-		: {};
 	const ENDPOINT_WRAPPER_SELECTOR = '.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id';
 	const ENDPOINT_SELECTOR         = ENDPOINT_WRAPPER_SELECTOR + ' input';
 
-	// REST route used to build "eas:endpoint" server-side.
-	const LOOKUP_PATH = '/wpo-ips/v1/peppol-endpoint';
+	const LOOKUP_PATH               = '/wpo-ips/v1/peppol-endpoint';
 
 	function log( ...args ) {
 		if ( DEBUG ) console.log( '[WPO IPS Peppol]', ...args );
