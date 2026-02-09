@@ -42,6 +42,7 @@ class Peppol {
 			add_action( 'woocommerce_set_additional_field_value', array( $this, 'peppol_save_checkout_block_fields' ), 10, 4 );
 			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_block_checkout_script' ), 20 );
+			add_action( 'rest_api_init', array( $this, 'peppol_register_block_checkout_endpoint_route' ) );
 		} else {
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );
@@ -780,13 +781,67 @@ class Peppol {
 			'wpoIpsPeppol',
 			array(
 				'countries'          => $country_codes,
-				'vat_mappings'       => $mappings,
 				'debug'              => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'vat_field_selector' => apply_filters(
 					'wpo_ips_edi_peppol_vat_field_selector',
 					'.wc-block-components-address-form__wpo-ips-checkout-field input' // Defaults to our own General Checkout Field
 				),
 				'override_link_text' => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
+	}
+	
+	/**
+	 * Register REST API endpoint for Peppol identifier autofill based on VAT number.
+	 *
+	 * @return void
+	 */
+	public function peppol_register_block_checkout_endpoint_route(): void {
+		register_rest_route(
+			'wpo-ips/v1',
+			'/peppol-endpoint',
+			array(
+				'methods'             => 'POST',
+				'permission_callback' => function( \WP_REST_Request $request ) {
+					$nonce = $request->get_header( 'x_wp_nonce' );
+					return (bool) wp_verify_nonce( $nonce, 'wp_rest' );
+				},
+				'callback'            => function( \WP_REST_Request $request ) {
+					$billing_country = wc_strtoupper( wc_clean( (string) $request->get_param( 'billing_country' ) ) );
+					$value           = wc_strtoupper( preg_replace( '/\s+/', '', wc_clean( (string) $request->get_param( 'vat' ) ) ) );
+
+					if ( empty( $billing_country ) || empty( $value ) || ! preg_match( '/^[A-Z]{2}$/', $billing_country ) ) {
+						return rest_ensure_response(
+							array(
+								'value' => '',
+								'eas'   => '',
+								'id'    => '',
+							)
+						);
+					}
+
+					$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $value );
+					if ( empty( $result['endpoint_id'] ) || empty( $result['eas'] ) ) {
+						return rest_ensure_response(
+							array(
+								'value' => '',
+								'eas'   => '',
+								'id'    => '',
+							)
+						);
+					}
+
+					$eas = (string) $result['eas'];
+					$id  = (string) $result['endpoint_id'];
+
+					return rest_ensure_response(
+						array(
+							'value' => $id,
+							'eas'   => $eas,
+							'id'    => $id,
+						)
+					);
+				},
 			)
 		);
 	}

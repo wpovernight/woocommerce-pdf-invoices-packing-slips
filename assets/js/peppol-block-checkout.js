@@ -9,11 +9,13 @@
 
 	const COUNTRY_SELECTOR          = '#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select';
 	const VAT_SELECTOR              = CONFIG.vat_field_selector;
-	const VAT_MAPPINGS              = CONFIG.vat_mappings && typeof CONFIG.vat_mappings === 'object'
 		? CONFIG.vat_mappings
 		: {};
 	const ENDPOINT_WRAPPER_SELECTOR = '.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id';
 	const ENDPOINT_SELECTOR         = ENDPOINT_WRAPPER_SELECTOR + ' input';
+
+	// REST route used to build "eas:endpoint" server-side.
+	const LOOKUP_PATH = '/wpo-ips/v1/peppol-endpoint';
 
 	function log( ...args ) {
 		if ( DEBUG ) console.log( '[WPO IPS Peppol]', ...args );
@@ -82,7 +84,7 @@
 
 		return true;
 	}
-	
+
 	function reapplyValueAfterUnlock( input, value ) {
 		if ( ! input ) return;
 
@@ -92,6 +94,24 @@
 			requestAnimationFrame( () => setFieldValue( input, value ) );
 		} );
 	}
+
+	function fetchPeppolEndpointValue( billingCountry, vatValue ) {
+		const apiFetch = window.wp?.apiFetch;
+		if ( ! apiFetch ) return Promise.resolve( null );
+
+		return apiFetch( {
+			path: LOOKUP_PATH,
+			method: 'POST',
+			data: {
+				billing_country: String( billingCountry || '' ).toUpperCase(),
+				vat: String( vatValue || '' ),
+			},
+		} );
+	}
+
+	// Debounce + cache.
+	let endpointLookupTimer = null;
+	let endpointLookupLast  = null;
 
 	// Manual override flag (session only).
 	let manualOverride = false;
@@ -216,18 +236,45 @@
 			manualOverride = false;
 			lastCountry    = country;
 			lastVat        = vatValue;
+
+			// Reset lookup cache when inputs change.
+			endpointLookupLast = null;
 		}
 
 		const shouldLockByRule = isLockCountry( country ) && vatValue !== '';
 		const locked           = shouldLockByRule && ! manualOverride;
 
-		// Autofill: copy VAT straight into endpoint.
-		const computedEndpoint = ( vatValue !== '' )
-			? normalizeVat( vatValue )
-			: '';
+		// Autofill: request "eas:endpoint" from backend based on VAT.
+		if ( shouldLockByRule && ! manualOverride && vatValue !== '' ) {
+			const vat = normalizeVat( vatValue );
+			const key = country + '|' + vat;
 
-		if ( shouldLockByRule && ! manualOverride && computedEndpoint ) {
-			setFieldValue( endpoint, computedEndpoint );
+			// If we already resolved this exact key, apply immediately.
+			if ( endpointLookupLast && endpointLookupLast.key === key ) {
+				if ( endpointLookupLast.value ) {
+					setFieldValue( endpoint, endpointLookupLast.value );
+				}
+			} else {
+				// Debounce to avoid calling on every keystroke.
+				if ( endpointLookupTimer ) clearTimeout( endpointLookupTimer );
+
+				endpointLookupTimer = setTimeout( () => {
+					fetchPeppolEndpointValue( country, vat )
+						.then( ( res ) => {
+							const value = String( res?.value || '' ).trim();
+
+							endpointLookupLast = {
+								key,
+								value,
+							};
+
+							if ( value ) {
+								setFieldValue( endpoint, value );
+							}
+						} )
+						.catch( () => {} );
+				}, 250 );
+			}
 		}
 
 		// Only skip if state and element are unchanged.
@@ -247,7 +294,7 @@
 			vatValue,
 			locked,
 			manualOverride,
-			computedEndpoint,
+			lastValue: endpointLookupLast ? endpointLookupLast.value : '',
 		} );
 	}
 
