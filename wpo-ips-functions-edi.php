@@ -973,13 +973,23 @@ function wpo_ips_edi_generate_action_button_html( string $url, string $class, st
 		return '';
 	}
 
+	$atts = apply_filters(
+		'wpo_ips_edi_generate_action_button_html_atts',
+		array(
+			'url'   => $url,
+			'class' => $class,
+			'label' => $label,
+			'icon'  => $icon,
+		)
+	);
+
 	return sprintf(
 		'<a href="%1$s" class="%2$s" alt="%3$s" title="%3$s">
 			<span class="dashicons %4$s"></span>
 		</a>',
-		esc_url( $url ),
-		esc_attr( $class ),
-		esc_attr( $label ),
-		esc_attr( $icon )
+		esc_url( $atts['url'] ),
+		esc_attr( $atts['class'] ),
+		esc_attr( $atts['label'] ),
+		esc_attr( $atts['icon'] )
 	);
 }
