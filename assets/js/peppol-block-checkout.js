@@ -60,40 +60,6 @@
 			.trim();
 	}
 
-	function computeEndpointFromVat( country, vatValue ) {
-		const map = VAT_MAPPINGS[country];
-		if ( ! map ) return '';
-
-		const vat = normalizeVat( vatValue );
-
-		// If mapping provides a regex, validate against it.
-		if ( map.vat_regex ) {
-			try {
-				const re = new RegExp( String( map.vat_regex ).replace( /^\/|\/[gimuy]*$/g, '' ) );
-				if ( ! re.test( vat ) ) return '';
-			} catch ( e ) {
-				// Invalid regex config: fail closed (no autofill).
-				return '';
-			}
-		}
-
-		// If mapping wants digits-only of a given length (example: BE).
-		if ( map.vat_digits ) {
-			const digits = vat.replace( /^[A-Z]{2}/, '' ).replace( /\D+/g, '' );
-			if ( digits.length !== Number( map.vat_digits ) ) return '';
-			if ( ! map.eas ) return '';
-			return String( map.eas ) + ':' + digits;
-		}
-
-		// Fallback: if it provides a simple "prefix" to prepend.
-		if ( map.prefix ) {
-			return String( map.prefix ) + vat;
-		}
-
-		// No known strategy.
-		return '';
-	}
-
 	function setFieldValue( el, value ) {
 		if ( ! el ) return false;
 
@@ -101,9 +67,30 @@
 		if ( String( el.value ?? '' ) === newVal ) return true;
 
 		el.value = newVal;
+
+		// Notify Blocks input wrapper.
 		el.dispatchEvent( new Event( 'input', { bubbles: true } ) );
 		el.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+
+		// If Blocks didn't update floating label state, fix it.
+		const wrapper = el.closest( '.wc-block-components-text-input' );
+		if ( wrapper && newVal ) {
+			wrapper.classList.add( 'is-active' );
+		} else if ( wrapper && ! newVal ) {
+			wrapper.classList.remove( 'is-active' );
+		}
+
 		return true;
+	}
+	
+	function reapplyValueAfterUnlock( input, value ) {
+		if ( ! input ) return;
+
+		// React may wipe it on the same tick; reapply on next frames.
+		requestAnimationFrame( () => {
+			setFieldValue( input, value );
+			requestAnimationFrame( () => setFieldValue( input, value ) );
+		} );
 	}
 
 	// Manual override flag (session only).
@@ -174,12 +161,20 @@
 		link.addEventListener( 'click', ( e ) => {
 			e.preventDefault();
 
+			// Preserve current value (the one we autofilled).
+			const preservedValue = endpointInput ? String( endpointInput.value || '' ) : '';
+
 			// One-way override: unlock until VAT/country changes again.
 			manualOverride = true;
 
 			applyLockState( 'override-click' );
 
 			if ( endpointInput ) {
+				// Ensure value doesn't disappear when Blocks re-renders.
+				if ( preservedValue ) {
+					reapplyValueAfterUnlock( endpointInput, preservedValue );
+				}
+
 				endpointInput.focus();
 			}
 		} );
@@ -226,9 +221,9 @@
 		const shouldLockByRule = isLockCountry( country ) && vatValue !== '';
 		const locked           = shouldLockByRule && ! manualOverride;
 
-		// Autofill.
+		// Autofill: copy VAT straight into endpoint.
 		const computedEndpoint = ( vatValue !== '' )
-			? computeEndpointFromVat( country, vatValue )
+			? normalizeVat( vatValue )
 			: '';
 
 		if ( shouldLockByRule && ! manualOverride && computedEndpoint ) {
@@ -252,6 +247,7 @@
 			vatValue,
 			locked,
 			manualOverride,
+			computedEndpoint,
 		} );
 	}
 
