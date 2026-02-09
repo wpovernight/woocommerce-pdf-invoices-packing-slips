@@ -185,8 +185,8 @@ class LineHandler extends AbstractUblHandler {
 				$quantity_value = -abs( $quantity_value );
 			}
 
-			// Use Woo’s net_total for the line extension amount.
-			$net_line_total = $this->format_decimal( $parts['net_total'], 2 );
+			// Compute line net amount from the same unit price we emit in PriceAmount
+			$net_line_total = $this->format_decimal( $net_unit_f * $quantity_value, 2 );
 
 			$line = array(
 				'name'  => "cac:{$root_element}Line",
