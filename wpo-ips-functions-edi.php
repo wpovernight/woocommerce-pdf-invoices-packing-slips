@@ -126,7 +126,7 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 	if ( ! wpo_ips_edi_peppol_is_available() ) {
 		return; // only save for Peppol formats
 	}
-	
+
 	$identifier     = '';
 	$scheme         = '';
 	$save_meta_data = false;
@@ -148,12 +148,12 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 			$identifier = $raw;
 		}
 	}
-	
+
 	if ( empty( $identifier ) || empty( $scheme ) ) {
 		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
 			? $order->get_customer_id()
 			: 0;
-			
+
 		if ( $customer_id <= 0 ) {
 			return;
 		}
@@ -175,7 +175,7 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 	if ( ! $save_meta_data ) {
 		return;
 	}
-	
+
 	$order->save_meta_data();
 }
 
@@ -780,7 +780,7 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
 	if ( $user_id <= 0 ) {
 		return;
 	}
-	
+
 	$mode = wpo_ips_edi_peppol_identifier_input_mode();
 
 	// [ text‑field , scheme‑field ]
@@ -877,13 +877,23 @@ function wpo_ips_edi_generate_action_button_html( string $url, string $class, st
 		return '';
 	}
 
+	$atts = apply_filters(
+		'wpo_ips_edi_generate_action_button_html_atts',
+		array(
+			'url'   => $url,
+			'class' => $class,
+			'label' => $label,
+			'icon'  => $icon,
+		)
+	);
+
 	return sprintf(
 		'<a href="%1$s" class="%2$s" alt="%3$s" title="%3$s">
 			<span class="dashicons %4$s"></span>
 		</a>',
-		esc_url( $url ),
-		esc_attr( $class ),
-		esc_attr( $label ),
-		esc_attr( $icon )
+		esc_url( $atts['url'] ),
+		esc_attr( $atts['class'] ),
+		esc_attr( $atts['label'] ),
+		esc_attr( $atts['icon'] )
 	);
 }
