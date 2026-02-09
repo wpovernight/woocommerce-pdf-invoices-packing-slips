@@ -762,16 +762,18 @@ class Peppol {
 			return;
 		}
 		
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		
 		wp_enqueue_style(
 			'wpo-ips-peppol-block-checkout-styles',
-			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-block-checkout.css',
+			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-block-checkout' . $suffix . '.css',
 			array(),
 			WPO_WCPDF_VERSION
 		);
 
 		wp_enqueue_script(
 			'wpo-ips-peppol-block-checkout',
-			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-block-checkout.js',
+			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-block-checkout' . $suffix . '.js',
 			array(
 				'wp-data',
 				'wp-dom-ready',
