@@ -12,7 +12,7 @@
 	const ENDPOINT_WRAPPER_SELECTOR = CONFIG.peppol_input_wrapper_selector;
 	const ENDPOINT_SELECTOR         = ENDPOINT_WRAPPER_SELECTOR + ' input';
 
-	const LOOKUP_PATH               = '/wpo-ips/v1/peppol-endpoint';
+	const AUTOFILL_ENDPOINT_ROUTE   = CONFIG.peppol_autofill_endpoint_route;
 
 	function log( ...args ) {
 		if ( DEBUG ) console.log( '[WPO IPS Peppol]', ...args );
@@ -97,7 +97,7 @@
 		if ( ! apiFetch ) return Promise.resolve( null );
 
 		return apiFetch( {
-			path: LOOKUP_PATH,
+			path: AUTOFILL_ENDPOINT_ROUTE,
 			method: 'POST',
 			data: {
 				billing_country: String( billingCountry || '' ).toUpperCase(),

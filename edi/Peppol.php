@@ -42,7 +42,7 @@ class Peppol {
 			add_action( 'woocommerce_set_additional_field_value', array( $this, 'peppol_save_checkout_block_fields' ), 10, 4 );
 			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_block_checkout_script' ), 20 );
-			add_action( 'rest_api_init', array( $this, 'peppol_register_block_checkout_endpoint_route' ) );
+			add_action( 'rest_api_init', array( $this, 'peppol_register_block_checkout_autofill_endpoint_route' ) );
 		} else {
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );
@@ -787,21 +787,22 @@ class Peppol {
 			'wpo-ips-peppol-block-checkout',
 			'wpoIpsPeppol',
 			array(
-				'countries'          => $country_codes,
-				'debug'              => defined( 'WP_DEBUG' ) && WP_DEBUG,
-				'billing_country_selector' => apply_filters(
+				'countries'                      => $country_codes,
+				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'billing_country_selector'       => apply_filters(
 					'wpo_ips_edi_peppol_billing_country_selector',
 					'#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select'
 				),
-				'vat_field_selector' => apply_filters(
+				'vat_field_selector'             => apply_filters(
 					'wpo_ips_edi_peppol_vat_field_selector',
 					'.wc-block-components-address-form__wpo-ips-checkout-field input' // Defaults to our own General Checkout Field
 				),
-				'peppol_input_wrapper_selector' => apply_filters(
+				'peppol_input_wrapper_selector'  => apply_filters(
 					'wpo_ips_edi_peppol_input_wrapper_selector',
 					'.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id'
 				),
-				'override_link_text' => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
+				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
 	}
@@ -811,7 +812,7 @@ class Peppol {
 	 *
 	 * @return void
 	 */
-	public function peppol_register_block_checkout_endpoint_route(): void {
+	public function peppol_register_block_checkout_autofill_endpoint_route(): void {
 		register_rest_route(
 			'wpo-ips/v1',
 			'/peppol-endpoint',
