@@ -790,15 +790,15 @@ class Peppol {
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
 				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'billing_country_selector'       => apply_filters(
-					'wpo_ips_edi_peppol_billing_country_selector',
+					'wpo_ips_edi_peppol_block_checkout_billing_country_selector',
 					'#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select'
 				),
 				'vat_field_selector'             => apply_filters(
-					'wpo_ips_edi_peppol_vat_field_selector',
+					'wpo_ips_edi_peppol_block_checkout_vat_field_selector',
 					'.wc-block-components-address-form__wpo-ips-checkout-field input' // Defaults to our own General Checkout Field
 				),
 				'peppol_input_wrapper_selector'  => apply_filters(
-					'wpo_ips_edi_peppol_input_wrapper_selector',
+					'wpo_ips_edi_peppol_block_checkout_input_wrapper_selector',
 					'.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id'
 				),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
