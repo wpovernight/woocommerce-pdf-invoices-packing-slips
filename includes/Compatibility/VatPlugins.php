@@ -74,7 +74,7 @@ class VatPlugins {
 					},
 					'selectors' => array(
 						'classic_form_selector' => '',
-						'block_form_selector'   => '',
+						'block_form_selector'   => '.wc-block-components-address-form__alg_eu_vat-billing_eu_vat_number input',
 					),
 				),
 
@@ -86,7 +86,7 @@ class VatPlugins {
 					},
 					'selectors' => array(
 						'classic_form_selector' => '',
-						'block_form_selector'   => '',
+						'block_form_selector'   => '', // not supported
 					),
 				),
 
@@ -98,7 +98,7 @@ class VatPlugins {
 					},
 					'selectors' => array(
 						'classic_form_selector' => '',
-						'block_form_selector'   => '',
+						'block_form_selector'   => '.wc-block-components-address-form__eu-vat-guard-vat_number input',
 					),
 				),
 			)
