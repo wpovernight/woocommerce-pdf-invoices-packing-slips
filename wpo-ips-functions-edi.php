@@ -623,8 +623,7 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 		return array();
 	}
 
-	$fmt        = (string) ( $cfg['endpoint_fmt'] ?? '%s:%s' );
-	$endpointid = sprintf( $fmt, $eas, $value );
+	$endpointid = sprintf( '%s:%s', $eas, $value );
 
 	return array(
 		'eas'         => $eas,
@@ -645,7 +644,6 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
 			'strip_prefixes' => array( 'BE' ),
 			'keep_pattern'   => '/\d+/',      // keep digits only
 			'length'         => 10,           // sanity check
-			'endpoint_fmt'   => '%s:%s',      // eas:value
 		),
 	);
 
