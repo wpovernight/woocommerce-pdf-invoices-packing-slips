@@ -29,6 +29,7 @@ class WPO_WCPDF {
 	public $plugin_basename;
 	public $legacy_addons;
 	public $third_party_plugins;
+	public $vat_plugins;
 	public $order_util;
 	public $file_system;
 	public $settings;
@@ -163,6 +164,7 @@ class WPO_WCPDF {
 
 		// Compatibility classes
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
+		$this->vat_plugins         = \WPO\IPS\Compatibility\VatPlugins::instance();
 		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
 

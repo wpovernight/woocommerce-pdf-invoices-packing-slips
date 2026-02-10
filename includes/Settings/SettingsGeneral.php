@@ -52,7 +52,7 @@ class SettingsGeneral {
 		$requires_pro           = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 		$states                 = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
 		$missing_template_files = $this->get_missing_template_files();
-		$has_vat_plugin_active  = \wpo_ips_has_vat_plugin_active();
+		$has_vat_plugin_active  = \WPO_WCPDF()->vat_plugins->has_active();
 		$vat_plugin_notice      = '';
 
 		if ( $has_vat_plugin_active ) {

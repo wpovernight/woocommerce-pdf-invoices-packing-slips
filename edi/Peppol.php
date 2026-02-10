@@ -43,6 +43,7 @@ class Peppol {
 			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_block_checkout_script' ), 20 );
 			add_action( 'rest_api_init', array( $this, 'peppol_register_block_checkout_autofill_endpoint_route' ) );
+			add_filter( 'wpo_ips_edi_peppol_block_checkout_vat_field_selector', array( $this, 'peppol_third_party_block_checkout_vat_field_selector' ) );
 		} else {
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );
@@ -805,6 +806,17 @@ class Peppol {
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
+	}
+	
+	/**
+	 * Filter to allow customizing the VAT field selector in the Block Checkout page.
+	 *
+	 * @param string $default
+	 * @return string
+	 */
+	public function peppol_third_party_block_checkout_vat_field_selector( string $default ): string {
+		// TODO
+		return $default;
 	}
 	
 	/**

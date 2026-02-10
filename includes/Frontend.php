@@ -796,7 +796,7 @@ class Frontend {
 		}
 
 		// Prevent conflicts with VAT plugins.
-		if ( \wpo_ips_has_vat_plugin_active() ) {
+		if ( \WPO_WCPDF()->vat_plugins->has_active() ) {
 			return false;
 		}
 
