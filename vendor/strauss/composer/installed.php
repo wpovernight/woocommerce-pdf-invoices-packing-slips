@@ -1,0 +1,114 @@
+<?php return array (
+  'root' => 
+  array (
+    'name' => 'wpovernight/woocommerce-pdf-invoices-packing-slips',
+    'pretty_version' => 'dev-main',
+    'version' => 'dev-main',
+    'reference' => '9855c0a33a8306528b7a3f026ed7955fe1290e95',
+    'type' => 'library',
+    'install_path' => __DIR__ . '/../',
+    'aliases' => 
+    array (
+    ),
+    'dev' => true,
+  ),
+  'versions' => 
+  array (
+    'dompdf/dompdf' => 
+    array (
+      'pretty_version' => 'v3.1.4',
+      'version' => '3.1.4.0',
+      'reference' => 'db712c90c5b9868df3600e64e68da62e78a34623',
+      'type' => 'library',
+      'install_path' => __DIR__ . '/../dompdf/dompdf',
+      'aliases' => 
+      array (
+      ),
+      'dev_requirement' => false,
+    ),
+    'dompdf/php-font-lib' => 
+    array (
+      'pretty_version' => '1.0.2',
+      'version' => '1.0.2.0',
+      'reference' => 'a6e9a688a2a80016ac080b97be73d3e10c444c9a',
+      'type' => 'library',
+      'install_path' => __DIR__ . '/../dompdf/php-font-lib',
+      'aliases' => 
+      array (
+      ),
+      'dev_requirement' => false,
+    ),
+    'dompdf/php-svg-lib' => 
+    array (
+      'pretty_version' => '1.0.2',
+      'version' => '1.0.2.0',
+      'reference' => '8259ffb930817e72b1ff1caef5d226501f3dfeb1',
+      'type' => 'library',
+      'install_path' => __DIR__ . '/../dompdf/php-svg-lib',
+      'aliases' => 
+      array (
+      ),
+      'dev_requirement' => false,
+    ),
+    'masterminds/html5' => 
+    array (
+      'pretty_version' => '2.10.0',
+      'version' => '2.10.0.0',
+      'reference' => 'fcf91eb64359852f00d921887b219479b4f21251',
+      'type' => 'library',
+      'install_path' => __DIR__ . '/../masterminds/html5',
+      'aliases' => 
+      array (
+      ),
+      'dev_requirement' => false,
+    ),
+    'sabberworm/php-css-parser' => 
+    array (
+      'pretty_version' => 'v9.1.0',
+      'version' => '9.1.0.0',
+      'reference' => '1b363fdbdc6dd0ca0f4bf98d3a4d7f388133f1fb',
+      'type' => 'library',
+      'install_path' => __DIR__ . '/../sabberworm/php-css-parser',
+      'aliases' => 
+      array (
+      ),
+      'dev_requirement' => false,
+    ),
+    'sabre/uri' => 
+    array (
+      'pretty_version' => '3.0.2',
+      'version' => '3.0.2.0',
+      'reference' => '38eeab6ed9eec435a2188db489d4649c56272c51',
+      'type' => 'library',
+      'install_path' => __DIR__ . '/../sabre/uri',
+      'aliases' => 
+      array (
+      ),
+      'dev_requirement' => false,
+    ),
+    'sabre/xml' => 
+    array (
+      'pretty_version' => '4.0.6',
+      'version' => '4.0.6.0',
+      'reference' => 'a89257fd188ce30e456b841b6915f27905dfdbe3',
+      'type' => 'library',
+      'install_path' => __DIR__ . '/../sabre/xml',
+      'aliases' => 
+      array (
+      ),
+      'dev_requirement' => false,
+    ),
+    'thecodingmachine/safe' => 
+    array (
+      'pretty_version' => 'v3.3.0',
+      'version' => '3.3.0.0',
+      'reference' => '2cdd579eeaa2e78e51c7509b50cc9fb89a956236',
+      'type' => 'library',
+      'install_path' => __DIR__ . '/../thecodingmachine/safe',
+      'aliases' => 
+      array (
+      ),
+      'dev_requirement' => false,
+    ),
+  ),
+);
