@@ -757,7 +757,8 @@ class Peppol {
 		if (
 			! function_exists( 'is_checkout' ) ||
 			! is_checkout() ||
-			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' )
+			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
+			! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' )
 		) {
 			return;
 		}
@@ -782,14 +783,11 @@ class Peppol {
 			true
 		);
 
-		$mappings      = wpo_ips_edi_get_peppol_vat_mappings();
-		$country_codes = array_keys( $mappings );
-
 		wp_localize_script(
 			'wpo-ips-peppol-block-checkout',
 			'wpoIpsPeppol',
 			array(
-				'countries'                      => $country_codes,
+				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
 				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'billing_country_selector'       => apply_filters(
 					'wpo_ips_edi_peppol_billing_country_selector',
@@ -815,6 +813,10 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_register_block_checkout_autofill_endpoint_route(): void {
+		if ( ! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ) {
+			return;
+		}
+		
 		register_rest_route(
 			'wpo-ips/v1',
 			'/peppol-endpoint',

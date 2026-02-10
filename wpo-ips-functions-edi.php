@@ -642,8 +642,8 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
 			'name'           => 'Belgium',
 			'eas'            => '0208',
 			'strip_prefixes' => array( 'BE' ),
-			'keep_pattern'   => '/\d+/',      // keep digits only
-			'length'         => 10,           // sanity check
+			'keep_pattern'   => '/\d+/',
+			'length'         => 10,
 		),
 	);
 
