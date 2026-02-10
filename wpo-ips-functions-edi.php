@@ -640,6 +640,7 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 function wpo_ips_edi_get_peppol_vat_mappings(): array {
 	$mappings = array(
 		'BE' => array(
+			'name'           => 'Belgium',
 			'eas'            => '0208',
 			'strip_prefixes' => array( 'BE' ),
 			'keep_pattern'   => '/\d+/',      // keep digits only
