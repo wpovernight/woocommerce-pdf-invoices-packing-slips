@@ -64,7 +64,7 @@ class VatPlugins {
 					},
 					'selectors' => array(
 						'classic_form_selector' => '',
-						'block_form_selector'   => '',
+						'block_form_selector'   => '#woocommerce_eu_vat_compliance_vat_number input',
 					),
 				),
 

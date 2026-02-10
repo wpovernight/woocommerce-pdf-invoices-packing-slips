@@ -815,7 +815,12 @@ class Peppol {
 	 * @return string
 	 */
 	public function peppol_third_party_block_checkout_vat_field_selector( string $default ): string {
-		// TODO
+		if ( \WPO_WCPDF()->vat_plugins->has_active() ) {
+			$custom_selector = \WPO_WCPDF()->vat_plugins->get_form_selector();
+			if ( $custom_selector ) {
+				return $custom_selector;
+			}
+		}
 		return $default;
 	}
 	
