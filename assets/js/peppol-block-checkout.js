@@ -279,15 +279,15 @@
 				endpointLookupTimer = setTimeout( () => {
 					fetchPeppolEndpointValue( country, vat )
 						.then( ( res ) => {
-							const value = String( res?.value || '' ).trim();
+							const id = String( res?.id || '' ).trim();
 
 							endpointLookupLast = {
 								key,
-								value,
+								value: id,
 							};
 
-							if ( value ) {
-								setFieldValue( endpoint, value );
+							if ( id ) {
+								setFieldValue( endpoint, id );
 							}
 						} )
 						.catch( () => {} );

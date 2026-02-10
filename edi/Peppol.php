@@ -833,9 +833,8 @@ class Peppol {
 					if ( empty( $billing_country ) || empty( $value ) || ! preg_match( '/^[A-Z]{2}$/', $billing_country ) ) {
 						return rest_ensure_response(
 							array(
-								'value' => '',
-								'eas'   => '',
-								'id'    => '',
+								'eas' => '',
+								'id'  => '',
 							)
 						);
 					}
@@ -844,9 +843,8 @@ class Peppol {
 					if ( empty( $result['endpoint_id'] ) || empty( $result['eas'] ) ) {
 						return rest_ensure_response(
 							array(
-								'value' => '',
-								'eas'   => '',
-								'id'    => '',
+								'eas' => '',
+								'id'  => '',
 							)
 						);
 					}
@@ -856,9 +854,8 @@ class Peppol {
 
 					return rest_ensure_response(
 						array(
-							'value' => $id,
-							'eas'   => $eas,
-							'id'    => $id,
+							'eas' => $eas,
+							'id'  => $id,
 						)
 					);
 				},
