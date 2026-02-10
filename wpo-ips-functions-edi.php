@@ -569,10 +569,12 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 	}
 
 	// If VAT looks like it has a prefix, ensure it's a plausible ISO prefix.
-	if ( strlen( $vat_number ) >= 2 && ctype_alpha( substr( $vat_number, 0, 2 ) ) ) {
-		if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
-			return array();
-		}
+	if (
+		strlen( $vat_number ) >= 2 &&
+		ctype_alpha( substr( $vat_number, 0, 2 ) ) &&
+		! wpo_ips_edi_vat_number_has_country_prefix( $vat_number )
+	) {
+		return array();
 	}
 
 	$mappings = wpo_ips_edi_get_peppol_vat_mappings();
@@ -607,7 +609,7 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 	}
 
 	$value = trim( $value );
-	if ( $value === '' ) {
+	if ( '' === $value ) {
 		return array();
 	}
 
@@ -617,7 +619,7 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 	}
 
 	$eas = (string) ( $cfg['eas'] ?? '' );
-	if ( $eas === '' ) {
+	if ( '' === $eas ) {
 		return array();
 	}
 
