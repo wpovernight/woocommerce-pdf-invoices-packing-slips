@@ -50,8 +50,8 @@ class VatPlugins {
 		$defaults = array(
 			'active'                => false,
 			'key'                   => '',
-			'classic_form_selector' => 'form.checkout',
-			'block_form_selector'   => '.wc-block-checkout__form',
+			'classic_form_selector' => '',
+			'block_form_selector'   => '.wc-block-components-address-form__wpo-ips-checkout-field input',
 			'match'                 => null,
 		);
 
