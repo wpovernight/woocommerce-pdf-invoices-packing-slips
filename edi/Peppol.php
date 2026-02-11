@@ -31,8 +31,11 @@ class Peppol {
 	public function __construct() {
 		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
+		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
+		
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
+		
 		add_rewrite_endpoint( 'peppol', EP_PAGES );
 
 		// Peppol Checkout
@@ -42,7 +45,6 @@ class Peppol {
 			add_action( 'woocommerce_set_additional_field_value', array( $this, 'peppol_save_checkout_block_fields' ), 10, 4 );
 			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_block_checkout_script' ), 20 );
-			add_action( 'rest_api_init', array( $this, 'peppol_register_block_checkout_autofill_endpoint_route' ) );
 		} else {
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );
@@ -637,7 +639,7 @@ class Peppol {
 		wp_enqueue_script(
 			'wpo-ips-peppol-classic-checkout',
 			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-classic-checkout' . $suffix . '.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wp-api-fetch' ),
 			WPO_WCPDF_VERSION,
 			true
 		);
@@ -646,7 +648,7 @@ class Peppol {
 			'wpo-ips-peppol-classic-checkout',
 			'wpoIpsPeppol',
 			array(
-				'visibilityMode'                 => $visibility_mode, // always|toggle|company
+				'visibilityMode'                 => $this->peppol_checkout_visibility_mode(), // always|toggle|company
 				'endpoint_derivation'            => (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ),
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
 				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
@@ -658,7 +660,7 @@ class Peppol {
 					'wpo_ips_edi_peppol_classic_checkout_input_wrapper_selector',
 					''
 				),
-				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector(),
+				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'classic' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
@@ -714,7 +716,7 @@ class Peppol {
 					'wpo_ips_edi_peppol_block_checkout_input_wrapper_selector',
 					'.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id'
 				),
-				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector(),
+				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'block' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
@@ -726,7 +728,7 @@ class Peppol {
 	 *
 	 * @return void
 	 */
-	public function peppol_register_block_checkout_autofill_endpoint_route(): void {
+	public function peppol_register_checkout_autofill_endpoint_route(): void {
 		if ( ! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ) {
 			return;
 		}

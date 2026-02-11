@@ -50,8 +50,8 @@ class VatPlugins {
 		$defaults = apply_filters( 'wpo_ips_vat_plugin_checkout_selectors_defaults', array(
 			'active'                => false,
 			'key'                   => '',
-			'classic_form_selector' => '',
-			'block_form_selector'   => '.wc-block-components-address-form__wpo-ips-checkout-field input', // defaults to our General Checkout field
+			'classic_form_selector' => '#wpo_ips_checkout_field_field input',                             // our General Checkout field
+			'block_form_selector'   => '.wc-block-components-address-form__wpo-ips-checkout-field input', // our General Checkout field
 			'match'                 => null,
 		) );
 
