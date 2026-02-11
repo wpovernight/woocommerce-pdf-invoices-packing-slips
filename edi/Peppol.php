@@ -239,17 +239,7 @@ class Peppol {
 			);
 		}
 
-		$conditional_hidden = array();
-
-		if ( $can_use_hidden ) {
-			$extra_hidden = array();
-			$vat_field_id = $this->get_vat_checkout_field_id();
-			$extra_hidden = array(
-				'not' => $this->peppol_checkout_block_autofill_condition( $vat_field_id ),
-			);
-
-			$conditional_hidden = $this->peppol_checkout_block_hidden_condition( $extra_hidden );
-		}
+		$conditional_hidden = $this->peppol_checkout_block_hidden_condition();
 
 		// Endpoint ID
 		$args = array(
@@ -883,13 +873,11 @@ class Peppol {
 	 *
 	 * @return array
 	 */
-	private function peppol_checkout_block_hidden_condition( array $extra_hidden = array() ): array {
+	private function peppol_checkout_block_hidden_condition(): array {
 		$visibility_mode = $this->peppol_checkout_visibility_mode();
 
-		$base_hidden = array();
-
 		if ( 'toggle' === $visibility_mode ) {
-			$base_hidden = array(
+			return array(
 				'checkout' => array(
 					'properties' => array(
 						'additional_fields' => array(
@@ -904,8 +892,10 @@ class Peppol {
 					),
 				),
 			);
-		} elseif ( 'company' === $visibility_mode ) {
-			$base_hidden = array(
+		}
+
+		if ( 'company' === $visibility_mode ) {
+			return array(
 				'customer' => array(
 					'properties' => array(
 						'billing_address' => array(
@@ -920,54 +910,7 @@ class Peppol {
 			);
 		}
 
-		// No extra rule? Keep old behavior.
-		if ( empty( $extra_hidden ) ) {
-			return $base_hidden;
-		}
-
-		// If base is empty, just return extra.
-		if ( empty( $base_hidden ) ) {
-			return $extra_hidden;
-		}
-
-		// Merge as OR: hide if base hides OR extra hides.
-		return array(
-			'anyOf' => array( $base_hidden, $extra_hidden ),
-		);
-	}
-
-	/**
-	 * Build the Checkout Block "autofill" condition for the Peppol field.
-	 *
-	 * @param string $vat_field_id
-	 * @return array
-	 */
-	private function peppol_checkout_block_autofill_condition( string $vat_field_id ): array {
-		$mappings      = wpo_ips_edi_get_peppol_vat_mappings();
-		$country_codes = array_keys( $mappings );
-
-		if ( empty( $country_codes ) ) {
-			return array();
-		}
-
-		return array(
-			'customer' => array(
-				'properties' => array(
-					'billing_address' => array(
-						'properties' => array(
-							'country' => array(
-								'enum' => $country_codes,
-							),
-							$vat_field_id => array(
-								'not' => array(
-									'maxLength' => 0,
-								),
-							),
-						),
-					),
-				),
-			),
-		);
+		return array();
 	}
 
 	/**
