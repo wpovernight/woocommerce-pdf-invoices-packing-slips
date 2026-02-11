@@ -4,21 +4,28 @@
 	cursor: not-allowed;
 }
 
-/* Make the entire form-row look disabled */
+/* Make wrapper look disabled */
+.wpo-ips-locked-wrap {
+	opacity: 0.75;
+}
+
+/* Classic typically uses .form-row */
 .form-row.wpo-ips-locked-wrap {
 	opacity: 0.75;
 }
 
-/* Slightly grey background for inputs when locked */
+/* Slightly grey background for form fields when locked */
+.wpo-ips-locked-wrap input,
+.wpo-ips-locked-wrap select,
+.wpo-ips-locked-wrap textarea {
+	background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Some themes force input backgrounds */
 .form-row.wpo-ips-locked-wrap input,
 .form-row.wpo-ips-locked-wrap select,
 .form-row.wpo-ips-locked-wrap textarea {
 	background-color: rgba(0, 0, 0, 0.04) !important;
-}
-
-/* Prevent text selection when locked */
-.form-row.wpo-ips-locked-wrap input {
-	user-select: none;
 }
 
 /* Override link */

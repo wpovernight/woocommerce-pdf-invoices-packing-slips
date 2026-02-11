@@ -628,18 +628,32 @@ class Peppol {
 		}
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		
+
+		// Shared styles.
 		wp_enqueue_style(
-			'wpo-ips-peppol-classic-checkout-styles',
-			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-classic-checkout' . $suffix . '.css',
+			'wpo-ips-peppol-endpoint-derivation-styles',
+			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-endpoint-derivation' . $suffix . '.css',
 			array(),
 			WPO_WCPDF_VERSION
 		);
 
+		// Shared engine (no jQuery required).
+		wp_enqueue_script(
+			'wpo-ips-peppol-endpoint-derivation',
+			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-endpoint-derivation' . $suffix . '.js',
+			array( 'wp-api-fetch' ), // engine uses wp.apiFetch by default
+			WPO_WCPDF_VERSION,
+			true
+		);
+
+		// Classic chekout script.
 		wp_enqueue_script(
 			'wpo-ips-peppol-classic-checkout',
 			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-classic-checkout' . $suffix . '.js',
-			array( 'jquery', 'wp-api-fetch' ),
+			array(
+				'jquery',
+				'wpo-ips-peppol-endpoint-derivation',
+			),
 			WPO_WCPDF_VERSION,
 			true
 		);
@@ -654,11 +668,11 @@ class Peppol {
 				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'billing_country_selector'       => apply_filters(
 					'wpo_ips_edi_peppol_classic_checkout_billing_country_selector',
-					''
+					'#billing_country'
 				),
 				'peppol_input_wrapper_selector'  => apply_filters(
 					'wpo_ips_edi_peppol_classic_checkout_input_wrapper_selector',
-					''
+					'#peppol_endpoint_id_field'
 				),
 				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'classic' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
@@ -681,22 +695,34 @@ class Peppol {
 		) {
 			return;
 		}
-		
+
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		
+
+		// Shared styles.
 		wp_enqueue_style(
-			'wpo-ips-peppol-block-checkout-styles',
-			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-block-checkout' . $suffix . '.css',
+			'wpo-ips-peppol-endpoint-derivation-styles',
+			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-endpoint-derivation' . $suffix . '.css',
 			array(),
 			WPO_WCPDF_VERSION
 		);
 
+		// Shared engine.
+		wp_enqueue_script(
+			'wpo-ips-peppol-endpoint-derivation',
+			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-endpoint-derivation' . $suffix . '.js',
+			array( 'wp-api-fetch' ),
+			WPO_WCPDF_VERSION,
+			true
+		);
+
+		// Block checkout script.
 		wp_enqueue_script(
 			'wpo-ips-peppol-block-checkout',
 			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-block-checkout' . $suffix . '.js',
 			array(
 				'wp-data',
 				'wp-dom-ready',
+				'wpo-ips-peppol-endpoint-derivation',
 			),
 			WPO_WCPDF_VERSION,
 			true
@@ -706,6 +732,7 @@ class Peppol {
 			'wpo-ips-peppol-block-checkout',
 			'wpoIpsPeppol',
 			array(
+				'endpoint_derivation'            => true,
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
 				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
 				'billing_country_selector'       => apply_filters(
