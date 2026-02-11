@@ -619,11 +619,11 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_enqueue_checkout_scripts(): void {
-		if ( wpo_wcpdf_current_page_has_checkout_block() ) {
+		if ( wpo_ips_current_page_has_checkout_block() ) {
 			$this->peppol_enqueue_block_checkout_script();
 		}
 
-		if ( wpo_wcpdf_current_page_has_checkout_shortcode() ) {
+		if ( wpo_ips_current_page_has_checkout_shortcode() ) {
 			$this->peppol_enqueue_classic_checkout_script();
 		}
 	}
