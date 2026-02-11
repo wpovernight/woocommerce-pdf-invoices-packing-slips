@@ -47,13 +47,13 @@ class VatPlugins {
 			return $this->detected;
 		}
 
-		$defaults = array(
+		$defaults = apply_filters( 'wpo_ips_vat_plugin_checkout_selectors_defaults', array(
 			'active'                => false,
 			'key'                   => '',
 			'classic_form_selector' => '',
-			'block_form_selector'   => '.wc-block-components-address-form__wpo-ips-checkout-field input',
+			'block_form_selector'   => '.wc-block-components-address-form__wpo-ips-checkout-field input', // defaults to our General Checkout field
 			'match'                 => null,
-		);
+		) );
 
 		$plugins = apply_filters(
 			'wpo_ips_vat_plugin_detectors',
@@ -127,7 +127,7 @@ class VatPlugins {
 				continue;
 			}
 
-			$out = $defaults;
+			$out           = $defaults;
 			$out['active'] = true;
 			$out['key']    = (string) $key;
 			$out['match']  = $match;
