@@ -42,31 +42,33 @@ class Frontend {
 		
 		// Optional Checkout field (General Settings).
 		if ( $this->checkout_field_is_enabled() ) {
-			if ( wpo_wcpdf_checkout_is_block() ) {
-				$this->checkout_field_display_checkout_block_field();
-				$this->checkout_field_set_checkout_block_field_value();
 
-				add_action( 'woocommerce_set_additional_field_value', array( $this, 'checkout_field_save_checkout_block_field' ), 10, 4 );
-				add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'checkout_field_remove_order_checkout_block_field_meta' ), 10, 1 );
-			} else {
-				add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_display_classic_checkout_field' ), 10, 1 );
-				add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
-				add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
-				add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
-			}
-			
+			// Blocks/store-api hooks
+			$this->checkout_field_display_checkout_block_field();
+			$this->checkout_field_set_checkout_block_field_value();
+
+			add_action( 'woocommerce_set_additional_field_value', array( $this, 'checkout_field_save_checkout_block_field' ), 10, 4 );
+			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'checkout_field_remove_order_checkout_block_field_meta' ), 10, 1 );
+
+			// Classic checkout hooks
+			add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_display_classic_checkout_field' ), 10, 1 );
+			add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
+			add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
+			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
+
 			if ( $this->checkout_field_is_vat_number() ) {
 				add_filter( 'wpo_wcpdf_order_customer_vat_number_meta_keys', array( $this, 'checkout_field_add_vat_meta_key' ), 10, 2 );
 			}
-			
+
 			add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
-			
+
 			// My Account (Account details).
 			if ( $this->checkout_field_is_my_account_enabled() ) {
 				add_action( 'woocommerce_edit_account_form', array( $this, 'account_details_display_checkout_field' ), 20 );
 				add_filter( 'woocommerce_save_account_details_errors', array( $this, 'account_details_validate_checkout_field' ), 20, 2 );
 				add_action( 'woocommerce_save_account_details', array( $this, 'account_details_save_checkout_field' ), 20, 1 );
 			}
+			
 		}
 	}
 

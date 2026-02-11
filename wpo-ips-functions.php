@@ -2024,3 +2024,82 @@ function wpo_ips_get_plugins_data( array $plugin_files ): array {
 
 	return $plugins;
 }
+
+/**
+ * Check if the current page contains the WooCommerce checkout shortcode.
+ *
+ * @return bool
+ */
+function wpo_ips_current_page_has_checkout_shortcode(): bool {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	$page_id = get_queried_object_id();
+	if ( ! $page_id ) {
+		return false;
+	}
+
+	$post = get_post( $page_id );
+	if ( ! $post instanceof WP_Post ) {
+		return false;
+	}
+
+	return function_exists( 'has_shortcode' ) && has_shortcode( $post->post_content, 'woocommerce_checkout' );
+}
+
+/**
+ * Check if the current page contains the WooCommerce checkout block.
+ *
+ * @return bool
+ */
+function wpo_ips_current_page_has_checkout_block(): bool {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	$page_id = get_queried_object_id();
+	if ( ! $page_id ) {
+		return false;
+	}
+
+	$post = get_post( $page_id );
+	if ( ! $post instanceof WP_Post ) {
+		return false;
+	}
+
+	if ( function_exists( 'has_block' ) && has_block( 'woocommerce/checkout', $post ) ) {
+		return true;
+	}
+
+	$blocks = function_exists( 'parse_blocks' ) ? parse_blocks( $post->post_content ) : array();
+	
+	return wpo_ips_blocks_contain( $blocks, 'woocommerce/checkout' );
+}
+
+/**
+ * Recursively check if blocks contain a specific block name.
+ *
+ * @param array  $blocks The array of blocks to search through.
+ * @param string $needle The block name to search for (e.g., 'woocommerce/checkout').
+ * @return bool True if the block is found, false otherwise.
+ */
+function wpo_ips_blocks_contain( array $blocks, string $needle ): bool {
+	if ( empty( $blocks ) ) {
+		return false;
+	}
+	
+	foreach ( $blocks as $block ) {
+		if ( ! empty( $block['blockName'] ) && $needle === $block['blockName'] ) {
+			return true;
+		}
+		
+		if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+			if ( wpo_ips_blocks_contain( $block['innerBlocks'], $needle ) ) {
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}

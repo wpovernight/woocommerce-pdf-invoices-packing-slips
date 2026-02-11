@@ -384,7 +384,7 @@ class SettingsEDI {
 		);
 		
 		// Peppol specific field
-		if ( ! wpo_wcpdf_checkout_is_block() || ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) ) ) {
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
 				'id'       => 'peppol_endpoint_id_checkout_visibility',
