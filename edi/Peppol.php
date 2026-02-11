@@ -239,7 +239,7 @@ class Peppol {
 			);
 		}
 
-		$conditional_hidden = $this->peppol_checkout_block_hidden_condition();
+		$conditional_hidden = ( $can_use_hidden ) ? $this->peppol_checkout_block_hidden_condition() : array();
 
 		// Endpoint ID
 		$args = array(
@@ -780,7 +780,7 @@ class Peppol {
 
 	/**
 	 * Build the Checkout Block "hidden" condition for the Peppol fields.
-	 *
+	 * 
 	 * @link https://developer.woocommerce.com/docs/block-development/tutorials/how-to-conditional-additional-fields/
 	 *
 	 * @return array
@@ -807,6 +807,7 @@ class Peppol {
 		}
 
 		if ( 'company' === $visibility_mode ) {
+			// Hide while company is empty.
 			return array(
 				'customer' => array(
 					'properties' => array(
@@ -822,6 +823,7 @@ class Peppol {
 			);
 		}
 
+		// always
 		return array();
 	}
 
