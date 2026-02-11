@@ -631,7 +631,7 @@ class Peppol {
 
 		// Shared styles.
 		wp_enqueue_style(
-			'wpo-ips-peppol-endpoint-derivation-styles',
+			'wpo-ips-peppol-endpoint-derivation',
 			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-endpoint-derivation' . $suffix . '.css',
 			array(),
 			WPO_WCPDF_VERSION
@@ -700,7 +700,7 @@ class Peppol {
 
 		// Shared styles.
 		wp_enqueue_style(
-			'wpo-ips-peppol-endpoint-derivation-styles',
+			'wpo-ips-peppol-endpoint-derivation',
 			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-endpoint-derivation' . $suffix . '.css',
 			array(),
 			WPO_WCPDF_VERSION
