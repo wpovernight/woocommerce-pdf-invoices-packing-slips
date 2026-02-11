@@ -665,7 +665,7 @@ class Peppol {
 				'visibilityMode'                 => $this->peppol_checkout_visibility_mode(), // always|toggle|company
 				'endpoint_derivation'            => (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ),
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
-				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'debug'                          => (bool) wpo_ips_edi_get_settings( 'enabled_logs' ),
 				'billing_country_selector'       => apply_filters(
 					'wpo_ips_edi_peppol_classic_checkout_billing_country_selector',
 					'#billing_country'
@@ -734,7 +734,7 @@ class Peppol {
 			array(
 				'endpoint_derivation'            => true,
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
-				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'debug'                          => (bool) wpo_ips_edi_get_settings( 'enabled_logs' ),
 				'billing_country_selector'       => apply_filters(
 					'wpo_ips_edi_peppol_block_checkout_billing_country_selector',
 					'#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select'
