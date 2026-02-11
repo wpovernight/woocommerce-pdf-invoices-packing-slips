@@ -63,7 +63,7 @@ class VatPlugins {
 						return class_exists( 'WC_EU_VAT_Compliance' );
 					},
 					'selectors' => array(
-						'classic_form_selector' => '',
+						'classic_form_selector' => '#woocommerce_eu_vat_compliance_vat_number input',
 						'block_form_selector'   => '#woocommerce_eu_vat_compliance_vat_number input',
 					),
 				),
@@ -73,7 +73,7 @@ class VatPlugins {
 						return defined( 'ALG_WC_EU_VAT_FILE' ) || class_exists( 'Alg_WC_EU_VAT' );
 					},
 					'selectors' => array(
-						'classic_form_selector' => '',
+						'classic_form_selector' => '#billing_eu_vat_number_field input',
 						'block_form_selector'   => '.wc-block-components-address-form__alg_eu_vat-billing_eu_vat_number input',
 					),
 				),
@@ -85,7 +85,7 @@ class VatPlugins {
 							|| isset( $GLOBALS['wc-aelia-eu-vat-assistant'] );
 					},
 					'selectors' => array(
-						'classic_form_selector' => '',
+						'classic_form_selector' => '.aelia_wc_eu_vat_assistant input',
 						'block_form_selector'   => '', // not supported
 					),
 				),
@@ -97,7 +97,7 @@ class VatPlugins {
 							|| class_exists( 'EU_VAT_Guard' );
 					},
 					'selectors' => array(
-						'classic_form_selector' => '',
+						'classic_form_selector' => '#_eu_vat_guard_order_vat_number_field input',
 						'block_form_selector'   => '.wc-block-components-address-form__eu-vat-guard-vat_number input',
 					),
 				),
