@@ -617,12 +617,6 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_enqueue_classic_checkout_script(): void {
-		$visibility_mode = $this->peppol_checkout_visibility_mode();
-
-		if ( 'always' === $visibility_mode ) {
-			return;
-		}
-
 		if (
 			! function_exists( 'is_checkout' ) ||
 			! is_checkout() ||
@@ -632,6 +626,13 @@ class Peppol {
 		}
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		
+		wp_enqueue_style(
+			'wpo-ips-peppol-classic-checkout-styles',
+			WPO_WCPDF()->plugin_url() . '/assets/css/peppol-classic-checkout' . $suffix . '.css',
+			array(),
+			WPO_WCPDF_VERSION
+		);
 
 		wp_enqueue_script(
 			'wpo-ips-peppol-classic-checkout',
@@ -645,7 +646,21 @@ class Peppol {
 			'wpo-ips-peppol-classic-checkout',
 			'wpoIpsPeppol',
 			array(
-				'visibilityMode' => $visibility_mode, // always|toggle|company
+				'visibilityMode'                 => $visibility_mode, // always|toggle|company
+				'endpoint_derivation'            => (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ),
+				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
+				'debug'                          => defined( 'WP_DEBUG' ) && WP_DEBUG,
+				'billing_country_selector'       => apply_filters(
+					'wpo_ips_edi_peppol_classic_checkout_billing_country_selector',
+					''
+				),
+				'peppol_input_wrapper_selector'  => apply_filters(
+					'wpo_ips_edi_peppol_classic_checkout_input_wrapper_selector',
+					''
+				),
+				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector(),
+				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
+				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
 	}
