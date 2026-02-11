@@ -9,9 +9,8 @@
 			: [];
 
 		const DEBUG                   = !!CONFIG.debug;
-		const VAT_SELECTOR            = CONFIG.vat_field_selector;
-		const AUTOFILL_ENDPOINT_ROUTE = CONFIG.peppol_autofill_endpoint_route;
-		const OVERRIDE_LINK_ENABLED   = !!CONFIG.override_link;
+		const VAT_SELECTOR             = CONFIG.vat_field_selector;
+		const AUTOFILL_ENDPOINT_ROUTE  = CONFIG.peppol_autofill_endpoint_route;
 
 		function log( ...args ) {
 			if ( DEBUG ) console.log( '[WPO IPS Peppol]', ...args );
@@ -101,13 +100,6 @@
 
 			let link = wrapper.querySelector( '.wpo-ips-override' );
 
-			// If disabled by setting, ensure it's not shown (and bail).
-			if ( ! OVERRIDE_LINK_ENABLED ) {
-				if ( link ) link.remove();
-				return;
-			}
-
-			// Only show link when locked.
 			if ( ! locked ) {
 				if ( link ) link.remove();
 				return;

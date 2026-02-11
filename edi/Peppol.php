@@ -747,7 +747,6 @@ class Peppol {
 				),
 				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'classic' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
-				'override_link'                  => (bool) wpo_ips_edi_get_settings( 'peppol_endpoint_id_override_link' ),
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);
@@ -817,7 +816,6 @@ class Peppol {
 				),
 				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'block' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
-				'override_link'                  => (bool) wpo_ips_edi_get_settings( 'peppol_endpoint_id_override_link' ),
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
 		);

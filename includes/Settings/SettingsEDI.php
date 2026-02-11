@@ -496,31 +496,6 @@ class SettingsEDI {
 			),
 		);
 		
-		$settings_fields[] = array(
-			'type'     => 'setting',
-			'id'       => 'peppol_endpoint_id_override_link',
-			'title'    => '',
-			'callback' => 'checkbox',
-			'section'  => $section,
-			'args'     => array(
-				'title'       => __( 'Allow manual override for Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
-				'option_name' => $option_name,
-				'id'          => 'peppol_endpoint_id_override_link',
-				'description' => sprintf(
-					__(
-						'Show the "%s" link so customers can edit the Endpoint ID even when it is automatically derived from the VAT number.',
-						'woocommerce-pdf-invoices-packing-slips'
-					),
-					__( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' )
-				),
-				'custom_attributes' => array(
-					'data-show_for_option_name'   => $option_name . '[ubl_format]',
-					'data-show_for_option_values' => wp_json_encode( array( 'peppol-bis-3p0' ) ),
-					'data-keep_current_value'     => true,
-				),
-			),
-		);
-		
 		$languages = wpo_wcpdf_get_multilingual_languages();
 
 		if ( count( $languages ) > 0 ) {
