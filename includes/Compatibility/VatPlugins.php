@@ -32,7 +32,7 @@ class VatPlugins {
 	protected function __construct() {}
 
 	/**
-	 * Detect active VAT plugin and return checkout selectors (placeholders for now).
+	 * Detect active VAT plugin and return checkout selectors.
 	 *
 	 * @return array{
 	 *   active: bool,

@@ -708,7 +708,7 @@ class Peppol {
 			WPO_WCPDF_VERSION
 		);
 
-		// Shared engine (no jQuery required).
+		// Shared engine.
 		wp_enqueue_script(
 			'wpo-ips-peppol-endpoint-derivation',
 			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-endpoint-derivation' . $suffix . '.js',
@@ -717,7 +717,7 @@ class Peppol {
 			true
 		);
 
-		// Classic chekout script.
+		// Classic checkout script.
 		wp_enqueue_script(
 			'wpo-ips-peppol-classic-checkout',
 			WPO_WCPDF()->plugin_url() . '/assets/js/peppol-classic-checkout' . $suffix . '.js',
