@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.8.0-i1426.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.8.0-i1426.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-11T17:47:46+00:00\n"
+"POT-Creation-Date: 2026-02-13T12:03:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2173,7 +2173,7 @@ msgstr ""
 #: includes/Admin.php:134
 #: includes/Main.php:933
 #: includes/Settings/SettingsDebug.php:1415
-#: includes/Settings/SettingsGeneral.php:804
+#: includes/Settings/SettingsGeneral.php:805
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:135
 #: views/promo.php:34
@@ -2758,13 +2758,13 @@ msgstr ""
 msgid "No customer identifiers found."
 msgstr ""
 
-#: includes/Compatibility/ThirdPartyPlugins.php:391
+#: includes/Compatibility/ThirdPartyPlugins.php:414
 msgid "Invoice numbers"
 msgstr ""
 
 #: includes/Documents/Invoice.php:24
 #: includes/Documents/Invoice.php:75
-#: includes/Frontend.php:86
+#: includes/Frontend.php:82
 #: includes/Settings/SettingsDebug.php:957
 #: views/settings-page.php:175
 msgid "Invoice"
@@ -3284,21 +3284,21 @@ msgid "Upgrade to our Professional extension to attach packing slips to any emai
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Frontend.php:252
+#: includes/Frontend.php:248
 #, php-format
 msgid "Download %s (PDF)"
 msgstr ""
 
-#: includes/Frontend.php:658
+#: includes/Frontend.php:636
 msgid "Please include the country prefix (for example NL123456789)."
 msgstr ""
 
-#: includes/Frontend.php:776
+#: includes/Frontend.php:775
 #: includes/Settings/SettingsGeneral.php:493
 msgid "Customer identification"
 msgstr ""
 
-#: includes/Frontend.php:834
+#: includes/Frontend.php:812
 msgid "Please enter a VAT number including a valid country prefix (for example PT123456789)."
 msgstr ""
 
@@ -4400,7 +4400,7 @@ msgstr ""
 
 #: includes/Settings/SettingsEDI.php:685
 #: includes/Settings/SettingsEDI.php:736
-#: includes/Settings/SettingsGeneral.php:822
+#: includes/Settings/SettingsGeneral.php:823
 msgid "Invalid nonce."
 msgstr ""
 
@@ -4423,7 +4423,7 @@ msgid "Missing details can be completed in the %s."
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:800
-#: includes/Settings/SettingsGeneral.php:626
+#: includes/Settings/SettingsGeneral.php:627
 msgid "Shop Information"
 msgstr ""
 
@@ -4813,103 +4813,103 @@ msgid "Treat as VAT number"
 msgstr ""
 
 #. translators: %s: WooCommerce EU VAT Compliance plugin link
-#: includes/Settings/SettingsGeneral.php:510
+#: includes/Settings/SettingsGeneral.php:511
 #, php-format
 msgid "When enabled, the checkout field is treated as a VAT number and may be used for basic VAT-related logic. Avoid enabling this option if you are already using a third-party VAT plugin, as it may result in duplicate or conflicting VAT fields. For advanced VAT validation, reporting, and full compliance with EU VAT rules, we recommend using %s."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:518
+#: includes/Settings/SettingsGeneral.php:519
 msgid "Editable in My Account"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:524
+#: includes/Settings/SettingsGeneral.php:525
 msgid "Allow customers to edit the custom checkout field on their account details page. The value is saved to the customer profile and used for future checkouts only."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:540
+#: includes/Settings/SettingsGeneral.php:541
 msgid "Customize the formatting of shipping and billing addresses in PDF documents, and add custom fields as needed."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:541
-#: includes/Settings/SettingsGeneral.php:555
-#: includes/Settings/SettingsGeneral.php:569
+#: includes/Settings/SettingsGeneral.php:542
+#: includes/Settings/SettingsGeneral.php:556
+#: includes/Settings/SettingsGeneral.php:570
 msgid "Upgrade today!"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:554
+#: includes/Settings/SettingsGeneral.php:555
 msgid "Create PDF documents in multiple languages based on the customer's language or locale."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:568
+#: includes/Settings/SettingsGeneral.php:569
 msgid "Attach up to 3 static files (for example, a terms & conditions document) to the WooCommerce emails of your choice."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:616
+#: includes/Settings/SettingsGeneral.php:617
 msgid "Display Settings"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:646
+#: includes/Settings/SettingsGeneral.php:647
 msgid "Advanced Formatting"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:656
+#: includes/Settings/SettingsGeneral.php:657
 msgid "Checkout Field"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:668
+#: includes/Settings/SettingsGeneral.php:669
 msgid "Customer Address Customization"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:669
-#: includes/Settings/SettingsGeneral.php:677
-#: includes/Settings/SettingsGeneral.php:685
+#: includes/Settings/SettingsGeneral.php:670
+#: includes/Settings/SettingsGeneral.php:678
+#: includes/Settings/SettingsGeneral.php:686
 msgid "Pro"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:676
+#: includes/Settings/SettingsGeneral.php:677
 msgid "Multilingual"
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:684
+#: includes/Settings/SettingsGeneral.php:685
 msgid "Static Files"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag
-#: includes/Settings/SettingsGeneral.php:793
+#: includes/Settings/SettingsGeneral.php:794
 #, php-format
 msgid "%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:828
+#: includes/Settings/SettingsGeneral.php:829
 msgid "No country code provided."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:925
+#: includes/Settings/SettingsGeneral.php:926
 msgid "a file"
 msgid_plural "files"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: "file"/"files" label (singular/plural), 2: list of document titles
-#: includes/Settings/SettingsGeneral.php:930
+#: includes/Settings/SettingsGeneral.php:931
 #, php-format
 msgid "Your custom template folder does not contain %1$s for: %2$s."
 msgstr ""
 
 #. translators: 1: Opening <strong>, 2: Closing </strong>
-#: includes/Settings/SettingsGeneral.php:937
+#: includes/Settings/SettingsGeneral.php:938
 #, php-format
 msgid "Documents where files are missing will remain functional and will use the default %1$sSimple%2$s template."
 msgstr ""
 
 #. translators: %s: Template folder path
-#: includes/Settings/SettingsGeneral.php:953
+#: includes/Settings/SettingsGeneral.php:954
 #, php-format
 msgid "If you are not using the latest version of the Premium Templates extension, please update it. Otherwise, copy the template files from the newest version in %s and adapt them to your custom template."
 msgstr ""
 
 #. translators: 1: opening <a>, 2: closing </a>
-#: includes/Settings/SettingsGeneral.php:962
+#: includes/Settings/SettingsGeneral.php:963
 #, php-format
 msgid "Please refer to the %1$sCreating a custom PDF template%2$s article to learn how to update your template."
 msgstr ""
