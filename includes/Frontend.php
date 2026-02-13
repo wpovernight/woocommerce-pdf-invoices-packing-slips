@@ -39,7 +39,7 @@ class Frontend {
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
-		
+
 		// Optional Checkout field (General Settings).
 		if ( $this->checkout_field_is_enabled() ) {
 
@@ -56,10 +56,6 @@ class Frontend {
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
 			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
 
-			if ( $this->checkout_field_is_vat_number() ) {
-				add_filter( 'wpo_wcpdf_order_customer_vat_number_meta_keys', array( $this, 'checkout_field_add_vat_meta_key' ), 10, 2 );
-			}
-
 			add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
 
 			// My Account (Account details).
@@ -68,7 +64,7 @@ class Frontend {
 				add_filter( 'woocommerce_save_account_details_errors', array( $this, 'account_details_validate_checkout_field' ), 20, 2 );
 				add_action( 'woocommerce_save_account_details', array( $this, 'account_details_save_checkout_field' ), 20, 1 );
 			}
-			
+
 		}
 	}
 
@@ -318,7 +314,7 @@ class Frontend {
 	public function restore_storing_document_settings(): void {
 		remove_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
 	}
-	
+
 	/**
 	 * Display optional checkout field in the Checkout Block.
 	 *
@@ -358,7 +354,7 @@ class Frontend {
 
 		woocommerce_register_additional_checkout_field( $args );
 	}
-	
+
 	/**
 	 * Set default value for the optional checkout field in the Checkout Block.
 	 *
@@ -388,7 +384,7 @@ class Frontend {
 			3
 		);
 	}
-	
+
 	/**
 	 * Save optional checkout field from the Checkout Block.
 	 *
@@ -437,7 +433,7 @@ class Frontend {
 			}
 		}
 	}
-	
+
 	/**
 	 * Remove optional checkout field from order meta after checkout.
 	 *
@@ -450,7 +446,7 @@ class Frontend {
 		$order->delete_meta_data( '_wc_other/' . $field_id );
 		$order->save_meta_data();
 	}
-	
+
 	/**
 	 * Display optional checkout field in the Classic Checkout page.
 	 *
@@ -481,7 +477,7 @@ class Frontend {
 
 		return $fields;
 	}
-	
+
 	/**
 	 * Set default value for the optional checkout field in the Classic Checkout page.
 	 *
@@ -503,7 +499,7 @@ class Frontend {
 
 		return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, 'classic', null );
 	}
-	
+
 	/**
 	 * Validate optional checkout field from the Classic Checkout page.
 	 *
@@ -515,7 +511,7 @@ class Frontend {
 		if ( ! $this->checkout_field_is_enabled() || ! $errors instanceof \WP_Error ) {
 			return;
 		}
-		
+
 		if ( ! is_array( $data ) ) {
 			return;
 		}
@@ -524,7 +520,7 @@ class Frontend {
 		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
 		$val = sanitize_text_field( $raw );
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
-		
+
 		if ( '' === trim( $val ) ) {
 			return;
 		}
@@ -546,7 +542,7 @@ class Frontend {
 			$errors->add( $result->get_error_code(), $result->get_error_message(), array( 'id' => $key ) );
 		}
 	}
-	
+
 	/**
 	 * Save optional checkout field from the Classic Checkout page.
 	 *
@@ -589,25 +585,7 @@ class Frontend {
 			}
 		}
 	}
-	
-	/**
-	 * Add our checkout field meta key to the list of VAT meta keys.
-	 *
-	 * @param array              $vat_meta_keys
-	 * @param \WC_Abstract_Order $order
-	 * @return array
-	 */
-	public function checkout_field_add_vat_meta_key( array $vat_meta_keys, \WC_Abstract_Order $order ): array {
-		$meta_key = '_wpo_ips_checkout_field';
 
-		// Prefer our value early (so it's picked before other plugins), but keep it safe.
-		if ( ! in_array( $meta_key, $vat_meta_keys, true ) ) {
-			array_unshift( $vat_meta_keys, $meta_key );
-		}
-
-		return $vat_meta_keys;
-	}
-	
 	/**
 	 * Display the optional checkout field under the Billing address in wp-admin.
 	 *
@@ -631,7 +609,7 @@ class Frontend {
 
 		echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
 	}
-	
+
 	/**
 	 * Display the optional checkout field in My Account > Account details.
 	 *
@@ -742,56 +720,15 @@ class Frontend {
 			update_user_meta( $user_id, $key, $val );
 		}
 	}
-	
-	/**
-	 * Check if the checkout field is enabled in settings.
-	 *
-	 * @return bool
-	 */
-	private function checkout_field_is_enabled(): bool {
-		$general_settings = WPO_WCPDF()->settings->general;
-		return ! empty( $general_settings->get_setting( 'checkout_field_enable' ) ?? '' );
-	}
-	
-	/**
-	 * Check if the My Account field is enabled in settings.
-	 *
-	 * @return bool
-	 */
-	private function checkout_field_is_my_account_enabled(): bool {
-		if ( ! $this->checkout_field_is_enabled() ) {
-			return false;
-		}
 
-		$general_settings = WPO_WCPDF()->settings->general;
-		return ! empty( $general_settings->get_setting( 'checkout_field_enable_my_account' ) );
-	}
-
-	/**
-	 * Get the checkout field label from settings.
-	 *
-	 * @return string
-	 */
-	private function checkout_field_get_label(): string {
-		$default          = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
-		$general_settings = WPO_WCPDF()->settings->general;
-		$label            = trim( $general_settings->get_setting( 'checkout_field_label' ) );
-
-		if ( '' === $label ) {
-			$label = $default;
-		}
-
-		return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
-	}
-	
 	/**
 	 * Check if the checkout field should be treated as a VAT number.
 	 *
 	 * @return bool
 	 */
-	private function checkout_field_is_vat_number(): bool {
-		$general_settings = WPO_WCPDF()->settings->general;
-		$enabled          = ! empty( $general_settings->get_setting( 'checkout_field_as_vat_number' ) );
+	public function checkout_field_is_vat_number(): bool {
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$enabled          = ! empty( $general_settings['checkout_field_as_vat_number'] );
 
 		if ( ! $enabled ) {
 			return false;
@@ -804,7 +741,48 @@ class Frontend {
 
 		return true;
 	}
-	
+
+	/**
+	 * Check if the checkout field is enabled in settings.
+	 *
+	 * @return bool
+	 */
+	private function checkout_field_is_enabled(): bool {
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		return ! empty( $general_settings['checkout_field_enable'] ?? '' );
+	}
+
+	/**
+	 * Check if the My Account field is enabled in settings.
+	 *
+	 * @return bool
+	 */
+	private function checkout_field_is_my_account_enabled(): bool {
+		if ( ! $this->checkout_field_is_enabled() ) {
+			return false;
+		}
+
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		return ! empty( $general_settings['checkout_field_enable_my_account'] ?? '' );
+	}
+
+	/**
+	 * Get the checkout field label from settings.
+	 *
+	 * @return string
+	 */
+	private function checkout_field_get_label(): string {
+		$default          = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$label            = trim( $general_settings['checkout_field_label'] ?? '' );
+
+		if ( '' === $label ) {
+			$label = $default;
+		}
+
+		return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
+	}
+
 	/**
 	 * Validate the checkout field value when treated as a VAT number.
 	 *

@@ -501,11 +501,12 @@ class SettingsGeneral {
 				'callback' => 'checkbox',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'checkout_field_as_vat_number',
-					'disabled'    => $has_vat_plugin_active,
-					'value'       => $has_vat_plugin_active ? false : $this->get_setting( 'checkout_field_as_vat_number' ),
-					'description' => sprintf(
+					'option_name'     => $option_name,
+					'id'              => 'checkout_field_as_vat_number',
+					'disabled'        => $has_vat_plugin_active,
+					'value'           => '1',
+					'store_unchecked' => true,
+					'description'     => sprintf(
 						/* translators: %s: WooCommerce EU VAT Compliance plugin link */
 						__( 'When enabled, the checkout field is treated as a VAT number and may be used for basic VAT-related logic. Avoid enabling this option if you are already using a third-party VAT plugin, as it may result in duplicate or conflicting VAT fields. For advanced VAT validation, reporting, and full compliance with EU VAT rules, we recommend using %s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="https://wpovernight.com/downloads/woocommerce-eu-vat-compliance/?utm_medium=plugin&utm_source=ips&utm_campaign=general-tab&utm_content=woocommerce-eu-vat-compliance-cross" target="_blank" rel="noopener noreferrer">WooCommerce EU VAT Compliance</a>',
@@ -821,7 +822,7 @@ class SettingsGeneral {
 		if ( ! $valid ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
 		}
-		
+
 		$request = stripslashes_deep( $_POST );
 
 		if ( empty( $request['country'] ) ) {
@@ -879,7 +880,7 @@ class SettingsGeneral {
 			$general_settings
 		);
 	}
-	
+
 	/**
 	 * Collect documents whose template files are missing.
 	 *
