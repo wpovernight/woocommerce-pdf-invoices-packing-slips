@@ -107,6 +107,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 
 		$mapping = apply_filters( 'wpo_ips_edi_payment_means_code_mapping', array(
+			'cheque'  => '20', // Cheque
 			'bacs'    => '58', // SEPA Credit Transfer
 			'paypal'  => '68', // Online payment
 			'stripe'  => '54', // Credit card
@@ -141,9 +142,10 @@ abstract class AbstractHandler implements HandlerInterface {
 			case 'stripe':
 				$data['transaction_id'] = $order->get_meta( '_stripe_source_id', true );
 				break;
+				
 		}
 
-		return $data;
+		return apply_filters( 'wpo_ips_edi_payment_means_data', $data, $method_id, $order, $this );
 	}
 
 	/**
@@ -222,6 +224,43 @@ abstract class AbstractHandler implements HandlerInterface {
 		// Emit plain decimal string (no exponent).
 		return number_format( $value, $decimal_places, '.', '' );
 	}
+	
+	/**
+	 * Get normalized zero-tax meta (scheme/category/reason), with filter support.
+	 *
+	 * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
+	 * @return array
+	 */
+	protected function get_zero_tax_meta( $context = null ): array {
+		$defaults = array(
+			'scheme'   => 'VAT',
+			'category' => 'Z',
+			'reason'   => 'NONE',
+		);
+
+		$meta = apply_filters(
+			'wpo_ips_edi_zero_tax_meta',
+			$defaults,
+			$context,
+			$this
+		);
+
+		$scheme   = strtoupper( trim( (string) ( $meta['scheme']   ?? $defaults['scheme'] ) )   );
+		$category = strtoupper( trim( (string) ( $meta['category'] ?? $defaults['category'] ) ) );
+		$reason   = strtoupper( trim( (string) ( $meta['reason']   ?? $defaults['reason'] ) )   );
+
+		if ( '' === $scheme ) {
+			$scheme = $defaults['scheme'];
+		}
+		if ( '' === $category ) {
+			$category = $defaults['category'];
+		}
+		if ( '' === $reason ) {
+			$reason = $defaults['reason'];
+		}
+
+		return compact( 'scheme', 'category', 'reason' );
+	}
 
 	/**
 	 * Get grouped order tax data by rate, category, reason, and scheme.
@@ -236,6 +275,11 @@ abstract class AbstractHandler implements HandlerInterface {
 		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
 		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order );
 		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $order );
+		
+		$zero_meta     = $this->get_zero_tax_meta( $order );
+		$zero_category = $zero_meta['category'];
+		$zero_scheme   = $zero_meta['scheme'];
+		$zero_reason   = $zero_meta['reason'];
 
 		foreach ( $line_items as $item ) {
 			$parts     = $this->compute_item_price_parts( $item, false );
@@ -257,13 +301,20 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 			
 			if ( '' === $category ) {
-				$category = ( 0.0 === $percentage ) ? 'Z' : 'S';
+				$category = ( 0.0 === $percentage ) ? $zero_category : 'S';
 			}
 
-			// Reason: from fallback only, or NONE.
+			// Reason:
+			// - if we have an order-level reason, use it;
+			// - otherwise, if this is a zero-tax line, use zero-tax reason;
+			// - otherwise, default to NONE.
 			$reason = strtoupper( trim( (string) $order_reason ) );
 			if ( '' === $reason || 'NONE' === $reason ) {
-				$reason = 'NONE';
+				if ( 0.0 === $percentage && $category === $zero_category && $scheme === $zero_scheme ) {
+					$reason = $zero_reason;
+				} else {
+					$reason = 'NONE';
+				}
 			}
 
 			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
@@ -294,23 +345,23 @@ abstract class AbstractHandler implements HandlerInterface {
 			$groups[ $key ]['total_tax'] += $item_tax;
 		}
 
-		// No tax lines at all: one Z group with whole net.
+		// No tax lines at all: one zero-tax group with whole net.
 		if ( empty( $groups ) ) {
 			$lines_net = $this->get_lines_net_total( $order );
 
-			$groups['0|Z|NONE|VAT'] = array(
+			$groups[ sprintf( '0|%s|%s|%s', $zero_category, $zero_reason, $zero_scheme ) ] = array(
 				'total_ex'   => $lines_net,
 				'total_tax'  => 0.0,
 				'percentage' => 0.0,
-				'category'   => 'Z',
-				'reason'     => 'NONE',
-				'scheme'     => 'VAT',
+				'category'   => $zero_category,
+				'reason'     => $zero_reason,
+				'scheme'     => $zero_scheme,
 				'name'       => '',
 			);
 		}
 
-		// Enforce exactly one Z group if needed.
-		$groups = $this->ensure_one_tax_z_group( $groups );
+		// Enforce exactly one zero tax group if needed.
+		$groups = $this->ensure_one_zero_tax_group( $groups );
 
 		// Reindex so callers get a numeric array.
 		$groups = array_values( $groups );
@@ -319,17 +370,26 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Consolidate and ensure exactly one Z group in the grouped tax data.
+	 * Consolidate and ensure exactly one zero tax group in the grouped tax data.
 	 *
 	 * @param array $grouped_tax_data Grouped tax data.
 	 * @return array Updated grouped tax data.
 	 */
-	protected function ensure_one_tax_z_group( array $grouped_tax_data ): array {
+	protected function ensure_one_zero_tax_group( array $grouped_tax_data ): array {
+		$zero_meta     = $this->get_zero_tax_meta( $this->document->order );
+		$zero_category = $zero_meta['category'];
+		$zero_scheme   = $zero_meta['scheme'];
+		$zero_reason   = $zero_meta['reason'];
+
 		$z_first_key = null;
 
-		// Consolidate any existing Z groups from $order_tax_data
+		// Consolidate any existing "zero tax" groups from $grouped_tax_data.
 		foreach ( $grouped_tax_data as $key => $g ) {
-			if ( 'Z' === strtoupper( $g['category'] ?? '' ) ) {
+			if (
+				strtoupper( $g['category'] ?? '' ) === strtoupper( $zero_category ) &&
+				(float) ( $g['percentage'] ?? 0 ) === 0.0 &&
+				strtoupper( $g['scheme'] ?? '' ) === strtoupper( $zero_scheme )
+			) {
 				if ( is_null( $z_first_key ) ) {
 					$z_first_key = $key;
 				} else {
@@ -338,7 +398,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 		}
 
-		// Compute the Z taxable basis strictly from lines
+		// Compute the zero-tax taxable basis strictly from lines.
 		$z_basis_from_lines = 0.0;
 		$has_z_line         = false;
 
@@ -359,7 +419,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$line_is_z = false;
 
 			if ( $has_nonzero_row ) {
-				// classify by the non-zero row's category/rate
+				// Classify by the non-zero row's category/rate.
 				foreach ( $rows as $tax_id => $amt ) {
 					if ( ! is_numeric( $amt ) || (float) $amt === 0.0 ) {
 						continue;
@@ -369,34 +429,37 @@ abstract class AbstractHandler implements HandlerInterface {
 					$cat  = strtoupper( $info['category'] ?? '' );
 					$rate = (float) ( $info['percentage'] ?? 0 );
 
-					if ( 'Z' === $cat || 0.0 === $rate ) {
+					// zero-tax lines are either explicitly zero-category or 0% rate.
+					if ( $cat === strtoupper( $zero_category ) || 0.0 === $rate ) {
 						$line_is_z = true;
 						break;
 					}
 				}
 			} else {
-				// No non-zero tax rows at all → treat as zero-rated (Z)
+				// No non-zero tax rows at all → treat as zero-tax (uses zero_category).
 				$line_is_z = true;
 			}
 
 			if ( $line_is_z ) {
 				$has_z_line          = true;
-				$z_basis_from_lines += $line_total; // contributes to Z taxable amount
+				$z_basis_from_lines += $line_total; // contributes to zero-tax taxable amount
 			}
 		}
 
-		// Ensure exactly one Z group if there is any Z line (even with basis 0)
+		// Ensure exactly one zero-tax group if there is any zero-tax line (even with basis 0).
 		if ( $has_z_line || $z_first_key ) {
-			$z_key = $z_first_key ?: '0|Z|NONE|VAT';
+			$z_key = $z_first_key ?: sprintf( '0|%s|%s|%s', $zero_category, $zero_reason, $zero_scheme );
 
 			$grouped_tax_data[ $z_key ] = array(
 				'total_ex'   => $this->format_decimal( wc_round_tax_total( $z_basis_from_lines ) ),
 				'total_tax'  => '0.00',
 				'percentage' => '0.0',
-				'category'   => 'Z',
-				'reason'     => 'NONE',
-				'scheme'     => 'VAT',
-				'name'       => $grouped_tax_data[ $z_first_key ]['name'] ?? '',
+				'category'   => $zero_category,
+				'reason'     => $zero_reason,
+				'scheme'     => $zero_scheme,
+				'name'       => ( ! is_null( $z_first_key ) && isset( $grouped_tax_data[ $z_first_key ]['name'] ) )
+					? $grouped_tax_data[ $z_first_key ]['name']
+					: '',
 			);
 		}
 
@@ -585,12 +648,14 @@ abstract class AbstractHandler implements HandlerInterface {
 			$percent  = (float) ( $row['percentage'] ?? 0     );
 			break;
 		}
-
-		// Fallback: no non-zero rows -> Zero-rated (Z / 0%)
+		
+		// Fallback: no non-zero rows -> use zero-tax meta (0%).
 		if ( null === $category ) {
-			$scheme   = 'VAT';
-			$category = 'Z';
-			$percent  = 0.0;
+			$percent   = 0.0;
+			$zero_meta = $this->get_zero_tax_meta( $item );
+
+			$scheme    = $zero_meta['scheme'];
+			$category  = $zero_meta['category'];
 		}
 
 		return array(

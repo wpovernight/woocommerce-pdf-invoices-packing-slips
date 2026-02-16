@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 5.5.0
+Stable tag: 5.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,20 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.7.0 (2026-02-09) =
+- New: Add filter to override EDI action button HTML
+- New: Add cheque payment method support to E-Documents
+- Tweak: Align line net amount with unit price times quantity for UBL and CII
+- Fix: Authorization when saving Peppol identifiers via AJAX
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.5
+
+= 5.6.0 (2026-01-21) =
+- New: Introduce filters to customize E-Documents zero-tax category
+- Fix: UBL credit note validation failure caused by negative unit price
+- Fix: Fatal checkout validation error triggered during Peppol processing
+- Translations: Updated translation template (POT)
 
 = 5.5.0 (2026-01-19) =
 - New: Add reference to Peppol extension in readme

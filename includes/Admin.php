@@ -894,41 +894,69 @@ class Admin {
 	 * @return void
 	 */
 	public function ajax_edi_save_order_customer_peppol_identifiers(): void {
+		// Nonce check.
 		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' )
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
+		// Authorization.
+		if ( ! current_user_can( 'edit_shop_orders' ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'You do not have permission to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				403
+			);
 		}
 
 		$request  = stripslashes_deep( $_POST );
 		$order_id = isset( $request['order_id'] ) ? absint( $request['order_id'] ) : 0;
-		$values   = isset( $request['values'] ) ? $request['values'] : array();
+		$values   = isset( $request['values'] ) && is_array( $request['values'] ) ? $request['values'] : array();
 
-		if ( empty( $order_id ) || empty( $values ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' )
-			) );
+		if ( ! $order_id || empty( $values ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				400
+			);
 		}
 
 		$order = wc_get_order( $order_id );
 
 		if ( ! $order ) {
-			wp_send_json_error( array(
-				'message' => __( 'Order not found.', 'woocommerce-pdf-invoices-packing-slips' )
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Order not found.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				404
+			);
 		}
 
-		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
-			? $order->get_customer_id()
-			: 0;
+		// Ensure the current user can edit this order in admin.
+		if ( ! current_user_can( 'edit_post', $order->get_id() ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'You do not have permission to edit this order.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				403
+			);
+		}
+
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) ) ? (int) $order->get_customer_id() : 0;
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
-
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $values );
 
-		wp_send_json_success( array(
-			'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),
-		) );
+		wp_send_json_success(
+			array(
+				'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
 	}
 
 	public function data_input_box_content( $post_or_order_object ) {

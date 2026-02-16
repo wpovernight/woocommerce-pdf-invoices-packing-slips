@@ -26,24 +26,32 @@ class LineHandler extends AbstractUblHandler {
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
 			// Resolve tax meta for this line
-			$meta = $this->resolve_item_tax_meta( $item );
+			$meta       = $this->resolve_item_tax_meta( $item );
+			$category   = strtoupper( (string) ( $meta['category'] ?? '' ) );
+			$scheme     = (string) ( $meta['scheme'] ?? 'VAT' );
+			$percentage = $meta['percentage'] ?? null;
 
 			$tax_category = array(
 				array(
 					'name'  => 'cbc:ID',
-					'value' => $meta['category'],
+					'value' => $category,
 				),
-				array(
+			);
+
+			// For VAT category O ("Not subject to VAT"), do NOT emit Percent.
+			if ( 'O' !== $category && null !== $percentage && '' !== $percentage ) {
+				$tax_category[] = array(
 					'name'  => 'cbc:Percent',
-					'value' => $this->format_decimal( $meta['percentage'], 1 ),
-				),
-				array(
-					'name'  => 'cac:TaxScheme',
-					'value' => array(
-						array(
-							'name'  => 'cbc:ID',
-							'value' => $meta['scheme'],
-						),
+					'value' => $this->format_decimal( $percentage, 1 ),
+				);
+			}
+
+			$tax_category[] = array(
+				'name'  => 'cac:TaxScheme',
+				'value' => array(
+					array(
+						'name'  => 'cbc:ID',
+						'value' => $scheme,
 					),
 				),
 			);
@@ -72,7 +80,7 @@ class LineHandler extends AbstractUblHandler {
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => $net_unit,
+					'value'      => abs( $net_unit ), // unit price always positive (Credit Notes as well)
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
@@ -177,8 +185,8 @@ class LineHandler extends AbstractUblHandler {
 				$quantity_value = -abs( $quantity_value );
 			}
 
-			// Use Woo’s net_total for the line extension amount.
-			$net_line_total = $this->format_decimal( $parts['net_total'], 2 );
+			// Compute line net amount from the same unit price we emit in PriceAmount
+			$net_line_total = $this->format_decimal( $net_unit_f * $quantity_value, 2 );
 
 			$line = array(
 				'name'  => "cac:{$root_element}Line",
@@ -273,22 +281,31 @@ class LineHandler extends AbstractUblHandler {
 			$this
 		);
 
+		$zero_meta = $this->get_zero_tax_meta( $this->document->order );
+		$category  = strtoupper( (string) ( $zero_meta['category'] ?? 'Z' ) );
+		$scheme    = (string) ( $zero_meta['scheme'] ?? 'VAT' );
+
 		$tax_category = array(
 			array(
 				'name'  => 'cbc:ID',
-				'value' => 'Z',
+				'value' => $category,
 			),
-			array(
+		);
+
+		// For coupons with category O ("Not subject to VAT"), do not emit Percent.
+		if ( 'O' !== $category ) {
+			$tax_category[] = array(
 				'name'  => 'cbc:Percent',
 				'value' => '0.0',
-			),
-			array(
-				'name'  => 'cac:TaxScheme',
-				'value' => array(
-					array(
-						'name'  => 'cbc:ID',
-						'value' => 'VAT',
-					),
+			);
+		}
+
+		$tax_category[] = array(
+			'name'  => 'cac:TaxScheme',
+			'value' => array(
+				array(
+					'name'  => 'cbc:ID',
+					'value' => $scheme,
 				),
 			),
 		);
