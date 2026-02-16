@@ -20,9 +20,7 @@ class LegalMonetaryTotalHandler extends AbstractUblHandler {
 		$totals   = $this->get_order_payment_totals( $this->document->order );
 		$currency = $this->document->order->get_currency();
 		
-		$line_extension = isset( $totals['lines_net'] )
-			? $totals['lines_net']
-			: $totals['total_exc_tax'];
+		$line_extension = $totals['lines_net_rounded'] ?? $totals['total_exc_tax'];
 
 		$legal_total = array(
 			'name'  => 'cac:LegalMonetaryTotal',

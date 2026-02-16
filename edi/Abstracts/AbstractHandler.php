@@ -561,7 +561,8 @@ abstract class AbstractHandler implements HandlerInterface {
 			'prepaid_amount',
 			'rounding_diff',
 			'payable_amount',
-			'lines_net'
+			'lines_net',
+			'lines_net_rounded'
 		);
 
 		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
