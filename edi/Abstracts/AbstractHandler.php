@@ -564,6 +564,8 @@ abstract class AbstractHandler implements HandlerInterface {
 			'lines_net',
 			'lines_net_rounded'
 		);
+		
+		wpo_ips_edi_log( 'Totals keys: ' . implode( ',', array_keys( $totals ) ), 'debug' );
 
 		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
 	}
