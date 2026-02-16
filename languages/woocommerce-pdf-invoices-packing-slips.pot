@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.7.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.8.0-beta.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-09T11:05:08+00:00\n"
+"POT-Creation-Date: 2026-02-16T16:14:29+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -130,7 +130,7 @@ msgid "Invalid Endpoint Scheme."
 msgstr ""
 
 #: edi/Peppol.php:745
-#: includes/Admin.php:2160
+#: includes/Admin.php:2189
 msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
 msgstr ""
 
@@ -2457,7 +2457,7 @@ msgid "Displayed in the document!"
 msgstr ""
 
 #: includes/Admin.php:1414
-#: includes/Admin.php:2164
+#: includes/Admin.php:2193
 msgid "Cancel"
 msgstr ""
 
@@ -2558,51 +2558,53 @@ msgstr ""
 msgid "Show"
 msgstr ""
 
-#: includes/Admin.php:2101
-#: includes/Admin.php:2144
+#: includes/Admin.php:2105
+#: includes/Admin.php:2131
+#: includes/Admin.php:2173
 #: includes/Assets.php:342
 #: includes/Settings/SettingsEDI.php:715
 msgid "Missing"
 msgstr ""
 
-#: includes/Admin.php:2102
-#: includes/Admin.php:2145
+#: includes/Admin.php:2106
+#: includes/Admin.php:2132
+#: includes/Admin.php:2174
 #: includes/Assets.php:343
 #: includes/Settings/SettingsEDI.php:716
 msgid "Optional"
 msgstr ""
 
-#: includes/Admin.php:2112
+#: includes/Admin.php:2143
 #: includes/Settings/SettingsEDI.php:724
 msgid "VAT number is missing the country prefix"
 msgstr ""
 
-#: includes/Admin.php:2127
+#: includes/Admin.php:2156
 msgid "Peppol"
 msgstr ""
 
-#: includes/Admin.php:2129
+#: includes/Admin.php:2158
 msgid "Edit"
 msgstr ""
 
-#: includes/Admin.php:2163
+#: includes/Admin.php:2192
 #: includes/Settings/SettingsCallbacks.php:913
 msgid "Save"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:2203
+#: includes/Admin.php:2232
 #, php-format
 msgid "Editing of %s number and date is currently disabled."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name
-#: includes/Admin.php:2208
+#: includes/Admin.php:2237
 #, php-format
 msgid "If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s."
 msgstr ""
 
-#: includes/Admin.php:2211
+#: includes/Admin.php:2240
 #: includes/Settings/SettingsDebug.php:947
 msgid "Enable document data editing"
 msgstr ""
