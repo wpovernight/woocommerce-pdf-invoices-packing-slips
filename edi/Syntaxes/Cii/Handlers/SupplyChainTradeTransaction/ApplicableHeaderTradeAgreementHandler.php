@@ -37,34 +37,41 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_seller_trade_party(): ?array {
-		$name       = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_name' ) );
-		$vat_number = $this->get_supplier_identifiers_data( 'vat_number' );
-		
+		$seller = apply_filters( 'wpo_ips_edi_cii_seller_data', array(
+			'name'         => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_name' ) ),
+			'vat_number'   => $this->get_supplier_identifiers_data( 'vat_number' ),
+			'postcode'     => $this->get_supplier_identifiers_data( 'shop_address_postcode' ),
+			'address_line' => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_line_1' ) ),
+			'city'         => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_city' ) ),
+			'country_code' => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_country' ) ),
+		), $this );
+
+		$name       = wpo_ips_edi_sanitize_string( (string) ( $seller['name'] ?? '' ) );
+		$vat_number = (string) ( $seller['vat_number'] ?? '' );
+
 		if ( empty( $name ) ) {
 			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Seller name is empty. Please check your shop settings.', 'error' );
 			return null;
 		}
-		
+
 		if ( empty( $vat_number ) ) {
 			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty. Please check your shop settings.', 'error' );
 			return null;
 		}
-		
-		$postcode       = $this->get_supplier_identifiers_data( 'shop_address_postcode' );
-		$address_line_1 = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_line_1' ) );
-		$address_city   = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_city' ) );
-		$country_code   = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_country' ) );
+
+		$postcode       = (string) ( $seller['postcode']     ?? '' );
+		$address_line_1 = (string) ( $seller['address_line'] ?? '' );
+		$address_city   = (string) ( $seller['city']         ?? '' );
+		$country_code   = (string) ( $seller['country_code'] ?? '' );
 
 		$seller_trade_party = array(
 			'name'  => 'ram:SellerTradeParty',
 			'value' => array(
-				// Seller Company Name
 				array(
 					'name'  => 'ram:Name',
 					'value' => $name,
 				),
 
-				// Legal Organization ID (if available)
 				array(
 					'name'  => 'ram:SpecifiedLegalOrganization',
 					'value' => array(
@@ -75,7 +82,6 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					),
 				),
 
-				// Postal Address
 				array(
 					'name'  => 'ram:PostalTradeAddress',
 					'value' => array(
@@ -98,7 +104,6 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					),
 				),
 
-				// Tax Registration (VAT ID)
 				array(
 					'name'  => 'ram:SpecifiedTaxRegistration',
 					'value' => array(
