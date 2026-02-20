@@ -11,6 +11,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPartyInterface {
 
 	/**
+	 * Cached supplier data after applying the single filter.
+	 *
+	 * @var array|null
+	 */
+	protected ?array $supplier_data = null;
+
+	/**
 	 * Handle the data and return the formatted output.
 	 *
 	 * @param array $data    The data to be handled.
@@ -29,13 +36,15 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 
 		return $data;
 	}
-	
+
 	/**
 	 * Returns the supplier party details for the UBL document.
 	 *
 	 * @return array
 	 */
 	public function get_party(): array {
+		$this->get_supplier_data();
+
 		$supplier_party = array(
 			'name'  => 'cac:Party',
 			'value' => array_filter( array(
@@ -49,20 +58,21 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party', $supplier_party, $this );
 	}
-	
+
 	/**
 	 * Returns the party name for the supplier.
 	 *
 	 * @return array|null
 	 */
 	public function get_party_name(): ?array {
-		$company = $this->get_supplier_identifiers_data( 'shop_name' );
-		
+		$supplier = $this->get_supplier_data();
+		$company  = $supplier['company'] ?? '';
+
 		if ( empty( $company ) ) {
 			wpo_ips_edi_log( 'UBL PartyName: Supplier company name is missing.', 'error' );
 			return null;
 		}
-		
+
 		$party_name = array(
 			'name'  => 'cac:PartyName',
 			'value' => array(
@@ -70,20 +80,22 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 				'value' => wpo_ips_edi_sanitize_string( $company ),
 			),
 		);
-		
+
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_name', $party_name, $this );
 	}
-	
+
 	/**
 	 * Returns the party postal address for the supplier.
 	 *
 	 * @return array|null
 	 */
 	public function get_party_postal_address(): ?array {
-		$address_line   = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_line_1' ) );
-		$city_name      = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_city' ) );
-		$postal_zone    = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_postcode' ) );
-		$country_code   = wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_country' ) );
+		$supplier = $this->get_supplier_data();
+
+		$address_line = wpo_ips_edi_sanitize_string( (string) ( $supplier['address_line_1'] ?? '' ) );
+		$city_name    = wpo_ips_edi_sanitize_string( (string) ( $supplier['city'] ?? '' ) );
+		$postal_zone  = wpo_ips_edi_sanitize_string( (string) ( $supplier['postcode'] ?? '' ) );
+		$country_code = wpo_ips_edi_sanitize_string( (string) ( $supplier['country_code'] ?? '' ) );
 
 		$postal_address = array(
 			'name'  => 'cac:PostalAddress',
@@ -119,21 +131,22 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_postal_address', $postal_address, $this );
 	}
-	
+
 	/**
 	 * Returns the party tax scheme for the supplier.
 	 *
 	 * @return array|null
 	 */
 	public function get_party_tax_scheme(): ?array {
-		$vat_number = $this->get_supplier_identifiers_data( 'vat_number' );
+		$supplier   = $this->get_supplier_data();
+		$vat_number = (string) ( $supplier['vat_number'] ?? '' );
 		$values     = array();
 
 		if ( ! empty( $vat_number ) ) {
 			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
 				wpo_ips_edi_log( 'UBL PartyTaxScheme: VAT number does not have a country prefix for supplier.', 'error' );
 			}
-			
+
 			$values[] = array(
 				'name'  => 'cbc:CompanyID',
 				'value' => $vat_number,
@@ -160,16 +173,17 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_tax_scheme', $party_tax_scheme, $this );
 	}
-	
+
 	/**
 	 * Returns the party legal entity for the supplier.
 	 *
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$company    = $this->get_supplier_identifiers_data( 'shop_name' );
-		$coc_number = $this->get_supplier_identifiers_data( 'coc_number' );
-		
+		$supplier    = $this->get_supplier_data();
+		$company     = (string) ( $supplier['company'] ?? '' );
+		$coc_number  = (string) ( $supplier['coc_number'] ?? '' );
+
 		if ( empty( $company ) && empty( $coc_number ) ) {
 			wpo_ips_edi_log( 'UBL PartyLegalEntity: Both company name and CoC number are missing for supplier.', 'error' );
 			return null;
@@ -191,14 +205,15 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_legal_entity', $party_legal_entity, $this );
 	}
-	
+
 	/**
 	 * Returns the party contact information for the supplier.
 	 *
 	 * @return array|null
 	 */
 	public function get_party_contact(): ?array {
-		$email_address = $this->get_supplier_identifiers_data( 'shop_email_address' );
+		$supplier       = $this->get_supplier_data();
+		$email_address  = (string) ( $supplier['email_address'] ?? '' );
 
 		if ( empty( $email_address ) ) {
 			wpo_ips_edi_log( 'UBL PartyContact: Supplier email address is missing.', 'error' );
@@ -216,6 +231,32 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_contact', $party_contact, $this );
+	}
+	
+	/**
+	 * Build and filter supplier data in one go.
+	 *
+	 * @return array
+	 */
+	protected function get_supplier_data(): array {
+		if ( null !== $this->supplier_data ) {
+			return $this->supplier_data;
+		}
+
+		$supplier = apply_filters( 'wpo_ips_edi_ubl_supplier_data', array(
+			'company'        => $this->get_supplier_identifiers_data( 'shop_name' ),
+			'vat_number'     => $this->get_supplier_identifiers_data( 'vat_number' ),
+			'coc_number'     => $this->get_supplier_identifiers_data( 'coc_number' ),
+			'address_line_1' => $this->get_supplier_identifiers_data( 'shop_address_line_1' ),
+			'city'           => $this->get_supplier_identifiers_data( 'shop_address_city' ),
+			'postcode'       => $this->get_supplier_identifiers_data( 'shop_address_postcode' ),
+			'country_code'   => $this->get_supplier_identifiers_data( 'shop_address_country' ),
+			'email_address'  => $this->get_supplier_identifiers_data( 'shop_email_address' ),
+		), $this );
+
+		$this->supplier_data = is_array( $this->supplier_data ) ? $this->supplier_data : $supplier;
+
+		return $this->supplier_data;
 	}
 	
 }
