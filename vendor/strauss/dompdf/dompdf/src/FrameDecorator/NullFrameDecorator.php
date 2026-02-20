@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
@@ -8,7 +9,6 @@ namespace WPO\IPS\Vendor\Dompdf\FrameDecorator;
 
 use WPO\IPS\Vendor\Dompdf\Dompdf;
 use WPO\IPS\Vendor\Dompdf\Frame;
-
 /**
  * Dummy decorator
  *
@@ -19,7 +19,7 @@ class NullFrameDecorator extends AbstractFrameDecorator
     /**
      * NullFrameDecorator constructor.
      * @param Frame $frame
-     * @param Dompdf $dompdf
+     * @param \Dompdf $dompdf
      */
     function __construct(Frame $frame, Dompdf $dompdf)
     {

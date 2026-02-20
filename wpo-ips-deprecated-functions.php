@@ -121,3 +121,15 @@ function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $
 	_deprecated_function( __FUNCTION__, '5.3.1', 'wpo_ips_edi_maybe_save_order_peppol_data' );
 	wpo_ips_edi_maybe_save_order_peppol_data( $order );
 }
+
+/**
+ * Check whether a VAT plugin is active.
+ *
+ * @return bool
+ * 
+ * @deprecated 5.8.0 Use \WPO_WCPDF()->vat_plugins->has_active() instead.
+ */
+function wpo_ips_has_vat_plugin_active(): bool {
+	_deprecated_function( __FUNCTION__, '5.8.0', '\WPO_WCPDF()->vat_plugins->has_active()' );
+	return \WPO_WCPDF()->vat_plugins->has_active();
+}

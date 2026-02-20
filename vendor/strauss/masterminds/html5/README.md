@@ -67,7 +67,7 @@ Here is how you use the high-level `HTML5` library API:
 // Assuming you installed from Composer:
 require "vendor/autoload.php";
 
-use WPO\IPS\Vendor\Masterminds\HTML5;
+use Masterminds\HTML5;
 
 // An example HTML document:
 $html = <<< 'HERE'
@@ -218,7 +218,7 @@ issues known issues that are not presently on the roadmap:
 To use XML style namespaces you have to configure well the main `HTML5` instance.
 
 ```php
-use WPO\IPS\Vendor\Masterminds\HTML5;
+use Masterminds\HTML5;
 $html = new HTML5(array(
     "xmlNamespaces" => true
 ));
@@ -233,7 +233,7 @@ You can also add some default prefixes that will not require the namespace decla
 but its elements will be namespaced.
 
 ```php
-use WPO\IPS\Vendor\Masterminds\HTML5;
+use Masterminds\HTML5;
 $html = new HTML5(array(
     "implicitNamespaces"=>array(
         "t"=>"http://www.example.com"

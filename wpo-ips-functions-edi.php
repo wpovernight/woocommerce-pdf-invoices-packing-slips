@@ -554,6 +554,103 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
 }
 
 /**
+ * Build PEPPOL endpoint ID from VAT number.
+ *
+ * @param string $billing_country The billing country code (ISO 3166-1 alpha-2).
+ * @param string $vat_number      The VAT number.
+ * @return array Array with 'eas' and 'endpoint_id' keys, or empty array on failure.
+ */
+function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, string $vat_number ): array {
+	$billing_country = strtoupper( trim( $billing_country ) );
+	$vat_number      = strtoupper( trim( $vat_number ) );
+
+	if ( '' === $billing_country || '' === $vat_number ) {
+		return array();
+	}
+
+	// If VAT looks like it has a prefix, ensure it's a plausible ISO prefix.
+	if (
+		strlen( $vat_number ) >= 2 &&
+		ctype_alpha( substr( $vat_number, 0, 2 ) ) &&
+		! wpo_ips_edi_vat_number_has_country_prefix( $vat_number )
+	) {
+		return array();
+	}
+
+	$mappings = wpo_ips_edi_get_peppol_vat_mappings();
+	if ( empty( $mappings[ $billing_country ] ) ) {
+		return array();
+	}
+
+	$cfg = $mappings[ $billing_country ];
+
+	// Normalize separators first.
+	$normalized = preg_replace( '/[\s\.\-]/', '', $vat_number ) ?? $vat_number;
+
+	// Strip configured prefixes.
+	if ( ! empty( $cfg['strip_prefixes'] ) && is_array( $cfg['strip_prefixes'] ) ) {
+		foreach ( $cfg['strip_prefixes'] as $prefix ) {
+			$prefix = strtoupper( (string) $prefix );
+			if ( '' !== $prefix && 0 === strpos( $normalized, $prefix ) ) {
+				$normalized = substr( $normalized, strlen( $prefix ) );
+				break;
+			}
+		}
+	}
+
+	// Keep only what the country expects.
+	$value = $normalized;
+	if ( ! empty( $cfg['keep_pattern'] ) && is_string( $cfg['keep_pattern'] ) ) {
+		if ( preg_match_all( $cfg['keep_pattern'], $value, $m ) ) {
+			$value = implode( '', $m[0] );
+		} else {
+			$value = '';
+		}
+	}
+
+	$value = trim( $value );
+	if ( '' === $value ) {
+		return array();
+	}
+
+	// Sanity constraints.
+	if ( ! empty( $cfg['length'] ) && is_int( $cfg['length'] ) && strlen( $value ) !== $cfg['length'] ) {
+		return array();
+	}
+
+	$eas = (string) ( $cfg['eas'] ?? '' );
+	if ( '' === $eas ) {
+		return array();
+	}
+
+	$endpointid = sprintf( '%s:%s', $eas, $value );
+
+	return array(
+		'eas'         => $eas,
+		'endpoint_id' => $endpointid,
+	);
+}
+
+/**
+ * Get PEPPOL VAT number mappings.
+ *
+ * @return array
+ */
+function wpo_ips_edi_get_peppol_vat_mappings(): array {
+	$mappings = array(
+		'BE' => array(
+			'name'           => 'Belgium',
+			'eas'            => '0208',
+			'strip_prefixes' => array( 'BE' ),
+			'keep_pattern'   => '/\d+/',
+			'length'         => 10,
+		),
+	);
+
+	return apply_filters( 'wpo_ips_edi_peppol_vat_mappings', $mappings );
+}
+
+/**
  * Get supplier identifiers data for EDI.
  *
  * @return array

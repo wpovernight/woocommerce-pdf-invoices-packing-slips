@@ -27,10 +27,10 @@
         "phpunit/phpunit" : "^4.8.35 || ^5.7.21 || ^6 || ^7 || ^8 || ^9"
     },
     "autoload": {
-        "psr-4": {"WPO\\IPS\\Vendor\\Masterminds\\": "src"}
+        "psr-4": {"Masterminds\\": "src"}
     },
     "autoload-dev": {
-        "psr-4": {"WPO\\IPS\\Vendor\\Masterminds\\HTML5\\Tests\\": "test/HTML5"}
+        "psr-4": {"Masterminds\\HTML5\\Tests\\": "test/HTML5"}
     },
     "extra": {
         "branch-alias": {

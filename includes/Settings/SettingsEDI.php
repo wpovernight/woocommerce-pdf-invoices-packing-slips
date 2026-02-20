@@ -384,7 +384,7 @@ class SettingsEDI {
 		);
 		
 		// Peppol specific field
-		if ( ! wpo_wcpdf_checkout_is_block() || ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) ) ) {
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9.0', '>=' ) ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
 				'id'       => 'peppol_endpoint_id_checkout_visibility',
@@ -426,6 +426,68 @@ class SettingsEDI {
 					'When enabled, the customer Peppol Endpoint ID entered at checkout or in the My Account area is validated against the Peppol Directory. If no matching participant is found, an error is shown so the value can be corrected.',
 					'woocommerce-pdf-invoices-packing-slips'
 				),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => wp_json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'     => true,
+				),
+			),
+		);
+		
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_automatic_endpoint_id_derivation',
+			'title'    => '',
+			'callback' => 'checkbox',
+			'section'  => $section,
+			'args'     => array(
+				'title'       => __( 'Automatic Endpoint ID Derivation', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name' => $option_name,
+				'id'          => 'peppol_automatic_endpoint_id_derivation',
+				'description' => __(
+					'Automatically generate Peppol IDs from VAT numbers for supported countries. This can help ensure the correct format and reduce errors.',
+					'woocommerce-pdf-invoices-packing-slips'
+				),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => wp_json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'     => true,
+				),
+			),
+		);
+		
+		$mappings  = wpo_ips_edi_get_peppol_vat_mappings();
+		$countries = array();
+
+		if ( is_array( $mappings ) ) {
+			foreach ( $mappings as $code => $data ) {
+				if ( empty( $data['name'] ) || empty( $data['eas'] ) ) {
+					continue;
+				}
+
+				$countries[ $code ] = sprintf( '%s [%s]', $data['name'], $data['eas'] );
+			}
+		}
+
+		asort( $countries, SORT_NATURAL | SORT_FLAG_CASE );
+
+		// Peppol specific field
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_automatic_endpoint_id_derivation_countries',
+			'title'    => '',
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'title'             => __( ' Select Countries to Automate Endpoint ID', 'wpo-ips-edocs-network' ),
+				'option_name'       => $option_name,
+				'id'                => 'peppol_automatic_endpoint_id_derivation_countries',
+				'options'           => $countries,
+				'multiple'          => true,
+				'enhanced_select'   => true,
+				'placeholder'       => __( 'Select one or more countries', 'wpo-ips-edocs-network' ),
+				'class'             => 'edi-multiple',
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
 					'data-show_for_option_values' => wp_json_encode( array( 'peppol-bis-3p0' ) ),
