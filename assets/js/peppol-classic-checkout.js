@@ -60,10 +60,20 @@ jQuery( function ( $ ) {
 		},
 
 		getEndpointNodes() {
-			return {
+			const nodes = {
 				wrapper: ENDPOINT_WRAPPER_SELECTOR ? document.querySelector( ENDPOINT_WRAPPER_SELECTOR ) : null,
 				endpoint: ENDPOINT_SELECTOR ? document.querySelector( ENDPOINT_SELECTOR ) : null,
 			};
+
+			engine.log( 'getEndpointNodes', {
+				wrapperSelector: ENDPOINT_WRAPPER_SELECTOR,
+				endpointSelector: ENDPOINT_SELECTOR,
+				wrapperFound: !! nodes.wrapper,
+				endpointFound: !! nodes.endpoint,
+				currentValue: nodes.endpoint ? String( nodes.endpoint.value || '' ) : '',
+			} );
+
+			return nodes;
 		},
 
 		appendOverrideLink( wrapper, endpoint, link ) {
@@ -76,6 +86,14 @@ jQuery( function ( $ ) {
 
 		// Fetch fallback if wp.apiFetch not present.
 		fetchEndpoint( billingCountry, vatValue ) {
+			engine.log( 'fetchEndpoint', {
+				billingCountry: billingCountry,
+				vatValue: vatValue,
+				hasApiFetch: !! window.wp?.apiFetch,
+				hasWpApiSettingsRoot: !! window.wpApiSettings?.root,
+				route: CONFIG.peppol_autofill_endpoint_route,
+			} );
+
 			const apiFetch = window.wp?.apiFetch;
 			if ( apiFetch ) {
 				return apiFetch( {
@@ -114,12 +132,24 @@ jQuery( function ( $ ) {
 	} );
 
 	$( document ).on( 'input change', COUNTRY_SELECTOR + ', ' + VAT_SELECTOR, function () {
+		engine.log( 'input/change event', {
+			target: this && this.name ? this.name : ( this && this.id ? this.id : '' ),
+			country: getValue( COUNTRY_SELECTOR ),
+			vat: VAT_SELECTOR ? getValue( VAT_SELECTOR ) : '',
+		} );
+
 		engine.schedule( 'input' );
 	} );
 
-	$( document.body ).on( 'updated_checkout updated_shipping_method', function () {
+	$( document.body ).on( 'updated_checkout updated_shipping_method', function ( event ) {
+		engine.log( 'wc event', {
+			type: event && event.type ? event.type : '',
+		} );
+
 		engine.schedule( 'wc-updated' );
 	} );
+
+	engine.log( 'init schedule' );
 
 	engine.schedule( 'init' );
 
