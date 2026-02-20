@@ -284,6 +284,7 @@
 		return {
 			apply: applyLockState,
 			schedule: scheduleApply,
+			log,
 		};
 	};
 
