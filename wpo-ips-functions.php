@@ -2075,14 +2075,23 @@ function wpo_ips_current_page_has_checkout_block(): bool {
 
 	$page_id = get_queried_object_id();
 	if ( ! $page_id ) {
-		return false;
+		$override = apply_filters( 'wpo_ips_current_page_has_checkout', null, 0, null );
+		return is_bool( $override ) ? $override : false;
 	}
 
 	$post = get_post( $page_id );
 	if ( ! $post instanceof WP_Post ) {
-		return false;
+		$override = apply_filters( 'wpo_ips_current_page_has_checkout', null, $page_id, null );
+		return is_bool( $override ) ? $override : false;
 	}
 
+	// Allow builders / custom setups (Elementor templates, custom endpoints, etc.) to override.
+	$override = apply_filters( 'wpo_ips_current_page_has_checkout', null, $page_id, $post );
+	if ( is_bool( $override ) ) {
+		return $override;
+	}
+
+	// Native block detection.
 	if ( function_exists( 'has_block' ) && has_block( 'woocommerce/checkout', $post ) ) {
 		return true;
 	}
