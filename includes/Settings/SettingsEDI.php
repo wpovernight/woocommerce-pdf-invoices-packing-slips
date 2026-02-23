@@ -397,6 +397,7 @@ class SettingsEDI {
 					'id'                => 'peppol_endpoint_id_checkout_visibility',
 					'default'           => 'always',
 					'options'           => array(
+						'never'   => __( 'Never', 'woocommerce-pdf-invoices-packing-slips' ),
 						'always'  => __( 'Always', 'woocommerce-pdf-invoices-packing-slips' ),
 						'toggle'  => __( 'On business purchase selection', 'woocommerce-pdf-invoices-packing-slips' ),
 						'company' => __( 'When company name is present', 'woocommerce-pdf-invoices-packing-slips' ),

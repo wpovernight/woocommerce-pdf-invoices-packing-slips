@@ -32,6 +32,7 @@ class Peppol {
 		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
+		add_action( 'woocommerce_new_order', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ) ) ;
 		
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
@@ -214,7 +215,10 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_display_checkout_block_fields(): void {
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
+		if (
+			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
+			'never' === $this->peppol_checkout_visibility_mode()
+		) {
 			return;
 		}
 
@@ -303,6 +307,10 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_set_checkout_block_fields_value(): void {
+		if ( 'never' === $this->peppol_checkout_visibility_mode() ) {
+			return;
+		}
+	
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
@@ -433,7 +441,10 @@ class Peppol {
 			$fields = array();
 		}
 
-		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
+		if (
+			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
+			'never' === $this->peppol_checkout_visibility_mode()
+		) {
 			return $fields;
 		}
 
@@ -685,6 +696,60 @@ class Peppol {
 	}
 	
 	/**
+	 * Handle automatic Peppol Endpoint ID derivation on new order creation.
+	 *
+	 * @param int $order_id
+	 * @param \WC_Order $order
+	 * @return void
+	 */
+	public function peppol_handle_new_order_automatic_endpoint_id_derivation( int $order_id, $order ): void {
+		if (
+			! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ||
+			'never' !== $this->peppol_checkout_visibility_mode()
+		) {
+			return;
+		}
+		
+		if ( is_null( $order ) ) {
+			$order = wc_get_order( $order_id );
+		}
+
+		// check if we have an order object
+		if ( empty( $order ) ) {
+			return;
+		}
+		
+		$billing_country = $order->get_billing_country();
+		$vat_number      = wpo_wcpdf_get_order_customer_vat_number( $order );
+		
+		if ( empty( $billing_country ) || empty( $vat_number ) ) {
+			return;
+		}
+		
+		$result = $this->peppol_validate_identifier_value( $request['peppol_endpoint_id'] );
+		if ( is_wp_error( $result ) ) {
+			return;
+		}
+		
+		$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $vat_number );
+		if ( empty( $result['endpoint_id'] ) ) {
+			return;
+		}
+		
+		$data = array(
+			'peppol_endpoint_id' => $result['endpoint_id'],
+		);
+		
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
+			? absint( $order->get_customer_id() )
+			: 0;
+
+		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $data );
+
+		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
+	}
+	
+	/**
 	 * Enqueue Peppol script for Classic Checkout page.
 	 *
 	 * @return void
@@ -733,7 +798,7 @@ class Peppol {
 			'wpo-ips-peppol-classic-checkout',
 			'wpoIpsPeppol',
 			array(
-				'visibilityMode'                 => $this->peppol_checkout_visibility_mode(), // always|toggle|company
+				'visibilityMode'                 => $this->peppol_checkout_visibility_mode(), // always|toggle|company|never
 				'endpoint_derivation'            => (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ),
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
 				'debug'                          => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
@@ -824,14 +889,14 @@ class Peppol {
 	/**
 	 * Get the configured visibility mode for the Peppol checkout fields.
 	 *
-	 * @return string One of: 'always', 'toggle', 'company'.
+	 * @return string One of: 'always', 'toggle', 'company', 'never'.
 	 */
 	private function peppol_checkout_visibility_mode(): string {
 		$visibility_mode = (string) wpo_ips_edi_get_settings( 'peppol_endpoint_id_checkout_visibility' );
 		$allowed         = array( 'always', 'toggle', 'company' );
 
 		if ( ! in_array( $visibility_mode, $allowed, true ) ) {
-			$visibility_mode = 'always';
+			$visibility_mode = 'never';
 		}
 
 		return $visibility_mode;
@@ -846,6 +911,13 @@ class Peppol {
 	 */
 	private function peppol_checkout_block_hidden_condition(): array {
 		$visibility_mode = $this->peppol_checkout_visibility_mode();
+		
+		// Always hidden.
+		if ( 'never' === $visibility_mode ) {
+			return array(
+				'const' => true,
+			);
+		}
 
 		if ( 'toggle' === $visibility_mode ) {
 			return array(
