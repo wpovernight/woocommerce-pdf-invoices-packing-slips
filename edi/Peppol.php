@@ -754,7 +754,8 @@ class Peppol {
 			return;
 		}
 
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$script_debug = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
+		$suffix       = $script_debug ? '' : '.min';
 
 		// Shared styles.
 		wp_enqueue_style(
@@ -792,7 +793,7 @@ class Peppol {
 				'visibilityMode'                 => $this->peppol_checkout_visibility_mode(), // always|toggle|company
 				'endpoint_derivation'            => (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ),
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
-				'debug'                          => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+				'debug'                          => $script_debug,
 				'billing_country_selector'       => apply_filters(
 					'wpo_ips_edi_peppol_classic_checkout_billing_country_selector',
 					'#billing_country'
@@ -823,7 +824,8 @@ class Peppol {
 			return;
 		}
 
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$script_debug = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
+		$suffix       = $script_debug ? '' : '.min';
 
 		// Shared styles.
 		wp_enqueue_style(
@@ -861,7 +863,7 @@ class Peppol {
 			array(
 				'endpoint_derivation'            => true,
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
-				'debug'                          => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
+				'debug'                          => $script_debug,
 				'billing_country_selector'       => apply_filters(
 					'wpo_ips_edi_peppol_block_checkout_billing_country_selector',
 					'#billing-country, select[name="billing_country"], .wc-block-components-address-form__country select, .wc-block-components-country-input select'
