@@ -215,10 +215,7 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_display_checkout_block_fields(): void {
-		if (
-			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
-			'never' === $this->peppol_checkout_visibility_mode()
-		) {
+		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
 
@@ -307,10 +304,6 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_set_checkout_block_fields_value(): void {
-		if ( 'never' === $this->peppol_checkout_visibility_mode() ) {
-			return;
-		}
-	
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
@@ -441,10 +434,7 @@ class Peppol {
 			$fields = array();
 		}
 
-		if (
-			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
-			'never' === $this->peppol_checkout_visibility_mode()
-		) {
+		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return $fields;
 		}
 
@@ -705,7 +695,8 @@ class Peppol {
 	public function peppol_handle_new_order_automatic_endpoint_id_derivation( int $order_id, $order ): void {
 		if (
 			! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ||
-			'never' !== $this->peppol_checkout_visibility_mode()
+			wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
+			wpo_ips_edi_peppol_enabled_for_location( 'both' )
 		) {
 			return;
 		}
@@ -798,7 +789,7 @@ class Peppol {
 			'wpo-ips-peppol-classic-checkout',
 			'wpoIpsPeppol',
 			array(
-				'visibilityMode'                 => $this->peppol_checkout_visibility_mode(), // always|toggle|company|never
+				'visibilityMode'                 => $this->peppol_checkout_visibility_mode(), // always|toggle|company
 				'endpoint_derivation'            => (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ),
 				'countries'                      => (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ),
 				'debug'                          => defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG,
@@ -889,14 +880,14 @@ class Peppol {
 	/**
 	 * Get the configured visibility mode for the Peppol checkout fields.
 	 *
-	 * @return string One of: 'always', 'toggle', 'company', 'never'.
+	 * @return string One of: 'always', 'toggle', 'company'.
 	 */
 	private function peppol_checkout_visibility_mode(): string {
 		$visibility_mode = (string) wpo_ips_edi_get_settings( 'peppol_endpoint_id_checkout_visibility' );
 		$allowed         = array( 'always', 'toggle', 'company' );
 
 		if ( ! in_array( $visibility_mode, $allowed, true ) ) {
-			$visibility_mode = 'never';
+			$visibility_mode = 'always';
 		}
 
 		return $visibility_mode;
@@ -911,13 +902,6 @@ class Peppol {
 	 */
 	private function peppol_checkout_block_hidden_condition(): array {
 		$visibility_mode = $this->peppol_checkout_visibility_mode();
-		
-		// Always hidden.
-		if ( 'never' === $visibility_mode ) {
-			return array(
-				'const' => true,
-			);
-		}
 
 		if ( 'toggle' === $visibility_mode ) {
 			return array(

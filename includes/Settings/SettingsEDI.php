@@ -368,8 +368,9 @@ class SettingsEDI {
 				'title'             => __( 'Customer Peppol Identifier Fields Location', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'       => $option_name,
 				'id'                => 'peppol_customer_identifier_fields_location',
-				'default'           => 'both',
+				'default'           => 'none',
 				'options'           => array(
+					'none '      => __( 'None', 'woocommerce-pdf-invoices-packing-slips' ),
 					'checkout'   => __( 'Checkout only', 'woocommerce-pdf-invoices-packing-slips' ),
 					'my_account' => __( 'My Account only', 'woocommerce-pdf-invoices-packing-slips' ),
 					'both'       => __( 'Both Checkout and My Account', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -397,7 +398,6 @@ class SettingsEDI {
 					'id'                => 'peppol_endpoint_id_checkout_visibility',
 					'default'           => 'always',
 					'options'           => array(
-						'never'   => __( 'Never', 'woocommerce-pdf-invoices-packing-slips' ),
 						'always'  => __( 'Always', 'woocommerce-pdf-invoices-packing-slips' ),
 						'toggle'  => __( 'On business purchase selection', 'woocommerce-pdf-invoices-packing-slips' ),
 						'company' => __( 'When company name is present', 'woocommerce-pdf-invoices-packing-slips' ),

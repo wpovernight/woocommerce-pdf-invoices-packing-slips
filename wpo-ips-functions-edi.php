@@ -843,8 +843,16 @@ function wpo_ips_edi_peppol_enabled_for_location( string $location ): bool {
 
 	$location_setting = wpo_ips_edi_get_settings( 'peppol_customer_identifier_fields_location' );
 
+	// Valid options
+	$valid = array( 'checkout', 'my_account', 'both', 'none' );
+
 	// Always return false if the field is not properly set
-	if ( empty( $location_setting ) || ! in_array( $location_setting, array( 'checkout', 'my_account', 'both' ), true ) ) {
+	if ( empty( $location_setting ) || ! in_array( $location_setting, $valid, true ) ) {
+		return false;
+	}
+
+	// Explicitly disabled everywhere
+	if ( 'none' === $location_setting ) {
 		return false;
 	}
 
