@@ -717,13 +717,13 @@ class Peppol {
 			return;
 		}
 		
-		$result = $this->peppol_validate_identifier_value( $request['peppol_endpoint_id'] );
-		if ( is_wp_error( $result ) ) {
+		$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $vat_number );
+		if ( empty( $result['endpoint_id'] ) ) {
 			return;
 		}
 		
-		$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $vat_number );
-		if ( empty( $result['endpoint_id'] ) ) {
+		$validation = $this->peppol_validate_identifier_value( $result['endpoint_id'] );
+		if ( is_wp_error( $validation ) ) {
 			return;
 		}
 		
