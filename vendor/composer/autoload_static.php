@@ -12,12 +12,12 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     );
 
     public static $prefixLengthsPsr4 = array (
-        'W' => 
+        'W' =>
         array (
             'WPO\\IPS\\EDI\\' => 12,
             'WPO\\IPS\\' => 8,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
@@ -25,19 +25,19 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     );
 
     public static $prefixDirsPsr4 = array (
-        'WPO\\IPS\\EDI\\' => 
+        'WPO\\IPS\\EDI\\' =>
         array (
             0 => __DIR__ . '/../..' . '/edi',
         ),
-        'WPO\\IPS\\' => 
+        'WPO\\IPS\\' =>
         array (
             0 => __DIR__ . '/../..' . '/includes',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Iconv\\' => 
+        'Symfony\\Polyfill\\Iconv\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
         ),
@@ -52,6 +52,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Compatibility\\FileSystem' => __DIR__ . '/../..' . '/includes/Compatibility/FileSystem.php',
         'WPO\\IPS\\Compatibility\\OrderUtil' => __DIR__ . '/../..' . '/includes/Compatibility/OrderUtil.php',
         'WPO\\IPS\\Compatibility\\ThirdPartyPlugins' => __DIR__ . '/../..' . '/includes/Compatibility/ThirdPartyPlugins.php',
+        'WPO\\IPS\\Compatibility\\VatPlugins' => __DIR__ . '/../..' . '/includes/Compatibility/VatPlugins.php',
         'WPO\\IPS\\Documents' => __DIR__ . '/../..' . '/includes/Documents.php',
         'WPO\\IPS\\Documents\\BulkDocument' => __DIR__ . '/../..' . '/includes/Documents/BulkDocument.php',
         'WPO\\IPS\\Documents\\DocumentNumber' => __DIR__ . '/../..' . '/includes/Documents/DocumentNumber.php',

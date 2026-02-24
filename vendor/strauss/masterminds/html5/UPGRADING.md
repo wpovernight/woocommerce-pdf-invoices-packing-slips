@@ -11,7 +11,7 @@ From 1.x to 2.x
         
     After:
 
-        use WPO\IPS\Vendor\Masterminds\HTML5;
+        use Masterminds\HTML5;
         
         $html5 = new HTML5();
         

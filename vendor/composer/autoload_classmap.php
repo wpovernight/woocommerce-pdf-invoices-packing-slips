@@ -14,6 +14,7 @@ return array(
     'WPO\\IPS\\Compatibility\\FileSystem' => $baseDir . '/includes/Compatibility/FileSystem.php',
     'WPO\\IPS\\Compatibility\\OrderUtil' => $baseDir . '/includes/Compatibility/OrderUtil.php',
     'WPO\\IPS\\Compatibility\\ThirdPartyPlugins' => $baseDir . '/includes/Compatibility/ThirdPartyPlugins.php',
+    'WPO\\IPS\\Compatibility\\VatPlugins' => $baseDir . '/includes/Compatibility/VatPlugins.php',
     'WPO\\IPS\\Documents' => $baseDir . '/includes/Documents.php',
     'WPO\\IPS\\Documents\\BulkDocument' => $baseDir . '/includes/Documents/BulkDocument.php',
     'WPO\\IPS\\Documents\\DocumentNumber' => $baseDir . '/includes/Documents/DocumentNumber.php',

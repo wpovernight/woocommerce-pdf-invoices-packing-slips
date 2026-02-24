@@ -132,9 +132,9 @@ function wcpdf_get_bulk_actions() {
 			if ( 'xml' === $output_format && ! \wpo_ips_edi_is_available() ) {
 				continue;
 			}
-			
+
 			$slug = $document->get_type();
-			
+
 			if ( 'pdf' !== $output_format ) {
 				$slug .= "_{$output_format}";
 			}
@@ -421,7 +421,7 @@ function wcpdf_date_format( $document = null, $date_type = null ) {
 
 /**
  * Catch MySQL errors from $wpdb and log them.
- * 
+ *
  * Inspired from here: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
  *
  * With SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
@@ -463,11 +463,11 @@ function wcpdf_catch_db_object_errors( \wpdb $wpdb, string $context = '' ): arra
 	foreach ( $errors as $msg ) {
 		$line = '' !== $context ? "{$context}: {$msg}" : $msg;
 		$key  = md5( $line );
-		
+
 		if ( isset( $seen[ $key ] ) ) {
 			continue;
 		}
-		
+
 		$seen[ $key ] = true;
 		wcpdf_log_error( $line, 'critical' );
 	}
@@ -772,7 +772,7 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 		if ( $finfo ) {
 			$mime_type = finfo_file( $finfo, $src );
-			
+
 			if ( PHP_VERSION_ID < 80100 ) {
 				finfo_close( $finfo );
 			}
@@ -815,7 +815,7 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 				if ( $finfo ) {
 					$mime_type = finfo_buffer( $finfo, $image_data );
-					
+
 					if ( PHP_VERSION_ID < 80100 ) {
 						finfo_close( $finfo );
 					}
@@ -1197,6 +1197,21 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_eu_vat',        // WooCommerce Eu Vat & B2B (WCEV)
 	), $order );
 
+	// Maybe add General Checkout Field key
+	if ( empty( WPO_WCPDF()->frontend ) ) {
+		$frontend = \WPO\IPS\Frontend::instance();
+	} else {
+		$frontend = WPO_WCPDF()->frontend;
+	}
+
+	if ( ! empty( $frontend ) && is_callable( array( $frontend, 'checkout_field_is_vat_number' ) ) ) {
+		$checkout_field_is_vat_number = $frontend->checkout_field_is_vat_number();
+
+		if ( $checkout_field_is_vat_number ) {
+			array_unshift( $vat_meta_keys, '_wpo_ips_checkout_field' );
+		}
+	}
+
 	$vat_number = null;
 
 	foreach ( $vat_meta_keys as $meta_key ) {
@@ -1561,12 +1576,12 @@ function wpo_wcpdf_format_address( array $address ): string {
 function wpo_wcpdf_is_document_using_historical_settings( string $document_type ): bool {
 	$document_settings = get_option( 'wpo_wcpdf_documents_settings_' . $document_type, array() );
 	$is_using          = true;
-	
+
 	// this setting is inverted on the frontend so that it needs to be actively/purposely enabled to be used
 	if ( ! empty( $document_settings ) && isset( $document_settings['use_latest_settings'] ) ) {
 		$is_using = false;
 	}
-	
+
 	return apply_filters( 'wpo_wcpdf_is_document_using_historical_settings', $is_using, $document_settings, $document_type );
 }
 
@@ -1749,28 +1764,28 @@ function wpo_ips_display_item_meta( \WC_Order_Item $item, array $args = array() 
  */
 function wpo_ips_order_has_local_pickup_method( \WC_Abstract_Order $order ): bool {
 	$has_local_pickup_method = false;
-	
+
 	if ( $order instanceof \WC_Order_Refund ) {
 		return $has_local_pickup_method;
 	}
-	
+
 	if ( ! class_exists( '\Automattic\WooCommerce\Utilities\ArrayUtil' ) ) {
 		return $has_local_pickup_method;
 	}
-	
+
 	$local_pickup_methods = apply_filters( 'woocommerce_local_pickup_methods', array( 'legacy_local_pickup', 'local_pickup' ) );
 	$shipping_method_ids  = \Automattic\WooCommerce\Utilities\ArrayUtil::select( $order->get_shipping_methods(), 'get_method_id', \Automattic\WooCommerce\Utilities\ArrayUtil::SELECT_BY_OBJECT_METHOD );
-	
+
 	if ( count( array_intersect( $shipping_method_ids, $local_pickup_methods ) ) > 0 ) {
 		$has_local_pickup_method = true;
 	}
-	
+
 	return $has_local_pickup_method;
 }
 
 /**
  * Add multiple filters.
- * 
+ *
  * @param array $filters Array of filters to add.
  * @return void
  */
@@ -1785,7 +1800,7 @@ function wpo_ips_add_filters( array $filters ): void {
 
 /**
  * Remove multiple filters.
- * 
+ *
  * @param array $filters Array of filters to remove.
  * @return void
  */
@@ -1800,7 +1815,7 @@ function wpo_ips_remove_filters( array $filters ): void {
 
 /**
  * Normalize filter arguments.
- * 
+ *
  * @param array $filter Filter arguments.
  * @return array
  */
@@ -1809,7 +1824,7 @@ function wpo_ips_normalize_filter_args( array $filter ): array {
 	$hook_name = '';
 	$callback  = '';
 	$is_valid  = true;
-	
+
 	// Validate minimum array structure
 	if ( count( $args ) < 2 ) {
 		wcpdf_log_error( 'Filter array must contain at least hook name and callback.', 'critical' );
@@ -1821,29 +1836,29 @@ function wpo_ips_normalize_filter_args( array $filter ): array {
 			wcpdf_log_error( 'Empty or invalid hook name provided for filter.', 'critical' );
 			$is_valid = false;
 		}
-		
+
 		// Validate callback
 		if ( isset( $args[1] ) && is_callable( $args[1] ) ) {
 			$callback = $args[1];
 		} elseif ( isset( $args[1] ) ) {
-			wcpdf_log_error( sprintf( 
-				'Non-callable callback provided for filter "%s": %s', 
-				$hook_name, 
+			wcpdf_log_error( sprintf(
+				'Non-callable callback provided for filter "%s": %s',
+				$hook_name,
 				is_string( $args[1] ) ? $args[1] : gettype( $args[1] )
 			), 'critical' );
 			$is_valid = false;
 		} else {
-			wcpdf_log_error( sprintf( 
-				'No callback provided for filter "%s".', 
+			wcpdf_log_error( sprintf(
+				'No callback provided for filter "%s".',
 				$hook_name
 			), 'critical' );
 			$is_valid = false;
 		}
 	}
-	
+
 	$priority      = isset( $args[2] ) ? absint( $args[2] ) : 10;
 	$accepted_args = isset( $args[3] ) ? absint( $args[3] ) : 1;
-	
+
 	return compact( 'hook_name', 'callback', 'priority', 'accepted_args', 'is_valid' );
 }
 
@@ -2026,51 +2041,87 @@ function wpo_ips_get_plugins_data( array $plugin_files ): array {
 }
 
 /**
- * Check whether a VAT plugin is active.
+ * Check if the current page contains the WooCommerce checkout shortcode.
  *
  * @return bool
  */
-function wpo_ips_has_vat_plugin_active(): bool {
-	$detectors = apply_filters(
-		'wpo_ips_vat_plugin_detectors',
-		array(
-			'woocommerce_eu_vat_compliance' => static function () {
-				return class_exists( 'WC_EU_VAT_Compliance' );
-			},
-
-			'eu_vat_for_woocommerce' => static function () {
-				return defined( 'ALG_WC_EU_VAT_FILE' )
-					|| class_exists( 'Alg_WC_EU_VAT' );
-			},
-
-			'aelia_eu_vat_assistant' => static function () {
-				return class_exists( 'Aelia_WC_EU_VAT_Assistant_RequirementsChecks' )
-					|| class_exists( 'WC_Aelia_EU_VAT_Assistant' )
-					|| isset( $GLOBALS['wc-aelia-eu-vat-assistant'] );
-			},
-
-			'eu_vat_guard_for_woocommerce' => static function () {
-				return defined( 'EU_VAT_GUARD_PLUGIN_FILE' )
-					|| class_exists( 'Stormlabs\\EUVATGuard\\VAT_Guard' )
-					|| class_exists( 'EU_VAT_Guard' );
-			},
-		)
-	);
-
-	if ( ! is_array( $detectors ) ) {
+function wpo_ips_current_page_has_checkout_shortcode(): bool {
+	if ( is_admin() ) {
 		return false;
 	}
 
-	foreach ( $detectors as $detector ) {
-		if ( ! is_callable( $detector ) ) {
-			continue;
+	$page_id = get_queried_object_id();
+	if ( ! $page_id ) {
+		return false;
+	}
+
+	$post = get_post( $page_id );
+	if ( ! $post instanceof WP_Post ) {
+		return false;
+	}
+
+	return function_exists( 'has_shortcode' ) && has_shortcode( $post->post_content, 'woocommerce_checkout' );
+}
+
+/**
+ * Check if the current page contains the WooCommerce checkout block.
+ *
+ * @return bool
+ */
+function wpo_ips_current_page_has_checkout_block(): bool {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	$page_id = get_queried_object_id();
+	if ( ! $page_id ) {
+		$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, 0, null );
+		return is_bool( $override ) ? $override : false;
+	}
+
+	$post = get_post( $page_id );
+	if ( ! $post instanceof WP_Post ) {
+		$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, $page_id, null );
+		return is_bool( $override ) ? $override : false;
+	}
+
+	// Allow builders / custom setups (Elementor templates, custom endpoints, etc.) to override.
+	$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, $page_id, $post );
+	if ( is_bool( $override ) ) {
+		return $override;
+	}
+
+	// Native block detection.
+	if ( function_exists( 'has_block' ) && has_block( 'woocommerce/checkout', $post ) ) {
+		return true;
+	}
+
+	$blocks = function_exists( 'parse_blocks' ) ? parse_blocks( $post->post_content ) : array();
+
+	return wpo_ips_blocks_contain( $blocks, 'woocommerce/checkout' );
+}
+
+/**
+ * Recursively check if blocks contain a specific block name.
+ *
+ * @param array  $blocks The array of blocks to search through.
+ * @param string $needle The block name to search for (e.g., 'woocommerce/checkout').
+ * @return bool True if the block is found, false otherwise.
+ */
+function wpo_ips_blocks_contain( array $blocks, string $needle ): bool {
+	if ( empty( $blocks ) ) {
+		return false;
+	}
+
+	foreach ( $blocks as $block ) {
+		if ( ! empty( $block['blockName'] ) && $needle === $block['blockName'] ) {
+			return true;
 		}
 
-		$result = $detector();
-
-		// Allow bool true, non-empty string, non-empty array, etc.
-		if ( ! empty( $result ) ) {
-			return true;
+		if ( ! empty( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+			if ( wpo_ips_blocks_contain( $block['innerBlocks'], $needle ) ) {
+				return true;
+			}
 		}
 	}
 

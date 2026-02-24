@@ -98,7 +98,13 @@ class ThirdPartyPlugins {
 	}
 
 	/**
-	 * Removes documents meta from WooCommerce Subscriptions renewal order
+	 * Adjusts meta data during WooCommerce Subscriptions renewal/resubscribe order creation.
+	 *
+	 * @param array      $meta       Meta data being copied to the renewal order.
+	 * @param \WC_Order  $to_order   The renewal/resubscribe order being created.
+	 * @param \WC_Order  $from_order The parent/original order the renewal is based on.
+	 *
+	 * @return array Filtered meta data to be applied to the renewal order.
 	 */
 	public function wcs_renewal_order_meta( $meta, $to_order, $from_order ) {
 		if ( empty( $meta ) ) {
@@ -133,6 +139,23 @@ class ThirdPartyPlugins {
 			if ( in_array( $meta_key, $documents_meta, true ) ) {
 				unset( $meta[ $key ] );
 			}
+		}
+
+		// Copy parent order meta into renewal order.
+		$keys_to_copy = array(
+			'_peppol_endpoint_eas',
+			'_peppol_endpoint_id',
+			'_wpo_ips_checkout_field',
+		);
+
+		foreach ( $keys_to_copy as $key ) {
+			$value = $from_order->get_meta( $key, true );
+
+			if ( '' === $value || null === $value ) {
+				continue;
+			}
+
+			$meta[ $key ] = $value;
 		}
 
 		return $meta;

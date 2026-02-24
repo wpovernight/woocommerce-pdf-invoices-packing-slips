@@ -31,7 +31,7 @@
     },
     "autoload" : {
         "psr-4" : {
-            "WPO\\IPS\\Vendor\\Sabre\\Xml\\" : "lib/"
+            "Sabre\\Xml\\" : "lib/"
         },
         "files": [
             "lib/Deserializer/functions.php",
@@ -40,7 +40,7 @@
     },
     "autoload-dev" : {
         "psr-4" : {
-            "WPO\\IPS\\Vendor\\Sabre\\Xml\\" : "tests/Sabre/Xml/"
+            "Sabre\\Xml\\" : "tests/Sabre/Xml/"
         }
     },
     "require-dev": {

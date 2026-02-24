@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
 use WPO\IPS\Vendor\Sabre\Xml;
 use WPO\IPS\Vendor\Sabre\Xml\Deserializer;
 use WPO\IPS\Vendor\Sabre\Xml\Serializer;
-
 /**
  * 'Elements' is a simple list of elements, without values or attributes.
  * For example, Elements will parse:.
@@ -43,7 +41,6 @@ class Elements implements Xml\Element
      * @var array<int, mixed>
      */
     protected array $value;
-
     /**
      * Constructor.
      *
@@ -53,7 +50,6 @@ class Elements implements Xml\Element
     {
         $this->value = $value;
     }
-
     /**
      * The xmlSerialize method is called during xml writing.
      *
@@ -72,9 +68,8 @@ class Elements implements Xml\Element
      */
     public function xmlSerialize(Xml\Writer $writer): void
     {
-        Serializer\enum($writer, $this->value);
+        \WPO\IPS\Vendor\Sabre\Xml\Serializer\enum($writer, $this->value);
     }
-
     /**
      * The deserialize method is called during xml parsing.
      *
@@ -97,6 +92,6 @@ class Elements implements Xml\Element
      */
     public static function xmlDeserialize(Xml\Reader $reader)
     {
-        return Deserializer\enum($reader);
+        return \WPO\IPS\Vendor\Sabre\Xml\Deserializer\enum($reader);
     }
 }

@@ -16,7 +16,7 @@ Usage Example
 ### Base font information
 
 ```php
-$font = \WPO\IPS\Vendor\FontLib\Font::load('fontfile.ttf');
+$font = \FontLib\Font::load('fontfile.ttf');
 $font->parse();  // for getFontWeight() to work this call must be done first!
 echo $font->getFontName() .'<br>';
 echo $font->getFontSubfamily() .'<br>';
@@ -31,7 +31,7 @@ $font->close();
 ### Font Metrics Generation
 
 ```php
-$font = WPO\IPS\Vendor\FontLib\Font::load('fontfile.ttf');
+$font = FontLib\Font::load('fontfile.ttf');
 $font->parse();
 $font->saveAdobeFontMetrics('fontfile.ufm');
 ```
@@ -39,12 +39,12 @@ $font->saveAdobeFontMetrics('fontfile.ufm');
 ### Create a font subset
 
 ```php
-$font = WPO\IPS\Vendor\FontLib\Font::load('fontfile.ttf');
+$font = FontLib\Font::load('fontfile.ttf');
 $font->parse();
 $font->setSubset("abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ.:,;' (!?)+-*/== 1234567890"); // characters to include
 $font->reduce();
 touch('fontfile.subset.ttf');
-$font->open('fontfile.subset.ttf', WPO\IPS\Vendor\FontLib\BinaryStream::modeReadWrite);
+$font->open('fontfile.subset.ttf', FontLib\BinaryStream::modeReadWrite);
 $font->encode(array("OS/2"));
 $font->close();
 ```

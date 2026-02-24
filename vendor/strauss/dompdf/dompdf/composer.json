@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "WPO\\IPS\\Vendor\\Dompdf\\": "src/"
+            "Dompdf\\": "src/"
         },
         "classmap": [
             "lib/"
@@ -20,7 +20,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "WPO\\IPS\\Vendor\\Dompdf\\Tests\\": "tests/"
+            "Dompdf\\Tests\\": "tests/"
         }
     },
     "require": {
