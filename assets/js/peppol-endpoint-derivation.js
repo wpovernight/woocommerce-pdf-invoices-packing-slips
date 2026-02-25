@@ -213,6 +213,7 @@
 			const country  = String( adapter.getBillingCountry ? adapter.getBillingCountry() : '' ).toUpperCase();
 			const vatValue = getValue( VAT_SELECTOR );
 
+			// reset override when VAT/country changes
 			if ( country !== lastCountry || vatValue !== lastVat ) {
 				manualOverride      = false;
 				manualOverrideValue = '';
@@ -221,10 +222,10 @@
 				endpointLookupLast  = null;
 			}
 
-			const shouldLockByRule = isLockCountry( country ) && vatValue !== '';
-			const locked           = shouldLockByRule && ! manualOverride;
+			// always locked unless user clicked override link
+			const locked = ! manualOverride;
 
-			if ( shouldLockByRule && ! manualOverride && vatValue !== '' ) {
+			if ( isLockCountry( country ) && ! manualOverride && vatValue !== '' ) {
 				const vat = normalizeVat( vatValue );
 				const key = country + '|' + vat;
 
@@ -240,10 +241,7 @@
 							.then( ( res ) => {
 								const id = String( res?.id || '' ).trim();
 
-								endpointLookupLast = {
-									key,
-									value: id,
-								};
+								endpointLookupLast = { key, value: id };
 
 								if ( id ) {
 									setFieldValue( endpoint, id );

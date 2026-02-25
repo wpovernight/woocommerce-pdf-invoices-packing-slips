@@ -15,15 +15,11 @@
 	}
 
 	function getBillingCountry() {
-
 		try {
-
 			const cart = window.wp?.data?.select?.( 'wc/store/cart' );
 
 			if ( cart && typeof cart.getCustomerData === 'function' ) {
-
-				const data = cart.getCustomerData() || {};
-
+				const data    = cart.getCustomerData() || {};
 				const country =
 					data.billingAddress?.country
 					|| data.billing_address?.country
@@ -31,18 +27,14 @@
 					|| data.customer?.billing_address?.country;
 
 				if ( country ) {
-
 					engine.log(
 						'billing country resolved from store',
 						country
 					);
-
 					return String( country ).trim();
 				}
 			}
-
 		} catch ( e ) {
-
 			engine.log(
 				'error reading billing country from store',
 				e
@@ -60,15 +52,11 @@
 	}
 
 	const engine = window.WPO_IPS_PeppolEndpointDerivation.init( CONFIG, {
-
 		getBillingCountry,
-
 		getEndpointNodes() {
-
 			const wrapper  = ENDPOINT_WRAPPER_SELECTOR
 				? document.querySelector( ENDPOINT_WRAPPER_SELECTOR )
 				: null;
-
 			const endpoint = ENDPOINT_SELECTOR
 				? document.querySelector( ENDPOINT_SELECTOR )
 				: null;
@@ -89,9 +77,7 @@
 				endpoint: endpoint,
 			};
 		},
-
 		onSetFieldValue( el, newVal ) {
-
 			engine.log(
 				'setting endpoint value',
 				newVal
@@ -130,19 +116,16 @@
 	);
 
 	new MutationObserver( () => {
-
 		engine.log(
 			'mutation observed -> scheduling apply'
 		);
 
 		engine.schedule( 'mutation' );
-
 	} ).observe( root, { childList: true, subtree: true } );
 
 	document.addEventListener( 'input', ( e ) => {
 
 		if ( COUNTRY_SELECTOR && e.target && e.target.matches( COUNTRY_SELECTOR ) ) {
-
 			engine.log(
 				'country input detected',
 				e.target.value
@@ -152,7 +135,6 @@
 		}
 
 		if ( VAT_SELECTOR && e.target && e.target.matches( VAT_SELECTOR ) ) {
-
 			engine.log(
 				'vat input detected',
 				e.target.value
@@ -164,19 +146,16 @@
 	} );
 
 	if ( window.wp?.data?.subscribe ) {
-
 		engine.log(
 			'subscribed to wp.data store'
 		);
 
 		window.wp.data.subscribe( () => {
-
 			engine.log(
 				'store change detected'
 			);
 
 			engine.schedule( 'store' );
-
 		} );
 	}
 
