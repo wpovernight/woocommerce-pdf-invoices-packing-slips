@@ -437,6 +437,7 @@ class SettingsGeneral {
 					'height'       => '8',
 					'description' => sprintf(
 						__(
+							/* translators: %d: footer column number */
 							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
 							'woocommerce-pdf-invoices-packing-slips'
 						),
@@ -458,6 +459,7 @@ class SettingsGeneral {
 					'height'       => '8',
 					'description' => sprintf(
 						__(
+							/* translators: %d: footer column number */
 							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
 							'woocommerce-pdf-invoices-packing-slips'
 						),
@@ -479,6 +481,7 @@ class SettingsGeneral {
 					'height'       => '8',
 					'description' => sprintf(
 						__(
+							/* translators: %d: footer column number */
 							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
 							'woocommerce-pdf-invoices-packing-slips'
 						),
