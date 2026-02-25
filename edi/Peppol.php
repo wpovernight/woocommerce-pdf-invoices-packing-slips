@@ -695,8 +695,7 @@ class Peppol {
 	public function peppol_handle_new_order_automatic_endpoint_id_derivation( int $order_id, $order ): void {
 		if (
 			! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ||
-			wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
-			wpo_ips_edi_peppol_enabled_for_location( 'both' )
+			wpo_ips_edi_peppol_enabled_for_location( 'checkout' )
 		) {
 			return;
 		}
