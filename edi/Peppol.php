@@ -33,12 +33,12 @@ class Peppol {
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
 		add_action( 'woocommerce_new_order', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 20, 2 ) ;
-		
+
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
-		
+
 		add_rewrite_endpoint( 'peppol', EP_PAGES );
-		
+
 		// Classic checkout hooks
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 		add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );
@@ -398,7 +398,7 @@ class Peppol {
 			: 0;
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, array( $meta_key => $value ) );
-		
+
 		if ( $wc_object instanceof \WC_Order ) {
 			wpo_ips_edi_maybe_save_order_peppol_data( $wc_object, array( $meta_key => $value ) );
 		}
@@ -613,7 +613,7 @@ class Peppol {
 
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
 	}
-	
+
 	/**
 	 * Enqueue Peppol scripts on the checkout page.
 	 *
@@ -628,7 +628,7 @@ class Peppol {
 			$this->peppol_enqueue_classic_checkout_script();
 		}
 	}
-	
+
 	/**
 	 * Register REST API endpoint for Peppol identifier autofill based on VAT number.
 	 *
@@ -638,7 +638,7 @@ class Peppol {
 		if ( ! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ) {
 			return;
 		}
-		
+
 		register_rest_route(
 			'wpo-ips/v1',
 			'/peppol-endpoint',
@@ -684,7 +684,7 @@ class Peppol {
 			)
 		);
 	}
-	
+
 	/**
 	 * Handle automatic Peppol Endpoint ID derivation on new order creation.
 	 *
@@ -700,7 +700,7 @@ class Peppol {
 		) {
 			return;
 		}
-		
+
 		if ( is_null( $order ) ) {
 			$order = wc_get_order( $order_id );
 		}
@@ -709,28 +709,28 @@ class Peppol {
 		if ( empty( $order ) ) {
 			return;
 		}
-		
+
 		$billing_country = $order->get_billing_country();
 		$vat_number      = wpo_wcpdf_get_order_customer_vat_number( $order );
-		
+
 		if ( empty( $billing_country ) || empty( $vat_number ) ) {
 			return;
 		}
-		
+
 		$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $vat_number );
 		if ( empty( $result['endpoint_id'] ) ) {
 			return;
 		}
-		
+
 		$validation = $this->peppol_validate_identifier_value( $result['endpoint_id'] );
 		if ( is_wp_error( $validation ) ) {
 			return;
 		}
-		
+
 		$data = array(
 			'peppol_endpoint_id' => $result['endpoint_id'],
 		);
-		
+
 		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
 			? absint( $order->get_customer_id() )
 			: 0;
@@ -739,18 +739,14 @@ class Peppol {
 
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
 	}
-	
+
 	/**
 	 * Enqueue Peppol script for Classic Checkout page.
 	 *
 	 * @return void
 	 */
 	private function peppol_enqueue_classic_checkout_script(): void {
-		if (
-			! function_exists( 'is_checkout' ) ||
-			! is_checkout() ||
-			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' )
-		) {
+		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
 
@@ -816,8 +812,6 @@ class Peppol {
 	 */
 	private function peppol_enqueue_block_checkout_script(): void {
 		if (
-			! function_exists( 'is_checkout' ) ||
-			! is_checkout() ||
 			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
 			! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' )
 		) {
@@ -897,7 +891,7 @@ class Peppol {
 
 	/**
 	 * Build the Checkout Block "hidden" condition for the Peppol fields.
-	 * 
+	 *
 	 * @link https://developer.woocommerce.com/docs/block-development/tutorials/how-to-conditional-additional-fields/
 	 *
 	 * @return array
