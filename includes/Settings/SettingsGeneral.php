@@ -435,7 +435,7 @@ class SettingsGeneral {
 					'id'           => 'extra_1',
 					'width'        => '72',
 					'height'       => '8',
-					'description' => sprintf(
+					'description'  => sprintf(
 						__(
 							/* translators: %d: footer column number */
 							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
@@ -457,7 +457,7 @@ class SettingsGeneral {
 					'id'           => 'extra_2',
 					'width'        => '72',
 					'height'       => '8',
-					'description' => sprintf(
+					'description'  => sprintf(
 						__(
 							/* translators: %d: footer column number */
 							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
@@ -479,7 +479,7 @@ class SettingsGeneral {
 					'id'           => 'extra_3',
 					'width'        => '72',
 					'height'       => '8',
-					'description' => sprintf(
+					'description'  => sprintf(
 						__(
 							/* translators: %d: footer column number */
 							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
