@@ -151,8 +151,9 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			$reason   = strtoupper( (string) ( $item['reason']   ?? 'NONE' ) );
 			$scheme   = strtoupper( (string) ( $item['scheme']   ?? 'VAT'  ) );
 
-			$basis    = wc_round_tax_total( (float) ( $item['total_ex']  ?? 0 ) );
-			$tax      = wc_round_tax_total( (float) ( $item['total_tax'] ?? 0 ) );
+			$basis_raw = (float) ( $item['total_ex'] ?? 0 );
+			$basis     = wc_round_tax_total( $basis_raw );
+			$tax       = wc_round_tax_total( $basis_raw * $percent / 100 );
 
 			// Skip empty non-Z groups.
 			$is_z = ( 'Z' === $category );
@@ -262,7 +263,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	public function get_monetary_summation(): ?array {
 		$totals   = $this->get_order_payment_totals( $this->document->order );
 		$currency = $this->document->order->get_currency();
-		
+
 		$line_total = isset( $totals['lines_net'] )
 			? $totals['lines_net']
 			: $totals['total_exc_tax'];
