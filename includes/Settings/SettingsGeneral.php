@@ -435,9 +435,15 @@ class SettingsGeneral {
 					'id'           => 'extra_1',
 					'width'        => '72',
 					'height'       => '8',
-					'description'  => __( 'This is footer column 1 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => sprintf(
+						__(
+							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
+							'woocommerce-pdf-invoices-packing-slips'
+						),
+						1
+					),
 					'translatable' => true,
-				)
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -450,9 +456,15 @@ class SettingsGeneral {
 					'id'           => 'extra_2',
 					'width'        => '72',
 					'height'       => '8',
-					'description'  => __( 'This is footer column 2 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => sprintf(
+						__(
+							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
+							'woocommerce-pdf-invoices-packing-slips'
+						),
+						2
+					),
 					'translatable' => true,
-				)
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -465,9 +477,15 @@ class SettingsGeneral {
 					'id'           => 'extra_3',
 					'width'        => '72',
 					'height'       => '8',
-					'description'  => __( 'This is footer column 3 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => sprintf(
+						__(
+							'This is footer column %d in the Modern (Premium) template. You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.',
+							'woocommerce-pdf-invoices-packing-slips'
+						),
+						3
+					),
 					'translatable' => true,
-				)
+				),
 			),
 			array(
 				'type'     => 'setting',
