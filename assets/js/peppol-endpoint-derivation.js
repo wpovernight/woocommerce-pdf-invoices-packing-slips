@@ -38,12 +38,25 @@
 			if ( ! el ) return false;
 
 			const newVal = String( value ?? '' );
-			if ( String( el.value ?? '' ) === newVal ) return true;
 
-			el.value = newVal;
+			// React controlled input friendly setter
+			const valueSetter =
+				Object.getOwnPropertyDescriptor( window.HTMLInputElement.prototype, 'value' )?.set;
+
+			// Some handlers ignore changes while readOnly. Temporarily lift it.
+			const prevReadOnly = !! el.readOnly;
+			el.readOnly = false;
+
+			if ( valueSetter ) {
+				valueSetter.call( el, newVal );
+			} else {
+				el.value = newVal;
+			}
 
 			el.dispatchEvent( new Event( 'input', { bubbles: true } ) );
 			el.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+
+			el.readOnly = prevReadOnly;
 
 			if ( typeof adapter.onSetFieldValue === 'function' ) {
 				adapter.onSetFieldValue( el, newVal );
