@@ -392,6 +392,10 @@ class Peppol {
 
 		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
 		$value    = trim( sanitize_text_field( wp_unslash( $value ) ) );
+		
+		if ( empty( $value ) ) {
+			return;
+		}
 
 		$customer_id = is_callable( array( $wc_object, 'get_customer_id' ) )
 			? absint( $wc_object->get_customer_id() )
