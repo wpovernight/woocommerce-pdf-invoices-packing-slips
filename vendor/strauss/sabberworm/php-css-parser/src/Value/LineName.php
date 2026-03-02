@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
@@ -12,47 +10,61 @@ use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
 class LineName extends ValueList
 {
     /**
-     * @param array<Value|string> $components
-     * @param int<1, max>|null $lineNumber
+     * @param array<int, RuleValueList|CSSFunction|CSSString|LineName|Size|URL|string> $aComponents
+     * @param int $iLineNo
      */
-    public function __construct(array $components = [], ?int $lineNumber = null)
+    public function __construct(array $aComponents = [], $iLineNo = 0)
     {
-        parent::__construct($components, ' ', $lineNumber);
+        parent::__construct($aComponents, ' ', $iLineNo);
     }
 
     /**
+     * @return LineName
+     *
      * @throws UnexpectedTokenException
      * @throws UnexpectedEOFException
      *
      * @internal since V8.8.0
      */
-    public static function parse(ParserState $parserState): LineName
+    public static function parse(ParserState $oParserState)
     {
-        $parserState->consume('[');
-        $parserState->consumeWhiteSpace();
-        $names = [];
+        $oParserState->consume('[');
+        $oParserState->consumeWhiteSpace();
+        $aNames = [];
         do {
-            if ($parserState->getSettings()->usesLenientParsing()) {
+            if ($oParserState->getSettings()->bLenientParsing) {
                 try {
-                    $names[] = $parserState->parseIdentifier();
+                    $aNames[] = $oParserState->parseIdentifier();
                 } catch (UnexpectedTokenException $e) {
-                    if (!$parserState->comes(']')) {
+                    if (!$oParserState->comes(']')) {
                         throw $e;
                     }
                 }
             } else {
-                $names[] = $parserState->parseIdentifier();
+                $aNames[] = $oParserState->parseIdentifier();
             }
-            $parserState->consumeWhiteSpace();
-        } while (!$parserState->comes(']'));
-        $parserState->consume(']');
-        return new LineName($names, $parserState->currentLine());
+            $oParserState->consumeWhiteSpace();
+        } while (!$oParserState->comes(']'));
+        $oParserState->consume(']');
+        return new LineName($aNames, $oParserState->currentLine());
     }
 
     /**
-     * @return non-empty-string
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
      */
-    public function render(OutputFormat $outputFormat): string
+    public function __toString()
+    {
+        return $this->render(new OutputFormat());
+    }
+
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat)
     {
         return '[' . parent::render(OutputFormat::createCompact()) . ']';
     }

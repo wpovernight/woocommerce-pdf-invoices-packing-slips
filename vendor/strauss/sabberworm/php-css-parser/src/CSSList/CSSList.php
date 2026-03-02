@@ -1,10 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\CSSList;
 
-use WPO\IPS\Vendor\Sabberworm\CSS\Comment\CommentContainer;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Commentable;
 use WPO\IPS\Vendor\Sabberworm\CSS\CSSElement;
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
@@ -18,268 +17,293 @@ use WPO\IPS\Vendor\Sabberworm\CSS\Property\Charset;
 use WPO\IPS\Vendor\Sabberworm\CSS\Property\CSSNamespace;
 use WPO\IPS\Vendor\Sabberworm\CSS\Property\Import;
 use WPO\IPS\Vendor\Sabberworm\CSS\Property\Selector;
+use WPO\IPS\Vendor\Sabberworm\CSS\Renderable;
 use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\AtRuleSet;
 use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\DeclarationBlock;
 use WPO\IPS\Vendor\Sabberworm\CSS\RuleSet\RuleSet;
+use WPO\IPS\Vendor\Sabberworm\CSS\Settings;
 use WPO\IPS\Vendor\Sabberworm\CSS\Value\CSSString;
 use WPO\IPS\Vendor\Sabberworm\CSS\Value\URL;
 use WPO\IPS\Vendor\Sabberworm\CSS\Value\Value;
-
-use function WPO\IPS\Vendor\Safe\preg_match;
 
 /**
  * This is the most generic container available. It can contain `DeclarationBlock`s (rule sets with a selector),
  * `RuleSet`s as well as other `CSSList` objects.
  *
  * It can also contain `Import` and `Charset` objects stemming from at-rules.
- *
- * Note that `CSSListItem` extends both `Commentable` and `Renderable`,
- * so those interfaces must also be implemented by concrete subclasses.
  */
-abstract class CSSList implements CSSElement, CSSListItem, Positionable
+abstract class CSSList implements Commentable, CSSElement, Positionable
 {
-    use CommentContainer;
     use Position;
 
     /**
-     * @var array<int<0, max>, CSSListItem>
+     * @var array<array-key, Comment>
      *
      * @internal since 8.8.0
      */
-    protected $contents = [];
+    protected $aComments;
 
     /**
-     * @param int<1, max>|null $lineNumber
+     * @var array<int, RuleSet|CSSList|Import|Charset>
+     *
+     * @internal since 8.8.0
      */
-    public function __construct(?int $lineNumber = null)
+    protected $aContents;
+
+    /**
+     * @param int $iLineNo
+     */
+    public function __construct($iLineNo = 0)
     {
-        $this->setPosition($lineNumber);
+        $this->aComments = [];
+        $this->aContents = [];
+        $this->setPosition($iLineNo);
     }
 
     /**
+     * @return void
+     *
      * @throws UnexpectedTokenException
      * @throws SourceException
      *
      * @internal since V8.8.0
      */
-    public static function parseList(ParserState $parserState, CSSList $list): void
+    public static function parseList(ParserState $oParserState, CSSList $oList)
     {
-        $isRoot = $list instanceof Document;
-        $usesLenientParsing = $parserState->getSettings()->usesLenientParsing();
-        $comments = [];
-        while (!$parserState->isEnd()) {
-            $comments = \array_merge($comments, $parserState->consumeWhiteSpace());
-            $listItem = null;
-            if ($usesLenientParsing) {
+        $bIsRoot = $oList instanceof Document;
+        if (is_string($oParserState)) {
+            $oParserState = new ParserState($oParserState, Settings::create());
+        }
+        $bLenientParsing = $oParserState->getSettings()->bLenientParsing;
+        $aComments = [];
+        while (!$oParserState->isEnd()) {
+            $aComments = array_merge($aComments, $oParserState->consumeWhiteSpace());
+            $oListItem = null;
+            if ($bLenientParsing) {
                 try {
-                    $listItem = self::parseListItem($parserState, $list);
+                    $oListItem = self::parseListItem($oParserState, $oList);
                 } catch (UnexpectedTokenException $e) {
-                    $listItem = false;
+                    $oListItem = false;
                 }
             } else {
-                $listItem = self::parseListItem($parserState, $list);
+                $oListItem = self::parseListItem($oParserState, $oList);
             }
-            if ($listItem === null) {
+            if ($oListItem === null) {
                 // List parsing finished
                 return;
             }
-            if ($listItem) {
-                $listItem->addComments($comments);
-                $list->append($listItem);
+            if ($oListItem) {
+                $oListItem->addComments($aComments);
+                $oList->append($oListItem);
             }
-            $comments = $parserState->consumeWhiteSpace();
+            $aComments = $oParserState->consumeWhiteSpace();
         }
-        $list->addComments($comments);
-        if (!$isRoot && !$usesLenientParsing) {
-            throw new SourceException('Unexpected end of document', $parserState->currentLine());
+        $oList->addComments($aComments);
+        if (!$bIsRoot && !$bLenientParsing) {
+            throw new SourceException("Unexpected end of document", $oParserState->currentLine());
         }
     }
 
     /**
-     * @return CSSListItem|false|null
-     *         If `null` is returned, it means the end of the list has been reached.
-     *         If `false` is returned, it means an invalid item has been encountered,
-     *         but parsing of the next item should proceed.
+     * @return AtRuleBlockList|KeyFrame|Charset|CSSNamespace|Import|AtRuleSet|DeclarationBlock|null|false
      *
      * @throws SourceException
      * @throws UnexpectedEOFException
      * @throws UnexpectedTokenException
      */
-    private static function parseListItem(ParserState $parserState, CSSList $list)
+    private static function parseListItem(ParserState $oParserState, CSSList $oList)
     {
-        $isRoot = $list instanceof Document;
-        if ($parserState->comes('@')) {
-            $atRule = self::parseAtRule($parserState);
-            if ($atRule instanceof Charset) {
-                if (!$isRoot) {
+        $bIsRoot = $oList instanceof Document;
+        if ($oParserState->comes('@')) {
+            $oAtRule = self::parseAtRule($oParserState);
+            if ($oAtRule instanceof Charset) {
+                if (!$bIsRoot) {
                     throw new UnexpectedTokenException(
                         '@charset may only occur in root document',
                         '',
                         'custom',
-                        $parserState->currentLine()
+                        $oParserState->currentLine()
                     );
                 }
-                if (\count($list->getContents()) > 0) {
+                if (count($oList->getContents()) > 0) {
                     throw new UnexpectedTokenException(
                         '@charset must be the first parseable token in a document',
                         '',
                         'custom',
-                        $parserState->currentLine()
+                        $oParserState->currentLine()
                     );
                 }
-                $parserState->setCharset($atRule->getCharset());
+                $oParserState->setCharset($oAtRule->getCharset());
             }
-            return $atRule;
-        } elseif ($parserState->comes('}')) {
-            if ($isRoot) {
-                if ($parserState->getSettings()->usesLenientParsing()) {
-                    return DeclarationBlock::parse($parserState) ?? false;
+            return $oAtRule;
+        } elseif ($oParserState->comes('}')) {
+            if ($bIsRoot) {
+                if ($oParserState->getSettings()->bLenientParsing) {
+                    return DeclarationBlock::parse($oParserState);
                 } else {
-                    throw new SourceException('Unopened {', $parserState->currentLine());
+                    throw new SourceException("Unopened {", $oParserState->currentLine());
                 }
             } else {
                 // End of list
                 return null;
             }
         } else {
-            return DeclarationBlock::parse($parserState, $list) ?? false;
+            return DeclarationBlock::parse($oParserState, $oList);
         }
     }
 
     /**
+     * @param ParserState $oParserState
+     *
+     * @return AtRuleBlockList|KeyFrame|Charset|CSSNamespace|Import|AtRuleSet|null
+     *
      * @throws SourceException
      * @throws UnexpectedTokenException
      * @throws UnexpectedEOFException
      */
-    private static function parseAtRule(ParserState $parserState): ?CSSListItem
+    private static function parseAtRule(ParserState $oParserState)
     {
-        $parserState->consume('@');
-        $identifier = $parserState->parseIdentifier();
-        $identifierLineNumber = $parserState->currentLine();
-        $parserState->consumeWhiteSpace();
-        if ($identifier === 'import') {
-            $location = URL::parse($parserState);
-            $parserState->consumeWhiteSpace();
-            $mediaQuery = null;
-            if (!$parserState->comes(';')) {
-                $mediaQuery = \trim($parserState->consumeUntil([';', ParserState::EOF]));
-                if ($mediaQuery === '') {
-                    $mediaQuery = null;
-                }
+        $oParserState->consume('@');
+        $sIdentifier = $oParserState->parseIdentifier();
+        $iIdentifierLineNum = $oParserState->currentLine();
+        $oParserState->consumeWhiteSpace();
+        if ($sIdentifier === 'import') {
+            $oLocation = URL::parse($oParserState);
+            $oParserState->consumeWhiteSpace();
+            $sMediaQuery = null;
+            if (!$oParserState->comes(';')) {
+                $sMediaQuery = trim($oParserState->consumeUntil([';', ParserState::EOF]));
             }
-            $parserState->consumeUntil([';', ParserState::EOF], true, true);
-            return new Import($location, $mediaQuery, $identifierLineNumber);
-        } elseif ($identifier === 'charset') {
-            $charsetString = CSSString::parse($parserState);
-            $parserState->consumeWhiteSpace();
-            $parserState->consumeUntil([';', ParserState::EOF], true, true);
-            return new Charset($charsetString, $identifierLineNumber);
-        } elseif (self::identifierIs($identifier, 'keyframes')) {
-            $result = new KeyFrame($identifierLineNumber);
-            $result->setVendorKeyFrame($identifier);
-            $result->setAnimationName(\trim($parserState->consumeUntil('{', false, true)));
-            CSSList::parseList($parserState, $result);
-            if ($parserState->comes('}')) {
-                $parserState->consume('}');
+            $oParserState->consumeUntil([';', ParserState::EOF], true, true);
+            return new Import($oLocation, $sMediaQuery ?: null, $iIdentifierLineNum);
+        } elseif ($sIdentifier === 'charset') {
+            $oCharsetString = CSSString::parse($oParserState);
+            $oParserState->consumeWhiteSpace();
+            $oParserState->consumeUntil([';', ParserState::EOF], true, true);
+            return new Charset($oCharsetString, $iIdentifierLineNum);
+        } elseif (self::identifierIs($sIdentifier, 'keyframes')) {
+            $oResult = new KeyFrame($iIdentifierLineNum);
+            $oResult->setVendorKeyFrame($sIdentifier);
+            $oResult->setAnimationName(trim($oParserState->consumeUntil('{', false, true)));
+            CSSList::parseList($oParserState, $oResult);
+            if ($oParserState->comes('}')) {
+                $oParserState->consume('}');
             }
-            return $result;
-        } elseif ($identifier === 'namespace') {
-            $prefix = null;
-            $url = Value::parsePrimitiveValue($parserState);
-            if (!$parserState->comes(';')) {
-                $prefix = $url;
-                $url = Value::parsePrimitiveValue($parserState);
+            return $oResult;
+        } elseif ($sIdentifier === 'namespace') {
+            $sPrefix = null;
+            $mUrl = Value::parsePrimitiveValue($oParserState);
+            if (!$oParserState->comes(';')) {
+                $sPrefix = $mUrl;
+                $mUrl = Value::parsePrimitiveValue($oParserState);
             }
-            $parserState->consumeUntil([';', ParserState::EOF], true, true);
-            if ($prefix !== null && !\is_string($prefix)) {
-                throw new UnexpectedTokenException('Wrong namespace prefix', $prefix, 'custom', $identifierLineNumber);
+            $oParserState->consumeUntil([';', ParserState::EOF], true, true);
+            if ($sPrefix !== null && !is_string($sPrefix)) {
+                throw new UnexpectedTokenException('Wrong namespace prefix', $sPrefix, 'custom', $iIdentifierLineNum);
             }
-            if (!($url instanceof CSSString || $url instanceof URL)) {
+            if (!($mUrl instanceof CSSString || $mUrl instanceof URL)) {
                 throw new UnexpectedTokenException(
                     'Wrong namespace url of invalid type',
-                    $url,
+                    $mUrl,
                     'custom',
-                    $identifierLineNumber
+                    $iIdentifierLineNum
                 );
             }
-            return new CSSNamespace($url, $prefix, $identifierLineNumber);
+            return new CSSNamespace($mUrl, $sPrefix, $iIdentifierLineNum);
         } else {
             // Unknown other at rule (font-face or such)
-            $arguments = \trim($parserState->consumeUntil('{', false, true));
-            if (\substr_count($arguments, '(') !== \substr_count($arguments, ')')) {
-                if ($parserState->getSettings()->usesLenientParsing()) {
+            $sArgs = trim($oParserState->consumeUntil('{', false, true));
+            if (substr_count($sArgs, "(") != substr_count($sArgs, ")")) {
+                if ($oParserState->getSettings()->bLenientParsing) {
                     return null;
                 } else {
-                    throw new SourceException('Unmatched brace count in media query', $parserState->currentLine());
+                    throw new SourceException("Unmatched brace count in media query", $oParserState->currentLine());
                 }
             }
-            $useRuleSet = true;
-            foreach (\explode('/', AtRule::BLOCK_RULES) as $blockRuleName) {
-                if (self::identifierIs($identifier, $blockRuleName)) {
-                    $useRuleSet = false;
+            $bUseRuleSet = true;
+            foreach (explode('/', AtRule::BLOCK_RULES) as $sBlockRuleName) {
+                if (self::identifierIs($sIdentifier, $sBlockRuleName)) {
+                    $bUseRuleSet = false;
                     break;
                 }
             }
-            if ($useRuleSet) {
-                $atRule = new AtRuleSet($identifier, $arguments, $identifierLineNumber);
-                RuleSet::parseRuleSet($parserState, $atRule);
+            if ($bUseRuleSet) {
+                $oAtRule = new AtRuleSet($sIdentifier, $sArgs, $iIdentifierLineNum);
+                RuleSet::parseRuleSet($oParserState, $oAtRule);
             } else {
-                $atRule = new AtRuleBlockList($identifier, $arguments, $identifierLineNumber);
-                CSSList::parseList($parserState, $atRule);
-                if ($parserState->comes('}')) {
-                    $parserState->consume('}');
+                $oAtRule = new AtRuleBlockList($sIdentifier, $sArgs, $iIdentifierLineNum);
+                CSSList::parseList($oParserState, $oAtRule);
+                if ($oParserState->comes('}')) {
+                    $oParserState->consume('}');
                 }
             }
-            return $atRule;
+            return $oAtRule;
         }
     }
 
     /**
      * Tests an identifier for a given value. Since identifiers are all keywords, they can be vendor-prefixed.
      * We need to check for these versions too.
+     *
+     * @param string $sIdentifier
+     * @param string $sMatch
+     *
+     * @return bool
      */
-    private static function identifierIs(string $identifier, string $match): bool
+    private static function identifierIs($sIdentifier, $sMatch)
     {
-        if (\strcasecmp($identifier, $match) === 0) {
-            return true;
-        }
-
-        return preg_match("/^(-\\w+-)?$match$/i", $identifier) === 1;
+        return (strcasecmp($sIdentifier, $sMatch) === 0)
+            ?: preg_match("/^(-\\w+-)?$sMatch$/i", $sIdentifier) === 1;
     }
 
     /**
      * Prepends an item to the list of contents.
+     *
+     * @param RuleSet|CSSList|Import|Charset $oItem
+     *
+     * @return void
      */
-    public function prepend(CSSListItem $item): void
+    public function prepend($oItem)
     {
-        \array_unshift($this->contents, $item);
+        array_unshift($this->aContents, $oItem);
     }
 
     /**
      * Appends an item to the list of contents.
+     *
+     * @param RuleSet|CSSList|Import|Charset $oItem
+     *
+     * @return void
      */
-    public function append(CSSListItem $item): void
+    public function append($oItem)
     {
-        $this->contents[] = $item;
+        $this->aContents[] = $oItem;
     }
 
     /**
      * Splices the list of contents.
      *
-     * @param array<int, CSSListItem> $replacement
+     * @param int $iOffset
+     * @param int $iLength
+     * @param array<int, RuleSet|CSSList|Import|Charset> $mReplacement
+     *
+     * @return void
      */
-    public function splice(int $offset, ?int $length = null, ?array $replacement = null): void
+    public function splice($iOffset, $iLength = null, $mReplacement = null)
     {
-        \array_splice($this->contents, $offset, $length, $replacement);
+        array_splice($this->aContents, $iOffset, $iLength, $mReplacement);
     }
 
     /**
      * Inserts an item in the CSS list before its sibling. If the desired sibling cannot be found,
      * the item is appended at the end.
+     *
+     * @param RuleSet|CSSList|Import|Charset $item
+     * @param RuleSet|CSSList|Import|Charset $sibling
      */
-    public function insertBefore(CSSListItem $item, CSSListItem $sibling): void
+    public function insertBefore($item, $sibling)
     {
-        if (\in_array($sibling, $this->contents, true)) {
+        if (in_array($sibling, $this->aContents, true)) {
             $this->replace($sibling, [$item, $sibling]);
         } else {
             $this->append($item);
@@ -289,53 +313,52 @@ abstract class CSSList implements CSSElement, CSSListItem, Positionable
     /**
      * Removes an item from the CSS list.
      *
-     * @param CSSListItem $itemToRemove
-     *        May be a `RuleSet` (most likely a `DeclarationBlock`), an `Import`,
-     *        a `Charset` or another `CSSList` (most likely a `MediaQuery`)
+     * @param RuleSet|Import|Charset|CSSList $oItemToRemove
+     *        May be a RuleSet (most likely a DeclarationBlock), a Import,
+     *        a Charset or another CSSList (most likely a MediaQuery)
      *
      * @return bool whether the item was removed
      */
-    public function remove(CSSListItem $itemToRemove): bool
+    public function remove($oItemToRemove)
     {
-        $key = \array_search($itemToRemove, $this->contents, true);
-        if ($key !== false) {
-            unset($this->contents[$key]);
+        $iKey = array_search($oItemToRemove, $this->aContents, true);
+        if ($iKey !== false) {
+            unset($this->aContents[$iKey]);
             return true;
         }
-
         return false;
     }
 
     /**
      * Replaces an item from the CSS list.
      *
-     * @param CSSListItem $oldItem
+     * @param RuleSet|Import|Charset|CSSList $oOldItem
      *        May be a `RuleSet` (most likely a `DeclarationBlock`), an `Import`, a `Charset`
      *        or another `CSSList` (most likely a `MediaQuery`)
-     * @param CSSListItem|array<CSSListItem> $newItem
+     *
+     * @return bool
      */
-    public function replace(CSSListItem $oldItem, $newItem): bool
+    public function replace($oOldItem, $mNewItem)
     {
-        $key = \array_search($oldItem, $this->contents, true);
-        if ($key !== false) {
-            if (\is_array($newItem)) {
-                \array_splice($this->contents, $key, 1, $newItem);
+        $iKey = array_search($oOldItem, $this->aContents, true);
+        if ($iKey !== false) {
+            if (is_array($mNewItem)) {
+                array_splice($this->aContents, $iKey, 1, $mNewItem);
             } else {
-                \array_splice($this->contents, $key, 1, [$newItem]);
+                array_splice($this->aContents, $iKey, 1, [$mNewItem]);
             }
             return true;
         }
-
         return false;
     }
 
     /**
-     * @param array<int, CSSListItem> $contents
+     * @param array<int, RuleSet|Import|Charset|CSSList> $aContents
      */
-    public function setContents(array $contents): void
+    public function setContents(array $aContents)
     {
-        $this->contents = [];
-        foreach ($contents as $content) {
+        $this->aContents = [];
+        foreach ($aContents as $content) {
             $this->append($content);
         }
     }
@@ -343,88 +366,131 @@ abstract class CSSList implements CSSElement, CSSListItem, Positionable
     /**
      * Removes a declaration block from the CSS list if it matches all given selectors.
      *
-     * @param DeclarationBlock|array<Selector>|string $selectors the selectors to match
-     * @param bool $removeAll whether to stop at the first declaration block found or remove all blocks
+     * @param DeclarationBlock|array<array-key, Selector>|string $mSelector the selectors to match
+     * @param bool $bRemoveAll whether to stop at the first declaration block found or remove all blocks
+     *
+     * @return void
      */
-    public function removeDeclarationBlockBySelector($selectors, bool $removeAll = false): void
+    public function removeDeclarationBlockBySelector($mSelector, $bRemoveAll = false)
     {
-        if ($selectors instanceof DeclarationBlock) {
-            $selectors = $selectors->getSelectors();
+        if ($mSelector instanceof DeclarationBlock) {
+            $mSelector = $mSelector->getSelectors();
         }
-        if (!\is_array($selectors)) {
-            $selectors = \explode(',', $selectors);
+        if (!is_array($mSelector)) {
+            $mSelector = explode(',', $mSelector);
         }
-        foreach ($selectors as $key => &$selector) {
-            if (!($selector instanceof Selector)) {
-                if (!Selector::isValid($selector)) {
+        foreach ($mSelector as $iKey => &$mSel) {
+            if (!($mSel instanceof Selector)) {
+                if (!Selector::isValid($mSel)) {
                     throw new UnexpectedTokenException(
                         "Selector did not match '" . Selector::SELECTOR_VALIDATION_RX . "'.",
-                        $selector,
-                        'custom'
+                        $mSel,
+                        "custom"
                     );
                 }
-                $selector = new Selector($selector);
+                $mSel = new Selector($mSel);
             }
         }
-        foreach ($this->contents as $key => $item) {
-            if (!($item instanceof DeclarationBlock)) {
+        foreach ($this->aContents as $iKey => $mItem) {
+            if (!($mItem instanceof DeclarationBlock)) {
                 continue;
             }
-            if ($item->getSelectors() == $selectors) {
-                unset($this->contents[$key]);
-                if (!$removeAll) {
+            if ($mItem->getSelectors() == $mSelector) {
+                unset($this->aContents[$iKey]);
+                if (!$bRemoveAll) {
                     return;
                 }
             }
         }
     }
 
-    protected function renderListContents(OutputFormat $outputFormat): string
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
     {
-        $result = '';
-        $isFirst = true;
-        $nextLevelFormat = $outputFormat;
+        return $this->render(new OutputFormat());
+    }
+
+    /**
+     * @return string
+     */
+    protected function renderListContents(OutputFormat $oOutputFormat)
+    {
+        $sResult = '';
+        $bIsFirst = true;
+        $oNextLevel = $oOutputFormat;
         if (!$this->isRootList()) {
-            $nextLevelFormat = $outputFormat->nextLevel();
+            $oNextLevel = $oOutputFormat->nextLevel();
         }
-        $nextLevelFormatter = $nextLevelFormat->getFormatter();
-        $formatter = $outputFormat->getFormatter();
-        foreach ($this->contents as $listItem) {
-            $renderedCss = $formatter->safely(static function () use ($nextLevelFormat, $listItem): string {
-                return $listItem->render($nextLevelFormat);
+        foreach ($this->aContents as $oContent) {
+            $sRendered = $oOutputFormat->safely(function () use ($oNextLevel, $oContent) {
+                return $oContent->render($oNextLevel);
             });
-            if ($renderedCss === null) {
+            if ($sRendered === null) {
                 continue;
             }
-            if ($isFirst) {
-                $isFirst = false;
-                $result .= $nextLevelFormatter->spaceBeforeBlocks();
+            if ($bIsFirst) {
+                $bIsFirst = false;
+                $sResult .= $oNextLevel->spaceBeforeBlocks();
             } else {
-                $result .= $nextLevelFormatter->spaceBetweenBlocks();
+                $sResult .= $oNextLevel->spaceBetweenBlocks();
             }
-            $result .= $renderedCss;
+            $sResult .= $sRendered;
         }
 
-        if (!$isFirst) {
+        if (!$bIsFirst) {
             // Had some output
-            $result .= $formatter->spaceAfterBlocks();
+            $sResult .= $oOutputFormat->spaceAfterBlocks();
         }
 
-        return $result;
+        return $sResult;
     }
 
     /**
      * Return true if the list can not be further outdented. Only important when rendering.
+     *
+     * @return bool
      */
-    abstract public function isRootList(): bool;
+    abstract public function isRootList();
 
     /**
      * Returns the stored items.
      *
-     * @return array<int<0, max>, CSSListItem>
+     * @return array<int, RuleSet|Import|Charset|CSSList>
      */
-    public function getContents(): array
+    public function getContents()
     {
-        return $this->contents;
+        return $this->aContents;
+    }
+
+    /**
+     * @param array<array-key, Comment> $aComments
+     *
+     * @return void
+     */
+    public function addComments(array $aComments)
+    {
+        $this->aComments = array_merge($this->aComments, $aComments);
+    }
+
+    /**
+     * @return array<array-key, Comment>
+     */
+    public function getComments()
+    {
+        return $this->aComments;
+    }
+
+    /**
+     * @param array<array-key, Comment> $aComments
+     *
+     * @return void
+     */
+    public function setComments(array $aComments)
+    {
+        $this->aComments = $aComments;
     }
 }
