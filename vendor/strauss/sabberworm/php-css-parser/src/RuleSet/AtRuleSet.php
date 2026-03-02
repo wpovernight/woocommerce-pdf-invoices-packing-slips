@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\RuleSet;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
@@ -16,53 +14,68 @@ use WPO\IPS\Vendor\Sabberworm\CSS\Property\AtRule;
 class AtRuleSet extends RuleSet implements AtRule
 {
     /**
-     * @var non-empty-string
+     * @var string
      */
-    private $type;
+    private $sType;
 
     /**
      * @var string
      */
-    private $arguments;
+    private $sArgs;
 
     /**
-     * @param non-empty-string $type
-     * @param int<1, max>|null $lineNumber
+     * @param string $sType
+     * @param string $sArgs
+     * @param int $iLineNo
      */
-    public function __construct(string $type, string $arguments = '', ?int $lineNumber = null)
+    public function __construct($sType, $sArgs = '', $iLineNo = 0)
     {
-        parent::__construct($lineNumber);
-        $this->type = $type;
-        $this->arguments = $arguments;
+        parent::__construct($iLineNo);
+        $this->sType = $sType;
+        $this->sArgs = $sArgs;
     }
 
     /**
-     * @return non-empty-string
+     * @return string
      */
-    public function atRuleName(): string
+    public function atRuleName()
     {
-        return $this->type;
-    }
-
-    public function atRuleArgs(): string
-    {
-        return $this->arguments;
+        return $this->sType;
     }
 
     /**
-     * @return non-empty-string
+     * @return string
      */
-    public function render(OutputFormat $outputFormat): string
+    public function atRuleArgs()
     {
-        $formatter = $outputFormat->getFormatter();
-        $result = $formatter->comments($this);
-        $arguments = $this->arguments;
-        if ($arguments !== '') {
-            $arguments = ' ' . $arguments;
+        return $this->sArgs;
+    }
+
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
+    {
+        return $this->render(new OutputFormat());
+    }
+
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat)
+    {
+        $sResult = $oOutputFormat->comments($this);
+        $sArgs = $this->sArgs;
+        if ($sArgs) {
+            $sArgs = ' ' . $sArgs;
         }
-        $result .= "@{$this->type}$arguments{$formatter->spaceBeforeOpeningBrace()}{";
-        $result .= $this->renderRules($outputFormat);
-        $result .= '}';
-        return $result;
+        $sResult .= "@{$this->sType}$sArgs{$oOutputFormat->spaceBeforeOpeningBrace()}{";
+        $sResult .= $this->renderRules($oOutputFormat);
+        $sResult .= '}';
+        return $sResult;
     }
 }

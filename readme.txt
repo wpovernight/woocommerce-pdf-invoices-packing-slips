@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 5.8.0
+Stable tag: 5.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,9 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.8.1 (2026-03-02) =
+- Fix: PHP 7.4 parse error caused by `sabberworm/php-css-parser` dependency update
 
 = 5.8.0 (2026-03-02) =
 - New: Automatically derive the Peppol Endpoint ID from the VAT number during checkout and order creation (Belgium supported)

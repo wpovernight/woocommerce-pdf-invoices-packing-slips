@@ -1,10 +1,25 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS;
 
 interface Renderable
 {
-    public function render(OutputFormat $outputFormat): string;
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString();
+
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat);
+
+    /**
+     * @return int
+     */
+    public function getLineNo();
 }

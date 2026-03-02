@@ -1,10 +1,8 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Property;
 
-use WPO\IPS\Vendor\Sabberworm\CSS\Comment\CommentContainer;
+use WPO\IPS\Vendor\Sabberworm\CSS\Comment\Comment;
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
 use WPO\IPS\Vendor\Sabberworm\CSS\Position\Position;
 use WPO\IPS\Vendor\Sabberworm\CSS\Position\Positionable;
@@ -15,71 +13,130 @@ use WPO\IPS\Vendor\Sabberworm\CSS\Value\URL;
  */
 class Import implements AtRule, Positionable
 {
-    use CommentContainer;
     use Position;
 
     /**
      * @var URL
      */
-    private $location;
+    private $oLocation;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private $mediaQuery;
+    private $sMediaQuery;
 
     /**
-     * @param int<1, max>|null $lineNumber
+     * @var array<array-key, Comment>
+     *
+     * @internal since 8.8.0
      */
-    public function __construct(URL $location, ?string $mediaQuery, ?int $lineNumber = null)
-    {
-        $this->location = $location;
-        $this->mediaQuery = $mediaQuery;
-        $this->setPosition($lineNumber);
-    }
-
-    public function setLocation(URL $location): void
-    {
-        $this->location = $location;
-    }
-
-    public function getLocation(): URL
-    {
-        return $this->location;
-    }
+    protected $aComments;
 
     /**
-     * @return non-empty-string
+     * @param URL $oLocation
+     * @param string $sMediaQuery
+     * @param int $iLineNo
      */
-    public function render(OutputFormat $outputFormat): string
+    public function __construct(URL $oLocation, $sMediaQuery, $iLineNo = 0)
     {
-        return $outputFormat->getFormatter()->comments($this) . '@import ' . $this->location->render($outputFormat)
-            . ($this->mediaQuery === null ? '' : ' ' . $this->mediaQuery) . ';';
+        $this->oLocation = $oLocation;
+        $this->sMediaQuery = $sMediaQuery;
+        $this->setPosition($iLineNo);
+        $this->aComments = [];
     }
 
     /**
-     * @return non-empty-string
+     * @param URL $oLocation
+     *
+     * @return void
      */
-    public function atRuleName(): string
+    public function setLocation($oLocation)
+    {
+        $this->oLocation = $oLocation;
+    }
+
+    /**
+     * @return URL
+     */
+    public function getLocation()
+    {
+        return $this->oLocation;
+    }
+
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
+    {
+        return $this->render(new OutputFormat());
+    }
+
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat)
+    {
+        return $oOutputFormat->comments($this) . "@import " . $this->oLocation->render($oOutputFormat)
+            . ($this->sMediaQuery === null ? '' : ' ' . $this->sMediaQuery) . ';';
+    }
+
+    /**
+     * @return string
+     */
+    public function atRuleName()
     {
         return 'import';
     }
 
     /**
-     * @return array{0: URL, 1?: non-empty-string}
+     * @return array<int, URL|string>
      */
-    public function atRuleArgs(): array
+    public function atRuleArgs()
     {
-        $result = [$this->location];
-        if (\is_string($this->mediaQuery) && $this->mediaQuery !== '') {
-            $result[] = $this->mediaQuery;
+        $aResult = [$this->oLocation];
+        if ($this->sMediaQuery) {
+            array_push($aResult, $this->sMediaQuery);
         }
-
-        return $result;
+        return $aResult;
     }
 
-    public function getMediaQuery(): ?string
+    /**
+     * @param array<array-key, Comment> $aComments
+     *
+     * @return void
+     */
+    public function addComments(array $aComments)
     {
-        return $this->mediaQuery;
+        $this->aComments = array_merge($this->aComments, $aComments);
+    }
+
+    /**
+     * @return array<array-key, Comment>
+     */
+    public function getComments()
+    {
+        return $this->aComments;
+    }
+
+    /**
+     * @param array<array-key, Comment> $aComments
+     *
+     * @return void
+     */
+    public function setComments(array $aComments)
+    {
+        $this->aComments = $aComments;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMediaQuery()
+    {
+        return $this->sMediaQuery;
     }
 }

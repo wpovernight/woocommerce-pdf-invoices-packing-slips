@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Comment;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
@@ -18,32 +16,53 @@ class Comment implements Positionable, Renderable
      *
      * @internal since 8.8.0
      */
-    protected $commentText;
+    protected $sComment;
 
     /**
-     * @param int<1, max>|null $lineNumber
+     * @param string $sComment
+     * @param int $iLineNo
      */
-    public function __construct(string $commentText = '', ?int $lineNumber = null)
+    public function __construct($sComment = '', $iLineNo = 0)
     {
-        $this->commentText = $commentText;
-        $this->setPosition($lineNumber);
-    }
-
-    public function getComment(): string
-    {
-        return $this->commentText;
-    }
-
-    public function setComment(string $commentText): void
-    {
-        $this->commentText = $commentText;
+        $this->sComment = $sComment;
+        $this->setPosition($iLineNo);
     }
 
     /**
-     * @return non-empty-string
+     * @return string
      */
-    public function render(OutputFormat $outputFormat): string
+    public function getComment()
     {
-        return '/*' . $this->commentText . '*/';
+        return $this->sComment;
+    }
+
+    /**
+     * @param string $sComment
+     *
+     * @return void
+     */
+    public function setComment($sComment)
+    {
+        $this->sComment = $sComment;
+    }
+
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
+    {
+        return $this->render(new OutputFormat());
+    }
+
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat)
+    {
+        return '/*' . $this->sComment . '*/';
     }
 }
