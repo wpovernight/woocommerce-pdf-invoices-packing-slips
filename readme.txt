@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 5.8.0-beta.4
+Stable tag: 5.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,20 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.8.0 (2026-03-02) =
+- New: Automatically derive the Peppol Endpoint ID from the VAT number during checkout and order creation (Belgium supported)
+- New: Add unified supplier data filter for CII and UBL and extend Dokan compatibility
+- New: Always display VAT number in Order customer identifiers section
+- New: Add `wpo_ips_edi_due_date_days` filter to customize EDI due date days
+- Tweak: Improve description of extra template fields to clarify HTML formatting limitations
+- Fix: Ensure "Treat as VAT number" setting is saved correctly
+- Fix: Copy Peppol meta data and custom VAT field to WooCommerce Subscriptions renewal orders
+- Fix: Incorrect VAT breakdown causing CII EN16931 validation failure
+- Fix: Revert line net amount alignment change for UBL and CII
+- Dev: Update Composer dependencies and add `thecodingmachine/safe` library
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.6
 
 = 5.7.0 (2026-02-09) =
 - New: Add filter to override EDI action button HTML
