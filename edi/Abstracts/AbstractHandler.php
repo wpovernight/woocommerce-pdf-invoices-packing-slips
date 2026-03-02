@@ -82,9 +82,11 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return int
 	 */
 	protected function get_due_date_days(): int {
-		return is_callable( array( $this->document->order_document, 'get_setting' ) )
+		$due_date_days = is_callable( array( $this->document->order_document, 'get_setting' ) )
 			? absint( $this->document->order_document->get_setting( 'due_date_days' ) )
 			: 0;
+
+		return apply_filters( 'wpo_ips_edi_due_date_days', $due_date_days, $this->document->order_document, $this );
 	}
 
 	/**
