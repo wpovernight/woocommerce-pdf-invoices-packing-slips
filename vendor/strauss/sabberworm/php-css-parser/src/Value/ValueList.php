@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
@@ -15,82 +13,102 @@ use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
 abstract class ValueList extends Value
 {
     /**
-     * @var array<Value|string>
+     * @var array<int, RuleValueList|CSSFunction|CSSString|LineName|Size|URL|string>
      *
      * @internal since 8.8.0
      */
-    protected $components;
+    protected $aComponents;
 
     /**
-     * @var non-empty-string
+     * @var string
      *
      * @internal since 8.8.0
      */
-    protected $separator;
+    protected $sSeparator;
 
     /**
-     * @param array<Value|string>|Value|string $components
-     * @param non-empty-string $separator
-     * @param int<1, max>|null $lineNumber
+     * phpcs:ignore Generic.Files.LineLength
+     * @param array<int, RuleValueList|CSSFunction|CSSString|LineName|Size|URL|string>|RuleValueList|CSSFunction|CSSString|LineName|Size|URL|string $aComponents
+     * @param string $sSeparator
+     * @param int $iLineNo
      */
-    public function __construct($components = [], $separator = ',', ?int $lineNumber = null)
+    public function __construct($aComponents = [], $sSeparator = ',', $iLineNo = 0)
     {
-        parent::__construct($lineNumber);
-        if (!\is_array($components)) {
-            $components = [$components];
+        parent::__construct($iLineNo);
+        if (!is_array($aComponents)) {
+            $aComponents = [$aComponents];
         }
-        $this->components = $components;
-        $this->separator = $separator;
+        $this->aComponents = $aComponents;
+        $this->sSeparator = $sSeparator;
     }
 
     /**
-     * @param Value|string $component
+     * @param RuleValueList|CSSFunction|CSSString|LineName|Size|URL|string $mComponent
+     *
+     * @return void
      */
-    public function addListComponent($component): void
+    public function addListComponent($mComponent)
     {
-        $this->components[] = $component;
+        $this->aComponents[] = $mComponent;
     }
 
     /**
-     * @return array<Value|string>
+     * @return array<int, RuleValueList|CSSFunction|CSSString|LineName|Size|URL|string>
      */
-    public function getListComponents(): array
+    public function getListComponents()
     {
-        return $this->components;
+        return $this->aComponents;
     }
 
     /**
-     * @param array<Value|string> $components
+     * @param array<int, RuleValueList|CSSFunction|CSSString|LineName|Size|URL|string> $aComponents
+     *
+     * @return void
      */
-    public function setListComponents(array $components): void
+    public function setListComponents(array $aComponents)
     {
-        $this->components = $components;
+        $this->aComponents = $aComponents;
     }
 
     /**
-     * @return non-empty-string
+     * @return string
      */
-    public function getListSeparator(): string
+    public function getListSeparator()
     {
-        return $this->separator;
+        return $this->sSeparator;
     }
 
     /**
-     * @param non-empty-string $separator
+     * @param string $sSeparator
+     *
+     * @return void
      */
-    public function setListSeparator(string $separator): void
+    public function setListSeparator($sSeparator)
     {
-        $this->separator = $separator;
+        $this->sSeparator = $sSeparator;
     }
 
-    public function render(OutputFormat $outputFormat): string
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
     {
-        $formatter = $outputFormat->getFormatter();
+        return $this->render(new OutputFormat());
+    }
 
-        return $formatter->implode(
-            $formatter->spaceBeforeListArgumentSeparator($this->separator) . $this->separator
-            . $formatter->spaceAfterListArgumentSeparator($this->separator),
-            $this->components
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat)
+    {
+        return $oOutputFormat->implode(
+            $oOutputFormat->spaceBeforeListArgumentSeparator($this->sSeparator) . $this->sSeparator
+            . $oOutputFormat->spaceAfterListArgumentSeparator($this->sSeparator),
+            $this->aComponents
         );
     }
 }

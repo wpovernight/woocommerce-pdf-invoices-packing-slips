@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Parsing;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\Position\Position;
@@ -12,14 +10,15 @@ class SourceException extends \Exception implements Positionable
     use Position;
 
     /**
-     * @param int<1, max>|null $lineNumber
+     * @param string $sMessage
+     * @param int $iLineNo
      */
-    public function __construct(string $message, ?int $lineNumber = null)
+    public function __construct($sMessage, $iLineNo = 0)
     {
-        $this->setPosition($lineNumber);
-        if ($lineNumber !== null) {
-            $message .= " [line no: $lineNumber]";
+        $this->setPosition($iLineNo);
+        if (!empty($iLineNo)) {
+            $sMessage .= " [line no: $iLineNo]";
         }
-        parent::__construct($message);
+        parent::__construct($sMessage);
     }
 }
