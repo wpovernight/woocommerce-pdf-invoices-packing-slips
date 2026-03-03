@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
@@ -14,19 +13,22 @@ namespace WPO\IPS\Vendor\Dompdf;
  */
 class JavascriptEmbedder
 {
+
     /**
-     * @var \Dompdf
+     * @var Dompdf
      */
     protected $_dompdf;
+
     /**
      * JavascriptEmbedder constructor.
      *
-     * @param \Dompdf $dompdf
+     * @param Dompdf $dompdf
      */
     public function __construct(Dompdf $dompdf)
     {
         $this->_dompdf = $dompdf;
     }
+
     /**
      * @param $script
      */
@@ -34,6 +36,7 @@ class JavascriptEmbedder
     {
         $this->_dompdf->getCanvas()->javascript($script);
     }
+
     /**
      * @param Frame $frame
      */
@@ -42,6 +45,7 @@ class JavascriptEmbedder
         if (!$this->_dompdf->getOptions()->getIsJavascriptEnabled()) {
             return;
         }
+
         $this->insert($frame->get_node()->nodeValue);
     }
 }

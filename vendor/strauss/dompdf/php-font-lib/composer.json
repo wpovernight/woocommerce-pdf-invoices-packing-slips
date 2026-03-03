@@ -12,12 +12,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "FontLib\\": "src/FontLib"
+            "WPO\\IPS\\Vendor\\FontLib\\": "src/FontLib"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "FontLib\\Tests\\": "tests/FontLib"
+            "WPO\\IPS\\Vendor\\FontLib\\Tests\\": "tests/FontLib"
         }
     },
     "require": {

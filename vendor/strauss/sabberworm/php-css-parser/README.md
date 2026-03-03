@@ -17,13 +17,13 @@ composer require sabberworm/php-css-parser
 To use the CSS Parser, create a new instance. The constructor takes the following form:
 
 ```php
-new \Sabberworm\CSS\Parser($css);
+new \WPO\IPS\Vendor\Sabberworm\CSS\Parser($css);
 ```
 
 To read a file, for example, you’d do the following:
 
 ```php
-$parser = new \Sabberworm\CSS\Parser(file_get_contents('somefile.css'));
+$parser = new \WPO\IPS\Vendor\Sabberworm\CSS\Parser(file_get_contents('somefile.css'));
 $cssDocument = $parser->parse();
 ```
 
@@ -36,9 +36,9 @@ The resulting CSS document structure can be manipulated prior to being output.
 The charset option will only be used if the CSS file does not contain an `@charset` declaration. UTF-8 is the default, so you won’t have to create a settings object at all if you don’t intend to change that.
 
 ```php
-$settings = \Sabberworm\CSS\Settings::create()
+$settings = \WPO\IPS\Vendor\Sabberworm\CSS\Settings::create()
     ->withDefaultCharset('windows-1252');
-$parser = new \Sabberworm\CSS\Parser($css, $settings);
+$parser = new \WPO\IPS\Vendor\Sabberworm\CSS\Parser($css, $settings);
 ```
 
 #### Strict parsing
@@ -46,9 +46,9 @@ $parser = new \Sabberworm\CSS\Parser($css, $settings);
 To have the parser throw an exception when encountering invalid/unknown constructs (as opposed to trying to ignore them and carry on parsing), supply a thusly configured `\Sabberworm\CSS\Settings` object:
 
 ```php
-$parser = new \Sabberworm\CSS\Parser(
+$parser = new \WPO\IPS\Vendor\Sabberworm\CSS\Parser(
     file_get_contents('somefile.css'),
-    \Sabberworm\CSS\Settings::create()->beStrict()
+    \WPO\IPS\Vendor\Sabberworm\CSS\Settings::create()->beStrict()
 );
 ```
 
@@ -59,8 +59,8 @@ Note that this will also disable a workaround for parsing the unquoted variant o
 To achieve faster parsing, you can choose to have PHP-CSS-Parser use regular string functions instead of `mb_*` functions. This should work fine in most cases, even for UTF-8 files, as all the multibyte characters are in string literals. Still it’s not recommended using this with input you have no control over as it’s not thoroughly covered by test cases.
 
 ```php
-$settings = \Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
-$parser = new \Sabberworm\CSS\Parser($css, $settings);
+$settings = \WPO\IPS\Vendor\Sabberworm\CSS\Settings::create()->withMultibyteSupport(false);
+$parser = new \WPO\IPS\Vendor\Sabberworm\CSS\Parser($css, $settings);
 ```
 
 ### Manipulation
@@ -126,7 +126,7 @@ There are a few convenience methods on `Document` to ease finding, manipulating 
 
 ```php
 $myId = "#my_id";
-$parser = new \Sabberworm\CSS\Parser($css);
+$parser = new \WPO\IPS\Vendor\Sabberworm\CSS\Parser($css);
 $cssDocument = $parser->parse();
 foreach ($cssDocument->getAllDeclarationBlocks() as $block) {
     foreach ($block->getSelectors() as $selector) {
@@ -140,7 +140,7 @@ foreach ($cssDocument->getAllDeclarationBlocks() as $block) {
 ### Shrink all absolute sizes to half
 
 ```php
-$parser = new \Sabberworm\CSS\Parser($css);
+$parser = new \WPO\IPS\Vendor\Sabberworm\CSS\Parser($css);
 $cssDocument = $parser->parse();
 foreach ($cssDocument->getAllValues() as $value) {
     if ($value instanceof CSSSize && !$value->isRelative()) {
@@ -152,7 +152,7 @@ foreach ($cssDocument->getAllValues() as $value) {
 ### Remove unwanted rules
 
 ```php
-$parser = new \Sabberworm\CSS\Parser($css);
+$parser = new \WPO\IPS\Vendor\Sabberworm\CSS\Parser($css);
 $cssDocument = $parser->parse();
 foreach($cssDocument->getAllRuleSets() as $oRuleSet) {
     // Note that the added dash will make this remove all rules starting with
@@ -168,7 +168,7 @@ foreach($cssDocument->getAllRuleSets() as $oRuleSet) {
 To output the entire CSS document into a variable, just use `->render()`:
 
 ```php
-$parser = new \Sabberworm\CSS\Parser(file_get_contents('somefile.css'));
+$parser = new \WPO\IPS\Vendor\Sabberworm\CSS\Parser(file_get_contents('somefile.css'));
 $cssDocument = $parser->parse();
 print $cssDocument->render();
 ```
@@ -176,7 +176,7 @@ print $cssDocument->render();
 If you want to format the output, pass an instance of type `\Sabberworm\CSS\OutputFormat`:
 
 ```php
-$format = \Sabberworm\CSS\OutputFormat::create()
+$format = \WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat::create()
     ->indentWithSpaces(4)->setSpaceBetweenRules("\n");
 print $cssDocument->render($format);
 ```
@@ -184,8 +184,8 @@ print $cssDocument->render($format);
 Or use one of the predefined formats:
 
 ```php
-print $cssDocument->render(Sabberworm\CSS\OutputFormat::createPretty());
-print $cssDocument->render(Sabberworm\CSS\OutputFormat::createCompact());
+print $cssDocument->render(WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat::createPretty());
+print $cssDocument->render(WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat::createCompact());
 ```
 
 To see what you can do with output formatting, look at the tests in `tests/OutputFormatTest.php`.
