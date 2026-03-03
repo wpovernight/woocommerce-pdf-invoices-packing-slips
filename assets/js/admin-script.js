@@ -327,8 +327,8 @@ jQuery( function( $ ) {
 	} );
 
 	// Check for settings change
-	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea', settingsChanged );
-	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
+	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input:not([type="color"]), #wpo-wcpdf-settings textarea', settingsChanged );
+	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select, #wpo-wcpdf-settings input[type="color"]', function( event ) {
 		if ( 'shop_address_country' === event.target.id || ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
 			settingsChanged( event );
 		}
@@ -358,17 +358,25 @@ jQuery( function( $ ) {
 		// Check if preview needs to reload and with what delay
 		let $element = $( event.target );
 
-		if ( ! settingIsExcludedForPreview( $element.attr('name') ) ) {
+		if ( ! settingIsExcludedForPreview( $element.attr( 'name' ) ) ) {
 
-			if ( $element.hasClass( 'remove-requirement' ) || $element.attr('id') == 'disable_for' ) {
+			// Special handling for color inputs
+			if ( $element.is( 'input[type="color"]' ) && $.inArray( event.type, [ 'change', 'input' ] ) !== -1 ) {
+				previewDelay = 0;
+				triggerPreview( previewDelay );
 				return;
 			}
 
-			if ( $.inArray( event.type, ['keyup', 'paste'] ) !== -1 ) {
+			if ( $element.hasClass( 'remove-requirement' ) || $element.attr( 'id' ) == 'disable_for' ) {
+				return;
+			}
+
+			if ( $.inArray( event.type, [ 'keyup', 'paste' ] ) !== -1 ) {
+				// For text-like inputs, delay preview on keyup / paste.
 				if ( $element.is( 'input[type="checkbox"], select' ) ) {
 					return;
 				} else {
-					previewDelay = event.type == 'keyup' ? 1000 : 0;
+					previewDelay = event.type === 'keyup' ? 1000 : 0;
 				}
 			}
 
