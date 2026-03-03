@@ -1,10 +1,12 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
+
 namespace WPO\IPS\Vendor\Sabre\Xml\Element;
 
 use WPO\IPS\Vendor\Sabre\Xml;
 use WPO\IPS\Vendor\Sabre\Xml\Deserializer;
+
 /**
  * 'KeyValue' parses out all child elements from a single node, and outputs a
  * key=>value struct.
@@ -41,6 +43,7 @@ class KeyValue implements Xml\Element
      * @var array<string, mixed>
      */
     protected array $value;
+
     /**
      * Constructor.
      *
@@ -50,6 +53,7 @@ class KeyValue implements Xml\Element
     {
         $this->value = $value;
     }
+
     /**
      * The xmlSerialize method is called during xml writing.
      *
@@ -70,6 +74,7 @@ class KeyValue implements Xml\Element
     {
         $writer->write($this->value);
     }
+
     /**
      * The deserialize method is called during xml parsing.
      *
@@ -92,6 +97,6 @@ class KeyValue implements Xml\Element
      */
     public static function xmlDeserialize(Xml\Reader $reader)
     {
-        return \WPO\IPS\Vendor\Sabre\Xml\Deserializer\keyValue($reader);
+        return Deserializer\keyValue($reader);
     }
 }

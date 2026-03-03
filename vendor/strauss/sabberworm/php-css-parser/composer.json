@@ -35,12 +35,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Sabberworm\\CSS\\": "src/"
+            "WPO\\IPS\\Vendor\\Sabberworm\\CSS\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Sabberworm\\CSS\\Tests\\": "tests/"
+            "WPO\\IPS\\Vendor\\Sabberworm\\CSS\\Tests\\": "tests/"
         }
     },
     "extra": {

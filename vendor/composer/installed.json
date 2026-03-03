@@ -41,7 +41,14 @@
             "time": "2025-10-29T12:43:30+00:00",
             "type": "library",
             "installation-source": "dist",
-            "autoload": [],
+            "autoload": {
+                "psr-4": {
+                    "Dompdf\\": "src/"
+                },
+                "classmap": [
+                    "lib/"
+                ]
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "LGPL-2.1"
@@ -85,7 +92,11 @@
             "time": "2026-01-20T14:10:26+00:00",
             "type": "library",
             "installation-source": "dist",
-            "autoload": [],
+            "autoload": {
+                "psr-4": {
+                    "FontLib\\": "src/FontLib"
+                }
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "LGPL-2.1-or-later"
@@ -130,7 +141,11 @@
             "time": "2026-01-02T16:01:13+00:00",
             "type": "library",
             "installation-source": "dist",
-            "autoload": [],
+            "autoload": {
+                "psr-4": {
+                    "Svg\\": "src/Svg"
+                }
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "LGPL-3.0-or-later"
@@ -179,7 +194,11 @@
                 }
             },
             "installation-source": "dist",
-            "autoload": [],
+            "autoload": {
+                "psr-4": {
+                    "Masterminds\\": "src"
+                }
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
@@ -249,7 +268,11 @@
                 }
             },
             "installation-source": "dist",
-            "autoload": [],
+            "autoload": {
+                "psr-4": {
+                    "Sabberworm\\CSS\\": "src/"
+                }
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
@@ -309,7 +332,14 @@
             "time": "2024-09-04T15:30:08+00:00",
             "type": "library",
             "installation-source": "dist",
-            "autoload": [],
+            "autoload": {
+                "files": [
+                    "lib/functions.php"
+                ],
+                "psr-4": {
+                    "Sabre\\Uri\\": "lib/"
+                }
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
@@ -367,7 +397,15 @@
             "time": "2024-09-06T08:00:55+00:00",
             "type": "library",
             "installation-source": "dist",
-            "autoload": [],
+            "autoload": {
+                "files": [
+                    "lib/Deserializer/functions.php",
+                    "lib/Serializer/functions.php"
+                ],
+                "psr-4": {
+                    "Sabre\\Xml\\": "lib/"
+                }
+            },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
