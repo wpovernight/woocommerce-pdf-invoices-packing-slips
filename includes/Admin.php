@@ -706,8 +706,7 @@ class Admin {
 		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
 
 		foreach ( $documents as $document ) {
-			$document_title = $document->get_title();
-			$document_type  = $document->get_type();
+			$document_type = $document->get_type();
 
 			if ( 'credit-note' === $document_type && $order instanceof \WC_Order ) {
 				$refunds = $order->get_refunds();
@@ -737,14 +736,14 @@ class Admin {
 
 		$meta_box_actions = apply_filters( 'wpo_ips_edi_meta_box_actions', $meta_box_actions, $order->get_id() );
 
-		if ( 0 === count( $meta_box_actions ) ) {
+		if ( empty( $meta_box_actions ) ) {
 			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require that the PDF version of the same document type is generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
 		}
 
 		// Peppol specific
 		echo $this->get_order_meta_box_peppol_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
-		if ( count( $meta_box_actions ) > 0 ) :
+		if ( ! empty( $meta_box_actions ) ) :
 		?>
 		<div class="edi-order-actions">
 			<table class="widefat">
@@ -756,15 +755,34 @@ class Admin {
 				</thead>
 				<tbody>
 					<?php
+						$store = null;
+						if ( class_exists( '\ActionScheduler' ) ) {
+							$store = \ActionScheduler::store();
+						}
+						
 						foreach ( $meta_box_actions as $document_type => $data ) {
-							$url      = $data['url']     ?? '';
-							$class    = $data['class']   ?? '';
-							$alt      = $data['alt']     ?? '';
-							$title    = $data['title']   ?? '';
-							$target   = $data['target']  ?? '';
-							$network  = $data['network'] ?? array(); // network links
-							$status   = $data['status']  ?? '';
-							$disabled = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
+							$url             = $data['url']     ?? '';
+							$class           = $data['class']   ?? '';
+							$alt             = $data['alt']     ?? '';
+							$title           = $data['title']   ?? '';
+							$target          = $data['target']  ?? '';
+							$network         = $data['network'] ?? array(); // network links
+							$status          = $data['status']  ?? '';
+							$action_id       = absint( $data['action_id'] ?? 0 );
+							$send_disabled   = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
+							$update_disabled = ' disabled';
+
+							if ( $action_id > 0 && $store ) {
+								try {
+									$action_status = $store->get_status( $action_id );
+
+									if ( \ActionScheduler_Store::STATUS_COMPLETE === $action_status ) {
+										$update_disabled = '';
+									}
+								} catch ( \Exception $e ) {
+									$update_disabled = ' disabled';
+								}
+							}
 
 							$network_buttons = '';
 
@@ -782,7 +800,7 @@ class Admin {
 
 									$network_buttons = \wpo_ips_edi_generate_action_button_html(
 										$dispatch_url,
-										'button xml sent' . $disabled,
+										'button xml sent' . $send_disabled,
 										$label,
 										'dashicons-cloud-saved'
 									);
@@ -790,7 +808,6 @@ class Admin {
 								} else {
 									// First time sending
 									if ( empty( $status ) ) {
-										$action_id     = $data['action_id'] ?? 0;
 										$scheduled_url = $network['scheduled'] ?? '';
 
 										// Already scheduled
@@ -815,10 +832,10 @@ class Admin {
 												esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 												esc_html( $alt )
 											);
-
+											
 											$send_button = \wpo_ips_edi_generate_action_button_html(
 												$dispatch_url,
-												'button button-primary xml send' . $disabled,
+												'button button-primary xml send' . $send_disabled,
 												$send_label,
 												'dashicons-cloud-upload'
 											);
@@ -833,10 +850,10 @@ class Admin {
 											esc_html__( 'Resend %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 											esc_html( $alt )
 										);
-
+										
 										$resend_button = \wpo_ips_edi_generate_action_button_html(
 											$dispatch_url,
-											'button button-primary xml resend' . $disabled,
+											'button button-primary xml resend' . $send_disabled,
 											$resend_label,
 											'dashicons-cloud-upload'
 										);
@@ -846,10 +863,10 @@ class Admin {
 											esc_html__( 'Update %s', 'woocommerce-pdf-invoices-packing-slips' ),
 											esc_html( $alt )
 										);
-
+										
 										$update_button = \wpo_ips_edi_generate_action_button_html(
 											$update_status_url,
-											'button xml update ' . $class . $disabled,
+											'button xml update ' . $class . $update_disabled,
 											$update_label,
 											'dashicons-update-alt'
 										);
