@@ -2117,6 +2117,14 @@ function wpo_ips_current_page_has_checkout_shortcode(): bool {
 		has_shortcode( $content, 'woocommerce_checkout' ) ||
 		has_shortcode( $content, 'checkout' )
 	);
+	
+	// Final fallback to configured checkout page.
+	if ( ! $result ) {
+		$checkout_page_id = (int) get_option( 'woocommerce_checkout_page_id' );
+		if ( $checkout_page_id && $checkout_page_id === (int) $page_id ) {
+			$result = true;
+		}
+	}
 
 	return (bool) apply_filters(
 		'wpo_ips_current_page_has_checkout_shortcode',
@@ -2133,35 +2141,61 @@ function wpo_ips_current_page_has_checkout_shortcode(): bool {
  */
 function wpo_ips_current_page_has_checkout_block(): bool {
 	if ( is_admin() ) {
-		return false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_block',
+			false,
+			0,
+			null
+		);
 	}
 
 	$page_id = get_queried_object_id();
 	if ( ! $page_id ) {
-		$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, 0, null );
-		return is_bool( $override ) ? $override : false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_block',
+			false,
+			0,
+			null
+		);
 	}
 
 	$post = get_post( $page_id );
 	if ( ! $post instanceof WP_Post ) {
-		$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, $page_id, null );
-		return is_bool( $override ) ? $override : false;
-	}
-
-	// Allow builders / custom setups (Elementor templates, custom endpoints, etc.) to override.
-	$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, $page_id, $post );
-	if ( is_bool( $override ) ) {
-		return $override;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_block',
+			false,
+			$page_id,
+			null
+		);
 	}
 
 	// Native block detection.
 	if ( function_exists( 'has_block' ) && has_block( 'woocommerce/checkout', $post ) ) {
-		return true;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_block',
+			true,
+			$page_id,
+			$post
+		);
 	}
 
 	$blocks = function_exists( 'parse_blocks' ) ? parse_blocks( $post->post_content ) : array();
+	$result = wpo_ips_blocks_contain( $blocks, 'woocommerce/checkout' );
+	
+	// Final fallback to configured checkout page.
+	if ( ! $result ) {
+		$checkout_page_id = (int) get_option( 'woocommerce_checkout_page_id' );
+		if ( $checkout_page_id && $checkout_page_id === (int) $page_id ) {
+			$result = true;
+		}
+	}
 
-	return wpo_ips_blocks_contain( $blocks, 'woocommerce/checkout' );
+	return (bool) apply_filters(
+		'wpo_ips_current_page_has_checkout_block',
+		$result,
+		$page_id,
+		$post
+	);
 }
 
 /**
