@@ -491,8 +491,8 @@ class SettingsEDI {
 				'placeholder'       => __( 'Select one or more countries', 'wpo-ips-edocs-network' ),
 				'class'             => 'edi-multiple',
 				'custom_attributes' => array(
-					'data-show_for_option_name'   => $option_name . '[ubl_format]',
-					'data-show_for_option_values' => wp_json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-show_for_option_name'   => $option_name . '[peppol_automatic_endpoint_id_derivation]',
+					'data-show_for_option_values' => wp_json_encode( array( '1' ) ),
 					'data-keep_current_value'     => true,
 				),
 			),
