@@ -699,12 +699,20 @@ class Install {
 			}
 		}
 
-		// 5.9.0-i1457.1: migrate EDI settings to remove supplier Legal Entity ID
+		// 5.9.0-i1457.1: migrate EDI settings
 		if ( version_compare( $installed_version, '5.9.0-i1457.1', '<' ) ) {
 			$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
 
+			// migrate Endpoint ID location key
+			if ( isset( $edi_settings['peppol_customer_identifier_fields_location'] ) ) {
+				$edi_settings['peppol_endpoint_id_field_location'] = $edi_settings['peppol_customer_identifier_fields_location'];
+				unset( $edi_settings['peppol_customer_identifier_fields_location'] );
+			}
+
+			// remove supplier Legal Entity ID fields
 			unset( $edi_settings['peppol_legal_identifier'] );
 			unset( $edi_settings['peppol_legal_identifier_icd'] );
+
 			update_option( 'wpo_ips_edi_settings', $edi_settings );
 		}
 
