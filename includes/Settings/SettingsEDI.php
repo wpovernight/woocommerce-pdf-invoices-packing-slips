@@ -506,7 +506,7 @@ class SettingsEDI {
 			'callback' => 'select',
 			'section'  => $section,
 			'args'     => array(
-				'title'       => __( 'Checkout Script Loading Fallback', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'       => __( 'Checkout Script Loading', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name' => $option_name,
 				'id'          => 'peppol_checkout_script_type',
 				'options'     => array(
