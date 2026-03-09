@@ -497,6 +497,34 @@ class SettingsEDI {
 				),
 			),
 		);
+		
+		// Peppol specific field.
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'peppol_checkout_script_type',
+			'title'    => '',
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'title'       => __( 'Checkout Script Loading Fallback', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name' => $option_name,
+				'id'          => 'peppol_checkout_script_type',
+				'options'     => array(
+					''        => __( 'Automatic detection', 'woocommerce-pdf-invoices-packing-slips' ),
+					'classic' => __( 'Force classic checkout scripts', 'woocommerce-pdf-invoices-packing-slips' ),
+					'block'   => __( 'Force block checkout scripts', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				'description' => __(
+					'Use this only if the Peppol Endpoint ID derivation scripts are not loading correctly on the checkout page. Leave it on Automatic detection unless you are experiencing issues.',
+					'woocommerce-pdf-invoices-packing-slips'
+				),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[peppol_automatic_endpoint_id_derivation]',
+					'data-show_for_option_values' => wp_json_encode( array( '1' ) ),
+					'data-keep_current_value'     => true,
+				),
+			),
+		);
 
 		$languages = wpo_wcpdf_get_multilingual_languages();
 

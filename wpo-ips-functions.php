@@ -2117,14 +2117,6 @@ function wpo_ips_current_page_has_checkout_shortcode(): bool {
 		has_shortcode( $content, 'woocommerce_checkout' ) ||
 		has_shortcode( $content, 'checkout' )
 	);
-	
-	// Final fallback to configured checkout page.
-	if ( ! $result ) {
-		$checkout_page_id = (int) get_option( 'woocommerce_checkout_page_id' );
-		if ( $checkout_page_id && $checkout_page_id === (int) $page_id ) {
-			$result = true;
-		}
-	}
 
 	return (bool) apply_filters(
 		'wpo_ips_current_page_has_checkout_shortcode',
@@ -2181,14 +2173,6 @@ function wpo_ips_current_page_has_checkout_block(): bool {
 
 	$blocks = function_exists( 'parse_blocks' ) ? parse_blocks( $post->post_content ) : array();
 	$result = wpo_ips_blocks_contain( $blocks, 'woocommerce/checkout' );
-	
-	// Final fallback to configured checkout page.
-	if ( ! $result ) {
-		$checkout_page_id = (int) get_option( 'woocommerce_checkout_page_id' );
-		if ( $checkout_page_id && $checkout_page_id === (int) $page_id ) {
-			$result = true;
-		}
-	}
 
 	return (bool) apply_filters(
 		'wpo_ips_current_page_has_checkout_block',
@@ -2223,4 +2207,24 @@ function wpo_ips_blocks_contain( array $blocks, string $needle ): bool {
 	}
 
 	return false;
+}
+
+/**
+ * Check if the current page is the configured WooCommerce checkout page.
+ *
+ * @return bool
+ */
+function wpo_ips_is_current_page_checkout_page(): bool {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	$page_id = get_queried_object_id();
+	if ( ! $page_id ) {
+		return false;
+	}
+
+	$checkout_page_id = (int) get_option( 'woocommerce_checkout_page_id' );
+
+	return $checkout_page_id > 0 && $checkout_page_id === (int) $page_id;
 }
