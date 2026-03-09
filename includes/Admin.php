@@ -762,7 +762,7 @@ class Admin {
 							$title           = $data['title']   ?? '';
 							$target          = $data['target']  ?? '';
 							$network         = $data['network'] ?? array(); // network links
-							$status          = $data['status'] ?? '';
+							$status          = $data['status']  ?? '';
 							$action_id       = absint( $data['action_id'] ?? 0 );
 							$send_disabled   = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
 
