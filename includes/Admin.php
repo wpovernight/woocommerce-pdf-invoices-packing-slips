@@ -756,7 +756,7 @@ class Admin {
 				<tbody>
 					<?php
 						$store = null;
-						if ( class_exists( '\ActionScheduler' ) ) {
+						if ( class_exists( '\\ActionScheduler' ) ) {
 							$store = \ActionScheduler::store();
 						}
 						
