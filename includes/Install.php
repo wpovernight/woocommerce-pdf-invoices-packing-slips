@@ -656,12 +656,12 @@ class Install {
 					$general_settings['shop_address_state'] = $new_states_by_locale;
 					update_option( 'wpo_wcpdf_settings_general', $general_settings );
 				}
-				
+
 				// reset shop address notice option
 				delete_option( 'wpo_wcpdf_dismiss_shop_address_notice' );
 			}
 		}
-		
+
 		// 5.0.0-pr1149.1: migrate UBL tax settings to IPS EDI settings
 		if ( version_compare( $installed_version, '5.0.0-pr1149.1', '<' ) ) {
 			$ubl_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
@@ -671,32 +671,41 @@ class Install {
 					delete_option( 'wpo_wcpdf_settings_ubl_taxes' );
 				}
 			}
-			
+
 			$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
-			
+
 			if ( ! empty( $invoice_settings['ubl'] ) ) {
 				$edi_settings = array(
 					'document_types' => array( 'invoice' ),
 					'syntax'         => 'ubl',
 					'ubl_format'     => 'ubl-2p1',
 				);
-				
+
 				if ( ! empty( $invoice_settings['ubl']['enabled'] ) ) {
 					$edi_settings['enabled'] = $invoice_settings['ubl']['enabled'];
 				}
-				
+
 				if ( ! empty( $invoice_settings['ubl']['include_encrypted_pdf'] ) ) {
 					$edi_settings['embed_encrypted_pdf'] = $invoice_settings['ubl']['include_encrypted_pdf'];
 				}
-				
+
 				if ( ! empty( $invoice_settings['ubl']['attach_to_email_ids'] ) ) {
 					$edi_settings['send_attachments'] = '1';
 				}
-				
+
 				update_option( 'wpo_ips_edi_settings', $edi_settings );
 				unset( $invoice_settings['ubl'] );
 				update_option( 'wpo_wcpdf_documents_settings_invoice', $invoice_settings );
 			}
+		}
+
+		// 5.9.0-i1457.1: migrate EDI settings to remove supplier Legal Entity ID
+		if ( version_compare( $installed_version, '5.9.0-i1457.1', '<' ) ) {
+			$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+
+			unset( $edi_settings['peppol_legal_identifier'] );
+			unset( $edi_settings['peppol_legal_identifier_icd'] );
+			update_option( 'wpo_ips_edi_settings', $edi_settings );
 		}
 
 		// Maybe reinstall fonts
