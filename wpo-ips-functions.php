@@ -2042,29 +2042,44 @@ function wpo_ips_get_plugins_data( array $plugin_files ): array {
 
 /**
  * Check if the current page contains the WooCommerce classic checkout (block or shortcode).
- * 
+ *
  * @return bool
  */
 function wpo_ips_current_page_has_checkout_shortcode(): bool {
 	if ( is_admin() ) {
-		return false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_shortcode',
+			false,
+			0,
+			null
+		);
 	}
 
 	$page_id = get_queried_object_id();
 	if ( ! $page_id ) {
-		return false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_shortcode',
+			false,
+			0,
+			null
+		);
 	}
 
 	$post = get_post( $page_id );
 	if ( ! $post instanceof \WP_Post ) {
-		return false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_shortcode',
+			false,
+			$page_id,
+			null
+		);
 	}
 
 	$content = (string) $post->post_content;
 
 	// Block-based "Classic Shortcode" wrapper.
 	if ( function_exists( 'has_block' ) && has_block( 'woocommerce/classic-shortcode', $content ) ) {
-		$blocks = parse_blocks( $content );
+		$blocks = function_exists( 'parse_blocks' ) ? parse_blocks( $content ) : array();
 
 		$has_checkout = static function( array $blocks ) use ( &$has_checkout ): bool {
 			foreach ( $blocks as $block ) {
@@ -2088,14 +2103,26 @@ function wpo_ips_current_page_has_checkout_shortcode(): bool {
 		};
 
 		if ( $has_checkout( $blocks ) ) {
-			return true;
+			return (bool) apply_filters(
+				'wpo_ips_current_page_has_checkout_shortcode',
+				true,
+				$page_id,
+				$post
+			);
 		}
 	}
 
 	// Legacy shortcode-based checkout page.
-	return function_exists( 'has_shortcode' ) && (
+	$result = function_exists( 'has_shortcode' ) && (
 		has_shortcode( $content, 'woocommerce_checkout' ) ||
 		has_shortcode( $content, 'checkout' )
+	);
+
+	return (bool) apply_filters(
+		'wpo_ips_current_page_has_checkout_shortcode',
+		$result,
+		$page_id,
+		$post
 	);
 }
 
