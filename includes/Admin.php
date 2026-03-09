@@ -755,11 +755,6 @@ class Admin {
 				</thead>
 				<tbody>
 					<?php
-						$store = null;
-						if ( class_exists( '\\ActionScheduler' ) ) {
-							$store = \ActionScheduler::store();
-						}
-						
 						foreach ( $meta_box_actions as $document_type => $data ) {
 							$url             = $data['url']     ?? '';
 							$class           = $data['class']   ?? '';
@@ -767,22 +762,9 @@ class Admin {
 							$title           = $data['title']   ?? '';
 							$target          = $data['target']  ?? '';
 							$network         = $data['network'] ?? array(); // network links
-							$status          = $data['status']  ?? '';
+							$status          = $data['status'] ?? '';
 							$action_id       = absint( $data['action_id'] ?? 0 );
 							$send_disabled   = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
-							$update_disabled = ' disabled';
-
-							if ( $action_id > 0 && $store ) {
-								try {
-									$action_status = $store->get_status( $action_id );
-
-									if ( \ActionScheduler_Store::STATUS_COMPLETE === $action_status ) {
-										$update_disabled = '';
-									}
-								} catch ( \Exception $e ) {
-									$update_disabled = ' disabled';
-								}
-							}
 
 							$network_buttons = '';
 
@@ -866,7 +848,7 @@ class Admin {
 										
 										$update_button = \wpo_ips_edi_generate_action_button_html(
 											$update_status_url,
-											'button xml update ' . $class . $update_disabled,
+											'button xml update ' . $class,
 											$update_label,
 											'dashicons-update-alt'
 										);
