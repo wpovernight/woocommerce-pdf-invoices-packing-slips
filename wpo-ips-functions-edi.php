@@ -713,31 +713,13 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	);
 
 	if ( wpo_ips_edi_peppol_is_available() ) {
-		$endpoint_id             = wpo_ips_edi_get_settings( 'peppol_endpoint_id' );
-		$endpoint_scheme         = wpo_ips_edi_get_settings( 'peppol_endpoint_eas' );
-		$legal_identifier        = wpo_ips_edi_get_settings( 'peppol_legal_identifier' );
-		$legal_identifier_scheme = wpo_ips_edi_get_settings( 'peppol_legal_identifier_icd' );
-
-		$legal_identifier_value  = $legal_identifier && ! empty( $data[ $language ][ $legal_identifier ]['value'] )
-			? $data[ $language ][ $legal_identifier ]['value']
-			: '';
-
-		if ( 'vat_number' === $legal_identifier && wpo_ips_edi_vat_number_has_country_prefix( $legal_identifier_value ) ) {
-			$legal_identifier_value = substr( $legal_identifier_value, 2 );
-		}
+		$endpoint_id     = wpo_ips_edi_get_settings( 'peppol_endpoint_id' );
+		$endpoint_scheme = wpo_ips_edi_get_settings( 'peppol_endpoint_eas' );
 
 		$data[ $language ]['peppol_endpoint_id'] = array(
 			'label'    => __( 'PEPPOL Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'    => ! empty( $endpoint_scheme ) && ! empty( $endpoint_id )
 				? sprintf( '%s:%s', $endpoint_scheme, $endpoint_id )
-				: '',
-			'required' => true,
-		);
-
-		$data[ $language ]['peppol_legal_identifier'] = array(
-			'label'    => __( 'PEPPOL Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier ) && ! empty( $legal_identifier_value )
-				? sprintf( '%s:%s', $legal_identifier_scheme, $legal_identifier_value )
 				: '',
 			'required' => true,
 		);
