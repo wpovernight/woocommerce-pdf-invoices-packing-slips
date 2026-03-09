@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @package dompdf
  * @link    https://github.com/dompdf/dompdf
@@ -23,8 +22,9 @@ class CanvasFactory
     private function __construct()
     {
     }
+
     /**
-     * @param \Dompdf         $dompdf
+     * @param Dompdf         $dompdf
      * @param string|float[] $paper
      * @param string         $orientation
      * @param string|null    $class
@@ -34,23 +34,35 @@ class CanvasFactory
     static function get_instance(Dompdf $dompdf, $paper, string $orientation, ?string $class = null)
     {
         $backend = strtolower($dompdf->getOptions()->getPdfBackend());
+
         if (isset($class) && class_exists($class, false)) {
             $class .= "_Adapter";
-        } else if (($backend === "auto" || $backend === "pdflib") && class_exists("PDFLib", false)) {
-            $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\PDFLib";
-        } else if (class_exists($backend, false)) {
-            $class = $backend;
-        } elseif ($backend === "gd" && extension_loaded('gd')) {
-            $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\GD";
         } else {
-            $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\CPDF";
+            if (($backend === "auto" || $backend === "pdflib") &&
+                class_exists("PDFLib", false)
+            ) {
+                $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\PDFLib";
+            }
+
+            else {
+                if (class_exists($backend, false)) {
+                    $class = $backend;
+                } elseif ($backend === "gd" && extension_loaded('gd')) {
+                    $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\GD";
+                } else {
+                    $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\CPDF";
+                }
+            }
         }
+
         $instance = new $class($paper, $orientation, $dompdf);
+
         $class_interfaces = class_implements($class, false);
         if (!$class_interfaces || !in_array("WPO\\IPS\\Vendor\\Dompdf\\Canvas", $class_interfaces)) {
             $class = "WPO\\IPS\\Vendor\\Dompdf\\Adapter\\CPDF";
             $instance = new $class($paper, $orientation, $dompdf);
         }
+
         return $instance;
     }
 }

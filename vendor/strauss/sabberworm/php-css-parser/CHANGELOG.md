@@ -301,7 +301,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 * Support removing a selector from a declaration block using
   `$oBlock->removeSelector($mSelector)`
-* Introduce a specialized exception (Sabberworm\CSS\Parsing\OuputException) for
+* Introduce a specialized exception (WPO\IPS\Vendor\Sabberworm\CSS\Parsing\OuputException) for
   exceptions during output rendering
 
 * *No deprecations*

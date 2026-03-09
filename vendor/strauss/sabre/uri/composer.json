@@ -28,12 +28,12 @@
             "lib/functions.php"
         ],
         "psr-4" : {
-            "Sabre\\Uri\\" : "lib/"
+            "WPO\\IPS\\Vendor\\Sabre\\Uri\\" : "lib/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Sabre\\Uri\\": "tests/Uri"
+            "WPO\\IPS\\Vendor\\Sabre\\Uri\\": "tests/Uri"
         }
     },
     "require-dev": {
