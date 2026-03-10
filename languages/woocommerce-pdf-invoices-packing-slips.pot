@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.9.0-beta.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.9.0-beta.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-09T16:22:54+00:00\n"
+"POT-Creation-Date: 2026-03-10T16:41:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -97,7 +97,7 @@ msgid "For more information on each Endpoint Address Scheme (EAS), refer to the 
 msgstr ""
 
 #: edi/Peppol.php:166
-#: includes/Admin.php:1412
+#: includes/Admin.php:1425
 msgid "Save changes"
 msgstr ""
 
@@ -133,7 +133,7 @@ msgid "Override (edit manually)"
 msgstr ""
 
 #: edi/Peppol.php:973
-#: includes/Admin.php:2188
+#: includes/Admin.php:2201
 msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
 msgstr ""
 
@@ -2170,7 +2170,7 @@ msgstr ""
 
 #: includes/Admin.php:134
 #: includes/Main.php:933
-#: includes/Settings/SettingsDebug.php:1415
+#: includes/Settings/SettingsDebug.php:1428
 #: includes/Settings/SettingsGeneral.php:842
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:135
@@ -2209,7 +2209,7 @@ msgid "I am the wizard"
 msgstr ""
 
 #: includes/Admin.php:361
-#: includes/Admin.php:1959
+#: includes/Admin.php:1972
 #: includes/Assets.php:371
 #: includes/Documents/Invoice.php:359
 #: includes/Main.php:1352
@@ -2262,352 +2262,362 @@ msgstr ""
 msgid "E-Documents require that the PDF version of the same document type is generated first."
 msgstr ""
 
-#: includes/Admin.php:753
+#. translators: settings link
+#: includes/Admin.php:750
+#, php-format
+msgid "Tax Classification for E-Documents is not set. Please configure it in %s."
+msgstr ""
+
+#: includes/Admin.php:751
+msgid "the settings"
+msgstr ""
+
+#: includes/Admin.php:766
 msgid "Actions"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:779
+#: includes/Admin.php:792
 #, php-format
 msgid "%s sent to Network"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:799
+#: includes/Admin.php:812
 #, php-format
 msgid "%s dispatch already scheduled"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:814
+#: includes/Admin.php:827
 #, php-format
 msgid "Send %s to Network"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:832
+#: includes/Admin.php:845
 #, php-format
 msgid "Resend %s to Network"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:845
+#: includes/Admin.php:858
 #, php-format
 msgid "Update %s"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:876
+#: includes/Admin.php:889
 #, php-format
 msgid "Download %s"
 msgstr ""
 
-#: includes/Admin.php:900
-#: includes/Admin.php:1777
+#: includes/Admin.php:913
+#: includes/Admin.php:1790
 msgid "Invalid security token."
 msgstr ""
 
-#: includes/Admin.php:909
+#: includes/Admin.php:922
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: includes/Admin.php:922
+#: includes/Admin.php:935
 msgid "Invalid order ID or values."
 msgstr ""
 
-#: includes/Admin.php:933
+#: includes/Admin.php:946
 msgid "Order not found."
 msgstr ""
 
-#: includes/Admin.php:943
+#: includes/Admin.php:956
 msgid "You do not have permission to edit this order."
 msgstr ""
 
-#: includes/Admin.php:956
+#: includes/Admin.php:969
 msgid "Peppol identifiers saved successfully."
 msgstr ""
 
-#: includes/Admin.php:974
+#: includes/Admin.php:987
 msgid "Invoice number:"
 msgstr ""
 
-#: includes/Admin.php:977
+#: includes/Admin.php:990
 msgid "Invoice date:"
 msgstr ""
 
-#: includes/Admin.php:980
+#: includes/Admin.php:993
 msgid "Invoice display date:"
 msgstr ""
 
-#: includes/Admin.php:983
+#: includes/Admin.php:996
 msgid "Invoice created via:"
 msgstr ""
 
-#: includes/Admin.php:986
+#: includes/Admin.php:999
 msgid "Notes (displayed in the invoice):"
 msgstr ""
 
-#: includes/Admin.php:1215
+#: includes/Admin.php:1228
 msgid "View more details"
 msgstr ""
 
-#: includes/Admin.php:1216
+#: includes/Admin.php:1229
 msgid "Hide details"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:1227
+#: includes/Admin.php:1240
 #, php-format
 msgid "Set %s number & date"
 msgstr ""
 
-#: includes/Admin.php:1236
+#: includes/Admin.php:1249
 msgid "You do not have sufficient permissions to edit this document."
 msgstr ""
 
-#: includes/Admin.php:1249
+#: includes/Admin.php:1262
 msgid "Number prefix"
 msgstr ""
 
-#: includes/Admin.php:1253
+#: includes/Admin.php:1266
 #: includes/Documents/Invoice.php:395
 msgid "If set, this value will be used as number prefix."
 msgstr ""
 
 #. translators: 1. document slug, 2-3 placeholders
-#: includes/Admin.php:1256
-#: includes/Admin.php:1276
+#: includes/Admin.php:1269
+#: includes/Admin.php:1289
 #: includes/Documents/Invoice.php:397
 #: includes/Documents/Invoice.php:406
 #, php-format
 msgid "You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively."
 msgstr ""
 
-#: includes/Admin.php:1269
+#: includes/Admin.php:1282
 msgid "Number suffix"
 msgstr ""
 
-#: includes/Admin.php:1273
+#: includes/Admin.php:1286
 #: includes/Documents/Invoice.php:404
 msgid "If set, this value will be used as number suffix."
 msgstr ""
 
-#: includes/Admin.php:1289
+#: includes/Admin.php:1302
 msgid "Number padding"
 msgstr ""
 
 #. translators: %1$s: code, %2$s: document title, %3$s: number, %4$s: padded number
-#: includes/Admin.php:1293
+#: includes/Admin.php:1306
 #, php-format
 msgid "Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
-#: includes/Admin.php:1309
+#: includes/Admin.php:1322
 #: includes/Documents/Invoice.php:420
 #, php-format
 msgid "For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article: %1$sNumber format explained%2$s"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1323
+#: includes/Admin.php:1336
 #, php-format
 msgid "%s number"
 msgstr ""
 
-#: includes/Admin.php:1331
+#: includes/Admin.php:1344
 msgid "Formatted number"
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
-#: includes/Admin.php:1338
+#: includes/Admin.php:1351
 #, php-format
 msgid "Manually changing the document's plain number also requires updating the next document number in the %1$sdocument settings%2$s."
 msgstr ""
 
-#: includes/Admin.php:1342
+#: includes/Admin.php:1355
 msgid "Please note that changing the document number may create gaps in the numbering sequence."
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:1355
+#: includes/Admin.php:1368
 #, php-format
 msgid "%s date"
 msgstr ""
 
-#: includes/Admin.php:1363
+#: includes/Admin.php:1376
 msgid "Hour"
 msgstr ""
 
-#: includes/Admin.php:1364
+#: includes/Admin.php:1377
 msgid "h"
 msgstr ""
 
-#: includes/Admin.php:1367
+#: includes/Admin.php:1380
 msgid "Minute"
 msgstr ""
 
-#: includes/Admin.php:1368
+#: includes/Admin.php:1381
 msgid "m"
 msgstr ""
 
-#: includes/Admin.php:1394
+#: includes/Admin.php:1407
 msgid "Notes"
 msgstr ""
 
-#: includes/Admin.php:1399
+#: includes/Admin.php:1412
 msgid "Displayed in the document!"
 msgstr ""
 
-#: includes/Admin.php:1413
-#: includes/Admin.php:2192
+#: includes/Admin.php:1426
+#: includes/Admin.php:2205
 msgid "Cancel"
 msgstr ""
 
 #. translators: %s: email title
-#: includes/Admin.php:1553
+#: includes/Admin.php:1566
 #, php-format
 msgid "%s email notification manually sent."
 msgstr ""
 
-#: includes/Admin.php:1601
+#: includes/Admin.php:1614
 msgid "Nonce expired!"
 msgstr ""
 
-#: includes/Admin.php:1609
+#: includes/Admin.php:1622
 msgid "Bad action!"
 msgstr ""
 
-#: includes/Admin.php:1615
+#: includes/Admin.php:1628
 msgid "Incomplete request!"
 msgstr ""
 
-#: includes/Admin.php:1621
+#: includes/Admin.php:1634
 msgid "No permissions!"
 msgstr ""
 
-#: includes/Admin.php:1647
+#: includes/Admin.php:1660
 msgid "Document data saved!"
 msgstr ""
 
-#: includes/Admin.php:1648
+#: includes/Admin.php:1661
 msgid "An error occurred while saving the document data!"
 msgstr ""
 
-#: includes/Admin.php:1651
+#: includes/Admin.php:1664
 msgid "Document regenerated!"
 msgstr ""
 
-#: includes/Admin.php:1652
+#: includes/Admin.php:1665
 msgid "An error occurred while regenerating the document!"
 msgstr ""
 
-#: includes/Admin.php:1655
+#: includes/Admin.php:1668
 msgid "Document deleted!"
 msgstr ""
 
-#: includes/Admin.php:1656
+#: includes/Admin.php:1669
 msgid "An error occurred while deleting the document!"
 msgstr ""
 
-#: includes/Admin.php:1716
+#: includes/Admin.php:1729
 msgid "Document does not exist."
 msgstr ""
 
-#: includes/Admin.php:1730
+#: includes/Admin.php:1743
 msgid "Document is empty."
 msgstr ""
 
-#: includes/Admin.php:1761
+#: includes/Admin.php:1774
 msgid "DEBUG output enabled"
 msgstr ""
 
-#: includes/Admin.php:1789
+#: includes/Admin.php:1802
 msgid "Invalid order ID."
 msgstr ""
 
-#: includes/Admin.php:1795
+#: includes/Admin.php:1808
 msgid "Invalid order."
 msgstr ""
 
-#: includes/Admin.php:1799
+#: includes/Admin.php:1812
 msgid "Invalid document type."
 msgstr ""
 
-#: includes/Admin.php:1805
+#: includes/Admin.php:1818
 msgid "Invalid document."
 msgstr ""
 
-#: includes/Admin.php:2040
+#: includes/Admin.php:2053
 msgid "RFND"
 msgstr ""
 
-#: includes/Admin.php:2040
+#: includes/Admin.php:2053
 msgid "ORD"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:2048
+#: includes/Admin.php:2061
 #, php-format
 msgid "XML %s"
 msgstr ""
 
-#: includes/Admin.php:2083
+#: includes/Admin.php:2096
 msgid "Identifier"
 msgstr ""
 
-#: includes/Admin.php:2085
+#: includes/Admin.php:2098
 #: includes/Assets.php:97
 msgid "Show"
 msgstr ""
 
-#: includes/Admin.php:2104
-#: includes/Admin.php:2130
-#: includes/Admin.php:2172
+#: includes/Admin.php:2117
+#: includes/Admin.php:2143
+#: includes/Admin.php:2185
 #: includes/Assets.php:342
 #: includes/Settings/SettingsEDI.php:685
 msgid "Missing"
 msgstr ""
 
-#: includes/Admin.php:2105
-#: includes/Admin.php:2131
-#: includes/Admin.php:2173
+#: includes/Admin.php:2118
+#: includes/Admin.php:2144
+#: includes/Admin.php:2186
 #: includes/Assets.php:343
 #: includes/Settings/SettingsEDI.php:686
 msgid "Optional"
 msgstr ""
 
-#: includes/Admin.php:2142
+#: includes/Admin.php:2155
 #: includes/Settings/SettingsEDI.php:694
 msgid "VAT number is missing the country prefix"
 msgstr ""
 
-#: includes/Admin.php:2155
+#: includes/Admin.php:2168
 msgid "Peppol"
 msgstr ""
 
-#: includes/Admin.php:2157
+#: includes/Admin.php:2170
 msgid "Edit"
 msgstr ""
 
-#: includes/Admin.php:2191
+#: includes/Admin.php:2204
 #: includes/Settings/SettingsCallbacks.php:913
 msgid "Save"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:2231
+#: includes/Admin.php:2244
 #, php-format
 msgid "Editing of %s number and date is currently disabled."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name
-#: includes/Admin.php:2236
+#: includes/Admin.php:2249
 #, php-format
 msgid "If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s."
 msgstr ""
 
-#: includes/Admin.php:2239
+#: includes/Admin.php:2252
 #: includes/Settings/SettingsDebug.php:947
 msgid "Enable document data editing"
 msgstr ""
@@ -2650,7 +2660,7 @@ msgstr ""
 
 #: includes/Assets.php:131
 #: includes/Settings.php:117
-#: includes/Settings/SettingsDebug.php:1561
+#: includes/Settings/SettingsDebug.php:1574
 #: includes/Settings/SettingsEDI.php:34
 msgid "Settings"
 msgstr ""
@@ -2701,8 +2711,8 @@ msgstr ""
 #: includes/Assets.php:306
 #: includes/Settings/SettingsDebug.php:339
 #: includes/Settings/SettingsDebug.php:617
-#: includes/Settings/SettingsDebug.php:1723
-#: includes/Settings/SettingsDebug.php:1984
+#: includes/Settings/SettingsDebug.php:1736
+#: includes/Settings/SettingsDebug.php:1997
 msgid "You are not allowed to perform this action."
 msgstr ""
 
@@ -3979,214 +3989,226 @@ msgstr ""
 msgid "Document can be accessed by everyone with the link."
 msgstr ""
 
+#: includes/Settings/SettingsDebug.php:1203
+msgid "Unknown"
+msgstr ""
+
 #. translators: %s dependency min version
-#: includes/Settings/SettingsDebug.php:1205
-#: includes/Settings/SettingsDebug.php:1214
-#: includes/Settings/SettingsDebug.php:1228
+#: includes/Settings/SettingsDebug.php:1212
+#: includes/Settings/SettingsDebug.php:1221
+#: includes/Settings/SettingsDebug.php:1235
 #, php-format
 msgid "%s or superior"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1221
+#: includes/Settings/SettingsDebug.php:1228
 msgid "Recommended"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1222
+#: includes/Settings/SettingsDebug.php:1229
 #: views/advanced-status.php:177
 msgid "Enabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1222
+#: includes/Settings/SettingsDebug.php:1229
 msgid "Disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1243
+#: includes/Settings/SettingsDebug.php:1242
+msgid "MySQL, MariaDB, or SQLite"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1245
+msgid "Unable to detect the database server"
+msgstr ""
+
+#: includes/Settings/SettingsDebug.php:1256
 msgid "Recommended, will use fallback functions"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1249
+#: includes/Settings/SettingsDebug.php:1262
 msgid "Required if you have images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1252
+#: includes/Settings/SettingsDebug.php:1265
 msgid "Required when using .webp images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1255
+#: includes/Settings/SettingsDebug.php:1268
 msgid "Required if you have .webp images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1258
+#: includes/Settings/SettingsDebug.php:1271
 msgid "To compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1261
+#: includes/Settings/SettingsDebug.php:1274
 msgid "Recommended to compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1264
+#: includes/Settings/SettingsDebug.php:1277
 msgid "For better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1267
-#: includes/Settings/SettingsDebug.php:1273
+#: includes/Settings/SettingsDebug.php:1280
+#: includes/Settings/SettingsDebug.php:1286
 msgid "Recommended for better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1270
+#: includes/Settings/SettingsDebug.php:1283
 msgid "Better with transparent PNG images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1276
+#: includes/Settings/SettingsDebug.php:1289
 msgid "Required to detect custom templates and to clear the temp folder periodically"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1279
+#: includes/Settings/SettingsDebug.php:1292
 msgid "Check PHP disable_functions"
 msgstr ""
 
 #. translators: <a> tags
-#: includes/Settings/SettingsDebug.php:1283
+#: includes/Settings/SettingsDebug.php:1296
 msgid "Recommended: 128MB (especially for plugin-heavy setups)"
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: includes/Settings/SettingsDebug.php:1285
+#: includes/Settings/SettingsDebug.php:1298
 #, php-format
 msgid "See: %1$sIncreasing the WordPress Memory Limit%2$s"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1293
+#: includes/Settings/SettingsDebug.php:1306
 msgid "Required to save documents to the server"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1296
+#: includes/Settings/SettingsDebug.php:1309
 msgid "Check your server configuration"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1299
+#: includes/Settings/SettingsDebug.php:1312
 msgid "Allow remote stylesheets and images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1302
+#: includes/Settings/SettingsDebug.php:1315
 msgid "allow_url_fopen disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1305
+#: includes/Settings/SettingsDebug.php:1318
 msgid "Necessary to verify the MIME type of local images."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1308
+#: includes/Settings/SettingsDebug.php:1321
 msgid "fileinfo disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1311
+#: includes/Settings/SettingsDebug.php:1324
 msgid "To compress and decompress font and image data"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1314
+#: includes/Settings/SettingsDebug.php:1327
 msgid "base64_decode disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1322
+#: includes/Settings/SettingsDebug.php:1335
 msgid "Required for IMagick"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1325
+#: includes/Settings/SettingsDebug.php:1338
 msgid "ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag
-#: includes/Settings/SettingsDebug.php:1405
+#: includes/Settings/SettingsDebug.php:1418
 #, php-format
 msgid "Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1458
+#: includes/Settings/SettingsDebug.php:1471
 msgid "Writable"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1459
+#: includes/Settings/SettingsDebug.php:1472
 msgid "Not writable"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1464
+#: includes/Settings/SettingsDebug.php:1477
 msgid "Central temporary plugin folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1470
+#: includes/Settings/SettingsDebug.php:1483
 msgid "Temporary attachments folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1476
+#: includes/Settings/SettingsDebug.php:1489
 msgid "Temporary DOMPDF folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1482
+#: includes/Settings/SettingsDebug.php:1495
 msgid "DOMPDF fonts folder (needs to be writable for custom/remote fonts)"
 msgstr ""
 
 #. translators: %s action date
-#: includes/Settings/SettingsDebug.php:1524
+#: includes/Settings/SettingsDebug.php:1537
 #, php-format
 msgid "Scheduled to: %s"
 msgstr ""
 
 #. translators: total scheduled actions
-#: includes/Settings/SettingsDebug.php:1533
+#: includes/Settings/SettingsDebug.php:1546
 #, php-format
 msgid "Only 1 scheduled action should exist, but %s were found"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag
-#: includes/Settings/SettingsDebug.php:1543
+#: includes/Settings/SettingsDebug.php:1556
 #, php-format
 msgid "Scheduled action not found. Please reschedule it %1$shere%2$s."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1562
+#: includes/Settings/SettingsDebug.php:1575
 #: views/advanced-status.php:52
 #: views/advanced-status.php:246
 msgid "Status"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1563
+#: includes/Settings/SettingsDebug.php:1576
 msgid "Tools"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1564
+#: includes/Settings/SettingsDebug.php:1577
 msgid "Numbers"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1576
+#: includes/Settings/SettingsDebug.php:1589
 msgid "File System & Access"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1586
+#: includes/Settings/SettingsDebug.php:1599
 msgid "Document Display & Interaction"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1595
+#: includes/Settings/SettingsDebug.php:1608
 msgid "Document Management & Behavior"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1604
+#: includes/Settings/SettingsDebug.php:1617
 msgid "Localization & Translation"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1611
+#: includes/Settings/SettingsDebug.php:1624
 msgid "Debugging & Logging"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1619
+#: includes/Settings/SettingsDebug.php:1632
 msgid "Versioning & Stability"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1625
+#: includes/Settings/SettingsDebug.php:1638
 msgid "Advanced / Experimental"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1742
+#: includes/Settings/SettingsDebug.php:1755
 msgid "Invalid request"
 msgstr ""
 
@@ -5169,17 +5191,17 @@ msgid "SKU"
 msgstr ""
 
 #: languages/strings.php:14
-#: wpo-ips-functions.php:1002
+#: wpo-ips-functions.php:1018
 msgid "Product"
 msgstr ""
 
 #: languages/strings.php:15
-#: wpo-ips-functions.php:1003
+#: wpo-ips-functions.php:1019
 msgid "Quantity"
 msgstr ""
 
 #: languages/strings.php:16
-#: wpo-ips-functions.php:1004
+#: wpo-ips-functions.php:1020
 msgid "Price"
 msgstr ""
 

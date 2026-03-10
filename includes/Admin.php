@@ -739,6 +739,19 @@ class Admin {
 		if ( empty( $meta_box_actions ) ) {
 			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require that the PDF version of the same document type is generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
 		}
+		
+		if (
+			( $order->get_cart_tax() > 0 || $order->get_shipping_tax() > 0 ) &&
+			empty( wpo_ips_edi_get_tax_settings() )
+		) {
+			echo '<div class="notice notice-warning inline"><p>' .
+				sprintf(
+					/* translators: settings link */
+					esc_html__( 'Tax Classification for E-Documents is not set. Please configure it in %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=edi&section=taxes' ) ) . '" target="_blank">' . esc_html__( 'the settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				) .
+			'</p></div>';
+		}
 
 		// Peppol specific
 		echo $this->get_order_meta_box_peppol_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
