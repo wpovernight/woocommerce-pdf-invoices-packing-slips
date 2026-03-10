@@ -747,7 +747,7 @@ class Admin {
 			echo '<div class="notice notice-warning inline"><p>' .
 				sprintf(
 					/* translators: settings link */
-					esc_html__( 'Tax Classification for E-Documents is not configured. Please configure it in %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					esc_html__( 'Tax Classification for E-Documents is not set. Please configure it in %s.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=edi&section=taxes' ) ) . '" target="_blank">' . esc_html__( 'the settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 				) .
 			'</p></div>';
