@@ -246,13 +246,14 @@ class WPO_WCPDF {
 	 */
 	public function is_woocommerce_activated() {
 		$blog_plugins = get_option( 'active_plugins', array() );
-		$site_plugins = is_multisite() ? (array) maybe_unserialize( get_site_option('active_sitewide_plugins' ) ) : array();
+		$site_plugins = is_multisite() ? (array) get_site_option( 'active_sitewide_plugins', array() ) : array();
 
-		if ( in_array( 'woocommerce/woocommerce.php', $blog_plugins ) || isset( $site_plugins['woocommerce/woocommerce.php'] ) ) {
+		if ( in_array( 'woocommerce/woocommerce.php', $blog_plugins, true ) || isset( $site_plugins['woocommerce/woocommerce.php'] ) ) {
 			$is_wc_activated = true;
 		} else {
 			$is_wc_activated = false;
 		}
+
 		return apply_filters( 'wpo_wcpdf_is_woocommerce_activated', $is_wc_activated );
 	}
 
