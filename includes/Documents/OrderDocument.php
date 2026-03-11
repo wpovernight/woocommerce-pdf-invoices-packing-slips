@@ -1132,6 +1132,12 @@ abstract class OrderDocument {
 
 	public function set_number( $value, $order = null ) {
 		$order = empty( $order ) ? $this->order : $order;
+		
+		// Ignore incorrectly stored serialized meta and only handle expected value types.
+		if ( is_string( $value ) && is_serialized( $value ) ) {
+			wcpdf_log_error( "Unexpected serialized string found for document number meta. Ignoring value. Meta value: {$value}" );
+			$value = null;
+		}
 
 		if ( is_array( $value ) ) {
 			$filtered_value = array_filter( $value );
