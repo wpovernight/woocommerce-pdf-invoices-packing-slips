@@ -624,12 +624,33 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_enqueue_checkout_scripts(): void {
+		if ( is_admin() ) {
+			return;
+		}
+
 		if ( wpo_ips_current_page_has_checkout_block() ) {
 			$this->peppol_enqueue_block_checkout_script();
+			return;
 		}
 
 		if ( wpo_ips_current_page_has_checkout_shortcode() ) {
 			$this->peppol_enqueue_classic_checkout_script();
+			return;
+		}
+
+		if ( ! wpo_ips_is_current_page_checkout_page() ) {
+			return;
+		}
+
+		// In case the page has neither the block nor the shortcode, but is still the assigned checkout page.
+		switch ( wpo_ips_edi_get_settings( 'peppol_checkout_script_type' ) ) {
+			case 'classic':
+				$this->peppol_enqueue_classic_checkout_script();
+				return;
+
+			case 'block':
+				$this->peppol_enqueue_block_checkout_script();
+				return;
 		}
 	}
 
