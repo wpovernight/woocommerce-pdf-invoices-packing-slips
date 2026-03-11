@@ -1211,6 +1211,7 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_shipping_vat_id',       // Germanized Pro (alternative)
 		'_billing_dic',           // EU/UK VAT Manager for WooCommerce
 		'_billing_eu_vat',        // WooCommerce Eu Vat & B2B (WCEV)
+		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
 
 	// Maybe add General Checkout Field key
