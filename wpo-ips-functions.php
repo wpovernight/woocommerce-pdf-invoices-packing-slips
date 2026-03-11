@@ -422,12 +422,6 @@ function wcpdf_date_format( $document = null, $date_type = null ) {
 /**
  * Catch MySQL errors from $wpdb and log them.
  *
- * Inspired from here: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
- *
- * With SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
- * Using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
- * More info about this constant can be found here: https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
- *
  * @param  \wpdb  $wpdb
  * @param  string $context Optional prefix for messages (e.g. __METHOD__).
  * @return array  List of error strings logged.
@@ -438,41 +432,63 @@ function wcpdf_catch_db_object_errors( \wpdb $wpdb, string $context = '' ): arra
 	static $seen = array(); // avoid duplicate logs in the same request
 	$errors      = array();
 
-	// Using $wpdb->queries (if SAVEQUERIES is true and a collector populates results)
+	// Using $wpdb->queries (if SAVEQUERIES is true and a collector populates results).
 	if ( ! empty( $wpdb->queries ) && is_array( $wpdb->queries ) ) {
 		foreach ( $wpdb->queries as $query ) {
 			$result = isset( $query['result'] ) ? $query['result'] : null;
 			if ( is_wp_error( $result ) && is_array( $result->errors ) ) {
 				foreach ( $result->errors as $error ) {
-					$errors[] = reset( $error );
+					$errors[] = array(
+						'error' => reset( $error ),
+						'query' => isset( $query['query'] ) ? $query['query'] : '',
+					);
 				}
 			}
 		}
 	}
 
-	// Fallback to $EZSQL_ERROR (wpdb::print_error collects here)
+	// Fallback to $EZSQL_ERROR (wpdb::print_error collects here).
 	if ( empty( $errors ) && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
 		foreach ( $EZSQL_ERROR as $error ) {
-			if ( ! empty( $error['error_str'] ) ) {
-				$errors[] = $error['error_str'];
+			if ( empty( $error['error_str'] ) ) {
+				continue;
 			}
+
+			$errors[] = array(
+				'error' => $error['error_str'],
+				'query' => isset( $error['query'] ) ? $error['query'] : '',
+			);
 		}
 	}
 
-	// Log (with optional context) and dedupe per request
-	foreach ( $errors as $msg ) {
-		$line = '' !== $context ? "{$context}: {$msg}" : $msg;
-		$key  = md5( $line );
+	// Log (with optional context) and dedupe per request.
+	foreach ( $errors as $item ) {
+		$msg   = (string) ( $item['error'] ?? '' );
+		$query = (string) ( $item['query'] ?? '' );
+
+		if ( '' === $msg ) {
+			continue;
+		}
+
+		// Dedupe by error+query (context does not create a "new" error).
+		$key = md5( $msg . '|' . $query );
 
 		if ( isset( $seen[ $key ] ) ) {
 			continue;
 		}
 
 		$seen[ $key ] = true;
+
+		$line = '' !== $context ? "{$context}: {$msg}" : $msg;
+
+		if ( '' !== $query ) {
+			$line .= "\nQuery: {$query}";
+		}
+
 		wcpdf_log_error( $line, 'critical' );
 	}
 
-	return $errors;
+	return wp_list_pluck( $errors, 'error' );
 }
 
 /**
@@ -1195,6 +1211,7 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_shipping_vat_id',       // Germanized Pro (alternative)
 		'_billing_dic',           // EU/UK VAT Manager for WooCommerce
 		'_billing_eu_vat',        // WooCommerce Eu Vat & B2B (WCEV)
+		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
 
 	// Maybe add General Checkout Field key
