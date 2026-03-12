@@ -225,7 +225,7 @@ class WPO_WCPDF {
 	 *
 	 * @return void
 	 */
-	public function need_woocommerce() {
+	public function need_woocommerce(): void {
 		$error_message = sprintf(
 			/* translators: 1. open anchor tag, 2. close anchor tag, 3. Woo version */
 			esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version %3$s or higher to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ),
@@ -243,15 +243,16 @@ class WPO_WCPDF {
 
 	/**
 	 * Check if woocommerce is activated
+	 * 
+	 * @return bool
 	 */
-	public function is_woocommerce_activated() {
-		$blog_plugins = get_option( 'active_plugins', array() );
-		$site_plugins = is_multisite() ? (array) get_site_option( 'active_sitewide_plugins', array() ) : array();
+	public function is_woocommerce_activated(): bool {
+		$blog_plugins    = (array) get_option( 'active_plugins', array() );
+		$site_plugins    = is_multisite() ? (array) get_site_option( 'active_sitewide_plugins', array() ) : array();
+		$is_wc_activated = false;
 
 		if ( in_array( 'woocommerce/woocommerce.php', $blog_plugins, true ) || isset( $site_plugins['woocommerce/woocommerce.php'] ) ) {
 			$is_wc_activated = true;
-		} else {
-			$is_wc_activated = false;
 		}
 
 		return apply_filters( 'wpo_wcpdf_is_woocommerce_activated', $is_wc_activated );
@@ -262,7 +263,7 @@ class WPO_WCPDF {
 	 *
 	 * @return void
 	 */
-	public function woocommerce_hpos_compatible() {
+	public function woocommerce_hpos_compatible(): void {
 		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
 			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
 		}
