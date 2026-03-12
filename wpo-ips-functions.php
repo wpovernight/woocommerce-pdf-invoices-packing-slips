@@ -422,12 +422,6 @@ function wcpdf_date_format( $document = null, $date_type = null ) {
 /**
  * Catch MySQL errors from $wpdb and log them.
  *
- * Inspired from here: https://github.com/johnbillion/query-monitor/blob/d5b622b91f18552e7105e62fa84d3102b08975a4/collectors/db_queries.php#L125-L280
- *
- * With SAVEQUERIES constant defined as 'false', '$wpdb->queries' is empty and '$EZSQL_ERROR' is used instead.
- * Using the Query Monitor plugin, the SAVEQUERIES constant is defined as 'true'
- * More info about this constant can be found here: https://wordpress.org/support/article/debugging-in-wordpress/#savequeries
- *
  * @param  \wpdb  $wpdb
  * @param  string $context Optional prefix for messages (e.g. __METHOD__).
  * @return array  List of error strings logged.
@@ -438,41 +432,63 @@ function wcpdf_catch_db_object_errors( \wpdb $wpdb, string $context = '' ): arra
 	static $seen = array(); // avoid duplicate logs in the same request
 	$errors      = array();
 
-	// Using $wpdb->queries (if SAVEQUERIES is true and a collector populates results)
+	// Using $wpdb->queries (if SAVEQUERIES is true and a collector populates results).
 	if ( ! empty( $wpdb->queries ) && is_array( $wpdb->queries ) ) {
 		foreach ( $wpdb->queries as $query ) {
 			$result = isset( $query['result'] ) ? $query['result'] : null;
 			if ( is_wp_error( $result ) && is_array( $result->errors ) ) {
 				foreach ( $result->errors as $error ) {
-					$errors[] = reset( $error );
+					$errors[] = array(
+						'error' => reset( $error ),
+						'query' => isset( $query['query'] ) ? $query['query'] : '',
+					);
 				}
 			}
 		}
 	}
 
-	// Fallback to $EZSQL_ERROR (wpdb::print_error collects here)
+	// Fallback to $EZSQL_ERROR (wpdb::print_error collects here).
 	if ( empty( $errors ) && ! empty( $EZSQL_ERROR ) && is_array( $EZSQL_ERROR ) ) {
 		foreach ( $EZSQL_ERROR as $error ) {
-			if ( ! empty( $error['error_str'] ) ) {
-				$errors[] = $error['error_str'];
+			if ( empty( $error['error_str'] ) ) {
+				continue;
 			}
+
+			$errors[] = array(
+				'error' => $error['error_str'],
+				'query' => isset( $error['query'] ) ? $error['query'] : '',
+			);
 		}
 	}
 
-	// Log (with optional context) and dedupe per request
-	foreach ( $errors as $msg ) {
-		$line = '' !== $context ? "{$context}: {$msg}" : $msg;
-		$key  = md5( $line );
+	// Log (with optional context) and dedupe per request.
+	foreach ( $errors as $item ) {
+		$msg   = (string) ( $item['error'] ?? '' );
+		$query = (string) ( $item['query'] ?? '' );
+
+		if ( '' === $msg ) {
+			continue;
+		}
+
+		// Dedupe by error+query (context does not create a "new" error).
+		$key = md5( $msg . '|' . $query );
 
 		if ( isset( $seen[ $key ] ) ) {
 			continue;
 		}
 
 		$seen[ $key ] = true;
+
+		$line = '' !== $context ? "{$context}: {$msg}" : $msg;
+
+		if ( '' !== $query ) {
+			$line .= "\nQuery: {$query}";
+		}
+
 		wcpdf_log_error( $line, 'critical' );
 	}
 
-	return $errors;
+	return wp_list_pluck( $errors, 'error' );
 }
 
 /**
@@ -1195,6 +1211,7 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_shipping_vat_id',       // Germanized Pro (alternative)
 		'_billing_dic',           // EU/UK VAT Manager for WooCommerce
 		'_billing_eu_vat',        // WooCommerce Eu Vat & B2B (WCEV)
+		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
 
 	// Maybe add General Checkout Field key
@@ -2042,29 +2059,44 @@ function wpo_ips_get_plugins_data( array $plugin_files ): array {
 
 /**
  * Check if the current page contains the WooCommerce classic checkout (block or shortcode).
- * 
+ *
  * @return bool
  */
 function wpo_ips_current_page_has_checkout_shortcode(): bool {
 	if ( is_admin() ) {
-		return false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_shortcode',
+			false,
+			0,
+			null
+		);
 	}
 
 	$page_id = get_queried_object_id();
 	if ( ! $page_id ) {
-		return false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_shortcode',
+			false,
+			0,
+			null
+		);
 	}
 
 	$post = get_post( $page_id );
 	if ( ! $post instanceof \WP_Post ) {
-		return false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_shortcode',
+			false,
+			$page_id,
+			null
+		);
 	}
 
 	$content = (string) $post->post_content;
 
 	// Block-based "Classic Shortcode" wrapper.
 	if ( function_exists( 'has_block' ) && has_block( 'woocommerce/classic-shortcode', $content ) ) {
-		$blocks = parse_blocks( $content );
+		$blocks = function_exists( 'parse_blocks' ) ? parse_blocks( $content ) : array();
 
 		$has_checkout = static function( array $blocks ) use ( &$has_checkout ): bool {
 			foreach ( $blocks as $block ) {
@@ -2088,14 +2120,26 @@ function wpo_ips_current_page_has_checkout_shortcode(): bool {
 		};
 
 		if ( $has_checkout( $blocks ) ) {
-			return true;
+			return (bool) apply_filters(
+				'wpo_ips_current_page_has_checkout_shortcode',
+				true,
+				$page_id,
+				$post
+			);
 		}
 	}
 
 	// Legacy shortcode-based checkout page.
-	return function_exists( 'has_shortcode' ) && (
+	$result = function_exists( 'has_shortcode' ) && (
 		has_shortcode( $content, 'woocommerce_checkout' ) ||
 		has_shortcode( $content, 'checkout' )
+	);
+
+	return (bool) apply_filters(
+		'wpo_ips_current_page_has_checkout_shortcode',
+		$result,
+		$page_id,
+		$post
 	);
 }
 
@@ -2106,35 +2150,53 @@ function wpo_ips_current_page_has_checkout_shortcode(): bool {
  */
 function wpo_ips_current_page_has_checkout_block(): bool {
 	if ( is_admin() ) {
-		return false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_block',
+			false,
+			0,
+			null
+		);
 	}
 
 	$page_id = get_queried_object_id();
 	if ( ! $page_id ) {
-		$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, 0, null );
-		return is_bool( $override ) ? $override : false;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_block',
+			false,
+			0,
+			null
+		);
 	}
 
 	$post = get_post( $page_id );
 	if ( ! $post instanceof WP_Post ) {
-		$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, $page_id, null );
-		return is_bool( $override ) ? $override : false;
-	}
-
-	// Allow builders / custom setups (Elementor templates, custom endpoints, etc.) to override.
-	$override = apply_filters( 'wpo_ips_current_page_has_checkout_block', null, $page_id, $post );
-	if ( is_bool( $override ) ) {
-		return $override;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_block',
+			false,
+			$page_id,
+			null
+		);
 	}
 
 	// Native block detection.
 	if ( function_exists( 'has_block' ) && has_block( 'woocommerce/checkout', $post ) ) {
-		return true;
+		return (bool) apply_filters(
+			'wpo_ips_current_page_has_checkout_block',
+			true,
+			$page_id,
+			$post
+		);
 	}
 
 	$blocks = function_exists( 'parse_blocks' ) ? parse_blocks( $post->post_content ) : array();
+	$result = wpo_ips_blocks_contain( $blocks, 'woocommerce/checkout' );
 
-	return wpo_ips_blocks_contain( $blocks, 'woocommerce/checkout' );
+	return (bool) apply_filters(
+		'wpo_ips_current_page_has_checkout_block',
+		$result,
+		$page_id,
+		$post
+	);
 }
 
 /**
@@ -2162,4 +2224,24 @@ function wpo_ips_blocks_contain( array $blocks, string $needle ): bool {
 	}
 
 	return false;
+}
+
+/**
+ * Check if the current page is the configured WooCommerce checkout page.
+ *
+ * @return bool
+ */
+function wpo_ips_is_current_page_checkout_page(): bool {
+	if ( is_admin() ) {
+		return false;
+	}
+
+	$page_id = get_queried_object_id();
+	if ( ! $page_id ) {
+		return false;
+	}
+
+	$checkout_page_id = (int) get_option( 'woocommerce_checkout_page_id' );
+
+	return $checkout_page_id > 0 && $checkout_page_id === (int) $page_id;
 }

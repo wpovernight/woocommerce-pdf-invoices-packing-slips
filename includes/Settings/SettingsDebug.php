@@ -1197,6 +1197,13 @@ class SettingsDebug {
 		$gd                = extension_loaded( 'gd' );
 		$zlib              = extension_loaded( 'zlib' );
 		$fileinfo          = extension_loaded( 'fileinfo' );
+		
+		// Database
+		$db_details     = $this->get_database_details();
+		$database_value = $db_details['type'] ?? __( 'Unknown', 'woocommerce-pdf-invoices-packing-slips' );
+		if ( ! empty( $db_details['version'] ) ) {
+			$database_value .= ' ' . $db_details['version'];
+		}
 
 		$server_configs = array(
 			'WordPress version' => array(
@@ -1230,6 +1237,12 @@ class SettingsDebug {
 				),
 				'value'    => PHP_VERSION,
 				'result'   => WPO_WCPDF()->is_dependency_version_supported( 'php' ),
+			),
+			'Database' => array(
+				'required' => __( 'MySQL, MariaDB, or SQLite', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => $database_value,
+				'result'   => ! empty( $db_details['type'] ),
+				'fallback' => __( 'Unable to detect the database server', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'DOMDocument extension' => array(
 				'required' => true,
@@ -2168,6 +2181,70 @@ class SettingsDebug {
 		}
 
 		return $results;
+	}
+	
+	/**
+	 * Get database server details.
+	 *
+	 * @return array{
+	 *     type: string|null,
+	 *     version: string|null,
+	 *     server_info: string|null,
+	 * }
+	 */
+	protected function get_database_details(): array {
+		global $wpdb;
+
+		$type        = null;
+		$version     = null;
+		$server_info = null;
+
+		if ( ! isset( $wpdb ) || ! is_object( $wpdb ) ) {
+			return array(
+				'type'        => null,
+				'version'     => null,
+				'server_info' => null,
+			);
+		}
+
+		$server_info = is_callable( array( $wpdb, 'db_server_info' ) ) ? (string) $wpdb->db_server_info() : '';
+		$version     = is_callable( array( $wpdb, 'db_version' ) ) ? (string) $wpdb->db_version() : '';
+
+		if ( false !== stripos( $server_info, 'MariaDB' ) ) {
+			$type = 'MariaDB';
+
+			// Older PHP/mysqlnd may report MariaDB as 5.5.5-10.x.x-MariaDB.
+			if (
+				'5.5.5' === $version        &&
+				defined( 'PHP_VERSION_ID' ) &&
+				PHP_VERSION_ID < 80016      &&
+				! empty( $server_info )
+			) {
+				$normalized = preg_replace( '/^5\.5\.5-(.*)$/', '$1', $server_info );
+				$version    = preg_replace( '/[^0-9.].*/', '', $normalized );
+			}
+		} elseif ( false !== stripos( $server_info, 'SQLite' ) ) {
+			$type = 'SQLite';
+		} elseif ( false !== stripos( $server_info, 'MySQL' ) || ! empty( $version ) ) {
+			// Default to MySQL when using core wpdb and no MariaDB marker is present.
+			$type = 'MySQL';
+		}
+
+		// Fallback for SQLite integrations that may not expose db_server_info cleanly.
+		if ( empty( $type ) && method_exists( $wpdb, 'get_var' ) ) {
+			$sqlite_version = $wpdb->get_var( 'SELECT sqlite_version()' );
+
+			if ( ! empty( $sqlite_version ) ) {
+				$type    = 'SQLite';
+				$version = $version ?: (string) $sqlite_version;
+			}
+		}
+
+		return array(
+			'type'        => $type,
+			'version'     => $version ?: null,
+			'server_info' => $server_info ?: null,
+		);
 	}
 
 }
