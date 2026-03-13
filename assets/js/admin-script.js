@@ -724,7 +724,7 @@ jQuery( function( $ ) {
 		};
 
 		const sections = $( '.settings_category h2' );
-		
+
 		if ( sections.length === 0 ) {
 			return; // No sections found
 		}
@@ -735,7 +735,7 @@ jQuery( function( $ ) {
 			const $panel    = $header.next( '.form-table' );
 			const $category = $header.parent( '.settings_category' );
 			const idBase    = $category.attr( 'id' ) || $header.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
-			
+
 			// Ensure header has an id and compute explicit ids
 			if ( ! $header.attr( 'id' ) ) {
 				$header.attr( 'id', `${idBase}_header` );
@@ -762,7 +762,7 @@ jQuery( function( $ ) {
 			const $category  = $header.parent( '.settings_category' );
 			const categoryId = $category.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
 			const $panel     = $header.next( '.form-table' );
-			
+
 			// Check localStorage for saved state
 			const stored = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}` );
 			let shouldOpen = false;
@@ -825,7 +825,199 @@ jQuery( function( $ ) {
 	// Initialize accordion
 	settingsAccordion();
 	//----------> /Settings Accordion <----------//
-	
+
+	//----------> Settings Search <----------//
+
+	function settingsSearch() {
+		const $input = $( '#settings-search' );
+
+		if ( ! $input.length ) {
+			return;
+		}
+
+		const $searchContainer = $input.closest( '.settings-search' );
+
+		// The search field may be a sibling of the form (General/Documents tabs)
+		// or inside the form (Debug tab).
+		let $form = $searchContainer.siblings( 'form' ).first();
+
+		if ( ! $form.length ) {
+			$form = $searchContainer.closest( 'form' );
+		}
+
+		if ( ! $form.length ) {
+			return;
+		}
+
+		// Build index of searchable settings from the current tab.
+		const settingItems = [];
+
+		$form.find( '.settings_category' ).each( function () {
+			const $category = $( this );
+			const $header   = $category.find( '> h2' );
+
+			$category.find( '.form-table > tbody > tr' ).each( function () {
+				const $row  = $( this );
+				const label = $row.find( '> th' ).text().trim();
+
+				if ( ! label ) {
+					return;
+				}
+
+				settingItems.push( {
+					label:     label,
+					$row:      $row,
+					$header:   $header,
+					$category: $category
+				} );
+			} );
+		} );
+
+		if ( ! settingItems.length ) {
+			return;
+		}
+
+		// Create dropdown container.
+		const $dropdown = $( '<ul class="settings-search-dropdown"></ul>' );
+		$searchContainer.append( $dropdown );
+
+		let activeIndex = -1;
+		let matches     = [];
+
+
+		function renderResults( query ) {
+			$dropdown.empty();
+			activeIndex = -1;
+			matches     = [];
+
+			if ( ! query ) {
+				$dropdown.hide();
+				return;
+			}
+
+			matches = settingItems.filter( function ( item ) {
+				return item.label.toLowerCase().indexOf( query.toLowerCase().trim() ) !== -1;
+			} );
+
+			if ( ! matches.length ) {
+				$dropdown.hide();
+				return;
+			}
+
+			matches.forEach( function ( item, index ) {
+				const $item = $( '<li class="settings-search-item"></li>' )
+					.text( item.label )
+					.attr( 'data-index', index )
+					.on( 'mousedown', function ( e ) {
+						e.preventDefault();
+						navigateToSetting( item );
+					} );
+				$dropdown.append( $item );
+			} );
+
+			$dropdown.show();
+		}
+
+		function setActiveItem( index ) {
+			const $items = $dropdown.find( '.settings-search-item' );
+
+			if ( ! $items.length ) {
+				return;
+			}
+
+			// Clamp index.
+			if ( index < 0 ) {
+				index = $items.length - 1;
+			} else if ( index >= $items.length ) {
+				index = 0;
+			}
+
+			activeIndex = index;
+			$items.removeClass( 'active' );
+			$items.eq( activeIndex ).addClass( 'active' );
+
+			// Scroll into view.
+			const el = $items.get( activeIndex );
+			if ( el ) {
+				el.scrollIntoView( { block: 'nearest' } );
+			}
+		}
+
+		function navigateToSetting( item ) {
+			$dropdown.hide();
+			$input.val( '' );
+
+			const $header = item.$header;
+			const $panel  = $header.next( '.form-table' );
+
+			// Open the accordion section if closed.
+			if ( ! $panel.is( ':visible' ) ) {
+				// Open and display the setting category.
+				$header.addClass( 'active' ).attr( 'aria-expanded', true );
+				$panel.show().attr( 'aria-hidden', 'false' );
+
+				const categoryId = item.$category.attr( 'id' );
+				const params     = new URLSearchParams( window.location.search );
+				const tab        = params.get( 'tab' ) || 'general';
+
+				// Save the open category state in localStorage.
+				if ( categoryId ) {
+					localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, 'true' );
+				}
+			}
+
+			// Scroll to and highlight the row.
+			const offset = item.$row.offset().top - 150;
+			$( 'html, body' ).animate( { scrollTop: offset }, 300, function () {
+				item.$row.addClass( 'settings-search-highlight' );
+				setTimeout( function () {
+					item.$row.removeClass( 'settings-search-highlight' );
+				}, 1500 );
+			} );
+		}
+
+		// Input events.
+		$input.on( 'input', function () {
+			renderResults( $( this ).val().trim() );
+		} );
+
+		$input.on( 'keydown', function ( e ) {
+			if ( ! $dropdown.is( ':visible' ) ) {
+				return;
+			}
+
+			if ( 'ArrowDown' === e.key ) {
+				e.preventDefault();
+				setActiveItem( activeIndex + 1 );
+			} else if ( 'ArrowUp' === e.key ) {
+				e.preventDefault();
+				setActiveItem( activeIndex - 1 );
+			} else if ( 'Enter' === e.key ) {
+				e.preventDefault();
+				if ( activeIndex >= 0 && matches[ activeIndex ] ) {
+					navigateToSetting( matches[ activeIndex ] );
+				}
+			} else if ( 'Escape' === e.key ) {
+				$dropdown.hide();
+				$input.val( '' );
+			}
+		} );
+
+		$input.on( 'blur', function () {
+			$dropdown.hide();
+		} );
+
+		$input.on( 'focus', function () {
+			const val = $( this ).val().trim();
+			if ( val ) {
+				renderResults( val );
+			}
+		} );
+	}
+
+	settingsSearch();
+	//----------> /Settings Search <----------//
+
 	//----------> Conditional Visibility <----------//
 	const bound = new Set();
 
@@ -857,7 +1049,7 @@ jQuery( function( $ ) {
 			let show       = false;
 			let show_for   = $( this ).data( 'show_for_option_values' );
 			let keep_value = $( this ).data( 'keep_current_value' );
-			
+
 			if ( checkbox ) {
 				show = value; // for checkboxes, checked = show
 			} else if ( Array.isArray( value ) ) { // Multiselect
@@ -878,7 +1070,7 @@ jQuery( function( $ ) {
 				$row.hide()
 					.find( ':input' ).each( function () {
 						const $input = $( this );
-						
+
 						// Don't reset value
 						if ( keep_value ) {
 							return;
@@ -903,7 +1095,7 @@ jQuery( function( $ ) {
 		} );
 	}
 	//----------> /Conditional Visibility <----------//
-	
+
 	//----------> Sync Address <----------//
 
 	$( '#wpo-wcpdf-settings .sync-address' ).on( 'click', function( event ) {
@@ -968,5 +1160,5 @@ jQuery( function( $ ) {
 	} );
 
 	//----------> /Sync Address <----------//
-	
+
 } );
