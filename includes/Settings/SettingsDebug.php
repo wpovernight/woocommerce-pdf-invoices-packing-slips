@@ -35,8 +35,11 @@ class SettingsDebug {
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
-		
+
 		add_action( 'wp_ajax_wpo_ips_plugin_report', array( $this, 'ajax_plugin_report' ) );
+
+		// Display search form.
+		add_action( 'wpo_wcpdf_after_sidebar', array( $this, 'display_search_field' ), 10, 2 );
 	}
 
 	/**
@@ -50,7 +53,7 @@ class SettingsDebug {
 		if ( ! \WPO_WCPDF()->settings->user_can_manage_settings() ) {
 			return;
 		}
-	
+
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
@@ -70,6 +73,8 @@ class SettingsDebug {
 			</h2>
 		</div>
 		<?php
+
+		$this->display_search_field( 'debug', $active_section );
 
 		switch ( $active_section ) {
 			case 'settings':
@@ -97,6 +102,45 @@ class SettingsDebug {
 		do_settings_sections( 'wpo_wcpdf_settings_debug' );
 
 		submit_button();
+	}
+
+	/**
+	 * Display the search field for settings sections that support it.
+	 *
+	 * @param string $active_tab
+	 * @param string $active_section
+	 *
+	 * @return void
+	 */
+	public function display_search_field( string $active_tab, string $active_section ): void {
+		$searchable_sections = apply_filters(
+			'wpo_wcpdf_searchable_sections',
+			array(
+				'general',
+				'documents',
+				'debug' => array( 'settings' )
+			)
+		);
+
+		// Tabs with subsection-specific search (associative keys) handle their own call in output(),
+		// so skip them when called via the `wpo_wcpdf_after_sidebar` hook to avoid duplicates.
+		if ( doing_action( 'wpo_wcpdf_after_sidebar' ) && isset( $searchable_sections[ $active_tab ] ) ) {
+			return;
+		}
+
+		if (
+			in_array( $active_tab, $searchable_sections, true ) ||
+			(
+				isset( $searchable_sections[ $active_tab ] ) &&
+				is_array( $searchable_sections[ $active_tab ] ) &&
+				in_array( $active_section, $searchable_sections[ $active_tab ], true ) )
+		) {
+			echo '
+				<div class="settings-search">
+					<input type="text" name="settings-search" id="settings-search" placeholder="', esc_attr_e( 'Search settings', 'woocommerce-pdf-invoices-packing-slips' ), '">
+				</div>
+			';
+		}
 	}
 
 	/**
@@ -328,10 +372,10 @@ class SettingsDebug {
 		wcpdf_log_error( $message, 'info' );
 		wp_send_json_success( compact( 'message' ) );
 	}
-	
+
 	/**
 	 * AJAX handler for processing settings debug tools.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function ajax_process_settings_debug_tools(): void {
@@ -340,9 +384,9 @@ class SettingsDebug {
 			wcpdf_log_error( $message );
 			wp_send_json_error( compact( 'message' ) );
 		}
-		
+
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
-		
+
 		$data = isset( $_POST ) ? stripslashes_deep( $_POST ) : array();
 
 		if (
@@ -370,11 +414,11 @@ class SettingsDebug {
 
 	/**
 	 * Export settings to JSON file.
-	 * 
+	 *
 	 * @param array $data
 	 * @return void
 	 */
-	private function export_settings( array $data ): void {		
+	private function export_settings( array $data ): void {
 		extract( $data );
 
 		if ( empty( $type ) ) {
@@ -408,7 +452,7 @@ class SettingsDebug {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				
+
 				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings = get_option( "wpo_wcpdf_documents_settings_{$type}", [] );
 					break;
@@ -429,7 +473,7 @@ class SettingsDebug {
 
 	/**
 	 * Import settings from uploaded JSON file.
-	 * 
+	 *
 	 * @param array $data
 	 * @return void
 	 */
@@ -479,7 +523,7 @@ class SettingsDebug {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				
+
 				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
@@ -518,7 +562,7 @@ class SettingsDebug {
 
 	/**
 	 * Reset settings to defaults.
-	 * 
+	 *
 	 * @param array $data
 	 * @return void
 	 */
@@ -556,7 +600,7 @@ class SettingsDebug {
 			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				
+
 				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
@@ -617,7 +661,7 @@ class SettingsDebug {
 			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
 			wp_send_json_error( compact( 'message' ) );
 		}
-		
+
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 
 		$request = stripslashes_deep( $_POST );
@@ -780,7 +824,7 @@ class SettingsDebug {
 
 	/**
 	 * Get the available setting types.
-	 * 
+	 *
 	 * @return array
 	 */
 	public function get_setting_types(): array {
@@ -790,12 +834,12 @@ class SettingsDebug {
 			'edi'     => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 			'edi_tax' => __( 'E-Document Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-		
+
 		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
-		
+
 		foreach ( $documents as $document ) {
 			$document_title = $document->get_title();
-			
+
 			if ( $document->title !== $document_title ) {
 				$title = $document->title . ' (' . $document_title . ')';
 			} else {
@@ -1178,12 +1222,12 @@ class SettingsDebug {
 		$debug_settings    = WPO_WCPDF()->settings->debug_settings;
 		$filesystem_method = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' );
 		$filesystem_method = 'wp' === $filesystem_method && function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : $filesystem_method;
-		
+
 		// WP + Woo
 		$wp_version        = get_bloginfo( 'version' );
 		$woo_version       = defined( 'WC_VERSION' ) ? WC_VERSION : null;
 		$woo_hpos_enabled  = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled();
-		
+
 		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
 		$gmagick           = extension_loaded( 'gmagick' );
@@ -1197,7 +1241,7 @@ class SettingsDebug {
 		$gd                = extension_loaded( 'gd' );
 		$zlib              = extension_loaded( 'zlib' );
 		$fileinfo          = extension_loaded( 'fileinfo' );
-		
+
 		// Database
 		$db_details     = $this->get_database_details();
 		$database_value = $db_details['type'] ?? __( 'Unknown', 'woocommerce-pdf-invoices-packing-slips' );
@@ -1736,7 +1780,7 @@ class SettingsDebug {
 			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
 			wp_send_json_error( compact( 'message' ) );
 		}
-		
+
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 
 		$request = stripslashes_deep( $_POST );
@@ -1986,7 +2030,7 @@ class SettingsDebug {
 	public function run_unstable_version_check(): void {
 		wpo_wcpdf_get_latest_releases_from_github();
 	}
-	
+
 	/**
 	 * Generate and download the plugin report as a PDF.
 	 *
@@ -1998,14 +2042,14 @@ class SettingsDebug {
 		}
 
 		check_ajax_referer( 'wpo_ips_plugin_report', 'nonce' );
-		
+
 		$include_sensitive    = isset( $_GET['include_sensitive'] )
 			? filter_var( wp_unslash( $_GET['include_sensitive'] ), FILTER_VALIDATE_BOOLEAN )
 			: false;
 		$output_html          = isset( $_GET['output_html'] )
 			? filter_var( wp_unslash( $_GET['output_html'] ), FILTER_VALIDATE_BOOLEAN )
 			: false;
-	
+
 		$report_title         = 'PDF Invoices & Packing Slips for WooCommerce - Report';
 		$premium_plugins      = $this->get_premium_plugins();
 		$free_extensions      = $this->get_free_extensions();
@@ -2017,7 +2061,7 @@ class SettingsDebug {
 		$server_configs       = $this->get_server_config();
 		$dir_permissions      = $include_sensitive ? $this->get_directory_permissions() : array();
 		$yearly_reset         = $this->get_yearly_reset_schedule();
-		
+
 		// Load CSS file contents
 		$report_css = '';
 		$suffix     = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
@@ -2026,13 +2070,13 @@ class SettingsDebug {
 		if ( \WPO_WCPDF()->file_system->exists( $css_path ) && \WPO_WCPDF()->file_system->is_readable( $css_path ) ) {
 			$report_css = \WPO_WCPDF()->file_system->get_contents( $css_path );
 		}
-		
+
 		// Load Settings
 		$general_settings   = get_option( 'wpo_wcpdf_settings_general', array() );
 		$debug_settings     = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$edi_settings       = get_option( 'wpo_ips_edi_settings', array() );
 		$documents_settings = array();
-		
+
 		$all_documents = \WPO_WCPDF()->documents->get_documents( 'all' );
 		if ( ! empty( $all_documents ) ) {
 			foreach ( $all_documents as $document ) {
@@ -2040,17 +2084,17 @@ class SettingsDebug {
 				$documents_settings[ $document_type ] = \WPO_WCPDF()->settings->get_document_settings( $document_type, 'pdf' );
 			}
 		}
-		
+
 		// Logs
 		$logs_data = $include_sensitive ? $this->get_recent_logs() : array();
-		
+
 		// Extensions Settings
 		$extensions_settings = apply_filters( 'wpo_ips_get_extensions_settings_for_report', array(), $include_sensitive );
-		
+
 		ob_start();
 		include \WPO_WCPDF()->plugin_path() . '/views/plugin-report.php';
 		$report_html = ob_get_clean();
-		
+
 		if ( $output_html ) {
 			echo $report_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			die();
@@ -2063,14 +2107,14 @@ class SettingsDebug {
 		);
 		$pdf_maker = \wcpdf_get_pdf_maker( $report_html, $pdf_settings, $this );
 		$pdf       = $pdf_maker->output();
-		
+
 		$filename  = 'plugin-report-' . gmdate( 'Y-m-d' ) . '.pdf';
-		
+
 		\wcpdf_pdf_headers( $filename, 'download', $pdf );
 		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit();
 	}
-	
+
 	/**
 	 * Get the premium plugins data.
 	 *
@@ -2098,7 +2142,7 @@ class SettingsDebug {
 
 		return apply_filters( 'wpo_ips_free_extensions_data', $plugins_data );
 	}
-	
+
 	/**
 	 * Get multilingual plugins data.
 	 *
@@ -2121,12 +2165,12 @@ class SettingsDebug {
 				'loco-translate/loco.php',
 			)
 		);
-		
+
 		$plugins_data = \wpo_ips_get_plugins_data( $multilingual_plugins );
 
 		return apply_filters( 'wpo_ips_multilingual_plugins_data', $plugins_data );
 	}
-	
+
 	/**
 	 * Get recent log excerpts for key handles.
 	 *
@@ -2182,7 +2226,7 @@ class SettingsDebug {
 
 		return $results;
 	}
-	
+
 	/**
 	 * Get database server details.
 	 *
