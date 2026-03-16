@@ -32,7 +32,7 @@ class Peppol {
 		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
-		add_action( 'woocommerce_new_order', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 20, 2 ) ;
+		add_action( 'woocommerce_new_order', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 20, 2 );
 
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
