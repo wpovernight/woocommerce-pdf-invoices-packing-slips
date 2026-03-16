@@ -32,7 +32,7 @@ class Peppol {
 		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
-		add_action( 'woocommerce_new_order', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 20, 2 ) ;
+		add_action( 'woocommerce_new_order', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 20, 2 );
 
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
@@ -624,12 +624,33 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_enqueue_checkout_scripts(): void {
+		if ( is_admin() ) {
+			return;
+		}
+
 		if ( wpo_ips_current_page_has_checkout_block() ) {
 			$this->peppol_enqueue_block_checkout_script();
+			return;
 		}
 
 		if ( wpo_ips_current_page_has_checkout_shortcode() ) {
 			$this->peppol_enqueue_classic_checkout_script();
+			return;
+		}
+
+		if ( ! wpo_ips_is_current_page_checkout_page() ) {
+			return;
+		}
+
+		// In case the page has neither the block nor the shortcode, but is still the assigned checkout page.
+		switch ( wpo_ips_edi_get_settings( 'peppol_checkout_script_type' ) ) {
+			case 'classic':
+				$this->peppol_enqueue_classic_checkout_script();
+				return;
+
+			case 'block':
+				$this->peppol_enqueue_block_checkout_script();
+				return;
 		}
 	}
 
