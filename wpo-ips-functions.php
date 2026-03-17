@@ -1622,13 +1622,21 @@ function wpo_wcpdf_is_document_using_historical_settings( string $document_type 
  *
  * @return string The fully formatted document number.
  */
-function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, ?string $suffix, ?int $padding, \WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order ): string {
+function wpo_wcpdf_format_document_number(
+	?int $plain_number,
+	?string $prefix,
+	?string $suffix,
+	?int $padding,
+	\WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order
+): string {
 	// Get dates
 	$order_date = $order->get_date_created();
 
 	// Order date can be empty when order is being saved, fallback to current time
-	if ( empty( $order_date ) && function_exists( 'wc_string_to_datetime' ) ) {
-		$order_date = wc_string_to_datetime( date_i18n( 'Y-m-d H:i:s' ) );
+	if ( empty( $order_date ) ) {
+		$order_date = function_exists( 'wc_string_to_datetime' )
+			? wc_string_to_datetime( date_i18n( 'Y-m-d H:i:s' ) )
+			: new \WC_DateTime( 'now', wp_timezone() );
 	}
 
 	$document_date = $document->get_date();
@@ -1653,6 +1661,8 @@ function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, 
 
 		if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'get_order_number' ) ) ) {
 			$order_number = $parent_order->get_order_number();
+		} else {
+			$order_number = '';
 		}
 	} else {
 		$order_number = '';
@@ -1664,19 +1674,28 @@ function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, 
 		'suffix' => $suffix,
 	);
 
+	$placeholder_value = apply_filters(
+		'wpo_wcpdf_format_document_number_placeholder_value',
+		array(
+			'order_year'              => $order_year,
+			'order_month'             => $order_month,
+			'order_day'               => $order_day,
+			'order_number'            => $order_number,
+			"{$document->slug}_year"  => $document_year,
+			"{$document->slug}_month" => $document_month,
+			"{$document->slug}_day"   => $document_day,
+		)
+	);
+
 	// make replacements
 	foreach ( $formats as $key => $value ) {
 		if ( empty( $value ) ) {
 			continue;
 		}
 
-		$value = str_replace( '[order_year]', $order_year, $value );
-		$value = str_replace( '[order_month]', $order_month, $value );
-		$value = str_replace( '[order_day]', $order_day, $value );
-		$value = str_replace( "[{$document->slug}_year]", $document_year, $value );
-		$value = str_replace( "[{$document->slug}_month]", $document_month, $value );
-		$value = str_replace( "[{$document->slug}_day]", $document_day, $value );
-		$value = str_replace( '[order_number]', $order_number, $value );
+		foreach ( $placeholder_value as $placeholder => $replacement ) {
+			$value = str_replace( "[{$placeholder}]", $replacement, $value );
+		}
 
 		// replace date tag in the form [invoice_date="{$date_format}"] or [order_date="{$date_format}"]
 		$date_types = array( 'order', $document->slug );
@@ -1699,17 +1718,8 @@ function wpo_wcpdf_format_document_number( ?int $plain_number, ?string $prefix, 
 	}
 
 	// Padding
-	$padding_string = '';
-	if ( function_exists( 'ctype_digit' ) ) { // requires the Ctype extension
-		if ( ctype_digit( (string) $padding ) ) {
-			$padding_string = (string) $padding;
-		}
-	} elseif ( ! empty( $padding ) ) {
-		$padding_string = (string) $padding;
-	}
-
-	if ( ! empty( $padding_string ) ) {
-		$plain_number = sprintf( '%0' . $padding_string . 'd', $plain_number );
+	if ( ! empty( $padding ) ) {
+		$plain_number = sprintf( '%0' . intval( $padding ) . 'd', $plain_number );
 	}
 
 	// Add prefix & suffix
