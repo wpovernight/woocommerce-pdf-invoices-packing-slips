@@ -289,8 +289,8 @@ class Settings {
 						$form_settings = $this->callbacks->validate( $form_settings );
 
 						// filter the options
-						add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
-							return maybe_unserialize( $form_settings );
+						add_filter( "option_{$option_key}", function( $_value, $_option ) use ( $form_settings ) {
+							return $form_settings;
 						}, 99, 2 );
 					}
 
