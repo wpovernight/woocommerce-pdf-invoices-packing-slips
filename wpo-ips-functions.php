@@ -1627,7 +1627,8 @@ function wpo_wcpdf_format_document_number(
 	?string $prefix,
 	?string $suffix,
 	?int $padding,
-	\WPO\IPS\Documents\OrderDocument $document, \WC_Abstract_Order $order
+	\WPO\IPS\Documents\OrderDocument $document,
+	\WC_Abstract_Order $order
 ): string {
 	// Get dates
 	$order_date = $order->get_date_created();
@@ -1636,7 +1637,7 @@ function wpo_wcpdf_format_document_number(
 	if ( empty( $order_date ) ) {
 		$order_date = function_exists( 'wc_string_to_datetime' )
 			? wc_string_to_datetime( date_i18n( 'Y-m-d H:i:s' ) )
-			: new \WC_DateTime( 'now', wp_timezone() );
+			: new \WC_DateTime( 'now', wc_timezone() );
 	}
 
 	$document_date = $document->get_date();
@@ -1653,6 +1654,7 @@ function wpo_wcpdf_format_document_number(
 	$document_month = $document_date->date_i18n( 'm' );
 	$document_day   = $document_date->date_i18n( 'd' );
 
+	$order_number = '';
 	// get order number
 	if ( is_callable( array( $order, 'get_order_number' ) ) ) { // order
 		$order_number = $order->get_order_number();
@@ -1661,11 +1663,7 @@ function wpo_wcpdf_format_document_number(
 
 		if ( ! empty( $parent_order ) && is_callable( array( $parent_order, 'get_order_number' ) ) ) {
 			$order_number = $parent_order->get_order_number();
-		} else {
-			$order_number = '';
 		}
-	} else {
-		$order_number = '';
 	}
 
 	// get format settings
@@ -1684,7 +1682,13 @@ function wpo_wcpdf_format_document_number(
 			"{$document->slug}_year"  => $document_year,
 			"{$document->slug}_month" => $document_month,
 			"{$document->slug}_day"   => $document_day,
-		)
+		),
+		$plain_number,
+		$prefix,
+		$suffix,
+		$padding,
+		$document,
+		$order
 	);
 
 	// make replacements
