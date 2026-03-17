@@ -155,16 +155,13 @@ abstract class OrderDocument {
 	}
 
 	public function get_order_settings() {
-		$order_settings = array();
-
-		if ( ! empty( $this->order ) ) {
-			$order_settings = $this->order->get_meta( "_wcpdf_{$this->slug}_settings" );
-			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
-				$order_settings = maybe_unserialize( $order_settings );
-			}
+		if ( empty( $this->order ) ) {
+			return array();
 		}
 
-		return $order_settings;
+		$order_settings = $this->order->get_meta( "_wcpdf_{$this->slug}_settings" );
+
+		return is_array( $order_settings ) ? $order_settings : array();
 	}
 
 	public function get_settings( $latest = false, $output_format = 'pdf' ) {
@@ -215,7 +212,16 @@ abstract class OrderDocument {
 				// this is either the first time the document is generated, or historical settings are disabled
 				// in both cases, we store the document settings
 				// exclude non historical settings from being saved in order meta
-				$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) ) );
+				$settings_to_store = is_array( $settings ) ? $settings : array();
+				$settings_to_store = array_diff_key(
+					$settings_to_store,
+					array_flip( $this->get_non_historical_settings() )
+				);
+				
+				$this->order->update_meta_data(
+					"_wcpdf_{$this->slug}_settings",
+					$this->sanitize_settings_for_storage( $settings_to_store )
+				);
 
 				if ( 'invoice' === $this->slug ) {
 					if ( isset( $settings['display_date'] ) && 'order_date' === $settings['display_date'] ) {
@@ -1126,7 +1132,12 @@ abstract class OrderDocument {
 
 	public function set_number( $value, $order = null ) {
 		$order = empty( $order ) ? $this->order : $order;
-		$value = maybe_unserialize( $value ); // fix incorrectly stored meta
+		
+		// Ignore incorrectly stored serialized meta and only handle expected value types.
+		if ( is_string( $value ) && is_serialized( $value ) ) {
+			wcpdf_log_error( "Unexpected serialized string found for document number meta. Ignoring value. Meta value: {$value}" );
+			$value = null;
+		}
 
 		if ( is_array( $value ) ) {
 			$filtered_value = array_filter( $value );
@@ -2216,6 +2227,27 @@ abstract class OrderDocument {
 	protected function normalize_filter_args( $filter ) {
 		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_normalize_filter_args' );
 		return wpo_ips_normalize_filter_args( $filter );
+	}
+	
+	/**
+	 * Recursively sanitize settings for storage by removing any objects or resources, which cannot be stored in the database.
+	 *
+	 * @param array $settings
+	 * @return array
+	 */
+	protected function sanitize_settings_for_storage( array $settings ): array {
+		foreach ( $settings as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$settings[ $key ] = $this->sanitize_settings_for_storage( $value );
+				continue;
+			}
+
+			if ( is_object( $value ) || is_resource( $value ) ) {
+				unset( $settings[ $key ] );
+			}
+		}
+
+		return $settings;
 	}
 
 }
