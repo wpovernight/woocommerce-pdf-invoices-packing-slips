@@ -1637,7 +1637,7 @@ function wpo_wcpdf_format_document_number(
 	if ( empty( $order_date ) ) {
 		$order_date = function_exists( 'wc_string_to_datetime' )
 			? wc_string_to_datetime( date_i18n( 'Y-m-d H:i:s' ) )
-			: new \WC_DateTime( 'now', wc_timezone() );
+			: new \WC_DateTime( 'now', wp_timezone() );
 	}
 
 	$document_date = $document->get_date();
