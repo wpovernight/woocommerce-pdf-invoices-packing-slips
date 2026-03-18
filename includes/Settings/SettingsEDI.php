@@ -388,13 +388,13 @@ class SettingsEDI {
 			'callback' => 'select',
 			'section'  => $section,
 			'args'     => array(
-				'title'             => __( 'Select countries for deriving the Peppol Endpoint ID', 'wpo-ips-edocs-network' ),
+				'title'             => __( 'Select countries for deriving the Peppol Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'       => $option_name,
 				'id'                => 'peppol_automatic_endpoint_id_derivation_countries',
 				'options'           => $countries,
 				'multiple'          => true,
 				'enhanced_select'   => true,
-				'placeholder'       => __( 'Select one or more countries', 'wpo-ips-edocs-network' ),
+				'placeholder'       => __( 'Select one or more countries', 'woocommerce-pdf-invoices-packing-slips' ),
 				'class'             => 'edi-multiple',
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[peppol_automatic_endpoint_id_derivation]',
@@ -403,7 +403,7 @@ class SettingsEDI {
 				),
 			),
 		);
-		
+
 		// Peppol specific field.
 		$settings_fields[] = array(
 			'type'     => 'setting',
@@ -1078,7 +1078,7 @@ class SettingsEDI {
 			<h1><?php esc_html_e( 'Network Products', 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
 			<div class="card-container">
 				<div class="recommendation-card">
-					<img src="<?php echo WPO_WCPDF()->plugin_url() . '/assets/images/wpo-ips-edocs-network-peppol-400x400.jpg' ?>" alt="Peppol">
+					<img src="<?php echo esc_url( WPO_WCPDF()->plugin_url() . '/assets/images/wpo-ips-edocs-network-peppol-400x400.jpg' ); ?>" alt="Peppol">
 					<div class="card-content">
 						<h5>Peppol</h5>
 						<p><?php esc_html_e( 'Peppol is a network for electronic document exchange, enabling businesses to send and receive electronic invoices and other documents securely and efficiently.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>

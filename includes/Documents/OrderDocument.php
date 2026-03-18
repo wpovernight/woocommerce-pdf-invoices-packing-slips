@@ -217,7 +217,7 @@ abstract class OrderDocument {
 					$settings_to_store,
 					array_flip( $this->get_non_historical_settings() )
 				);
-				
+
 				$this->order->update_meta_data(
 					"_wcpdf_{$this->slug}_settings",
 					$this->sanitize_settings_for_storage( $settings_to_store )
@@ -1132,7 +1132,7 @@ abstract class OrderDocument {
 
 	public function set_number( $value, $order = null ) {
 		$order = empty( $order ) ? $this->order : $order;
-		
+
 		// Ignore incorrectly stored serialized meta and only handle expected value types.
 		if ( is_string( $value ) && is_serialized( $value ) ) {
 			wcpdf_log_error( "Unexpected serialized string found for document number meta. Ignoring value. Meta value: {$value}" );
@@ -1714,7 +1714,7 @@ abstract class OrderDocument {
 		wpo_ips_edi_file_headers( $quoted, $size );
 
 		// Disable output compression.
-		@ini_set( 'zlib.output_compression', 'Off' );
+		@ini_set( 'zlib.output_compression', 'Off' ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 
 		// Clear all output buffers to prevent stray bytes/newlines before the XML declaration.
 		while ( ob_get_level() ) {
@@ -2228,7 +2228,7 @@ abstract class OrderDocument {
 		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_normalize_filter_args' );
 		return wpo_ips_normalize_filter_args( $filter );
 	}
-	
+
 	/**
 	 * Recursively sanitize settings for storage by removing any objects or resources, which cannot be stored in the database.
 	 *

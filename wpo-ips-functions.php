@@ -2034,7 +2034,7 @@ function wpo_ips_format_report_setting_value( $value ): string {
 
 	// Objects
 	if ( is_object( $value ) ) {
-		return '<pre style="margin:0;">' . esc_html( print_r( $value, true ) ) . '</pre>';
+		return '<pre style="margin:0;">' . esc_html( print_r( $value, true ) ) . '</pre>'; // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
 	}
 
 	// Numbers and everything else

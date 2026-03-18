@@ -42,14 +42,14 @@ class Frontend {
 
 		// Optional Checkout field (General Settings).
 		if ( $this->checkout_field_is_enabled() ) {
-			
+
 			if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
 				$file = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
 				if ( \WPO_WCPDF()->file_system->is_readable( $file ) ) {
 					include_once $file;
 				}
 			}
-			
+
 			// Blocks/store-api hooks
 			$this->checkout_field_display_checkout_block_field();
 			$this->checkout_field_set_checkout_block_field_value();
@@ -671,8 +671,7 @@ class Frontend {
 			return $errors;
 		}
 
-		$raw = (string) wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$val = sanitize_text_field( $raw );
+		$val = (string) sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
 		if ( '' === trim( $val ) ) {
@@ -717,8 +716,7 @@ class Frontend {
 			return;
 		}
 
-		$raw = (string) wp_unslash( $_POST[ $key ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$val = sanitize_text_field( $raw );
+		$val = (string) sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
 		if ( '' === trim( $val ) ) {
