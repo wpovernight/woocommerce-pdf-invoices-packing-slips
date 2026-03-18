@@ -993,9 +993,10 @@ button.button-edi-save-taxes {
 	max-width: 800px;
 	max-height: 85vh;
 	width: auto!important;
-	margin: 2em auto;
+	margin: 0 auto;
 	background: white;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+	box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1), -8px -8px 8px rgba(0, 0, 0, 0.02);
+	-webkit-box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1), -8px -8px 8px rgba(0, 0, 0, 0.02);
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"] #preview-canvas {
