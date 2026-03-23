@@ -2038,7 +2038,7 @@ class SettingsDebug {
 	 */
 	public function ajax_plugin_report(): void {
 		if ( ! \WPO_WCPDF()->settings->user_can_manage_settings() ) {
-			wp_die( __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) );
+			wp_die( esc_html__( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
 		check_ajax_referer( 'wpo_ips_plugin_report', 'nonce' );
@@ -2276,7 +2276,7 @@ class SettingsDebug {
 
 		// Fallback for SQLite integrations that may not expose db_server_info cleanly.
 		if ( empty( $type ) && method_exists( $wpdb, 'get_var' ) ) {
-			$sqlite_version = $wpdb->get_var( 'SELECT sqlite_version()' );
+			$sqlite_version = $wpdb->get_var( 'SELECT sqlite_version()' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 			if ( ! empty( $sqlite_version ) ) {
 				$type    = 'SQLite';

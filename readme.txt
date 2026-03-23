@@ -3,9 +3,9 @@ Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, moham
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 5.9.0-beta.4
+Stable tag: 5.9.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,8 +110,22 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 5.8.2 (2026-03-03) =
-- Fix: Rebuilt prefixed dependencies using a previous Strauss PHAR version
+= 5.9.0 (2026-03-23) =
+- New: Introduced filter to allow modification of document number placeholder values
+- New: Bump Dompdf dependency to version 3.1.5
+- New: Add filter to override classic checkout detection for shortcodes or page builders
+- New: Add support for `_billing_btw_nummer` VAT meta key
+- New: Added warning in order sidebar E-Documents meta box when Tax Classification is not configured
+- New: Allow manual status check when EDI Peppol document dispatch status gets stuck
+- Tweak: Refine preview canvas shadow styling and adjust margin
+- Tweak: Improve DB error logging to include failing query and prevent misleading duplicate context logs
+- Tweak: Remove supplier legal identifier ID from backend settings and XML generation
+- Fix: Fatal error when settings category title is `null`
+- Fix: Plugin check errors and warnings with code improvements and PHPCS adjustments
+- Fix: Remove unnecessary unserialization and harden document settings handling
+- Fix: Namespaced call to `woocommerce_register_additional_checkout_field()`
+- Translations: Updated translation template (POT)
+- Tested: Tested up WordPress 7.0
 
 = 5.8.1 (2026-03-02) =
 - Fix: PHP 7.4 parse error caused by `sabberworm/php-css-parser` dependency update

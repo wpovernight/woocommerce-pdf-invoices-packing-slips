@@ -12,35 +12,35 @@ defined( 'ABSPATH' ) or exit;
 if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) :
 
 class FileSystem {
-	
+
 	/**
 	 * Default filesystem method.
 	 */
 	public const FILESYSTEM_DEFAULT = 'php';
-	
+
 	/**
 	 * Available filesystem methods.
 	 */
 	public const FILESYSTEM_METHODS = array( 'php', 'wp' );
-	
+
 	/**
 	 * Filesystem method enabled.
 	 * @var string
 	 */
 	public string $system_enabled = self::FILESYSTEM_DEFAULT;
-	
+
 	/**
 	 * Suppress errors.
 	 * @var bool
 	 */
 	public bool $suppress_errors = false;
-	
+
 	/**
 	 * WP_Filesystem instance.
 	 * @var \WP_Filesystem_Direct|null
 	 */
 	public ?\WP_Filesystem_Direct $wp_filesystem = null;
-	
+
 	/**
 	 * Singleton instance.
 	 * @var self|null
@@ -64,27 +64,27 @@ class FileSystem {
 	public function __construct() {
 		$this->suppress_errors = apply_filters( 'wpo_wcpdf_file_system_suppress_errors', true );
 		$debug_settings        = get_option( 'wpo_wcpdf_settings_debug', array() );
-		
+
 		if ( ! is_array( $debug_settings ) ) {
 			$debug_settings = array();
 		}
-		
+
 		$debug_settings['file_system_method'] = apply_filters( // Allow overriding the filesystem method via filter
 			'wpo_wcpdf_filesystem_method',
 			$debug_settings['file_system_method'] ?? self::FILESYSTEM_DEFAULT
 		);
-		
+
 		$this->system_enabled = in_array( $debug_settings['file_system_method'], self::FILESYSTEM_METHODS, true )
 			? $debug_settings['file_system_method']
 			: self::FILESYSTEM_DEFAULT;
-		
+
 		if ( $this->is_wp_filesystem() ) {
 			$this->initialize_wp_filesystem();
 		} elseif ( ! defined( 'FS_CHMOD_FILE' ) ) {
 			define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
 		}
 	}
-	
+
 	/**
 	 * Check if WP_Filesystem is enabled.
 	 * @return bool
@@ -92,7 +92,7 @@ class FileSystem {
 	public function is_wp_filesystem(): bool {
 		return ( 'wp' === $this->system_enabled );
 	}
-	
+
 	/**
 	 * Check if PHP file functions are being used.
 	 * @return bool
@@ -123,7 +123,7 @@ class FileSystem {
 
 		$this->wp_filesystem = $wp_filesystem;
 	}
-	
+
 	/**
 	 * Change the filesystem setting value
 	 * @param string $method
@@ -132,9 +132,9 @@ class FileSystem {
 	protected function change_setting_value( string $method ): string {
 		$debug_settings                       = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$debug_settings['file_system_method'] = in_array( $method, self::FILESYSTEM_METHODS, true ) ? $method : self::FILESYSTEM_DEFAULT;
-		
+
 		update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
-		
+
 		return $debug_settings['file_system_method'];
 	}
 
@@ -181,7 +181,7 @@ class FileSystem {
 			$this->wp_filesystem->put_contents( $filename, $contents, $mode ) :
 			( $this->suppress_errors ? @file_put_contents( $filename, $contents ) : file_put_contents( $filename, $contents ) );
 	}
-	
+
 	/**
 	 * Output a file directly to the response.
 	 *
@@ -204,21 +204,21 @@ class FileSystem {
 			return true;
 		}
 
-		$handle = $this->suppress_errors ? @fopen( $filename, 'rb' ) : fopen( $filename, 'rb' );
+		$handle = $this->suppress_errors ? @fopen( $filename, 'rb' ) : fopen( $filename, 'rb' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		if ( false === $handle ) {
 			return false;
 		}
 
 		while ( ! feof( $handle ) ) {
-			$buffer = fread( $handle, 8192 );
+			$buffer = fread( $handle, 8192 ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fread
 			if ( false === $buffer ) {
-				fclose( $handle );
+				fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 				return false;
 			}
 			echo $buffer; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 
-		fclose( $handle );
+		fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		return true;
 	}
 
@@ -263,7 +263,7 @@ class FileSystem {
 			$this->wp_filesystem->mkdir( $path ) :
 			( $this->suppress_errors ? @mkdir( $path ) : mkdir( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_mkdir
 	}
-	
+
 	/**
 	 * Check if file is writable
 	 * @param string $filename
@@ -323,7 +323,7 @@ class FileSystem {
 			$this->wp_filesystem->mtime( $filename ) :
 			( $this->suppress_errors ? @filemtime( $filename ) : filemtime( $filename ) );
 	}
-	
+
 }
 
 endif; // Class exists check

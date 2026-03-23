@@ -210,7 +210,7 @@ class Settings {
 
 	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
 		$this->load_settings();
-		
+
 		if ( isset( $this->debug_settings['disable_preview'] ) ) {
 			foreach ( $settings_tabs as $tab_key => &$tab ) {
 				if ( is_array( $tab ) && ! empty( $tab['preview_states'] ) ) {
@@ -289,8 +289,8 @@ class Settings {
 						$form_settings = $this->callbacks->validate( $form_settings );
 
 						// filter the options
-						add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
-							return maybe_unserialize( $form_settings );
+						add_filter( "option_{$option_key}", function( $_value, $_option ) use ( $form_settings ) {
+							return $form_settings;
 						}, 99, 2 );
 					}
 
@@ -585,7 +585,7 @@ class Settings {
 		}
 		return $output_mode;
 	}
-	
+
 	/**
 	 * Get installed templates list as options.
 	 *
@@ -594,7 +594,7 @@ class Settings {
 	public function get_installed_templates_list(): array {
 		$installed_templates = $this->get_installed_templates();
 		$template_list       = array();
-		
+
 		foreach ( $installed_templates as $path => $template_id ) {
 			$template_name = basename( $template_id );
 			$group         = dirname( $template_id );
@@ -618,10 +618,10 @@ class Settings {
 					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
 					break;
 			}
-			
+
 			$template_list[ $template_id ] = $template_name;
 		}
-		
+
 		return $template_list;
 	}
 
@@ -629,14 +629,14 @@ class Settings {
 		$selected_template = $template_path
 			? sanitize_text_field( $template_path )
 			: ( $this->general_settings['template_path'] ?? '' );
-		
+
 		// return default path if no template selected
 		if ( empty( $selected_template ) ) {
 			return wp_normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
 		}
 
 		$installed_templates = $this->get_installed_templates();
-		
+
 		if ( in_array( $selected_template, $installed_templates ) ) {
 			return array_search( $selected_template, $installed_templates );
 		} else {
@@ -1233,11 +1233,19 @@ class Settings {
 
 		// Update settings fields.
 		foreach ( $settings_categories as $category_name => $category_details ) {
+			$category_title = isset( $category_details['title'] ) && is_string( $category_details['title'] )
+				? $category_details['title']
+				: '';
+
+			$category_members = isset( $category_details['members'] ) && is_array( $category_details['members'] )
+				? $category_details['members']
+				: array();
+
 			// Add section for each category.
-			$modified_settings_fields[] = $this->create_section( $category_name, $category_details['title'] );
+			$modified_settings_fields[] = $this->create_section( $category_name, $category_title );
 
 			// Add settings fields based on the order in the members array.
-			foreach ( $category_details['members'] as $member ) {
+			foreach ( $category_members as $member ) {
 				if ( isset( $settings_lookup[ $member ] ) ) {
 					$key = $settings_lookup[ $member ];
 
@@ -1275,13 +1283,13 @@ class Settings {
 
 		return $modified_settings_fields;
 	}
-	
+
 	/**
 	 * Initializes settings by loading them from the database.
 	 *
 	 * @return void
 	 */
-	private function load_settings(): void {
+	public function load_settings(): void {
 		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 		$debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
@@ -1299,7 +1307,7 @@ class Settings {
 	 *
 	 * @return array The section configuration array.
 	 */
-	private function create_section( string $category_name, string $category_title ): array {
+	public function create_section( string $category_name, string $category_title ): array {
 		return array(
 			'type'     => 'section',
 			'id'       => $category_name,
@@ -1350,7 +1358,7 @@ class Settings {
 	 *
 	 * @return array
 	 */
-	private function add_setting_field_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
+	public function add_setting_field_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
 		if ( ! isset( $settings_categories[ $category_name ] ) ) {
 			return $settings_categories;
 		}
