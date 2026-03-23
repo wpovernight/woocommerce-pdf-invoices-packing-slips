@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.9.0-rc.3\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.9.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-18T15:15:13+00:00\n"
+"POT-Creation-Date: 2026-03-23T11:42:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -3545,19 +3545,19 @@ msgstr ""
 msgid "Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found"
 msgstr ""
 
-#: includes/Settings.php:1266
+#: includes/Settings.php:1274
 msgid "Additional settings"
 msgstr ""
 
-#: includes/Settings.php:1425
+#: includes/Settings.php:1433
 msgid "Address field is required."
 msgstr ""
 
-#: includes/Settings.php:1441
+#: includes/Settings.php:1449
 msgid "Invalid address field."
 msgstr ""
 
-#: includes/Settings.php:1450
+#: includes/Settings.php:1458
 msgid "The field is empty."
 msgstr ""
 
