@@ -1289,7 +1289,7 @@ class Settings {
 	 *
 	 * @return void
 	 */
-	private function load_settings(): void {
+	public function load_settings(): void {
 		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 		$debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
@@ -1307,7 +1307,7 @@ class Settings {
 	 *
 	 * @return array The section configuration array.
 	 */
-	private function create_section( string $category_name, string $category_title ): array {
+	public function create_section( string $category_name, string $category_title ): array {
 		return array(
 			'type'     => 'section',
 			'id'       => $category_name,
@@ -1358,7 +1358,7 @@ class Settings {
 	 *
 	 * @return array
 	 */
-	private function add_setting_field_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
+	public function add_setting_field_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
 		if ( ! isset( $settings_categories[ $category_name ] ) ) {
 			return $settings_categories;
 		}
