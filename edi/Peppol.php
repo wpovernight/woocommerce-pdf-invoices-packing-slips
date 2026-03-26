@@ -630,18 +630,15 @@ class Peppol {
 
 		if ( wpo_ips_current_page_has_checkout_block() ) {
 			$this->peppol_enqueue_block_checkout_script();
-			wpo_ips_edi_log( 'Enqueued Peppol checkout script for checkout block.' );
 			return;
 		}
 
 		if ( wpo_ips_current_page_has_checkout_shortcode() ) {
 			$this->peppol_enqueue_classic_checkout_script();
-			wpo_ips_edi_log( 'Enqueued Peppol checkout script for classic checkout shortcode.' );
 			return;
 		}
 
 		if ( ! wpo_ips_is_current_page_checkout_page() ) {
-			wpo_ips_edi_log( 'Not enqueuing Peppol checkout script: not on checkout page.' );
 			return;
 		}
 
@@ -649,16 +646,13 @@ class Peppol {
 		switch ( wpo_ips_edi_get_settings( 'peppol_checkout_script_type' ) ) {
 			case 'classic':
 				$this->peppol_enqueue_classic_checkout_script();
-				wpo_ips_edi_log( 'Enqueued Peppol checkout script for classic checkout (fallback).' );
 				return;
 
 			case 'block':
 				$this->peppol_enqueue_block_checkout_script();
-				wpo_ips_edi_log( 'Enqueued Peppol checkout script for block checkout (fallback).' );
 				return;
 
 			default:
-				wpo_ips_edi_log( 'Peppol checkout script type setting is invalid. No script enqueued.' );
 				return;
 		}
 	}
