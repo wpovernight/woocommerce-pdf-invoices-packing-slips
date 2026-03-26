@@ -415,8 +415,9 @@ class SettingsEDI {
 				'title'       => __( 'Checkout Script Loading', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name' => $option_name,
 				'id'          => 'peppol_checkout_script_type',
+				'default'     => 'auto',
 				'options'     => array(
-					''        => __( 'Automatic detection', 'woocommerce-pdf-invoices-packing-slips' ),
+					'auto'    => __( 'Automatic detection', 'woocommerce-pdf-invoices-packing-slips' ),
 					'classic' => __( 'Force classic checkout scripts', 'woocommerce-pdf-invoices-packing-slips' ),
 					'block'   => __( 'Force block checkout scripts', 'woocommerce-pdf-invoices-packing-slips' ),
 				),

@@ -823,7 +823,7 @@ function wpo_ips_edi_peppol_enabled_for_location( string $location ): bool {
 		return false;
 	}
 
-	$location_setting = wpo_ips_edi_get_settings( 'peppol_customer_identifier_fields_location' );
+	$location_setting = wpo_ips_edi_get_settings( 'peppol_endpoint_id_field_location' );
 
 	// Valid options
 	$valid = array( 'checkout', 'my_account', 'both', 'none' );

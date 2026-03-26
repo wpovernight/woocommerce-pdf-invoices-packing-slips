@@ -716,6 +716,20 @@ class Install {
 			update_option( 'wpo_ips_edi_settings', $edi_settings );
 		}
 
+		// 5.9.1-i1477.1: migrate EDI setting
+		if ( version_compare( $installed_version, '5.9.1-i1477.1', '<' ) ) {
+			$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+
+			// migrate checkout script type setting
+			if (
+				isset( $edi_settings['peppol_checkout_script_type'] ) &&
+				'' === $edi_settings['peppol_checkout_script_type']
+			) {
+				$edi_settings['peppol_checkout_script_type'] = 'auto';
+				update_option( 'wpo_ips_edi_settings', $edi_settings );
+			}
+		}
+
 		// Maybe reinstall fonts
 		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
 	}
