@@ -392,7 +392,7 @@ class Peppol {
 
 		$meta_key = str_replace( '-', '_', substr( $key, strlen( 'wpo-ips-edi/' ) ) );
 		$value    = trim( sanitize_text_field( wp_unslash( $value ) ) );
-		
+
 		if ( empty( $value ) ) {
 			return;
 		}
@@ -650,6 +650,9 @@ class Peppol {
 
 			case 'block':
 				$this->peppol_enqueue_block_checkout_script();
+				return;
+
+			default:
 				return;
 		}
 	}
