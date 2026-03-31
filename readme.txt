@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 5.9.1
+Stable tag: 5.9.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,10 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.9.2 (2026-03-31) =
+- New: Added Composer installation support
+- Tested: Compatibility confirmed with WooCommerce 10.7
 
 = 5.9.1 (2026-03-26) =
 - Fix: Corrected Peppol Endpoint ID field location setting not being applied due to wrong key

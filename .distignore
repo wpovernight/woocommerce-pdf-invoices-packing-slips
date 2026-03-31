@@ -13,6 +13,7 @@
 
 # Node & Composer
 node_modules/
+composer.dist.json
 composer.json
 composer.lock
 package.json
