@@ -56,6 +56,10 @@ jobs:
           cp /tmp/composer.dist.json composer.json
           git add composer.json
 
+          mkdir -p .github/workflows
+          git checkout origin/main -- .github/workflows/release-assets.yml || true
+          git add .github/workflows/release-assets.yml || true
+
           if ! git diff --cached --quiet; then
             git commit -m "Prepare dist branch from main"
           fi
