@@ -1,6 +1,7 @@
 {
 	"name": "wpovernight/woocommerce-pdf-invoices-packing-slips",
 	"description": "PDF Invoices & Packing Slips for WooCommerce",
+	"type": "wordpress-plugin",
 	"license": "GPL-2.0-or-later",
 	"authors": [
 		{
@@ -13,73 +14,6 @@
 		"psr-4": {
 			"WPO\\IPS\\": "includes/",
 			"WPO\\IPS\\EDI\\": "edi/"
-		}
-	},
-	"require": {
-		"dompdf/dompdf": "^3.1",
-		"symfony/polyfill-mbstring": "^1.31",
-		"symfony/polyfill-iconv": "^1.31",
-		"sabre/xml": "^4.0",
-		"sabberworm/php-css-parser": "^8.9"
-	},
-	"extra": {
-		"strauss": {
-			"target_directory": "vendor/strauss",
-			"namespace_prefix": "WPO\\IPS\\Vendor\\",
-			"classmap_prefix": "WPO_IPS_Vendor_",
-			"constant_prefix": "WPO_IPS_VENDOR_",
-			"packages": [
-				"dompdf/dompdf",
-				"sabberworm/php-css-parser",
-				"sabre/xml",
-				"sabre/uri",
-				"masterminds/html5"
-			],
-			"update_call_sites": true,
-			"override_autoload": {
-				"dompdf/dompdf": {
-					"classmap": ["."]
-				},
-				"dompdf/php-font-lib": {
-					"classmap": ["."]
-				},
-				"dompdf/php-svg-lib": {
-					"classmap": ["."]
-				},
-				"masterminds/html5": {
-					"classmap": ["."]
-				},
-				"sabberworm/php-css-parser": {
-					"classmap": ["."]
-				},
-				"sabre/uri": {
-					"classmap": ["."]
-				},
-				"sabre/xml": {
-					"classmap": ["."]
-				}
-			},
-			"exclude_from_copy": {
-				"packages": [
-					"symfony/polyfill-mbstring",
-					"symfony/polyfill-iconv"
-				],
-				"namespaces": [],
-				"file_patterns": [
-					"/^psr.*$/"
-				]
-			},
-			"exclude_from_prefix": {
-				"packages": [
-					"symfony/polyfill-mbstring",
-					"symfony/polyfill-iconv"
-				],
-				"namespaces": [],
-				"file_patterns": []
-			},
-			"namespace_replacement_patterns": {},
-			"delete_vendor_packages": true,
-			"delete_vendor_files": true
 		}
 	},
 	"config": {
