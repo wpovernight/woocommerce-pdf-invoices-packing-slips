@@ -35,7 +35,8 @@ jobs:
 
           if git ls-remote --exit-code --heads origin dist; then
             git checkout -B dist origin/dist
-            git merge origin/main --no-edit
+            git reset --hard origin/dist
+            git merge origin/main --no-edit -X theirs
           else
             git checkout -B dist origin/main
           fi
