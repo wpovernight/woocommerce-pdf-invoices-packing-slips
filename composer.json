@@ -1,6 +1,14 @@
 {
 	"name": "wpovernight/woocommerce-pdf-invoices-packing-slips",
 	"description": "PDF Invoices & Packing Slips for WooCommerce",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "WP Overnight",
+			"email": "support@wpovernight.com",
+			"homepage": "https://wpovernight.com"
+		}
+	],
 	"autoload": {
 		"psr-4": {
 			"WPO\\IPS\\": "includes/",
