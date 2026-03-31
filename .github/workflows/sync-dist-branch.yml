@@ -29,19 +29,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Update dist branch
+      - name: Rebuild dist branch from main
         run: |
           git fetch origin
 
-          if git ls-remote --exit-code --heads origin dist; then
-            git checkout -B dist origin/dist
-            git reset --hard origin/dist
-            git merge origin/main --no-edit -X theirs
-          else
-            git checkout -B dist origin/main
-          fi
-
           cp composer.dist.json /tmp/composer.dist.json
+
+          git checkout -B dist origin/main
 
           if [ -f .distignore ]; then
             while IFS= read -r path || [ -n "$path" ]; do
@@ -66,4 +60,4 @@ jobs:
             git commit -m "Prepare dist branch from main"
           fi
 
-          git push origin dist
+          git push origin dist --force
