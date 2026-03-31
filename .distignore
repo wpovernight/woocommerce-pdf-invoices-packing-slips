@@ -16,7 +16,6 @@ node_modules/
 composer.dist.json
 composer.json
 composer.lock
-composer.md
 package.json
 package-lock.json
 yarn.lock
