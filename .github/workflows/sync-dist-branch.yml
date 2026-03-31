@@ -48,9 +48,8 @@ jobs:
 
           git add composer.json
 
-          if ! git diff --cached --quiet || ! git diff --quiet; then
-            git commit -m "Sync dist branch from main" || true
-            git push origin dist
-          else
-            echo "No changes to push"
+          if ! git diff --cached --quiet; then
+            git commit -m "Prepare dist branch from main"
           fi
+
+          git push origin dist
