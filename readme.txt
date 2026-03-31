@@ -111,6 +111,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 == Changelog ==
 
 = 5.9.2 (2026-03-31) =
+- New: Added Composer installation support
 - Tested: Compatibility confirmed with WooCommerce 10.7
 
 = 5.9.1 (2026-03-26) =
