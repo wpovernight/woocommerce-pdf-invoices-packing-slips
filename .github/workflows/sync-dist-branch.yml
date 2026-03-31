@@ -1,0 +1,56 @@
+name: Sync dist branch
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-dist
+  cancel-in-progress: true
+
+jobs:
+  sync-dist:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Update dist branch
+        run: |
+          git fetch origin
+
+          if git ls-remote --exit-code --heads origin dist; then
+            git checkout -B dist origin/dist
+            git merge origin/main --no-edit
+          else
+            git checkout -B dist origin/main
+          fi
+
+          cp composer.dist.json composer.json
+
+          if [ -f composer.lock ]; then
+            git rm -f composer.lock
+          fi
+
+          git add composer.json
+
+          if ! git diff --cached --quiet || ! git diff --quiet; then
+            git commit -m "Sync dist branch from main" || true
+            git push origin dist
+          else
+            echo "No changes to push"
+          fi
