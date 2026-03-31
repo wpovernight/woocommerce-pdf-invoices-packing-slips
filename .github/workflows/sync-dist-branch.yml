@@ -40,12 +40,25 @@ jobs:
             git checkout -B dist origin/main
           fi
 
-          cp composer.dist.json composer.json
+          cp composer.dist.json /tmp/composer.dist.json
 
-          if [ -f composer.lock ]; then
-            git rm -f composer.lock
+          if [ -f .distignore ]; then
+            while IFS= read -r path || [ -n "$path" ]; do
+              path="$(echo "$path" | xargs)"
+
+              [ -z "$path" ] && continue
+
+              case "$path" in
+                \#*) continue ;;
+              esac
+
+              path="${path#/}"
+
+              git rm -rf --ignore-unmatch "$path"
+            done < .distignore
           fi
 
+          cp /tmp/composer.dist.json composer.json
           git add composer.json
 
           if ! git diff --cached --quiet; then
