@@ -306,11 +306,8 @@ abstract class AbstractHandler implements HandlerInterface {
 				$category = ( 0.0 === $percentage ) ? $zero_category : 'S';
 			}
 
-			// Reason:
-			// - if we have an order-level reason, use it;
-			// - otherwise, if this is a zero-tax line, use zero-tax reason;
-			// - otherwise, default to NONE.
-			$reason = strtoupper( trim( (string) $order_reason ) );
+			// Reason
+			$reason = strtoupper( trim( (string) ( $tax_meta['reason'] ?? $order_reason   ) ) );
 			if ( '' === $reason || 'NONE' === $reason ) {
 				if ( 0.0 === $percentage && $category === $zero_category && $scheme === $zero_scheme ) {
 					$reason = $zero_reason;
@@ -405,46 +402,21 @@ abstract class AbstractHandler implements HandlerInterface {
 		$has_z_line         = false;
 
 		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $item ) {
-			$line_total = (float) $item->get_total();
-			$taxes      = $item->get_taxes();
-			$rows       = ( is_array( $taxes['total'] ?? null ) ) ? $taxes['total'] : array();
+			$line_total  = (float) $item->get_total();
+			$tax_meta    = $this->resolve_item_tax_meta( $item );
+			$item_cat    = strtoupper( $tax_meta['category'] ?? '' );
+			$item_rate   = (float) ( $tax_meta['percentage'] ?? 0 );
+			$item_scheme = strtoupper( $tax_meta['scheme'] ?? '' );
 
-			// Does this line have any non-zero tax amount?
-			$has_nonzero_row = false;
-			foreach ( $rows as $amt ) {
-				if ( is_numeric( $amt ) && (float) $amt !== 0.0 ) {
-					$has_nonzero_row = true;
-					break;
-				}
-			}
-
-			$line_is_z = false;
-
-			if ( $has_nonzero_row ) {
-				// Classify by the non-zero row's category/rate.
-				foreach ( $rows as $tax_id => $amt ) {
-					if ( ! is_numeric( $amt ) || (float) $amt === 0.0 ) {
-						continue;
-					}
-
-					$info = $this->document->order_tax_data[ $tax_id ] ?? array();
-					$cat  = strtoupper( $info['category'] ?? '' );
-					$rate = (float) ( $info['percentage'] ?? 0 );
-
-					// zero-tax lines are either explicitly zero-category or 0% rate.
-					if ( $cat === strtoupper( $zero_category ) || 0.0 === $rate ) {
-						$line_is_z = true;
-						break;
-					}
-				}
-			} else {
-				// No non-zero tax rows at all → treat as zero-tax (uses zero_category).
-				$line_is_z = true;
-			}
+			$line_is_z = (
+				0.0 === $item_rate &&
+				$item_cat === strtoupper( $zero_category ) &&
+				$item_scheme === strtoupper( $zero_scheme )
+			);
 
 			if ( $line_is_z ) {
 				$has_z_line          = true;
-				$z_basis_from_lines += $line_total; // contributes to zero-tax taxable amount
+				$z_basis_from_lines += $line_total;
 			}
 		}
 
@@ -640,7 +612,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		$rows     = $this->get_item_tax_rows( $item );
 
 		foreach ( $rows as $tax_id => $tax_amt ) {
-			if ( ! is_numeric( $tax_amt ) || (float) $tax_amt == 0.0 ) {
+			if ( ! is_numeric( $tax_amt ) ) {
 				continue;
 			}
 
@@ -648,6 +620,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$scheme   = strtoupper( $row['scheme']   ?? 'VAT' );
 			$category = strtoupper( $row['category'] ?? 'Z'   );
 			$percent  = (float) ( $row['percentage'] ?? 0     );
+			$reason   = strtoupper( $row['reason']   ?? 'NONE' );
 			break;
 		}
 
@@ -658,12 +631,14 @@ abstract class AbstractHandler implements HandlerInterface {
 
 			$scheme    = $zero_meta['scheme'];
 			$category  = $zero_meta['category'];
+			$reason    = $zero_meta['reason'];
 		}
 
 		return array(
 			'scheme'     => $scheme,
 			'category'   => $category,
 			'percentage' => $percent,
+			'reason'     => $reason,
 		);
 	}
 
