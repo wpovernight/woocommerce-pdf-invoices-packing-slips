@@ -61,13 +61,21 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 	if ( wpo_wcpdf_order_is_vat_exempt( $order ) ) {
 		switch ( $key ) {
 			case 'scheme':
-				$result = 'VAT';
+				if ( empty( $result ) || 'default' === $result ) {
+					$result = 'VAT';
+				}
 				break;
+
 			case 'category':
-				$result = 'AE';
+				if ( empty( $result ) || 'default' === $result ) {
+					$result = 'AE';
+				}
 				break;
+
 			case 'reason':
-				$result = 'VATEX-EU-AE';
+				if ( empty( $result ) || 'default' === $result ) {
+					$result = 'VATEX-EU-AE';
+				}
 				break;
 		}
 
