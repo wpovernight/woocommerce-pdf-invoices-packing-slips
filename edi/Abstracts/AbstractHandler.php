@@ -53,14 +53,14 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return string
 	 */
 	protected function get_supplier_identifiers_data( string $key ): string {
-		$general_settings = WPO_WCPDF()->settings->general;
-		$language         = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
+		$general_settings_instance = WPO_WCPDF()->settings->get_general_instance();
+		$language                  = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 
 		if ( empty( $language ) ) {
 			$language = 'default';
 		}
 
-		return $general_settings->get_setting( $key, $language ) ?: '';
+		return $general_settings_instance->get_setting( $key, $language ) ?: '';
 	}
 
 	/**

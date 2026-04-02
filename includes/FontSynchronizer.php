@@ -21,13 +21,23 @@ class FontSynchronizer {
 	/**
 	 * Vanilla instance of dompdf
 	 *
-	 * @var Dompdf
+	 * @var Dompdf|null
 	 */
-	public Dompdf $dompdf;
+	protected ?Dompdf $dompdf = null;
 
-	protected static $_instance = null;
+	/**
+	 * Singleton instance
+	 *
+	 * @var FontSynchronizer|null
+	 */
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get singleton instance
+	 *
+	 * @return FontSynchronizer
+	 */
+	public static function instance(): FontSynchronizer {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -35,10 +45,16 @@ class FontSynchronizer {
 	}
 
 	/**
-	 * Constructor
+	 * Get dompdf instance
+	 *
+	 * @return Dompdf
 	 */
-	public function __construct() {
-		$this->dompdf = new Dompdf();
+	protected function get_dompdf_instance(): Dompdf {
+		if ( null === $this->dompdf ) {
+			$this->dompdf = new Dompdf();
+		}
+
+		return $this->dompdf;
 	}
 
 	/**
@@ -131,7 +147,7 @@ class FontSynchronizer {
 
 				if ( WPO_WCPDF()->file_system->is_readable( $file ) ) {
 					$local_filename = $destination . basename( $file );
-					
+
 					if ( ! copy( $file, $local_filename ) ) {
 						wcpdf_log_error( sprintf( 'Failed to copy font file: %s to %s', $file, $local_filename ) );
 					}
@@ -155,7 +171,7 @@ class FontSynchronizer {
 	public function get_local_fonts( string $path ): array {
 		// prepare variables used in the cache list
 		$fontDir           = $path;
-		$rootDir           = $this->dompdf->getOptions()->getRootDir();
+		$rootDir           = $this->get_dompdf_instance()->getOptions()->getRootDir();
 		$cache_file        = trailingslashit( $path ) . $this->font_cache_filename;
 		$legacy_cache_file = trailingslashit( $path ) . 'dompdf_font_family_cache.php'; // Dompdf <2.0
 
@@ -188,7 +204,7 @@ class FontSynchronizer {
 	 * @return array
 	 */
 	public function get_dompdf_fonts(): array {
-		$fonts = $this->dompdf->getFontMetrics()->getFontFamilies();
+		$fonts = $this->get_dompdf_instance()->getFontMetrics()->getFontFamilies();
 		return $this->normalize_font_paths( $fonts );
 	}
 

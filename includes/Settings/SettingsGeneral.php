@@ -9,9 +9,9 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsGeneral' ) ) :
 
 class SettingsGeneral {
 
-	protected $option_name = 'wpo_wcpdf_settings_general';
-
-	protected static $_instance = null;
+	protected string $option_name            = 'wpo_wcpdf_settings_general';
+	protected ?array $missing_template_files = null;
+	protected static ?self $_instance        = null;
 
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
@@ -20,14 +20,17 @@ class SettingsGeneral {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
+		// WP
 		add_action( 'admin_init', array( $this, 'init_settings' ) );
+		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
+		
+		// IPS
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
+		
+		// AJAX
 		add_action( 'wp_ajax_wcpdf_get_country_states', array( $this, 'ajax_get_shop_country_states' ) );
-
-		// Display an admin notice if shop address fields are empty.
-		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
 	}
 
 	public function output( $section, $nonce ) {
@@ -798,18 +801,18 @@ class SettingsGeneral {
 			}
 		}
 
-		$general_settings = WPO_WCPDF()->settings->general;
-		$display_notice   = false;
-		$languages_data   = wpo_wcpdf_get_multilingual_languages();
-		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
+		$general_settings_instance = WPO_WCPDF()->settings->get_general_instance();
+		$display_notice            = false;
+		$languages_data            = wpo_wcpdf_get_multilingual_languages();
+		$languages                 = $languages_data ? array_keys( $languages_data ) : array( 'default' );
 
 		foreach ( $languages as $language ) {
-			$line_1   = $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '';
-			$country  = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
+			$line_1   = $general_settings_instance->get_setting( 'shop_address_line_1', $language ) ?? '';
+			$country  = $general_settings_instance->get_setting( 'shop_address_country', $language ) ?? '';
 			$states   = wpo_wcpdf_get_country_states( $country );
-			$state    = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
-			$city     = $general_settings->get_setting( 'shop_address_city', $language ) ?? '';
-			$postcode = $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '';
+			$state    = ! empty( $states ) ? $general_settings_instance->get_setting( 'shop_address_state', $language ) : '';
+			$city     = $general_settings_instance->get_setting( 'shop_address_city', $language ) ?? '';
+			$postcode = $general_settings_instance->get_setting( 'shop_address_postcode', $language ) ?? '';
 
 			if (
 				empty( $line_1 ) ||
@@ -924,11 +927,14 @@ class SettingsGeneral {
 	 * @return string[] Array of document titles.
 	 */
 	private function get_missing_template_files(): array {
-		$template_path       = WPO_WCPDF()->settings->get_template_path();
-		$template_path_array = explode( '/', $template_path );
-		$template_name       = end( $template_path_array );
-		$enabled_documents   = WPO_WCPDF()->documents->get_documents( 'enabled' );
-		$missing             = array();
+		if ( null !== $this->missing_template_files ) {
+			return $this->missing_template_files;
+		}
+
+		$template_path     = WPO_WCPDF()->settings->get_template_path();
+		$template_name     = basename( wp_normalize_path( $template_path ) );
+		$enabled_documents = WPO_WCPDF()->documents->get_documents( 'enabled' );
+		$missing           = array();
 
 		foreach ( $enabled_documents as $doc ) {
 			$filename         = $doc->get_type() . '.php';
@@ -945,7 +951,9 @@ class SettingsGeneral {
 			$missing[] = $doc->get_title();
 		}
 
-		return $missing;
+		$this->missing_template_files = $missing;
+
+		return $this->missing_template_files;
 	}
 
 	/**
@@ -979,7 +987,7 @@ class SettingsGeneral {
 
 		// Premium Templates guidance (only if bundle license missing/invalid)
 		if ( function_exists( 'WPO_WCPDF_Templates' ) ) {
-			$license_info = WPO_WCPDF()->settings->upgrade->get_extension_license_infos();
+			$license_info = WPO_WCPDF()->settings->get_upgrade_instance()->get_extension_license_infos();
 			$info         = $license_info['bundle'] ?? null;
 
 			if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {

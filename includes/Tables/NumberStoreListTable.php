@@ -65,7 +65,7 @@ class NumberStoreListTable extends \WP_List_Table {
 			case 'type':
 				$value                          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
 				$document_types                 = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
-				$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
+				$invoice_number_store_doc_types = WPO_WCPDF()->settings->get_debug_instance()->get_additional_invoice_number_store_document_types();
 
 				// document using invoice number, eg. proforma
 				if ( count( $document_types ) > 1 ) {
@@ -213,11 +213,13 @@ class NumberStoreListTable extends \WP_List_Table {
 	 * @return array $numbers All the data for number list table
 	 */
 	public function get_numbers() {
-		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		extract( WPO_WCPDF()->settings->debug->filter_fetch_request_data( $request ) );
+		$request                 = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$debug_settings_instance = WPO_WCPDF()->settings->get_debug_instance();
+		
+		extract( $debug_settings_instance->filter_fetch_request_data( $request ) );
 
-		$document_type                  = WPO_WCPDF()->settings->debug->get_document_type_from_store_table_name( $table_name );
-		$invoice_number_store_doc_types = WPO_WCPDF()->settings->debug->get_additional_invoice_number_store_document_types();
+		$document_type                  = $debug_settings_instance->get_document_type_from_store_table_name( $table_name );
+		$invoice_number_store_doc_types = $debug_settings_instance->get_additional_invoice_number_store_document_types();
 
 		if (
 			empty( $document_type ) ||
@@ -236,7 +238,7 @@ class NumberStoreListTable extends \WP_List_Table {
 
 			// we have a search request, return results by search term
 			if ( isset( $request['s'] ) ) {
-				$results = WPO_WCPDF()->settings->debug->search_number_in_table_data( $table_name, esc_attr( $request['s'] ) );
+				$results = $debug_settings_instance->search_number_in_table_data( $table_name, esc_attr( $request['s'] ) );
 			}
 
 			// include document types
@@ -284,7 +286,7 @@ class NumberStoreListTable extends \WP_List_Table {
 			}
 
 			// maybe sort the data
-			$results = WPO_WCPDF()->settings->debug->sort_number_table_data( $results, $order, $orderby );
+			$results = $debug_settings_instance->sort_number_table_data( $results, $order, $orderby );
 		}
 
 		return $results;

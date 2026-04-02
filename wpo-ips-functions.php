@@ -1512,14 +1512,23 @@ function wpo_wcpdf_get_country_address_format( string $country_code ): string {
  * @return array
  */
 function wpo_wcpdf_get_country_states( string $country_code ): array {
+	static $states_cache = array();
+
 	$states = array();
 
 	if ( ! empty( $country_code ) ) {
 		$country_code = strtoupper( trim( $country_code ) );
-		$states       = \WC()->countries->get_states( $country_code );
+
+		if ( isset( $states_cache[ $country_code ] ) ) {
+			return $states_cache[ $country_code ];
+		}
+
+		$states = \WC()->countries->get_states( $country_code );
 	}
 
-	return $states ?: array();
+	$states_cache[ $country_code ] = $states ?: array();
+
+	return $states_cache[ $country_code ];
 }
 
 /**
@@ -2258,4 +2267,17 @@ function wpo_ips_is_current_page_checkout_page(): bool {
 	$checkout_page_id = (int) get_option( 'woocommerce_checkout_page_id' );
 
 	return $checkout_page_id > 0 && $checkout_page_id === (int) $page_id;
+}
+
+/**
+ * Check if the current admin page is the plugin's settings page.
+ *
+ * @return bool
+ */
+function wpo_ips_is_settings_page(): bool {
+	if ( ! isset( $_GET['page'] ) ) {
+		return false;
+	}
+
+	return 'wpo_wcpdf_options_page' === sanitize_text_field( wp_unslash( $_GET['page'] ) );
 }

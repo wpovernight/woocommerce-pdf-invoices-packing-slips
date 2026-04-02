@@ -17,14 +17,14 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings' ) ) :
 
 class Settings {
 
-	/** @var string|false */
+	public ?SettingsCallbacks $callbacks = null;
+	public ?SettingsGeneral $general     = null;
+	public ?SettingsDocuments $documents = null;
+	public ?SettingsDebug $debug         = null;
+	public ?SettingsUpgrade $upgrade     = null;
+	public ?SettingsEDI $edi             = null;
+	
 	public $options_page_hook;
-	public SettingsCallbacks $callbacks;
-	public SettingsGeneral $general;
-	public SettingsDocuments $documents;
-	public SettingsDebug $debug;
-	public SettingsUpgrade $upgrade;
-	public SettingsEDI $edi;
 	public array $general_settings;
 	public array $debug_settings;
 	public array $edi_settings;
@@ -33,6 +33,7 @@ class Settings {
 	private array $installed_templates_cache = array();
 	private array $template_list_cache       = array();
 
+	protected bool $settings_loaded   = false;
 	protected static ?self $_instance = null;
 
 	public static function instance(): self {
@@ -43,13 +44,6 @@ class Settings {
 	}
 
 	public function __construct() {
-		$this->callbacks = SettingsCallbacks::instance();
-		$this->general   = SettingsGeneral::instance();
-		$this->documents = SettingsDocuments::instance();
-		$this->debug     = SettingsDebug::instance();
-		$this->edi       = SettingsEDI::instance();
-		$this->upgrade   = SettingsUpgrade::instance();
-
 		$this->load_settings();
 
 		// Settings menu item
@@ -94,6 +88,84 @@ class Settings {
 
 		// Sync address from WooCommerce address.
 		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
+	}
+	
+	/**
+	 * Get the settings callbacks instance.
+	 *
+	 * @return SettingsCallbacks
+	 */
+	public function get_callbacks_instance(): SettingsCallbacks {
+		if ( null === $this->callbacks ) {
+			$this->callbacks = SettingsCallbacks::instance();
+		}
+
+		return $this->callbacks;
+	}
+
+	/**
+	 * Get the general settings instance.
+	 *
+	 * @return SettingsGeneral
+	 */
+	public function get_general_instance(): SettingsGeneral {
+		if ( null === $this->general ) {
+			$this->general = SettingsGeneral::instance();
+		}
+
+		return $this->general;
+	}
+
+	/**
+	 * Get the documents settings instance.
+	 *
+	 * @return SettingsDocuments
+	 */
+	public function get_documents_settings_instance(): SettingsDocuments {
+		if ( null === $this->documents ) {
+			$this->documents = SettingsDocuments::instance();
+		}
+
+		return $this->documents;
+	}
+
+	/**
+	 * Get the debug settings instance.
+	 *
+	 * @return SettingsDebug
+	 */
+	public function get_debug_instance(): SettingsDebug {
+		if ( null === $this->debug ) {
+			$this->debug = SettingsDebug::instance();
+		}
+
+		return $this->debug;
+	}
+
+	/**
+	 * Get the upgrade settings instance.
+	 *
+	 * @return SettingsUpgrade
+	 */
+	public function get_upgrade_instance(): SettingsUpgrade {
+		if ( null === $this->upgrade ) {
+			$this->upgrade = SettingsUpgrade::instance();
+		}
+
+		return $this->upgrade;
+	}
+
+	/**
+	 * Get the EDI settings instance.
+	 *
+	 * @return SettingsEDI
+	 */
+	public function get_edi_instance(): SettingsEDI {
+		if ( null === $this->edi ) {
+			$this->edi = SettingsEDI::instance();
+		}
+
+		return $this->edi;
 	}
 
 	public function menu() {
@@ -209,7 +281,7 @@ class Settings {
 	}
 
 	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
-		$this->load_settings();
+		$this->load_settings( true );
 
 		if ( isset( $this->debug_settings['disable_preview'] ) ) {
 			foreach ( $settings_tabs as $tab_key => &$tab ) {
@@ -286,7 +358,7 @@ class Settings {
 						}
 
 						// validate option values
-						$form_settings = $this->callbacks->validate( $form_settings );
+						$form_settings = $this->get_callbacks_instance()->validate( $form_settings );
 
 						// filter the options
 						add_filter( "option_{$option_key}", function( $_value, $_option ) use ( $form_settings ) {
@@ -295,7 +367,7 @@ class Settings {
 					}
 
 					// reload settings
-					$this->load_settings();
+					$this->load_settings( true );
 
 					do_action( 'wpo_wcpdf_preview_after_reload_settings' );
 				}
@@ -479,8 +551,8 @@ class Settings {
 		foreach ( $settings_fields as $settings_field ) {
 			if ( ! isset( $settings_field['callback'] ) ) {
 				continue;
-			} elseif ( is_callable( array( $this->callbacks, $settings_field['callback'] ) ) ) {
-				$callback = array( $this->callbacks, $settings_field['callback'] );
+			} elseif ( is_callable( array( $this->get_callbacks_instance(), $settings_field['callback'] ) ) ) {
+				$callback = array( $this->get_callbacks_instance(), $settings_field['callback'] );
 			} elseif ( is_callable( $settings_field['callback'] ) ) {
 				$callback = $settings_field['callback'];
 			} else {
@@ -506,12 +578,12 @@ class Settings {
 				);
 				// register option separately for singular options
 				if ( is_string( $settings_field['callback'] ) && $settings_field['callback'] == 'singular_text_element') {
-					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
+					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->get_callbacks_instance(), 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 				}
 			}
 		}
 		// $page, $option_group & $option_name are all the same...
-		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
+		register_setting( $option_group, $option_name, array( $this->get_callbacks_instance(), 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 		add_filter( 'option_page_capability_'.$page, array( $this, 'user_settings_capability' ) );
 
 	}
@@ -1068,7 +1140,7 @@ class Settings {
 
 		// get settings HTML
 		ob_start();
-		$this->callbacks->media_upload( $args );
+		$this->get_callbacks_instance()->media_upload( $args );
 		$html = ob_get_clean();
 
 		return wp_send_json_success( $html );
@@ -1189,8 +1261,8 @@ class Settings {
 	 * @return array
 	 */
 	public function update_debug_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name ): array {
-		$settings_categories = is_callable( array( $this->debug, 'get_settings_categories' ) )
-			? $this->debug->get_settings_categories()
+		$settings_categories = is_callable( array( $this->get_debug_instance(), 'get_settings_categories' ) )
+			? $this->get_debug_instance()->get_settings_categories()
 			: array();
 
 		if ( empty( $settings_categories ) ) {
@@ -1287,9 +1359,14 @@ class Settings {
 	/**
 	 * Initializes settings by loading them from the database.
 	 *
+	 * @param bool $force_reload Force reload settings.
 	 * @return void
 	 */
-	public function load_settings(): void {
+	public function load_settings( bool $force_reload = false ): void {
+		if ( $this->settings_loaded && ! $force_reload ) {
+			return;
+		}
+
 		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 		$debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
@@ -1297,6 +1374,8 @@ class Settings {
 		$this->general_settings = is_array( $general_settings ) ? $general_settings : array();
 		$this->debug_settings   = is_array( $debug_settings )   ? $debug_settings   : array();
 		$this->edi_settings     = is_array( $edi_settings )     ? $edi_settings     : array();
+
+		$this->settings_loaded = true;
 	}
 
 	/**

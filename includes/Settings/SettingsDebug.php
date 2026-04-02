@@ -322,7 +322,7 @@ class SettingsDebug {
 	}
 
 	private function clear_extensions_license_cache( $data ) {
-		WPO_WCPDF()->settings->upgrade->clear_extensions_license_cache();
+		WPO_WCPDF()->settings->get_upgrade_instance()->clear_extensions_license_cache();
 
 		$message = __( "Extensions' license cache cleared successfully!", 'woocommerce-pdf-invoices-packing-slips' );
 		wcpdf_log_error( $message, 'info' );
