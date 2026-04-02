@@ -2268,16 +2268,3 @@ function wpo_ips_is_current_page_checkout_page(): bool {
 
 	return $checkout_page_id > 0 && $checkout_page_id === (int) $page_id;
 }
-
-/**
- * Check if the current admin page is the plugin's settings page.
- *
- * @return bool
- */
-function wpo_ips_is_settings_page(): bool {
-	if ( ! isset( $_GET['page'] ) ) {
-		return false;
-	}
-
-	return 'wpo_wcpdf_options_page' === sanitize_text_field( wp_unslash( $_GET['page'] ) );
-}

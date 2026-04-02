@@ -44,18 +44,12 @@ class Settings {
 	}
 
 	public function __construct() {
-		$is_wpo_wcpdf_ajax = wp_doing_ajax()
-			&& ! empty( $_REQUEST['action'] )
-			&& 0 === strpos( sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ), 'wpo_wcpdf_' );
-
-		if ( \wpo_ips_is_settings_page() || $is_wpo_wcpdf_ajax ) {
-			$this->get_callbacks_instance();
-			$this->get_general_instance();
-			$this->get_documents_settings_instance();
-			$this->get_debug_instance();
-			$this->get_upgrade_instance();
-			$this->get_edi_instance();
-		}
+		$this->get_callbacks_instance();
+		$this->get_general_instance();
+		$this->get_documents_settings_instance();
+		$this->get_debug_instance();
+		$this->get_upgrade_instance();
+		$this->get_edi_instance();
 		
 		$this->load_settings();
 
