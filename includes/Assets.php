@@ -20,7 +20,7 @@ class Assets {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
 		add_filter( 'script_loader_tag', array( $this, 'edi_prism_add_data_manual_attr' ), 10, 3 );
 	}

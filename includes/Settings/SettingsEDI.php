@@ -29,7 +29,7 @@ class SettingsEDI {
 	/**
 	 * Constructor.
 	 */
-	public function __construct()	{
+	public function __construct() {
 		$this->sections = apply_filters( 'wpo_ips_edi_settings_sections', array(
 			'settings'    => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
 			'identifiers' => __( 'Identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -37,11 +37,18 @@ class SettingsEDI {
 			'network'     => __( 'Network', 'woocommerce-pdf-invoices-packing-slips' ),
 		) );
 
-		add_action( 'admin_init', array( $this, 'init_settings' ) );
+		// WP
+		if ( \wpo_ips_is_settings_page() ) {
+			add_action( 'admin_init', array( $this, 'init_settings' ) );
+			add_filter( 'pre_update_option_wpo_ips_edi_settings', array( $this, 'preserve_peppol_settings' ), 10, 3 );
+		}
+		
+		// IPS
 		add_action( 'wpo_wcpdf_settings_output_edi', array( $this, 'output_settings' ), 10, 2 );
+		
+		// Woo
 		add_action( 'woocommerce_order_after_calculate_totals', array( $this, 'save_taxes_on_calculate_order_totals' ), 10, 2 );
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'save_taxes_on_checkout' ), 10, 3 );
-		add_filter( 'pre_update_option_wpo_ips_edi_settings', array( $this, 'preserve_peppol_settings' ), 10, 3 );
 
 		// AJAX
 		add_action( 'wp_ajax_wpo_ips_edi_save_taxes', array( $this, 'ajax_save_taxes' ) );

@@ -22,8 +22,10 @@ class SettingsGeneral {
 
 	public function __construct() {
 		// WP
-		add_action( 'admin_init', array( $this, 'init_settings' ) );
-		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
+		if ( \wpo_ips_is_settings_page() ) {
+			add_action( 'admin_init', array( $this, 'init_settings' ) );
+			add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
+		}
 		
 		// IPS
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );

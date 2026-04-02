@@ -21,7 +21,7 @@ class ThirdPartyPlugins {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	public function __construct() {
 		// WooCommerce Subscriptions compatibility
 		if ( class_exists( 'WC_Subscriptions' ) ) {
 			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {

@@ -22,6 +22,7 @@ class SettingsUpgrade {
 	public function __construct() {
 		$this->extensions = array( 'pro', 'templates' );
 
+		// IPS
 		add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'extensions_license_cache_notice' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
 		add_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing', array( $this, 'clear_extensions_license_cache' ) );

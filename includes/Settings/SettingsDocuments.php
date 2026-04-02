@@ -18,8 +18,13 @@ class SettingsDocuments {
 		return self::$_instance;
 	}
 
-	public function __construct()	{
-		add_action( 'admin_init', array( $this, 'init_settings' ) );
+	public function __construct() {
+		// WP
+		if ( \wpo_ips_is_settings_page() ) {
+			add_action( 'admin_init', array( $this, 'init_settings' ) );
+		}
+		
+		// IPS
 		add_action( 'wpo_wcpdf_settings_output_documents', array( $this, 'output' ), 10, 2 );
 	}
 

@@ -82,7 +82,7 @@ class Admin {
 
 	// display review admin notice after 100 pdf downloads
 	public function review_plugin_notice() {
-		if ( $this->is_order_page() === false && !( isset( $_GET['page'] ) && $_GET['page'] == 'wpo_wcpdf_options_page' ) ) {
+		if ( ! \wpo_ips_is_settings_page() ) {
 			return;
 		}
 
@@ -152,7 +152,7 @@ class Admin {
 
 	public function install_wizard_notice() {
 		// automatically remove notice after 1 week, set transient the first time
-		if ( $this->is_order_page() === false && !( isset( $_GET['page'] ) && $_GET['page'] == 'wpo_wcpdf_options_page' ) ) {
+		if ( ! \wpo_ips_is_settings_page() ) {
 			return;
 		}
 
