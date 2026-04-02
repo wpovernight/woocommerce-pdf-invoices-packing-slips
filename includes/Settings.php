@@ -44,6 +44,15 @@ class Settings {
 	}
 
 	public function __construct() {
+		if ( \wpo_ips_is_settings_page() ) {
+			$this->get_callbacks_instance();
+			$this->get_general_instance();
+			$this->get_documents_settings_instance();
+			$this->get_debug_instance();
+			$this->get_upgrade_instance();
+			$this->get_edi_instance();
+		}
+		
 		$this->load_settings();
 
 		// Settings menu item
