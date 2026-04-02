@@ -44,7 +44,11 @@ class Settings {
 	}
 
 	public function __construct() {
-		if ( \wpo_ips_is_settings_page() ) {
+		$is_wpo_wcpdf_ajax = wp_doing_ajax()
+			&& ! empty( $_REQUEST['action'] )
+			&& 0 === strpos( sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ), 'wpo_wcpdf_' );
+
+		if ( \wpo_ips_is_settings_page() || $is_wpo_wcpdf_ajax ) {
 			$this->get_callbacks_instance();
 			$this->get_general_instance();
 			$this->get_documents_settings_instance();
@@ -290,7 +294,7 @@ class Settings {
 	}
 
 	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
-		$this->load_settings( true );
+		$this->load_settings();
 
 		if ( isset( $this->debug_settings['disable_preview'] ) ) {
 			foreach ( $settings_tabs as $tab_key => &$tab ) {
