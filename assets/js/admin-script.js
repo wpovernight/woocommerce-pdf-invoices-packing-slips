@@ -829,61 +829,38 @@ jQuery( function( $ ) {
 	//----------> Settings Search <----------//
 
 	function settingsSearch() {
-		const $input = $( '#settings-search' );
+		const $input = $( '#wpo-settings-search' );
 
 		if ( ! $input.length ) {
 			return;
 		}
 
+		// Check if search index is available.
+		if ( ! wpo_wcpdf_admin.search_index.length ) {
+			return;
+		}
+
 		const $searchContainer = $input.closest( '.settings-search' );
 
-		// The search field may be a sibling of the form (General/Documents tabs)
-		// or inside the form (Debug tab).
-		let $form = $searchContainer.siblings( 'form' ).first();
-
-		if ( ! $form.length ) {
-			$form = $searchContainer.closest( 'form' );
-		}
-
-		if ( ! $form.length ) {
-			return;
-		}
-
-		// Build index of searchable settings from the current tab.
-		const settingItems = [];
-
-		$form.find( '.settings_category' ).each( function () {
-			const $category = $( this );
-			const $header   = $category.find( '> h2' );
-
-			$category.find( '.form-table > tbody > tr' ).each( function () {
-				const $row  = $( this );
-				const label = $row.find( '> th' ).text().trim();
-
-				if ( ! label ) {
-					return;
-				}
-
-				settingItems.push( {
-					label:     label,
-					$row:      $row,
-					$header:   $header,
-					$category: $category
-				} );
-			} );
-		} );
-
-		if ( ! settingItems.length ) {
-			return;
-		}
-
 		// Create dropdown container.
+		$searchContainer.find( '.settings-search-dropdown' ).remove();
 		const $dropdown = $( '<ul class="settings-search-dropdown"></ul>' );
 		$searchContainer.append( $dropdown );
 
 		let activeIndex = -1;
 		let matches     = [];
 
+		function findSettingRow( item ) {
+			const $category = $( '#' + item.category );
+
+			if ( ! $category.length ) {
+				return $();
+			}
+
+			return $category.find(
+				'[name$="[' + item.id + ']"], [name$="[' + item.id + '][]"]'
+			).first().closest( 'tr' );
+		}
 
 		function renderResults( query ) {
 			$dropdown.empty();
@@ -895,7 +872,7 @@ jQuery( function( $ ) {
 				return;
 			}
 
-			matches = settingItems.filter( function ( item ) {
+			matches = wpo_wcpdf_admin.search_index.filter( function ( item ) {
 				return item.label.toLowerCase().indexOf( query.toLowerCase().trim() ) !== -1;
 			} );
 
@@ -904,7 +881,7 @@ jQuery( function( $ ) {
 				return;
 			}
 
-			matches.forEach( function ( item, index ) {
+			$.each( matches, function ( index, item ) {
 				const $item = $( '<li class="settings-search-item"></li>' )
 					.text( item.label )
 					.attr( 'data-index', index )
@@ -947,31 +924,42 @@ jQuery( function( $ ) {
 			$dropdown.hide();
 			$input.val( '' );
 
-			const $header = item.$header;
-			const $panel  = $header.next( '.form-table' );
+			const $category = $( '#' + item.category );
+
+			// Early return if category is not found.
+			if ( ! $category.length ) {
+				return;
+			}
+
+			// Find the target row by setting ID.
+			const $row = findSettingRow( item );
+
+			// Early return if row is not found.
+			if ( ! $row.length ) {
+				return;
+			}
+
+			// Open the category and store the state in the local storage.
+			const $header = $category.find('> h2');
+			const $panel  = $header.next('.form-table');
 
 			// Open the accordion section if closed.
-			if ( ! $panel.is( ':visible' ) ) {
-				// Open and display the setting category.
+			if ( $panel.length && ! $panel.is( ':visible' ) ) {
 				$header.addClass( 'active' ).attr( 'aria-expanded', true );
 				$panel.show().attr( 'aria-hidden', 'false' );
 
-				const categoryId = item.$category.attr( 'id' );
-				const params     = new URLSearchParams( window.location.search );
-				const tab        = params.get( 'tab' ) || 'general';
+				const params = new URLSearchParams( window.location.search );
+				const tab    = params.get( 'tab' ) || 'general';
 
-				// Save the open category state in localStorage.
-				if ( categoryId ) {
-					localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}`, 'true' );
-				}
+				localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${item.category}`, 'true' );
 			}
 
 			// Scroll to and highlight the row.
-			const offset = item.$row.offset().top - 150;
+			const offset = $row.offset().top - 150;
 			$( 'html, body' ).animate( { scrollTop: offset }, 300, function () {
-				item.$row.addClass( 'settings-search-highlight' );
+				$row.addClass( 'settings-search-highlight' );
 				setTimeout( function () {
-					item.$row.removeClass( 'settings-search-highlight' );
+					$row.removeClass( 'settings-search-highlight' );
 				}, 1500 );
 			} );
 		}

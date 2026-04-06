@@ -137,7 +137,7 @@ class SettingsDebug {
 		) {
 			echo '
 				<div class="settings-search">
-					<input type="text" name="settings-search" id="settings-search" placeholder="', esc_attr_e( 'Search settings', 'woocommerce-pdf-invoices-packing-slips' ), '">
+					<input type="text" name="settings-search" id="wpo-settings-search" placeholder="', esc_attr_e( 'Search settings', 'woocommerce-pdf-invoices-packing-slips' ), '">
 				</div>
 			';
 		}
