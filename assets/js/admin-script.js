@@ -991,8 +991,10 @@ jQuery( function( $ ) {
 			}
 		} );
 
-		$input.on( 'blur', function () {
-			$dropdown.hide();
+		$( document ).on( 'mousedown', function ( e ) {
+			if ( ! $( e.target ).closest( '.settings-search' ).length ) {
+				$dropdown.hide();
+			}
 		} );
 
 		$input.on( 'focus', function () {
