@@ -202,6 +202,13 @@ table.wcpdf_documents_settings_list td.title {
 	position: relative;
 }
 
+.wcpdf_document_settings_sections > span {
+	font-size: 14px;
+	font-weight: 600;
+	margin-bottom: 0.6em;
+	display: inline-block;
+}
+
 .wcpdf_document_settings_sections > h2 {
 	cursor: pointer;
 	padding: 1em 0.8em;

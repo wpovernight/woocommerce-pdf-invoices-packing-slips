@@ -36,7 +36,7 @@ class SettingsDocuments {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
-		
+
 		$section          = ! empty( $section ) ? $section : 'invoice';
 		$option_name      = "wpo_wcpdf_documents_settings_{$section}";
 		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
@@ -54,6 +54,7 @@ class SettingsDocuments {
 		}
 		?>
 		<div class="wcpdf_document_settings_sections">
+			<span><?php esc_html_e( 'Choose document', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
 			<?php echo '<h2>'.esc_html( $section_document->get_title() ).'<span class="arrow-down">&#9660;</span></h2>'; ?>
 			<ul>
 				<?php
