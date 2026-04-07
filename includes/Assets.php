@@ -141,13 +141,13 @@ class Assets {
 			if ( ! wp_script_is( 'wp-pointer', 'enqueued' ) ) {
 				wp_enqueue_script( 'wp-pointer' );
 			}
-			
+
 			$tiptip_handle = version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip';
-			
+
 			if ( ! wp_script_is( $tiptip_handle, 'enqueued' ) ) {
 				wp_enqueue_script( $tiptip_handle );
 			}
-			
+
 			$admin_deps = array(
 				'jquery',
 				'wc-enhanced-select',
@@ -156,8 +156,8 @@ class Assets {
 				wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
 				wp_script_is( 'wc-jquery-tiptip', 'registered' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip',
 			);
-			
-			// edi preview			
+
+			// edi preview
 			if ( wpo_ips_edi_preview_is_enabled() ) {
 				wp_enqueue_style(
 					'wpo-ips-edi-prism',
@@ -165,7 +165,7 @@ class Assets {
 					array(),
 					'1.30.0'
 				);
-				
+
 				wp_enqueue_script(
 					'wpo-ips-edi-prism-core',
 					WPO_WCPDF()->plugin_url() . '/assets/js/prism.min.js',
@@ -173,7 +173,7 @@ class Assets {
 					'1.30.0',
 					true
 				);
-				
+
 				$admin_deps[] = 'wpo-ips-edi-prism-core';
 			}
 
@@ -185,11 +185,14 @@ class Assets {
 				true
 			);
 
+			$search_index = $this->get_settings_search_index( $tab );
+
 			wp_localize_script(
 				'wpo-wcpdf-admin',
 				'wpo_wcpdf_admin',
 				array(
 					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+					'search_index'              => $search_index,
 					'nonce'                     => wp_create_nonce( 'wpo_wcpdf_admin_nonce' ),
 					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
 					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.min.js?ver=' . $pdfjs_version, // taken from https://cdnjs.com/libraries/pdf.js
@@ -261,7 +264,7 @@ class Assets {
 			}
 
 			wp_enqueue_media();
-			
+
 			wp_enqueue_script(
 				'wpo-wcpdf-media-upload',
 				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
@@ -374,10 +377,46 @@ class Assets {
 		}
 
 	}
-	
+
 	/**
-	 * Adds the `data-manual` attribute to Prism’s <script> tag so that Prism
-	 * stays in “manual” mode (i.e. it won’t auto-highlight the entire page;
+	 * Build the search index for the current settings tab.
+	 *
+	 * @param string $tab
+	 *
+	 * @return array
+	 */
+	private function get_settings_search_index( string $tab ): array {
+		$page = '';
+
+		switch ( $tab ) {
+			case 'general':
+			case '':
+				$page = 'wpo_wcpdf_settings_general';
+				break;
+			case 'documents':
+				$section = filter_input( INPUT_GET, 'section', FILTER_DEFAULT );
+				$section = ! empty( $section ) ? sanitize_text_field( $section ) : 'invoice';
+				$page    = 'wpo_wcpdf_documents_settings_' . $section;
+				break;
+			case 'debug':
+				$section = filter_input( INPUT_GET, 'section', FILTER_DEFAULT );
+				$section = ! empty( $section ) ? sanitize_text_field( $section ) : 'settings';
+				if ( 'settings' === $section ) {
+					$page = 'wpo_wcpdf_settings_debug';
+				}
+				break;
+		}
+
+		if ( empty( $page ) ) {
+			return array();
+		}
+
+		return WPO_WCPDF()->settings->get_search_index( $page );
+	}
+
+	/**
+	 * Adds the `data-manual` attribute to Prism's <script> tag so that Prism
+	 * stays in “manual” mode (i.e. it won't auto-highlight the entire page;
 	 * you will call `Prism.highlightElement()` yourself).
 	 *
 	 * @param string $tag

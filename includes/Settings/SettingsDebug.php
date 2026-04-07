@@ -40,6 +40,9 @@ class SettingsDebug {
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
 		add_action( 'wp_ajax_wpo_ips_plugin_report', array( $this, 'ajax_plugin_report' ) );
+
+		// Display search form.
+		add_action( 'wpo_wcpdf_after_sidebar', array( $this, 'display_search_field' ), 10, 2 );
 	}
 
 	/**
@@ -74,6 +77,8 @@ class SettingsDebug {
 		</div>
 		<?php
 
+		$this->display_search_field( 'debug', $active_section );
+
 		switch ( $active_section ) {
 			case 'settings':
 				$this->display_settings();
@@ -100,6 +105,45 @@ class SettingsDebug {
 		do_settings_sections( 'wpo_wcpdf_settings_debug' );
 
 		submit_button();
+	}
+
+	/**
+	 * Display the search field for settings sections that support it.
+	 *
+	 * @param string $active_tab
+	 * @param string $active_section
+	 *
+	 * @return void
+	 */
+	public function display_search_field( string $active_tab, string $active_section ): void {
+		$searchable_sections = apply_filters(
+			'wpo_wcpdf_searchable_sections',
+			array(
+				'general',
+				'documents',
+				'debug' => array( 'settings' )
+			)
+		);
+
+		// Tabs with subsection-specific search (associative keys) handle their own call in output(),
+		// so skip them when called via the `wpo_wcpdf_after_sidebar` hook to avoid duplicates.
+		if ( doing_action( 'wpo_wcpdf_after_sidebar' ) && isset( $searchable_sections[ $active_tab ] ) ) {
+			return;
+		}
+
+		if (
+			in_array( $active_tab, $searchable_sections, true ) ||
+			(
+				isset( $searchable_sections[ $active_tab ] ) &&
+				is_array( $searchable_sections[ $active_tab ] ) &&
+				in_array( $active_section, $searchable_sections[ $active_tab ], true ) )
+		) {
+			echo '
+				<div class="settings-search">
+					<input type="text" name="settings-search" id="wpo-settings-search" placeholder="', esc_attr_e( 'Search settings', 'woocommerce-pdf-invoices-packing-slips' ), '">
+				</div>
+			';
+		}
 	}
 
 	/**

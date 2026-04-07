@@ -202,12 +202,20 @@ table.wcpdf_documents_settings_list td.title {
 	position: relative;
 }
 
+.wcpdf_document_settings_sections > span {
+	font-size: 14px;
+	font-weight: 600;
+	margin-bottom: 0.6em;
+	display: inline-block;
+}
+
 .wcpdf_document_settings_sections > h2 {
 	cursor: pointer;
 	padding: 1em 0.8em;
-	margin: 0;
 	border: 1px solid #c3c4c7;
 	background: #ffffff;
+	border-radius: 0.5em;
+	margin: 0 0 0.5em;
 }
 
 .wcpdf_document_settings_sections ul {
@@ -539,7 +547,75 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	box-sizing: border-box;
 	background: transparent;
 	flex: 0 0 35%;
-	overflow-x: hidden;
+	overflow-x: clip;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search {
+	margin-bottom: 2em;
+	position: sticky;
+	top: 2em;
+	z-index: 100;
+	background: #fff;
+	padding: 2em 0 1em;
+}
+#wpo-wcpdf-preview-wrapper .sidebar > .settings-search {
+	margin-left: 2em;
+	width: calc(100% - 4em);
+	max-width: 50vw;
+}
+
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search > input {
+	width: 100%;
+	padding: 0 0.4em 0 2.6em;
+	font-size: 1em;
+	border: 1px solid #c3c4c7;
+	border-radius: 0.5em;
+	background-repeat: no-repeat;
+	background-size: 1.1em 1.1em;
+	background-position: 0.75em center;
+	background-image: url(data:image/svg+xml,%3Csvg%20width%3D%2217%22%20height%3D%2217%22%20viewBox%3D%220%200%2017%2017%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20d%3D%22M15.8334%2015.8334L12.2084%2012.2084M14.1667%207.50004C14.1667%2011.1819%2011.1819%2014.1667%207.50004%2014.1667C3.81814%2014.1667%200.833374%2011.1819%200.833374%207.50004C0.833374%203.81814%203.81814%200.833374%207.50004%200.833374C11.1819%200.833374%2014.1667%203.81814%2014.1667%207.50004Z%22%20stroke%3D%22%23717680%22%20stroke-width%3D%221.66667%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%3C%2Fsvg%3E);
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-dropdown {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 0.5em;
+	max-height: 23em;
+	overflow: hidden auto;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+	padding: 0;
+	list-style: none;
+	margin: -1em 0 0;
+	scrollbar-color: #c3c4c7 transparent;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item {
+	padding: 0.6em 1em;
+	margin: 0;
+	cursor: pointer;
+	color: #1e1e1e;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item:last-child {
+	border-bottom: none;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item:hover,
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item.active {
+	background-color: #f0f0f1;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr.settings-search-highlight {
+	background-color: #D9E0FF;
+	transition: background-color 0.3s;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form {
@@ -570,12 +646,13 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding: 0;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th {
-	padding-bottom: 0.6em;
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr {
+	padding: 2em !important;
+	box-sizing: border-box;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr:not(:last-child) > td {
-	padding-bottom: 2.4em;
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th {
+	padding-bottom: 0.6em;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td p.description {
@@ -717,7 +794,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-left: 1px solid #c3c4c7;
 	border-right: 1px solid #c3c4c7;
 	border-bottom: 1px solid #c3c4c7;
-	padding: 2em;
 	margin-top: 0;
 	background: #ffffff;
 	margin-bottom: 20px;
