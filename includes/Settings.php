@@ -1472,6 +1472,41 @@ class Settings {
 		wp_send_json_success( array( 'value' => $value ) );
 	}
 
+	/**
+	 * Get search index for settings fields of a specific settings page.
+	 *
+	 * @param string $page The settings page key.
+	 *
+	 * @return array
+	 */
+	public function get_search_index( string $page ): array {
+		global $wp_settings_fields;
+
+		$index = array();
+
+		if ( empty( $wp_settings_fields[ $page ] ) ) {
+			return $index;
+		}
+
+		foreach ( $wp_settings_fields[ $page ] as $section_id => $fields ) {
+			foreach ( $fields as $field_id => $field ) {
+				$title = wp_strip_all_tags( $field['title'] );
+
+				if ( empty( trim( $title ) ) ) {
+					continue;
+				}
+
+				$index[] = array(
+					'id'       => $field_id,
+					'label'    => $title,
+					'category' => $section_id,
+				);
+			}
+		}
+
+		return $index;
+	}
+
 }
 
 endif; // class_exists
