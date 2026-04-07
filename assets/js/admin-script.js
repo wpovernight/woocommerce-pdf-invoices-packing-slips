@@ -857,9 +857,7 @@ jQuery( function( $ ) {
 				return $();
 			}
 
-			return $category.find(
-				'[name$="[' + item.id + ']"], [name$="[' + item.id + '][]"]'
-			).first().closest( 'tr' );
+			return $category.find( '[name*="[' + item.id + ']"]' ).first().closest( 'tr' );
 		}
 
 		function renderResults( query ) {
@@ -940,8 +938,8 @@ jQuery( function( $ ) {
 			}
 
 			// Open the category and store the state in the local storage.
-			const $header = $category.find('> h2');
-			const $panel  = $header.next('.form-table');
+			const $header = $category.find( '> h2' );
+			const $panel  = $header.next( '.form-table' );
 
 			// Open the accordion section if closed.
 			if ( $panel.length && ! $panel.is( ':visible' ) ) {
