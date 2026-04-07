@@ -65,7 +65,7 @@ class NumberStoreListTable extends \WP_List_Table {
 			case 'type':
 				$value                          = '<span class="item-number number-gapped">' . __( 'gapped', 'woocommerce-pdf-invoices-packing-slips' ) . '</span>';
 				$document_types                 = isset( $item->document_types ) && is_array( $item->document_types ) ? $item->document_types : array();
-				$invoice_number_store_doc_types = WPO_WCPDF()->settings->get_debug_instance()->get_additional_invoice_number_store_document_types();
+				$invoice_number_store_doc_types = WPO_WCPDF()->settings->get_instance( 'debug' )->get_additional_invoice_number_store_document_types();
 
 				// document using invoice number, eg. proforma
 				if ( count( $document_types ) > 1 ) {
@@ -214,7 +214,7 @@ class NumberStoreListTable extends \WP_List_Table {
 	 */
 	public function get_numbers() {
 		$request                 = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$debug_settings_instance = WPO_WCPDF()->settings->get_debug_instance();
+		$debug_settings_instance = WPO_WCPDF()->settings->get_instance( 'debug' );
 		
 		extract( $debug_settings_instance->filter_fetch_request_data( $request ) );
 

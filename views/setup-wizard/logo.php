@@ -5,7 +5,7 @@
 </div>
 <div class="wpo-setup-input">
 	<?php
-		WPO_WCPDF()->settings->get_callbacks_instance()->media_upload( array(
+		WPO_WCPDF()->settings->get_instance( 'callbacks' )->media_upload( array(
 			'option_name'          => 'wpo_wcpdf_settings_general',
 			'setting_name'         => 'wcpdf_settings[wpo_wcpdf_settings_general][header_logo]',
 			'id'                   => 'header_logo',

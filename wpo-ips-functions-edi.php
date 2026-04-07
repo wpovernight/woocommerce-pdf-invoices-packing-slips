@@ -656,7 +656,7 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
  * @return array
  */
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
-	$general_settings_instance = WPO_WCPDF()->settings->get_general_instance();
+	$general_settings_instance = WPO_WCPDF()->settings->get_instance( 'general' );
 	$language                  = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 	$data                      = array();
 

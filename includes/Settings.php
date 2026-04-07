@@ -44,12 +44,12 @@ class Settings {
 	}
 
 	public function __construct() {
-		$this->get_callbacks_instance();
-		$this->get_general_instance();
-		$this->get_documents_settings_instance();
-		$this->get_debug_instance();
-		$this->get_upgrade_instance();
-		$this->get_edi_instance();
+		$this->get_instance( 'callbacks' );
+		$this->get_instance( 'general' );
+		$this->get_instance( 'documents' );
+		$this->get_instance( 'debug' );
+		$this->get_instance( 'upgrade' );
+		$this->get_instance( 'edi' );
 		
 		$this->load_settings();
 
@@ -98,81 +98,32 @@ class Settings {
 	}
 	
 	/**
-	 * Get the settings callbacks instance.
+	 * Get a settings instance by slug.
 	 *
-	 * @return SettingsCallbacks
+	 * @param string $setting
+	 *
+	 * @return object|null
 	 */
-	public function get_callbacks_instance(): SettingsCallbacks {
-		if ( null === $this->callbacks ) {
-			$this->callbacks = SettingsCallbacks::instance();
+	public function get_instance( string $setting ) {
+		$map = array(
+			'callbacks' => SettingsCallbacks::class,
+			'general'   => SettingsGeneral::class,
+			'documents' => SettingsDocuments::class,
+			'debug'     => SettingsDebug::class,
+			'upgrade'   => SettingsUpgrade::class,
+			'edi'       => SettingsEDI::class,
+		);
+
+		if ( ! isset( $map[ $setting ] ) ) {
+			return null;
 		}
 
-		return $this->callbacks;
-	}
-
-	/**
-	 * Get the general settings instance.
-	 *
-	 * @return SettingsGeneral
-	 */
-	public function get_general_instance(): SettingsGeneral {
-		if ( null === $this->general ) {
-			$this->general = SettingsGeneral::instance();
+		if ( null === $this->{$setting} ) {
+			$class = $map[ $setting ];
+			$this->{$setting} = $class::instance();
 		}
 
-		return $this->general;
-	}
-
-	/**
-	 * Get the documents settings instance.
-	 *
-	 * @return SettingsDocuments
-	 */
-	public function get_documents_settings_instance(): SettingsDocuments {
-		if ( null === $this->documents ) {
-			$this->documents = SettingsDocuments::instance();
-		}
-
-		return $this->documents;
-	}
-
-	/**
-	 * Get the debug settings instance.
-	 *
-	 * @return SettingsDebug
-	 */
-	public function get_debug_instance(): SettingsDebug {
-		if ( null === $this->debug ) {
-			$this->debug = SettingsDebug::instance();
-		}
-
-		return $this->debug;
-	}
-
-	/**
-	 * Get the upgrade settings instance.
-	 *
-	 * @return SettingsUpgrade
-	 */
-	public function get_upgrade_instance(): SettingsUpgrade {
-		if ( null === $this->upgrade ) {
-			$this->upgrade = SettingsUpgrade::instance();
-		}
-
-		return $this->upgrade;
-	}
-
-	/**
-	 * Get the EDI settings instance.
-	 *
-	 * @return SettingsEDI
-	 */
-	public function get_edi_instance(): SettingsEDI {
-		if ( null === $this->edi ) {
-			$this->edi = SettingsEDI::instance();
-		}
-
-		return $this->edi;
+		return $this->{$setting};
 	}
 
 	public function menu() {
@@ -365,7 +316,7 @@ class Settings {
 						}
 
 						// validate option values
-						$form_settings = $this->get_callbacks_instance()->validate( $form_settings );
+						$form_settings = $this->get_instance( 'callbacks' )->validate( $form_settings );
 
 						// filter the options
 						add_filter( "option_{$option_key}", function( $_value, $_option ) use ( $form_settings ) {
@@ -558,8 +509,8 @@ class Settings {
 		foreach ( $settings_fields as $settings_field ) {
 			if ( ! isset( $settings_field['callback'] ) ) {
 				continue;
-			} elseif ( is_callable( array( $this->get_callbacks_instance(), $settings_field['callback'] ) ) ) {
-				$callback = array( $this->get_callbacks_instance(), $settings_field['callback'] );
+			} elseif ( is_callable( array( $this->get_instance( 'callbacks' ), $settings_field['callback'] ) ) ) {
+				$callback = array( $this->get_instance( 'callbacks' ), $settings_field['callback'] );
 			} elseif ( is_callable( $settings_field['callback'] ) ) {
 				$callback = $settings_field['callback'];
 			} else {
@@ -585,12 +536,12 @@ class Settings {
 				);
 				// register option separately for singular options
 				if ( is_string( $settings_field['callback'] ) && $settings_field['callback'] == 'singular_text_element') {
-					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->get_callbacks_instance(), 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
+					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->get_instance( 'callbacks' ), 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 				}
 			}
 		}
 		// $page, $option_group & $option_name are all the same...
-		register_setting( $option_group, $option_name, array( $this->get_callbacks_instance(), 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
+		register_setting( $option_group, $option_name, array( $this->get_instance( 'callbacks' ), 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 		add_filter( 'option_page_capability_'.$page, array( $this, 'user_settings_capability' ) );
 
 	}
@@ -1147,7 +1098,7 @@ class Settings {
 
 		// get settings HTML
 		ob_start();
-		$this->get_callbacks_instance()->media_upload( $args );
+		$this->get_instance( 'callbacks' )->media_upload( $args );
 		$html = ob_get_clean();
 
 		return wp_send_json_success( $html );
@@ -1268,8 +1219,8 @@ class Settings {
 	 * @return array
 	 */
 	public function update_debug_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name ): array {
-		$settings_categories = is_callable( array( $this->get_debug_instance(), 'get_settings_categories' ) )
-			? $this->get_debug_instance()->get_settings_categories()
+		$settings_categories = is_callable( array( $this->get_instance( 'debug' ), 'get_settings_categories' ) )
+			? $this->get_instance( 'debug' )->get_settings_categories()
 			: array();
 
 		if ( empty( $settings_categories ) ) {

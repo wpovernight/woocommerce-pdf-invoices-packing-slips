@@ -216,7 +216,7 @@
 			</form>
 		</div>
 		<!-- /reset_settings -->
-		<?php if ( WPO_WCPDF()->settings->get_upgrade_instance()->are_any_extensions_installed() ) : ?>
+		<?php if ( WPO_WCPDF()->settings->get_instance( 'upgrade' )->are_any_extensions_installed() ) : ?>
 			<!-- clear_extensions_license_cache -->
 			<div class="tool">
 				<h4><?php esc_html_e( 'Clear extensions license caching', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>

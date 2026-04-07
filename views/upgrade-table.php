@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			
 			// check if pro and templates are enabled
 			foreach ( $default_extensions as $extension ) {
-				$extension_is_enabled = WPO_WCPDF()->settings->get_upgrade_instance()->extension_is_enabled( $extension );
+				$extension_is_enabled = WPO_WCPDF()->settings->get_instance( 'upgrade' )->extension_is_enabled( $extension );
 				
 				if ( $extension_is_enabled ) {
 					$extensions_enabled[]  = $extension;

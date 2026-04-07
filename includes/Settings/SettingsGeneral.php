@@ -803,18 +803,17 @@ class SettingsGeneral {
 			}
 		}
 
-		$general_settings_instance = WPO_WCPDF()->settings->get_general_instance();
-		$display_notice            = false;
-		$languages_data            = wpo_wcpdf_get_multilingual_languages();
-		$languages                 = $languages_data ? array_keys( $languages_data ) : array( 'default' );
+		$display_notice = false;
+		$languages_data = wpo_wcpdf_get_multilingual_languages();
+		$languages      = $languages_data ? array_keys( $languages_data ) : array( 'default' );
 
 		foreach ( $languages as $language ) {
-			$line_1   = $general_settings_instance->get_setting( 'shop_address_line_1', $language ) ?? '';
-			$country  = $general_settings_instance->get_setting( 'shop_address_country', $language ) ?? '';
+			$line_1   = $this->get_setting( 'shop_address_line_1', $language ) ?? '';
+			$country  = $this->get_setting( 'shop_address_country', $language ) ?? '';
 			$states   = wpo_wcpdf_get_country_states( $country );
-			$state    = ! empty( $states ) ? $general_settings_instance->get_setting( 'shop_address_state', $language ) : '';
-			$city     = $general_settings_instance->get_setting( 'shop_address_city', $language ) ?? '';
-			$postcode = $general_settings_instance->get_setting( 'shop_address_postcode', $language ) ?? '';
+			$state    = ! empty( $states ) ? $this->get_setting( 'shop_address_state', $language ) : '';
+			$city     = $this->get_setting( 'shop_address_city', $language ) ?? '';
+			$postcode = $this->get_setting( 'shop_address_postcode', $language ) ?? '';
 
 			if (
 				empty( $line_1 ) ||
@@ -838,19 +837,15 @@ class SettingsGeneral {
 				'<a href="' . esc_url( $general_page_url ) . '">',
 				'</a>'
 			);
-
 			?>
-
-			<div class="notice notice-warning">
-				<p><?php echo wp_kses_post( $notice_message ); ?></p>
-				<p><a href="<?php echo esc_url( $dismiss_url ); ?>"
-					  class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-				</p>
-			</div>
-
+				<div class="notice notice-warning">
+					<p><?php echo wp_kses_post( $notice_message ); ?></p>
+					<p><a href="<?php echo esc_url( $dismiss_url ); ?>"
+						class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
+					</p>
+				</div>
 			<?php
 		}
-
 	}
 
 	/**
@@ -989,7 +984,7 @@ class SettingsGeneral {
 
 		// Premium Templates guidance (only if bundle license missing/invalid)
 		if ( function_exists( 'WPO_WCPDF_Templates' ) ) {
-			$license_info = WPO_WCPDF()->settings->get_upgrade_instance()->get_extension_license_infos();
+			$license_info = WPO_WCPDF()->settings->get_instance( 'upgrade' )->get_extension_license_infos();
 			$info         = $license_info['bundle'] ?? null;
 
 			if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {
