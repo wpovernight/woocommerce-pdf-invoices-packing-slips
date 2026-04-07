@@ -18,38 +18,56 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
+use WPO\IPS\Compatibility\ThirdPartyPlugins;
+use WPO\IPS\Compatibility\VatPlugins;
+use WPO\IPS\Compatibility\OrderUtil;
+use WPO\IPS\Compatibility\FileSystem;
+use WPO\IPS\Settings;
+use WPO\IPS\Documents;
+use WPO\IPS\Main;
+use WPO\IPS\Endpoint;
+use WPO\IPS\Assets;
+use WPO\IPS\Admin;
+use WPO\IPS\Frontend;
+use WPO\IPS\Install;
+use WPO\IPS\FontSynchronizer;
+use WPO\IPS\EDI\Peppol;
+
 if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '5.9.2';
-	public $version_php          = '7.4';
-	public $version_woo          = '3.3';
-	public $version_wp           = '4.4';
-	public $plugin_basename;
-	public $legacy_addons;
-	public $third_party_plugins;
-	public $vat_plugins;
-	public $order_util;
-	public $file_system;
-	public $settings;
-	public $documents;
-	public $main;
-	public $endpoint;
-	public $assets;
-	public $admin;
-	public $frontend;
-	public $install;
-	public $font_synchronizer;
+	public string $version                         = '5.9.2';
+	public string $version_php                     = '7.4';
+	public string $version_woo                     = '3.3';
+	public string $version_wp                      = '4.4';
+	public ?string $plugin_basename                = null;
+	public array $legacy_addons                    = array();
+	
+	public ?ThirdPartyPlugins $third_party_plugins = null;
+	public ?VatPlugins $vat_plugins                = null;
+	public ?OrderUtil $order_util                  = null;
+	public ?FileSystem $file_system                = null;
+	public ?Settings $settings                     = null;
+	public ?Documents $documents                   = null;
+	public ?Main $main                             = null;
+	public ?Endpoint $endpoint                     = null;
+	public ?Assets $assets                         = null;
+	public ?Admin $admin                           = null;
+	public ?Frontend $frontend                     = null;
+	public ?Install $install                       = null;
+	public ?FontSynchronizer $font_synchronizer    = null;
 
-	protected static $_instance = null;
+	protected static ?self $_instance              = null;
 
 	/**
 	 * Main Plugin Instance
 	 *
 	 * Ensures only one instance of plugin is loaded or can be loaded.
+	 * 
+	 * @return self
 	 */
-	public static function instance() {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -63,7 +81,7 @@ class WPO_WCPDF {
 		require $this->plugin_path() . '/vendor/autoload.php';
 		require $this->plugin_path() . '/vendor/strauss/autoload.php';
 
-		$this->plugin_basename = plugin_basename(__FILE__);
+		$this->plugin_basename = plugin_basename( __FILE__ );
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
 			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
 			'woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
@@ -81,21 +99,55 @@ class WPO_WCPDF {
 		add_action( 'init', array( $this, 'load_classes' ), 9 ); // Pro runs on default 10, if this runs after it will not work
 		add_action( 'in_plugin_update_message-' . $this->plugin_basename, array( $this, 'in_plugin_update_message' ) );
 		add_action( 'before_woocommerce_init', array( $this, 'woocommerce_hpos_compatible' ) );
-		add_action( 'admin_notices', array( $this, 'nginx_detected' ) );
-		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected' ) );
-		add_action( 'admin_notices', array( $this, 'rtl_detected' ) );
-		add_action( 'admin_notices', array( $this, 'yearly_reset_action_missing_notice' ) );
-		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
-		add_action( 'admin_notices', array( $this, 'unstable_option_announcement_notice' ) );
-		add_action( 'admin_notices', array( $this, 'new_unstable_version_available_notice' ) );
+		
+		// admin notices
+		add_action( 'admin_init', array( $this, 'maybe_setup_admin_notices' ) );
+		
 		add_action( 'wpo_wcpdf_new_github_prerelease_available', array( $this, 'set_new_unstable_version_available_option' ), 10, 3 );
 		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
 		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
 	}
+	
+	/**
+	 * Maybe register admin notices only where they are needed.
+	 *
+	 * @return void
+	 */
+	public function maybe_setup_admin_notices(): void {
+		if ( ! is_admin() ) {
+			return;
+		}
 
-	public function is_dependency_version_supported( $dependency ) {
+		$is_settings_page = $this->is_settings_page();
+		$is_plugins_page  = $this->is_plugins_page();
+
+		// Notices that are only relevant on the plugin settings page.
+		if ( $is_settings_page ) {
+			add_action( 'admin_notices', array( $this, 'nginx_detected_notice' ) );
+			add_action( 'admin_notices', array( $this, 'yearly_reset_action_missing_notice' ) );
+			add_action( 'admin_notices', array( $this, 'unstable_option_announcement_notice' ) );
+			add_action( 'admin_notices', array( $this, 'new_unstable_version_available_notice' ) );
+		}
+
+		// Notices that are relevant on plugins and settings pages.
+		if ( $is_settings_page || $is_plugins_page ) {
+			add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
+		}
+
+		// Notices that are relevant globally in the admin.
+		add_action( 'admin_notices', array( $this, 'mailpoet_mta_detected_notice' ) );
+		add_action( 'admin_notices', array( $this, 'rtl_detected_notice' ) );
+	}
+
+	/**
+	 * Is the dependency version supported?
+	 * 
+	 * @param string $dependency
+	 * @return bool
+	 */
+	public function is_dependency_version_supported( string $dependency ): bool {
 		switch ( $dependency ) {
 			case 'php':
 				return defined( 'PHP_VERSION' ) && version_compare( PHP_VERSION, $this->version_php, '>=' );
@@ -110,22 +162,13 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * Define constant if not already set
-	 * @param  string $name
-	 * @param  string|bool $value
-	 */
-	private function define( $name, $value ) {
-		if ( ! defined( $name ) ) {
-			define( $name, $value );
-		}
-	}
-
-	/**
 	 * Load the translation / textdomain files
 	 *
 	 * Note: the first-loaded translation file overrides any following ones if the same translation is present
+	 * 
+	 * @return void
 	 */
-	public function translations() {
+	public function translations(): void {
 		$locale = $this->determine_locale();
 		$dir    = trailingslashit( WP_LANG_DIR );
 
@@ -149,8 +192,10 @@ class WPO_WCPDF {
 
 	/**
 	 * Load the main plugin classes and functions
+	 * 
+	 * @return void
 	 */
-	public function includes() {
+	public function includes(): void {
 		// plugin legacy class mapping
 		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
 
@@ -161,32 +206,34 @@ class WPO_WCPDF {
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 		include_once $this->plugin_path() . '/wpo-ips-functions-edi.php';
-
+			
 		// Compatibility classes
-		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
-		$this->vat_plugins         = \WPO\IPS\Compatibility\VatPlugins::instance();
-		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
-		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
+		$this->third_party_plugins = ThirdPartyPlugins::instance();
+		$this->vat_plugins         = VatPlugins::instance();
+		$this->order_util          = OrderUtil::instance();
+		$this->file_system         = FileSystem::instance();
 
 		// Plugin classes
-		$this->settings            = \WPO\IPS\Settings::instance();
-		$this->documents           = \WPO\IPS\Documents::instance();
-		$this->main                = \WPO\IPS\Main::instance();
-		$this->endpoint            = \WPO\IPS\Endpoint::instance();
-		$this->assets              = \WPO\IPS\Assets::instance();
-		$this->admin               = \WPO\IPS\Admin::instance();
-		$this->frontend            = \WPO\IPS\Frontend::instance();
-		$this->install             = \WPO\IPS\Install::instance();
-		$this->font_synchronizer   = \WPO\IPS\FontSynchronizer::instance();
+		$this->settings            = Settings::instance();
+		$this->documents           = Documents::instance();
+		$this->main                = Main::instance();
+		$this->endpoint            = Endpoint::instance();
+		$this->assets              = Assets::instance();
+		$this->admin               = Admin::instance();
+		$this->frontend            = Frontend::instance();
+		$this->install             = Install::instance();
+		$this->font_synchronizer   = FontSynchronizer::instance();
 
 		// EDI classes
-		\WPO\IPS\EDI\Peppol::instance();
+		Peppol::instance();
 	}
 
 	/**
 	 * Instantiate classes when woocommerce is activated
+	 * 
+	 * @return void
 	 */
-	public function load_classes() {
+	public function load_classes(): void {
 		if ( ! $this->dependencies_are_ready() ) {
 			return;
 		}
@@ -206,14 +253,14 @@ class WPO_WCPDF {
 	public function dependencies_are_ready(): bool {
 		// Check if WooCommerce is activated and meets the minimum version
 		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
-			add_action( 'admin_notices', array( $this, 'need_woocommerce' ) );
+			add_action( 'admin_notices', array( $this, 'need_woocommerce_notice' ) );
 			return false;
 		}
 
 		// Check if PHP version is supported
 		if ( ! has_filter( 'wpo_wcpdf_pdf_maker' ) && ! $this->is_dependency_version_supported( 'php' ) ) {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
-			add_action( 'admin_notices', array( $this, 'required_php_version' ) );
+			add_action( 'admin_notices', array( $this, 'required_php_version_notice' ) );
 			return false;
 		}
 
@@ -225,7 +272,7 @@ class WPO_WCPDF {
 	 *
 	 * @return void
 	 */
-	public function need_woocommerce(): void {
+	public function need_woocommerce_notice(): void {
 		$error_message = sprintf(
 			/* translators: 1. open anchor tag, 2. close anchor tag, 3. Woo version */
 			esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version %3$s or higher to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ),
@@ -271,8 +318,10 @@ class WPO_WCPDF {
 
 	/**
 	 * PHP version requirement notice
+	 * 
+	 * @return void
 	 */
-	public function required_php_version() {
+	public function required_php_version_notice(): void {
 		$error_message = sprintf(
 			/* translators: PHP version */
 			esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires PHP %s or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -296,15 +345,18 @@ class WPO_WCPDF {
 
 	/**
 	 * Show plugin changes. Code adapted from W3 Total Cache.
+	 * 
+	 * @param array $args Update message args.
+	 * @return void
 	 */
-	public function in_plugin_update_message( $args ) {
+	public function in_plugin_update_message( array $args ): void {
 		$transient_name = 'wpo_wcpdf_upgrade_notice_' . $args['Version'];
 
 		if ( false === ( $upgrade_notice = get_transient( $transient_name ) ) ) {
 			$response = wp_safe_remote_get( 'https://plugins.svn.wordpress.org/woocommerce-pdf-invoices-packing-slips/trunk/readme.txt' );
 
 			if ( ! is_wp_error( $response ) && ! empty( $response['body'] ) ) {
-				$upgrade_notice = self::parse_update_notice( $response['body'], $args['new_version'] );
+				$upgrade_notice = $this->parse_update_notice( $response['body'], $args['new_version'] );
 				set_transient( $transient_name, $upgrade_notice, DAY_IN_SECONDS );
 			}
 		}
@@ -313,52 +365,11 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * Parse update notice from readme file.
+	 * NGINX detected notice
 	 *
-	 * @param  string $content
-	 * @param  string $new_version
-	 * @return string
+	 * @return void
 	 */
-	private function parse_update_notice( $content, $new_version ) {
-		// Output Upgrade Notice.
-		$matches        = null;
-		$regexp         = '~==\s*Upgrade Notice\s*==\s*=\s*(.*)\s*=(.*)(=\s*' . preg_quote( $new_version ) . '\s*=|$)~Uis';
-		$upgrade_notice = '';
-
-
-		if ( preg_match( $regexp, $content, $matches ) ) {
-			$notices = (array) preg_split( '~[\r\n]+~', trim( $matches[2] ) );
-
-			// Convert the full version strings to minor versions.
-			$notice_version_parts  = explode( '.', trim( $matches[1] ) );
-			$current_version_parts = explode( '.', $this->version );
-
-			if ( 3 !== sizeof( $notice_version_parts ) ) {
-				return $upgrade_notice;
-			}
-
-			$notice_version  = $notice_version_parts[0] . '.' . $notice_version_parts[1];
-			$current_version = $current_version_parts[0] . '.' . $current_version_parts[1];
-
-			// Check the latest stable version and ignore trunk.
-			if ( version_compare( $current_version, $notice_version, '<' ) ) {
-
-				$upgrade_notice .= '</p><p class="wpo_wcpdf_upgrade_notice">';
-
-				foreach ( $notices as $index => $line ) {
-					if ( empty( $line ) ) {
-						continue;
-					}
-					$upgrade_notice .= preg_replace( '~\[([^\]]*)\]\(([^\)]*)\)~', '<a href="${2}">${1}</a>', $line );
-				}
-			}
-		}
-
-		return wp_kses_post( $upgrade_notice );
-	}
-
-	public function nginx_detected()
-	{
+	public function nginx_detected_notice(): void {
 		if ( empty( $this->main ) ) {
 			return;
 		}
@@ -418,10 +429,11 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * Detect MailPoet.
+	 * MailPoet MTA detected notice
+	 * 
 	 * @return void
 	 */
-	public function mailpoet_mta_detected() {
+	public function mailpoet_mta_detected_notice(): void {
 		if( is_callable( array( '\\MailPoet\\Settings\\SettingsController', 'getInstance' ) ) ) {
 			$settings = \MailPoet\Settings\SettingsController::getInstance();
 			if( empty($settings) ) return;
@@ -462,7 +474,7 @@ class WPO_WCPDF {
 	 *
 	 * @return void
 	 */
-	public function rtl_detected() {
+	public function rtl_detected_notice(): void {
 		if ( ! is_super_admin() ) {
 			return;
 		}
@@ -544,24 +556,11 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * Get an array of all active plugins, including multisite
-	 * @return array active plugin paths
+	 * Deactivate legacy add-ons that are still active.
+	 *
+	 * @return void
 	 */
-	public function get_active_plugins() {
-		$active_plugins = (array) apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
-		if ( is_multisite() ) {
-			// get_site_option( 'active_sitewide_plugins', array() ) returns a 'reversed list'
-			// like [hello-dolly/hello.php] => 1369572703 so we do array_keys to make the array
-			// compatible with $active_plugins
-			$active_sitewide_plugins = (array) array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
-			// merge arrays and remove doubles
-			$active_plugins = (array) array_unique( array_merge( $active_plugins, $active_sitewide_plugins ) );
-		}
-
-		return $active_plugins;
-	}
-
-	public function deactivate_legacy_addons() {
+	public function deactivate_legacy_addons(): void {
 		foreach ( $this->legacy_addons as $filename => $name ) {
 			$legacy_addon = $this->plugin_is_activated( $filename );
 
@@ -573,28 +572,12 @@ class WPO_WCPDF {
 		}
 	}
 
-	public function plugin_is_activated( $filename ) {
-		$active_plugins = $this->get_active_plugins();
-		$active_plugin  = '';
-
-		foreach ( $active_plugins as $plugin ) {
-			if ( ! empty( $plugin ) && false !== strpos( $plugin, $filename ) ) {
-				$active_plugin = $plugin;
-				break;
-			}
-		}
-
-		return $active_plugin;
-	}
-
-	public function get_legacy_addon_transient_name( $filename ) {
-		$filename_without_ext = basename( $filename, '.php' );
-		$legacy_addon_name    = str_replace( '-', '_', $filename_without_ext );
-
-		return "wpo_wcpdf_legacy_addon_{$legacy_addon_name}";
-	}
-
-	public function legacy_addon_notices() {
+	/**
+	 * Show admin notices for legacy add-ons that were deactivated on plugin activation.
+	 *
+	 * @return void
+	 */
+	public function legacy_addon_notices(): void {
 		foreach ( $this->legacy_addons as $filename => $name ) {
 			$transient_name = $this->get_legacy_addon_transient_name( $filename );
 			$query_arg      = "{$transient_name}_notice";
@@ -638,6 +621,10 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function unstable_option_announcement_notice(): void {
+		if ( empty( $this->settings ) ) {
+			return;
+		}
+		
 		$dismiss_option = 'wpo_wcpdf_dismiss_unstable_option_announcement';
 		$dismiss_arg    = 'wpo_wcpdf_dismiss_unstable_option_announcement';
 		$nonce_action   = 'wcpdf_dismiss_unstable_option_announcement';
@@ -705,6 +692,10 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function new_unstable_version_available_notice(): void {
+		if ( empty( $this->settings ) ) {
+			return;
+		}
+		
 		$debug_settings         = $this->settings->debug_settings;
 		$check_unstable_enabled = isset( $debug_settings['check_unstable_versions'] );
 		$unstable_state         = get_option( 'wpo_wcpdf_unstable_version_state', array() );
@@ -805,24 +796,28 @@ class WPO_WCPDF {
 
 	/**
 	 * Get the plugin url.
+	 * 
 	 * @return string
 	 */
-	public function plugin_url() {
+	public function plugin_url(): string {
 		return untrailingslashit( plugins_url( '/', __FILE__ ) );
 	}
 
 	/**
 	 * Get the plugin path.
+	 * 
 	 * @return string
 	 */
-	public function plugin_path() {
+	public function plugin_path(): string {
 		return untrailingslashit( plugin_dir_path( __FILE__ ) );
 	}
 
 	/**
 	 * Determine the site locale
+	 * 
+	 * @return string
 	 */
-	public function determine_locale() {
+	public function determine_locale(): string {
 		if ( function_exists( 'determine_locale' ) ) { // WP5.0+
 			$locale = determine_locale();
 		} else {
@@ -830,6 +825,140 @@ class WPO_WCPDF {
 		}
 
 		return apply_filters( 'plugin_locale', $locale, 'woocommerce-pdf-invoices-packing-slips' );
+	}
+	
+	/**
+	 * Check if the current admin page is the plugin settings page.
+	 *
+	 * @return bool
+	 */
+	public function is_settings_page(): bool {
+		return isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === sanitize_text_field( wp_unslash( $_GET['page'] ) );
+	}
+
+	/**
+	 * Check if the current admin page is the plugins page.
+	 *
+	 * @return bool
+	 */
+	public function is_plugins_page(): bool {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+
+		if ( ! empty( $screen ) && isset( $screen->id ) ) {
+			return 'plugins' === $screen->id;
+		}
+
+		return isset( $GLOBALS['pagenow'] ) && 'plugins.php' === $GLOBALS['pagenow'];
+	}
+	
+	/**
+	 * Define constant if not already set
+	 * 
+	 * @param  string $name
+	 * @param  string|bool $value
+	 * @return void
+	 */
+	private function define( string $name, $value ): void {
+		if ( ! defined( $name ) ) {
+			define( $name, $value );
+		}
+	}
+	
+	/**
+	 * Parse update notice from readme file.
+	 *
+	 * @param  string $content
+	 * @param  string $new_version
+	 * @return string
+	 */
+	private function parse_update_notice( string $content, string $new_version ): string {
+		// Output Upgrade Notice.
+		$matches        = null;
+		$regexp         = '~==\s*Upgrade Notice\s*==\s*=\s*(.*)\s*=(.*)(=\s*' . preg_quote( $new_version ) . '\s*=|$)~Uis';
+		$upgrade_notice = '';
+
+
+		if ( preg_match( $regexp, $content, $matches ) ) {
+			$notices = (array) preg_split( '~[\r\n]+~', trim( $matches[2] ) );
+
+			// Convert the full version strings to minor versions.
+			$notice_version_parts  = explode( '.', trim( $matches[1] ) );
+			$current_version_parts = explode( '.', $this->version );
+
+			if ( 3 !== sizeof( $notice_version_parts ) ) {
+				return $upgrade_notice;
+			}
+
+			$notice_version  = $notice_version_parts[0] . '.' . $notice_version_parts[1];
+			$current_version = $current_version_parts[0] . '.' . $current_version_parts[1];
+
+			// Check the latest stable version and ignore trunk.
+			if ( version_compare( $current_version, $notice_version, '<' ) ) {
+
+				$upgrade_notice .= '</p><p class="wpo_wcpdf_upgrade_notice">';
+
+				foreach ( $notices as $index => $line ) {
+					if ( empty( $line ) ) {
+						continue;
+					}
+					$upgrade_notice .= preg_replace( '~\[([^\]]*)\]\(([^\)]*)\)~', '<a href="${2}">${1}</a>', $line );
+				}
+			}
+		}
+
+		return wp_kses_post( $upgrade_notice );
+	}
+	
+	/**
+	 * Get an array of all active plugins, including multisite
+	 * 
+	 * @return array active plugin paths
+	 */
+	private function get_active_plugins(): array {
+		$active_plugins = (array) apply_filters( 'active_plugins', get_option( 'active_plugins' ) );
+		if ( is_multisite() ) {
+			// get_site_option( 'active_sitewide_plugins', array() ) returns a 'reversed list'
+			// like [hello-dolly/hello.php] => 1369572703 so we do array_keys to make the array
+			// compatible with $active_plugins
+			$active_sitewide_plugins = (array) array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
+			// merge arrays and remove doubles
+			$active_plugins = (array) array_unique( array_merge( $active_plugins, $active_sitewide_plugins ) );
+		}
+
+		return $active_plugins;
+	}
+	
+	/**
+	 * Check if a plugin with the given filename is activated.
+	 *
+	 * @param string $filename The filename to check for (e.g., 'wcpdf-legacy-addon.php').
+	 * @return string The full plugin path if activated, or an empty string if not.
+	 */
+	private function plugin_is_activated( string $filename ): string {
+		$active_plugins = $this->get_active_plugins();
+		$active_plugin  = '';
+
+		foreach ( $active_plugins as $plugin ) {
+			if ( ! empty( $plugin ) && false !== strpos( $plugin, $filename ) ) {
+				$active_plugin = $plugin;
+				break;
+			}
+		}
+
+		return $active_plugin;
+	}
+	
+	/**
+	 * Get transient name for legacy addon notice based on the addon filename.
+	 *
+	 * @param string $filename
+	 * @return string
+	 */
+	private function get_legacy_addon_transient_name( string $filename ): string {
+		$filename_without_ext = basename( $filename, '.php' );
+		$legacy_addon_name    = str_replace( '-', '_', $filename_without_ext );
+
+		return "wpo_wcpdf_legacy_addon_{$legacy_addon_name}";
 	}
 
 } // class WPO_WCPDF

@@ -24,7 +24,7 @@ class SettingsDebug {
 
 	public function __construct() {
 		// WP
-		if ( \wpo_ips_is_settings_page() ) {
+		if ( \WPO_WCPDF()->is_settings_page() ) {
 			add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
 			add_action( 'admin_init', array( $this, 'init_settings' ) );
 			add_action( 'admin_init', array( $this, 'maybe_schedule_unstable_version_check' ) );

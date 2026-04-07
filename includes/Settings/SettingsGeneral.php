@@ -22,7 +22,7 @@ class SettingsGeneral {
 
 	public function __construct() {
 		// WP
-		if ( \wpo_ips_is_settings_page() ) {
+		if ( \WPO_WCPDF()->is_settings_page() ) {
 			add_action( 'admin_init', array( $this, 'init_settings' ) );
 			add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
 		}

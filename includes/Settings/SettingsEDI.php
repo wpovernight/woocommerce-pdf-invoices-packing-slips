@@ -38,7 +38,7 @@ class SettingsEDI {
 		) );
 
 		// WP
-		if ( \wpo_ips_is_settings_page() ) {
+		if ( \WPO_WCPDF()->is_settings_page() ) {
 			add_action( 'admin_init', array( $this, 'init_settings' ) );
 			add_filter( 'pre_update_option_wpo_ips_edi_settings', array( $this, 'preserve_peppol_settings' ), 10, 3 );
 		}
