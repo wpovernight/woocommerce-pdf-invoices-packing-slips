@@ -76,9 +76,6 @@ class Main {
 		// set ink saving mode
 		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_ink_saving_styles' ), 10, 2 );
 
-		// show notice of missing required directories
-		add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
-
 		// add custom webhook topics for documents
 		add_filter( 'woocommerce_webhook_topic_hooks', array( $this, 'wc_webhook_topic_hooks' ), 10, 2 );
 		add_filter( 'woocommerce_valid_webhook_events', array( $this, 'wc_webhook_topic_events' ) );
@@ -908,51 +905,6 @@ class Main {
 		}
 	}
 
-	public function no_dir_notice() {
-		if( is_admin() && ( $path = get_option( 'wpo_wcpdf_no_dir_error' ) ) ) {
-			// if all folders exist and are writable delete the option
-			if( $this->tmp_folders_exist_and_writable() ) {
-				delete_option( 'wpo_wcpdf_no_dir_error' );
-			// if not, show notice
-			} else {
-				if ( $path ) {
-					ob_start();
-					?>
-					<div class="error">
-						<p>
-							<?php
-								printf(
-									/* translators: 1. plugin name, 2. directory path */
-									wp_kses_post( 'The %1$s directory %2$s couldn\'t be created or is not writable!', 'woocommerce-pdf-invoices-packing-slips' ),
-									'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-									'<code>' . wpo_wcpdf_escape_url_path_or_base64( $path ) . '</code>' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-								);
-							?>
-						</p>
-						<p><?php esc_html_e( 'Please check your directories write permissions or contact your hosting service provider.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
-						<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_no_dir_notice', 'true' ), 'hide_no_dir_notice_nonce' ) ); ?>"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-					</div>
-					<?php
-					echo wp_kses_post( ob_get_clean() );
-
-					// save option to hide notice
-					if ( isset( $_REQUEST['wpo_wcpdf_hide_no_dir_notice'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
-						// validate nonce
-						if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'hide_no_dir_notice_nonce' ) ) {
-							wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_wcpdf_hide_no_dir_notice' );
-							wp_safe_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-							exit;
-						} else {
-							delete_option( 'wpo_wcpdf_no_dir_error' );
-							wp_safe_redirect( 'admin.php?page=wpo_wcpdf_options_page' );
-							exit;
-						}
-					}
-				}
-			}
-		}
-	}
-
 	/**
 	 * Copy contents from one directory to another
 	 */
@@ -995,19 +947,20 @@ class Main {
 
 	/**
 	 * checks if the plugin tmp folders exist and are writable
+	 * 
+	 * @return bool
 	 */
-	private function tmp_folders_exist_and_writable()
-	{
+	public function tmp_folders_exist_and_writable(): bool {
 		// tmp base
 		$tmp_base = $this->get_tmp_base();
-		if( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
+		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
 			return false;
 		}
 
 		// subfolders
-		foreach( $this->subfolders as $type ) {
+		foreach ( $this->subfolders as $type ) {
 			$tmp_path = $this->get_tmp_path( $type );
-			if( ! WPO_WCPDF()->file_system->is_dir( $tmp_path ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
+			if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_path ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_path ) ) {
 				return false;
 			}
 		}

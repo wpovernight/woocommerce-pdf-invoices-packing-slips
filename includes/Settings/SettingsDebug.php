@@ -3,6 +3,7 @@ namespace WPO\IPS\Settings;
 
 use WPO\IPS\Tables\NumberStoreListTable;
 use WPO\IPS\Semaphore;
+use WPO\IPS\Notices;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -1449,33 +1450,7 @@ class SettingsDebug {
 		}
 
 		// Display the notice.
-		add_action( 'admin_notices', array( $this, 'display_server_requirement_notice' ) );
-	}
-
-	/**
-	 * Display a notice informing the user that the server requirements are not met.
-	 *
-	 * @return void
-	 */
-	public function display_server_requirement_notice(): void {
-		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
-		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
-		$notice_message  = sprintf(
-			/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
-			__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-			'<a href="' . esc_url( $status_page_url ) . '">',
-			'</a>'
-		);
-
-		?>
-
-		<div class="notice notice-warning">
-			<p><?php echo wp_kses_post( $notice_message ); ?></p>
-			<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-		</div>
-
-		<?php
+		Notices::maybe_add_admin_notice( array( Notices::class, 'display_server_requirement_notice' ) );
 	}
 
 	/**

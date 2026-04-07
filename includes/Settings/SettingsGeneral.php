@@ -24,7 +24,6 @@ class SettingsGeneral {
 		// WP
 		if ( \WPO_WCPDF()->is_settings_page() ) {
 			add_action( 'admin_init', array( $this, 'init_settings' ) );
-			add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
 		}
 		
 		// IPS
@@ -784,33 +783,21 @@ class SettingsGeneral {
 
 		return apply_filters( 'wpo_wcpdf_templates', $installed_templates );
 	}
-
-	public function display_admin_notice_for_shop_address(): void {
-		// Return if the notice has been dismissed.
-		if ( get_option( 'wpo_wcpdf_dismiss_shop_address_notice', false ) ) {
-			return;
-		}
-
-		// Handle dismissal action.
-		if ( isset( $_GET['wpo_dismiss_shop_address_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_shop_address_notice' ) ) {
-				update_option( 'wpo_wcpdf_dismiss_shop_address_notice', true );
-				wp_safe_redirect( remove_query_arg( array( 'wpo_dismiss_shop_address_notice', '_wpnonce' ) ) );
-				exit;
-			} else {
-				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
-				return;
-			}
-		}
-
-		$display_notice = false;
-		$languages_data = wpo_wcpdf_get_multilingual_languages();
+	
+	/**
+	 * Check if the shop address is incomplete.
+	 *
+	 * @return bool True if the shop address is incomplete, false otherwise.
+	 */
+	public function maybe_shop_address_is_incomplete(): bool {
+		$incomplete     = false;
+		$languages_data = \wpo_wcpdf_get_multilingual_languages();
 		$languages      = $languages_data ? array_keys( $languages_data ) : array( 'default' );
 
 		foreach ( $languages as $language ) {
 			$line_1   = $this->get_setting( 'shop_address_line_1', $language ) ?? '';
 			$country  = $this->get_setting( 'shop_address_country', $language ) ?? '';
-			$states   = wpo_wcpdf_get_country_states( $country );
+			$states   = \wpo_wcpdf_get_country_states( $country );
 			$state    = ! empty( $states ) ? $this->get_setting( 'shop_address_state', $language ) : '';
 			$city     = $this->get_setting( 'shop_address_city', $language ) ?? '';
 			$postcode = $this->get_setting( 'shop_address_postcode', $language ) ?? '';
@@ -822,30 +809,12 @@ class SettingsGeneral {
 				empty( $city ) ||
 				empty( $postcode )
 			) {
-				$display_notice = true;
+				$incomplete = true;
 				break;
 			}
 		}
-
-		if ( $display_notice ) {
-			$general_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
-			$dismiss_url      = wp_nonce_url( add_query_arg( 'wpo_dismiss_shop_address_notice', true ), 'dismiss_shop_address_notice' );
-			$notice_message   = sprintf(
-				/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
-				__( '%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-				'<a href="' . esc_url( $general_page_url ) . '">',
-				'</a>'
-			);
-			?>
-				<div class="notice notice-warning">
-					<p><?php echo wp_kses_post( $notice_message ); ?></p>
-					<p><a href="<?php echo esc_url( $dismiss_url ); ?>"
-						class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-					</p>
-				</div>
-			<?php
-		}
+		
+		return $incomplete;
 	}
 
 	/**
