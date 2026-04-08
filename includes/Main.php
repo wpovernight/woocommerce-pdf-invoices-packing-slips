@@ -833,8 +833,34 @@ class Main {
 		} else {
 			$code = md5( uniqid( wp_rand(), true ) );
 		}
+		
 		// create option
 		update_option( 'wpo_wcpdf_random_string', $code );
+	}
+	
+	/**
+	 * Regenerate random string and copy contents to new tmp folder
+	 *
+	 * @param bool $reinstall_fonts
+	 *
+	 * @return string|false
+	 */
+	public function regenerate_random_string( bool $reinstall_fonts = true ) {
+		if ( ! empty( $this->get_random_string() ) ) {
+			$old_path = $this->get_tmp_base();
+		} else {
+			$old_path = $this->get_tmp_base( false );
+		}
+
+		$this->generate_random_string();
+		$new_path = $this->get_tmp_base();
+		$this->copy_directory( $old_path, $new_path );
+		
+		if ( $reinstall_fonts ) {
+			$this->maybe_reinstall_fonts( $reinstall_fonts );
+		}
+		
+		return $new_path;
 	}
 
 	/**

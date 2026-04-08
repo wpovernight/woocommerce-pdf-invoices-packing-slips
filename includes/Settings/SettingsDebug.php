@@ -302,18 +302,8 @@ class SettingsDebug {
 	}
 
 	private function generate_random_string( $data ) {
-		if ( ! empty( WPO_WCPDF()->main->get_random_string() ) ) {
-			$old_path = WPO_WCPDF()->main->get_tmp_base();
-		} else {
-			$old_path = WPO_WCPDF()->main->get_tmp_base( false );
-		}
-
-		WPO_WCPDF()->main->generate_random_string();
-		$new_path = WPO_WCPDF()->main->get_tmp_base();
-		WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
-		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
-
-		$message = esc_html__( 'Temporary folder moved to', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . wp_normalize_path( $new_path );
+		$new_path = WPO_WCPDF()->main->regenerate_random_string( true );
+		$message  = esc_html__( 'Temporary folder moved to', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . wp_normalize_path( $new_path );
 
 		wcpdf_log_error( $message, 'info' );
 		wp_send_json_success( compact( 'message' ) );
@@ -1418,16 +1408,14 @@ class SettingsDebug {
 		}
 
 		// Handle dismissal action.
-		if ( isset( $_GET['wpo_dismiss_requirements_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_requirements_notice' ) ) {
+		Notices::handle_notice_action(
+			'wpo_dismiss_requirements_notice',
+			'dismiss_requirements_notice',
+			function (): void {
 				update_option( 'wpo_wcpdf_dismiss_requirements_notice', true );
-				wp_safe_redirect( remove_query_arg( array( 'wpo_dismiss_requirements_notice', '_wpnonce' ) ) );
-				exit;
-			} else {
-				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
-				return;
-			}
-		}
+			},
+			admin_url( 'admin.php?page=wpo_wcpdf_options_page' )
+		);
 
 		// Check if the server requirements are met.
 		$show_requirement_notice = false;

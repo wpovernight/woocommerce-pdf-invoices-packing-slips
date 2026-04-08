@@ -300,6 +300,19 @@ class WPO_WCPDF {
 			}
 		}
 	}
+	
+	/**
+	 * Get transient name for legacy addon notice based on the addon filename.
+	 *
+	 * @param string $filename
+	 * @return string
+	 */
+	public function get_legacy_addon_transient_name( string $filename ): string {
+		$filename_without_ext = basename( $filename, '.php' );
+		$legacy_addon_name    = str_replace( '-', '_', $filename_without_ext );
+
+		return "wpo_wcpdf_legacy_addon_{$legacy_addon_name}";
+	}
 
 	/**
 	 * Store the new unstable version if version checking is enabled.
@@ -483,19 +496,6 @@ class WPO_WCPDF {
 		}
 
 		return $active_plugin;
-	}
-	
-	/**
-	 * Get transient name for legacy addon notice based on the addon filename.
-	 *
-	 * @param string $filename
-	 * @return string
-	 */
-	private function get_legacy_addon_transient_name( string $filename ): string {
-		$filename_without_ext = basename( $filename, '.php' );
-		$legacy_addon_name    = str_replace( '-', '_', $filename_without_ext );
-
-		return "wpo_wcpdf_legacy_addon_{$legacy_addon_name}";
 	}
 
 } // class WPO_WCPDF
