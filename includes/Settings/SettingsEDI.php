@@ -40,8 +40,10 @@ class SettingsEDI {
 		// WP
 		if ( \WPO_WCPDF()->is_settings_page() ) {
 			add_action( 'admin_init', array( $this, 'init_settings' ) );
-			add_filter( 'pre_update_option_wpo_ips_edi_settings', array( $this, 'preserve_peppol_settings' ), 10, 3 );
 		}
+		
+		// WP
+		add_filter( 'pre_update_option_wpo_ips_edi_settings', array( $this, 'preserve_peppol_settings' ), 10, 3 );
 		
 		// IPS
 		add_action( 'wpo_wcpdf_settings_output_edi', array( $this, 'output_settings' ), 10, 2 );

@@ -35,15 +35,13 @@ class SettingsDebug {
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
 		add_action( 'wpo_wcpdf_check_unstable_version_daily', array( $this, 'run_unstable_version_check' ) );
+		add_action( 'wpo_wcpdf_after_sidebar', array( $this, 'display_search_field' ), 10, 2 );
 
 		// AJAX
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
 		add_action( 'wp_ajax_wpo_ips_plugin_report', array( $this, 'ajax_plugin_report' ) );
-
-		// Display search form.
-		add_action( 'wpo_wcpdf_after_sidebar', array( $this, 'display_search_field' ), 10, 2 );
 	}
 
 	/**

@@ -52,48 +52,27 @@ class Settings {
 		$this->get_instance( 'edi' );
 		
 		$this->load_settings();
-
-		// Settings menu item
-		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
-		// Links on plugin page
+		
+		// WP
+		add_action( 'admin_menu', array( $this, 'menu' ), 999 );
 		add_filter( 'plugin_action_links_'.WPO_WCPDF()->plugin_basename, array( $this, 'add_settings_link' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'add_support_links' ), 10, 2 );
-
-		// settings capabilities
 		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
-
-		// AJAX set number store
-		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
-
-		// AJAX get header logo setting HTML
-		add_action( 'wp_ajax_wpo_wcpdf_get_media_upload_setting_html', array( $this, 'get_media_upload_setting_html' ) );
-
-		// refresh template path cache each time the general settings are updated
-		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
-		// sets transient to flush rewrite rules
-		add_action( "update_option_wpo_wcpdf_settings_debug", array( $this, 'debug_settings_updated' ), 10, 3 );
-		add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
-		// migrate old template paths to template IDs before loading settings page
+		add_action( 'update_option_wpo_wcpdf_settings_general', array( $this, 'general_settings_updated' ), 10, 3 );
+		add_action( 'update_option_wpo_wcpdf_settings_debug', array( $this, 'debug_settings_updated' ), 10, 3 );
+		
+		// IPS
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 2 );
-
-		// AJAX preview
-		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
-		// AJAX preview order search
-		add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
-
-		// schedule yearly reset numbers
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
-
-		// Apply categories to document settings.
 		add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_categories' ), 999 );
-
-		// Apply categories to general settings.
 		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
-
-		// Apply categories to debug (Advanced) settings.
 		add_filter( 'wpo_wcpdf_settings_fields_debug', array( $this, 'update_debug_settings_categories' ), 999, 4 );
-
-		// Sync address from WooCommerce address.
+		
+		// AJAX
+		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_get_media_upload_setting_html', array( $this, 'get_media_upload_setting_html' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 	}
 	
@@ -802,14 +781,7 @@ class Settings {
 
 	public function debug_settings_updated( $old_settings, $settings, $option ) {
 		if ( is_array( $settings ) && is_array( $old_settings ) && empty( $old_settings['pretty_document_links'] ) && ! empty ( $settings['pretty_document_links'] ) ) {
-			set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
-		}
-	}
-
-	public function maybe_delete_flush_rewrite_rules_transient() {
-		if ( get_transient( 'wpo_wcpdf_flush_rewrite_rules' ) ) {
 			flush_rewrite_rules();
-			delete_transient( 'wpo_wcpdf_flush_rewrite_rules' );
 		}
 	}
 

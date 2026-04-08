@@ -555,7 +555,7 @@ class Install {
 
 			// set transient to flush rewrite rules if pretty links are enabled
 			if ( WPO_WCPDF()->get_instance( 'endpoint' )->pretty_links_enabled() ) {
-				set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
+				flush_rewrite_rules();
 			}
 		}
 
