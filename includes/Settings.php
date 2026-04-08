@@ -105,6 +105,9 @@ class Settings {
 		return $this->{$setting};
 	}
 
+	/**
+	 * Add plugin settings page to WooCommerce menu.
+	 */
 	public function menu() {
 		$parent_slug = 'woocommerce';
 

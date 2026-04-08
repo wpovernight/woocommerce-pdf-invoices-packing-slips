@@ -402,7 +402,21 @@ class WPO_WCPDF {
 	 * @return bool
 	 */
 	public function is_settings_page(): bool {
-		return isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === sanitize_text_field( wp_unslash( $_GET['page'] ) );
+		if ( isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
+			return true;
+		}
+
+		global $pagenow;
+
+		if ( 'options.php' === $pagenow ) {
+			$option_page = isset( $_POST['option_page'] )
+				? sanitize_text_field( wp_unslash( $_POST['option_page'] ) )
+				: '';
+
+			return 0 === strpos( $option_page, 'wpo_wcpdf_settings_' );
+		}
+
+		return false;
 	}
 
 	/**

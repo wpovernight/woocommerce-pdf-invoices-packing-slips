@@ -95,6 +95,13 @@ abstract class OrderDocument {
 	 * @var array
 	 */
 	protected $data = array();
+	
+	/**
+	 * Resolved settings cache for this document instance.
+	 *
+	 * @var array
+	 */
+	protected $resolved_settings_cache = array();
 
 	/**
 	 * Init/load the order object.
@@ -134,6 +141,8 @@ abstract class OrderDocument {
 	}
 
 	public function init_settings_data(): void {
+		$this->reset_resolved_settings_cache();
+		
 		// order
 		$this->order_settings  = $this->get_order_settings();
 		// pdf
@@ -163,8 +172,18 @@ abstract class OrderDocument {
 
 		return is_array( $order_settings ) ? $order_settings : array();
 	}
-
+	
 	public function get_settings( $latest = false, $output_format = 'pdf' ) {
+		$cache_key = sprintf(
+			'%s|%s',
+			$latest ? 'latest' : 'current',
+			(string) $output_format
+		);
+
+		if ( isset( $this->resolved_settings_cache[ $cache_key ] ) ) {
+			return $this->resolved_settings_cache[ $cache_key ];
+		}
+
 		// get most current settings
 		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
 		$common_settings   = $settings_instance->get_common_document_settings();
@@ -174,13 +193,10 @@ abstract class OrderDocument {
 		if ( ! $latest ) {
 			// get historical settings if enabled
 			if ( ! empty( $this->order ) && $this->use_historical_settings() && ! empty( $this->order_settings ) ) {
-				// ideally we should combine the order settings with the latest settings, so that new settings will
-				// automatically be applied to existing orders too. However, doing this by combining arrays is not
-				// possible because the way settings are currently stored means unchecked options are not included.
-				// This means there is no way to tell whether an option didn't exist yet (in which case the new
-				// option should be added) or whether the option was simply unchecked (in which case it should not
-				// be overwritten). This can only be address by storing unchecked checkboxes too.
-				$settings = (array) $this->order_settings + array_intersect_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) );
+				$settings = (array) $this->order_settings + array_intersect_key(
+					(array) $settings,
+					array_flip( $this->get_non_historical_settings() )
+				);
 			}
 		}
 
@@ -193,7 +209,9 @@ abstract class OrderDocument {
 			unset( $settings['display_number'] );
 		}
 
-		return $settings;
+		$this->resolved_settings_cache[ $cache_key ] = $settings;
+
+		return $this->resolved_settings_cache[ $cache_key ];
 	}
 
 	public function save_settings( $latest = false ) {
@@ -2216,6 +2234,15 @@ abstract class OrderDocument {
 	 */
 	public function show_due_date(): bool {
 		return $this->get_due_date() > 0;
+	}
+	
+	/**
+	 * Reset the resolved settings cache.
+	 *
+	 * @return void
+	 */
+	protected function reset_resolved_settings_cache(): void {
+		$this->resolved_settings_cache = array();
 	}
 
 	protected function add_filters( $filters ) {
