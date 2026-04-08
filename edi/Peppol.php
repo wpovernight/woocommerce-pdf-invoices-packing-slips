@@ -45,6 +45,7 @@ class Peppol {
 		add_action( 'woocommerce_after_checkout_validation', array( $this, 'peppol_validate_classic_checkout_field_values' ), 10, 2 );
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'peppol_save_classic_checkout_fields' ), 10, 2 );
 		
+		// Blocks/store-api hooks
 		$this->peppol_display_checkout_block_fields();
 		$this->peppol_set_checkout_block_fields_value();
 		
