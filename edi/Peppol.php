@@ -29,6 +29,10 @@ class Peppol {
 	 * Constructor
 	 */
 	public function __construct() {
+		if ( ! WPO_WCPDF()->is_frontend_page_request() ) {
+			return;
+		}
+		
 		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );

@@ -29,66 +29,46 @@ class Main {
 	}
 
 	public function __construct() {
+		// enable debug mode if set in settings
+		$this->maybe_enable_debug();
+		
+		// include template specific custom functions
+		$this->load_template_functions();
+		
+		// WP
+		add_action( 'init', array( $this, 'handle_document_link_in_emails' ), 20 );
+		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );
+		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
+		
+		// Woo
+		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_document_to_email' ), 99, 4 );
+		add_filter( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
+		add_filter( 'woocommerce_webhook_topic_hooks', array( $this, 'wc_webhook_topic_hooks' ), 10, 2 );
+		add_filter( 'woocommerce_valid_webhook_events', array( $this, 'wc_webhook_topic_events' ) );
+		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
+		add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'remove_order_personal_data' ), 10, 1 );
+		add_action( 'woocommerce_privacy_export_order_personal_data_meta', array( $this, 'export_order_personal_data_meta' ), 10, 1 );
+		
+		// IPS
+		add_filter( 'wpo_wcpdf_document_is_allowed', array( $this, 'disable_free' ), 10, 2 );
+		add_filter( 'wpo_wcpdf_document_use_historical_settings', array( $this, 'test_mode_settings' ), 15, 2 );
+		add_filter( 'wpo_wcpdf_get_html', array( $this, 'format_page_number_placeholders' ), 10, 2 );
+		add_filter( 'wpo_wcpdf_pdf_filters', array( $this, 'pdf_currency_filters' ) );
+		add_filter( 'wpo_wcpdf_html_filters', array( $this, 'html_currency_filters' ) );
+		add_filter( 'wpo_wcpdf_document_is_allowed', array( $this, 'disable_anonymized' ), 11, 2 );
+		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_ink_saving_styles' ), 10, 2 );
+		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
+		add_action( 'wpo_wcpdf_after_dompdf_render', array( $this, 'page_number_replacements' ), 9, 2 );
+		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
+		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date_table_row' ), 10, 2 );
+		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
+		
+		// AJAX
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
 		add_action( 'wp_ajax_nopriv_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
-
-		// mark/unmark printed
 		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'document_printed_ajax' ) );
-
-		// email
-		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_document_to_email' ), 99, 4 );
-		add_filter( 'wpo_wcpdf_document_is_allowed', array( $this, 'disable_free' ), 10, 2 );
-		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );
-
-		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_debug'] ) ) {
-			$this->enable_debug();
-		}
-
-		// include template specific custom functions
-		$this->load_template_functions();
-
-		// test mode
-		add_filter( 'wpo_wcpdf_document_use_historical_settings', array( $this, 'test_mode_settings' ), 15, 2 );
-
-		// page numbers & currency filters
-		add_filter( 'wpo_wcpdf_get_html', array( $this, 'format_page_number_placeholders' ), 10, 2 );
-		add_action( 'wpo_wcpdf_after_dompdf_render', array( $this, 'page_number_replacements' ), 9, 2 );
-		add_filter( 'wpo_wcpdf_pdf_filters', array( $this, 'pdf_currency_filters' ) );
-		add_filter( 'wpo_wcpdf_html_filters', array( $this, 'html_currency_filters' ) );
-
-		// scheduled attachments cleanup (following settings on Advanced tab)
-		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
-
-		// remove private data
-		if ( apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
-			add_action( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
-			add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'remove_order_personal_data' ), 10, 1 );
-			add_filter( 'wpo_wcpdf_document_is_allowed', array( $this, 'disable_anonymized' ), 11, 2 );
-		}
-		// export private data
-		add_action( 'woocommerce_privacy_export_order_personal_data_meta', array( $this, 'export_order_personal_data_meta' ), 10, 1 );
-
-		// apply header logo height
-		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
-
-		// set ink saving mode
-		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_ink_saving_styles' ), 10, 2 );
-
-		// add custom webhook topics for documents
-		add_filter( 'woocommerce_webhook_topic_hooks', array( $this, 'wc_webhook_topic_hooks' ), 10, 2 );
-		add_filter( 'woocommerce_valid_webhook_events', array( $this, 'wc_webhook_topic_events' ) );
-		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
-		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
-
-		// Add due date via action hook for legacy templates
-		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date_table_row' ), 10, 2 );
-
-		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
-
-		// Add document link to emails
-		add_action( 'init', array( $this, 'handle_document_link_in_emails' ), 20 );
 	}
 
 	/**
@@ -389,7 +369,7 @@ class Main {
 
 		// debug enabled by URL
 		if ( isset( $request['debug'] ) && ! ( is_user_logged_in() || isset( $request['my-account'] ) ) ) {
-			$this->enable_debug();
+			$this->maybe_enable_debug( true );
 		}
 
 		$document_type = sanitize_text_field( $request['document_type'] );
@@ -1054,6 +1034,10 @@ class Main {
 	}
 
 	public function disable_anonymized( $allowed, $document ) {
+		if ( ! apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
+			return $allowed;
+		}
+	
 		if ( ! empty( $document->order ) && ! empty( $anonymized = $document->order->get_meta( '_anonymized' ) ) ) {
 			if ( apply_filters( 'wpo_wcpdf_disallow_anonymized_order_document', wc_string_to_bool( $anonymized ), $this ) ) {
 				$allowed = false;
@@ -1307,12 +1291,17 @@ class Main {
 	 * Remove all invoice data when requested
 	 */
 	public function remove_order_personal_data_meta( $meta_to_remove ) {
+		if ( ! apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
+			return $meta_to_remove;
+		}
+		
 		$wcpdf_private_meta = array(
 			'_wcpdf_invoice_number'         => 'numeric_id',
 			'_wcpdf_invoice_number_data'    => 'array',
 			'_wcpdf_invoice_date'           => 'timestamp',
 			'_wcpdf_invoice_date_formatted' => 'date',
 		);
+		
 		return $meta_to_remove + $wcpdf_private_meta;
 	}
 
@@ -1323,6 +1312,10 @@ class Main {
 	 * @return void
 	 */
 	public function remove_order_personal_data( \WC_Abstract_Order $order ): void {
+		if ( ! apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
+			return;
+		}
+		
 		global $wpdb;
 
 		// Remove order ID from number stores
@@ -1746,9 +1739,15 @@ class Main {
 
 	/**
 	 * Enable error logging for administrators.
+	 * 
+	 * @param bool $force
+	 * @return void
 	 */
-	public function enable_debug() {
-		if ( \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+	public function maybe_enable_debug( bool $force = false ): void {
+		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
+		$debug_settings    = get_option( 'wpo_wcpdf_settings_debug', array() );
+		
+		if ( ( isset( $debug_settings['enable_debug'] ) && $debug_settings['enable_debug'] && $settings_instance->user_can_manage_settings() ) || $force ) {
 			error_reporting( E_ALL );       // phpcs:ignore WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting
 			ini_set( 'display_errors', 1 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 		}
@@ -1915,10 +1914,12 @@ class Main {
 
 	public function handle_document_link_in_emails(): void {
 		$email_hooks = array();
-		$documents   = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
+		$plugin      = WPO_WCPDF();
+		$documents   = $plugin->get_instance( 'documents' )->get_documents();
+		$settings    = $plugin->get_instance( 'settings' );
 
 		foreach ( $documents as $document ) {
-			$document_settings = WPO_WCPDF()->get_instance( 'settings' )->get_document_settings( $document->get_type(), 'pdf' );
+			$document_settings = $settings->get_document_settings( $document->get_type(), 'pdf' );
 			$email_placement   = $document_settings['include_email_link_placement'] ?? '';
 
 			if ( ! empty( $email_placement ) ) {

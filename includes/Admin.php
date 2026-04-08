@@ -23,64 +23,53 @@ class Admin {
 	}
 
 	public function __construct() {
-		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
-
-		if ( $this->invoice_columns_enabled() ) { // prevents the expensive hooks below to be attached. Improves Order List page loading speed
-			add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 200 ); // WC 7.1+ (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
-			add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
-			add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
-			add_filter( 'woocommerce_shop_order_list_table_sortable_columns', array( $this, 'add_invoice_column_to_sortable_columns' ) );
-			add_filter( 'woocommerce_order_list_table_prepare_items_query_args', array( $this, 'adjust_order_list_query_args' ) );
-
-			add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 200 ); // (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
-			add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
-			add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
-			add_action( 'pre_get_posts', array( $this, 'sort_orders_by_numeric_invoice_number' ) );
-		}
-
+		// WP
+		add_action( 'init', array( $this, 'setup_wizard') );
+		add_action( 'pre_get_posts', array( $this, 'sort_orders_by_numeric_invoice_number' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
-
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
-
+		add_action( 'admin_bar_menu', array( $this, 'debug_enabled_warning' ), 999 );
+		
+		// Woo
+		add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 200 ); // WC 7.1+ (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
+		add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
+		add_filter( 'woocommerce_shop_order_list_table_sortable_columns', array( $this, 'add_invoice_column_to_sortable_columns' ) );
+		add_filter( 'woocommerce_order_list_table_prepare_items_query_args', array( $this, 'adjust_order_list_query_args' ) );
+		add_filter( 'manage_edit-shop_order_columns', array( $this, 'add_invoice_columns' ), 200 ); // (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
+		add_filter( 'manage_edit-shop_order_sortable_columns', array( $this, 'invoice_columns_sortable' ) );
 		add_filter( 'bulk_actions-edit-shop_order', array( $this, 'bulk_actions' ), 20 );
 		add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 ); // WC 7.1+
-
-		if ( $this->invoice_number_search_enabled() ) { // prevents slowing down the orders list search
-			add_filter( 'woocommerce_order_table_search_query_meta_keys', array( $this, 'search_fields' ) ); // HPOS specific filter
-			add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
-		}
-
+		add_filter( 'woocommerce_order_table_search_query_meta_keys', array( $this, 'search_fields' ) ); // HPOS specific filter
+		add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
+		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
+		add_filter( 'woocommerce_report_orders_export_columns', array( $this, 'add_invoice_number_header_to_order_export' ) );
+		add_filter( 'woocommerce_report_orders_prepare_export_item', array( $this, 'add_invoice_number_value_to_order_export' ), 10, 2 );
+		add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
+		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
+		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
 		add_action( 'woocommerce_process_shop_order_meta', array( $this,'save_invoice_number_date' ), 35, 2 );
-
-		// manually send emails
-		// WooCommerce core processes order actions at priority 50
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'send_emails' ), 60, 2 );
-
-		add_action( 'init', array( $this, 'setup_wizard') );
-
-		add_action( 'admin_bar_menu', array( $this, 'debug_enabled_warning' ), 999 );
-
-		// AJAX actions for deleting, regenerating and saving document data
+		
+		// IPS
+		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
+		
+		// AJAX
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_preview_formatted_number', array( $this, 'ajax_preview_formatted_number' ) );
 		add_action( 'wp_ajax_wpo_ips_edi_save_order_customer_peppol_identifiers', array( $this, 'ajax_edi_save_order_customer_peppol_identifiers' ) );
-
-		// document actions
-		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
-
-		// add "invoice number" column to WooCommerce Analytic - Orders
-		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
-		add_filter( 'woocommerce_report_orders_export_columns', array( $this, 'add_invoice_number_header_to_order_export' ) );
-		add_filter( 'woocommerce_report_orders_prepare_export_item', array( $this, 'add_invoice_number_value_to_order_export' ), 10, 2 );
 	}
 
-	public function setup_wizard() {
-		// Setup/welcome
-		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	/**
+	 * Check if the setup wizard should be launched and launch it.
+	 *
+	 * @return void
+	 */
+	public function setup_wizard(): void {
+		if ( get_transient( 'wpo_wcpdf_new_install' ) !== false && ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			delete_transient( 'wpo_wcpdf_new_install' );
-			SetupWizard::instance();
+			WPO_WCPDF()->get_instance( 'setup_wizard' );
 		}
 	}
 
@@ -215,9 +204,13 @@ class Admin {
 	 * @param array $columns shop order columns
 	 */
 	public function add_invoice_columns( $columns ) {
-		$current_screen = get_current_screen();
+		if ( ! $this->invoice_columns_enabled() ) {
+			return $columns;
+		}
+		
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-		if ( WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() && 'woocommerce_page_wc-orders' !== $current_screen->id ) {
+		if ( WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() && 'woocommerce_page_wc-orders' !== $screen->id ) {
 			return $columns;
 		}
 
@@ -251,6 +244,10 @@ class Admin {
 	 * @param  string $post_or_order_object   object
 	 */
 	public function invoice_columns_data( $column, $post_or_order_object ) {
+		if ( ! $this->invoice_columns_enabled() ) {
+			return;
+		}
+		
 		if ( ! in_array( $column, array( 'invoice_number_column', 'invoice_date_column' ) ) ) {
 			return;
 		}
@@ -321,6 +318,10 @@ class Admin {
 	 * Makes invoice columns sortable
 	 */
 	public function invoice_columns_sortable( $columns ) {
+		if ( ! $this->invoice_columns_enabled() ) {
+			return $columns;
+		}
+		
 		$columns['invoice_number_column'] = 'invoice_number_column';
 		$columns['invoice_date_column']   = 'invoice_date_column';
 		return $columns;
@@ -1458,21 +1459,13 @@ class Admin {
 	 * Add invoice number to order search scope
 	 */
 	public function search_fields ( $custom_fields ) {
+		if ( ! $this->invoice_number_search_enabled() ) {
+			return $custom_fields;
+		}
+		
 		$custom_fields[] = '_wcpdf_invoice_number';
 		$custom_fields[] = '_wcpdf_formatted_invoice_number';
 		return $custom_fields;
-	}
-
-	/**
-	 * Check if this is a shop_order page (edit or list)
-	 */
-	public function is_order_page() {
-		$screen = get_current_screen();
-		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ) ) ) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	public function user_can_manage_document( $document_type ) {
@@ -1865,6 +1858,10 @@ class Admin {
 	}
 
 	public function add_invoice_column_to_sortable_columns( array $columns ): array {
+		if ( ! $this->invoice_columns_enabled() ) {
+			return $columns;
+		}
+		
 		$columns['invoice_date_column']   = 'invoice_date_column';
 		$columns['invoice_number_column'] = 'invoice_number_column';
 
@@ -1872,6 +1869,10 @@ class Admin {
 	}
 
 	public function adjust_order_list_query_args( array $order_query_args ): array {
+		if ( ! $this->invoice_columns_enabled() ) {
+			return $order_query_args;
+		}
+		
 		if ( 'invoice_number_column' === $order_query_args['orderby'] ) {
 			$is_numeric = $this->is_invoice_number_numeric();
 
@@ -1899,6 +1900,10 @@ class Admin {
 	}
 
 	public function sort_orders_by_numeric_invoice_number( $query ): void {
+		if ( ! $this->invoice_columns_enabled() ) {
+			return;
+		}
+		
 		if ( ! is_admin() || ! $query->is_main_query() || 'shop_order' !== $query->get( 'post_type' ) || '_wcpdf_invoice_number' !== $query->get( 'meta_key' ) ) {
 			return;
 		}

@@ -45,7 +45,6 @@ class Install {
 
 		// installed version lower than plugin version?
 		if ( version_compare( $installed_version, WPO_WCPDF_VERSION, '<' ) ) {
-
 			if ( ! $installed_version ) {
 				try {
 					$this->install();
@@ -62,18 +61,20 @@ class Install {
 
 			// new version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
+			
+			// deactivate legacy addons
+			WPO_WCPDF()->deactivate_legacy_addons();
+			
 		} elseif ( $installed_version && version_compare( $installed_version, WPO_WCPDF_VERSION, '>' ) ) {
 			try {
 				$this->downgrade( $installed_version );
 			} catch ( \Throwable $th ) {
 				wcpdf_log_error( sprintf( "Plugin downgrade procedure failed (downgrading from version %s to %s): %s", $installed_version, WPO_WCPDF_VERSION, $th->getMessage() ), 'critical', $th );
 			}
+			
 			// downgrade version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
-
-		// deactivate legacy addons
-		add_action( 'admin_init', array( WPO_WCPDF(), 'deactivate_legacy_addons') );
 	}
 
 

@@ -168,6 +168,7 @@ class WPO_WCPDF {
 			'font_synchronizer'   => FontSynchronizer::class,
 			'peppol'              => Peppol::class,
 			'notices'             => Notices::class,
+			'setup_wizard'        => SetupWizard::class,
 		);
 
 		if ( ! isset( $map[ $property ] ) ) {
@@ -417,6 +418,53 @@ class WPO_WCPDF {
 		}
 
 		return isset( $GLOBALS['pagenow'] ) && 'plugins.php' === $GLOBALS['pagenow'];
+	}
+	
+	/**
+	 * Check if this is a shop_order page (edit or list)
+	 * 
+	 * @return bool
+	 */
+	public function is_order_page(): bool {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		
+		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ) ) ) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Check if this is the My Account page
+	 * 
+	 * @return bool
+	 */
+	public function is_account_page(): bool {
+		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+			return true;
+		}
+		
+		if ( ! function_exists( 'wc_get_page_id' ) ) {
+			return false;
+		}
+		
+		$page_id = wc_get_page_id( 'myaccount' );
+
+		return ( $page_id && is_page( $page_id ) ) || wc_post_content_has_shortcode( 'woocommerce_my_account' ) || apply_filters( 'woocommerce_is_account_page', false );
+	}
+	
+	/**
+	 * Check if this is a frontend page request (not admin, ajax, cron, rest or wp-cli)
+	 * 
+	 * @return bool
+	 */
+	public function is_frontend_page_request(): bool {
+		return ! is_admin()
+			&& ! wp_doing_ajax()
+			&& ! wp_doing_cron()
+			&& ! ( defined( 'REST_REQUEST' ) && REST_REQUEST )
+			&& ! ( defined( 'WP_CLI' ) && WP_CLI );
 	}
 	
 	/**

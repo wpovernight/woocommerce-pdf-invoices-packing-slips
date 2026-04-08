@@ -51,18 +51,18 @@ class ThirdPartyPlugins {
 		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_composite_product_class' ), 10, 4 );
 
 		// WooCommerce Order Status & Actions Manager emails compatibility
-		if (class_exists('WC_Custom_Status')) {
+		if ( class_exists( 'WC_Custom_Status' ) ) {
 			add_filter( 'wpo_wcpdf_wc_emails', array( $this, 'wc_order_status_actions_emails' ), 10, 1 );
 		}
 
 		// Aelia Currency Switcher compatibility
-		$currency_switcher_active = !empty($GLOBALS['woocommerce-aelia-currencyswitcher']);
+		$currency_switcher_active = ! empty( $GLOBALS['woocommerce-aelia-currencyswitcher'] );
 		if ( $currency_switcher_active ) {
 			add_action( 'wpo_wcpdf_before_html', array( $this, 'aelia_currency_formatting' ), 10, 2 );
 		}
 
 		// Avoid double images from WooCommerce German Market
-		if ( class_exists('WGM_Product') ) {
+		if ( class_exists( 'WGM_Product' ) ) {
 			add_action( 'wpo_wcpdf_before_html', array( $this, 'remove_wgm_thumbnails' ), 10, 2 );
 			add_action( 'wpo_wcpdf_after_html', array( $this, 'restore_wgm_thumbnails' ), 10, 2 );
 		}
