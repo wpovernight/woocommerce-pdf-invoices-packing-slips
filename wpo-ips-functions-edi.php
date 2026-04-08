@@ -259,7 +259,7 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	}
 
 	if ( $attachment ) {
-		$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
+		$tmp_path = WPO_WCPDF()->get_instance( 'main' )->get_tmp_path( 'attachments' );
 
 		if ( ! $tmp_path ) {
 			return wcpdf_error_handling( 'Temporary path not available. Cannot write EDI file.' );
@@ -656,7 +656,7 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
  * @return array
  */
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
-	$general_settings_instance = WPO_WCPDF()->settings->get_instance( 'general' );
+	$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
 	$language                  = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 	$data                      = array();
 

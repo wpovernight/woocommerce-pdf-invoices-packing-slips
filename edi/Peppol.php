@@ -825,7 +825,7 @@ class Peppol {
 					'wpo_ips_edi_peppol_classic_checkout_input_wrapper_selector',
 					'#peppol_endpoint_id_field'
 				),
-				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'classic' ),
+				'vat_field_selector'             => \WPO_WCPDF()->get_instance( 'vat_plugins' )->get_form_selector( 'classic' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
@@ -893,7 +893,7 @@ class Peppol {
 					'wpo_ips_edi_peppol_block_checkout_input_wrapper_selector',
 					'.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id'
 				),
-				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'block' ),
+				'vat_field_selector'             => \WPO_WCPDF()->get_instance( 'vat_plugins' )->get_form_selector( 'block' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)

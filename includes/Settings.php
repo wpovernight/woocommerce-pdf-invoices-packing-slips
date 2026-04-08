@@ -744,13 +744,16 @@ class Settings {
 	}
 
 	public function get_template_list_cache() {
-		$template_list = get_option( 'wpo_wcpdf_installed_template_paths', array() );
+		$template_list        = get_option( 'wpo_wcpdf_installed_template_paths', array() );
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+		
 		if ( ! empty( $template_list ) ) {
 			$checked_list = array();
-			$outdated = false;
+			$outdated     = false;
+			
 			// cache could be outdated, so we check whether the folders exist
 			foreach ( $template_list as $path => $template_id ) {
-				if ( WPO_WCPDF()->file_system->is_dir( $path ) ) {
+				if ( $file_system_instance->is_dir( $path ) ) {
 					$checked_list[$path] = $template_id; // folder exists
 					continue;
 				}
@@ -761,8 +764,9 @@ class Settings {
 				if ( ! empty( $path ) && false !== strpos( $path, $wp_content_folder ) && defined( WP_CONTENT_DIR ) ) {
 					// try wp-content
 					$relative_path = substr( $path, strrpos( $path, $wp_content_folder ) + strlen( $wp_content_folder ) );
-					$new_path = WP_CONTENT_DIR . $relative_path;
-					if ( WPO_WCPDF()->file_system->is_dir( $new_path ) ) {
+					$new_path      = WP_CONTENT_DIR . $relative_path;
+					
+					if ( $file_system_instance->is_dir( $new_path ) ) {
 						$checked_list[$new_path] = $template_id;
 					}
 				}
@@ -984,7 +988,7 @@ class Settings {
 
 			try {
 				// reset numbers
-				$documents     = WPO_WCPDF()->documents->get_documents( 'all' );
+				$documents     = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 				$number_stores = array();
 				foreach ( $documents as $document ) {
 					if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
@@ -1029,7 +1033,7 @@ class Settings {
 	public function maybe_schedule_yearly_reset_numbers() {
 		$schedule = false;
 
-		foreach ( WPO_WCPDF()->documents->get_documents( 'all' ) as $document ) {
+		foreach ( WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' ) as $document ) {
 			if ( isset( $document->settings['reset_number_yearly'] ) ) {
 				$schedule = true;
 				break;
@@ -1143,7 +1147,7 @@ class Settings {
 	 * @return void
 	 */
 	public function update_documents_settings_categories(): void {
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+		$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {

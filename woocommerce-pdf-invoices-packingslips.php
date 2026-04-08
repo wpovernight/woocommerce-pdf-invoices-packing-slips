@@ -58,6 +58,7 @@ class WPO_WCPDF {
 	public ?Frontend $frontend                     = null;
 	public ?Install $install                       = null;
 	public ?FontSynchronizer $font_synchronizer    = null;
+	public ?Peppol $peppol                         = null;
 	public ?Notices $notices                       = null;
 
 	protected static ?self $_instance              = null;
@@ -107,6 +108,79 @@ class WPO_WCPDF {
 		// deactivate legacy extensions if activated
 		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
 	}
+	
+	/**
+	 * Load the main plugin classes and functions
+	 * 
+	 * @return void
+	 */
+	public function includes(): void {
+		// plugin legacy class mapping
+		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
+
+		// deprecated
+		include_once $this->plugin_path() . '/wpo-ips-deprecated-hooks.php';
+		include_once $this->plugin_path() . '/wpo-ips-deprecated-functions.php';
+
+		// plugin functions
+		include_once $this->plugin_path() . '/wpo-ips-functions.php';
+		include_once $this->plugin_path() . '/wpo-ips-functions-edi.php';
+		
+		// plugin classes
+		$this->get_instance( 'third_party_plugins' );
+		$this->get_instance( 'vat_plugins' );
+		$this->get_instance( 'order_util' );
+		$this->get_instance( 'file_system' );
+		$this->get_instance( 'settings' );
+		$this->get_instance( 'documents' );
+		$this->get_instance( 'main' );
+		$this->get_instance( 'endpoint' );
+		$this->get_instance( 'assets' );
+		$this->get_instance( 'admin' );
+		$this->get_instance( 'frontend' );
+		$this->get_instance( 'install' );
+		$this->get_instance( 'font_synchronizer' );
+		$this->get_instance( 'peppol' );
+		$this->get_instance( 'notices' );
+	}
+	
+	/**
+	 * Get a plugin class instance by slug.
+	 *
+	 * @param string $property
+	 *
+	 * @return object|null
+	 */
+	public function get_instance( string $property ) {
+		$map = array(
+			'third_party_plugins' => ThirdPartyPlugins::class,
+			'vat_plugins'         => VatPlugins::class,
+			'order_util'          => OrderUtil::class,
+			'file_system'         => FileSystem::class,
+			'settings'            => Settings::class,
+			'documents'           => Documents::class,
+			'main'                => Main::class,
+			'endpoint'            => Endpoint::class,
+			'assets'              => Assets::class,
+			'admin'               => Admin::class,
+			'frontend'            => Frontend::class,
+			'install'             => Install::class,
+			'font_synchronizer'   => FontSynchronizer::class,
+			'peppol'              => Peppol::class,
+			'notices'             => Notices::class,
+		);
+
+		if ( ! isset( $map[ $property ] ) ) {
+			return null;
+		}
+
+		if ( null === $this->{$property} ) {
+			$class_name = $map[ $property ];
+			$this->{$property} = $class_name::instance();
+		}
+
+		return $this->{$property};
+	}
 
 	/**
 	 * Is the dependency version supported?
@@ -153,47 +227,6 @@ class WPO_WCPDF {
 			load_textdomain( $textdomain, $dir . 'plugins/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
 			load_plugin_textdomain( $textdomain, false, dirname( $this->plugin_basename ) . '/languages' );
 		}
-	}
-
-	/**
-	 * Load the main plugin classes and functions
-	 * 
-	 * @return void
-	 */
-	public function includes(): void {
-		// plugin legacy class mapping
-		include_once $this->plugin_path() . '/wpo-ips-legacy-class-alias-mapping.php';
-
-		// deprecated
-		include_once $this->plugin_path() . '/wpo-ips-deprecated-hooks.php';
-		include_once $this->plugin_path() . '/wpo-ips-deprecated-functions.php';
-
-		// plugin functions
-		include_once $this->plugin_path() . '/wpo-ips-functions.php';
-		include_once $this->plugin_path() . '/wpo-ips-functions-edi.php';
-			
-		// Compatibility classes
-		$this->third_party_plugins = ThirdPartyPlugins::instance();
-		$this->vat_plugins         = VatPlugins::instance();
-		$this->order_util          = OrderUtil::instance();
-		$this->file_system         = FileSystem::instance();
-
-		// Plugin classes
-		$this->settings            = Settings::instance();
-		$this->documents           = Documents::instance();
-		$this->main                = Main::instance();
-		$this->endpoint            = Endpoint::instance();
-		$this->assets              = Assets::instance();
-		$this->admin               = Admin::instance();
-		$this->frontend            = Frontend::instance();
-		$this->install             = Install::instance();
-		$this->font_synchronizer   = FontSynchronizer::instance();
-		
-		// Notices
-		$this->notices             = Notices::instance();
-
-		// EDI classes
-		Peppol::instance();
 	}
 
 	/**

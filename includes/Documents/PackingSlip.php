@@ -177,6 +177,8 @@ class PackingSlip extends OrderDocumentMethods {
 				)
 			),
 		);
+		
+		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
 
 		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
 			ob_start();
@@ -201,7 +203,7 @@ class PackingSlip extends OrderDocumentMethods {
 					)
 				),
 			);
-			$settings_fields = WPO_WCPDF()->settings->move_setting_after_id( $settings_fields, $pro_notice, 'enabled' );
+			$settings_fields = $settings_instance->move_setting_after_id( $settings_fields, $pro_notice, 'enabled' );
 		}
 
 		// Legacy filter to allow plugins to alter settings fields.
@@ -211,7 +213,7 @@ class PackingSlip extends OrderDocumentMethods {
 		$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_pdf", $settings_fields, $page, $option_group, $option_name, $this );
 
 		if ( ! empty( $settings_fields ) ) {
-			WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+			$settings_instance->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		}
 	}
 

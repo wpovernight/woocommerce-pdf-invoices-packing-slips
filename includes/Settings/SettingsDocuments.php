@@ -29,7 +29,7 @@ class SettingsDocuments {
 	}
 
 	public function init_settings() {
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+		$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 		foreach ( $documents as $document ) {
 			if ( is_callable( array( $document, 'init_settings' ) ) ) {
 				$document->init_settings();
@@ -44,7 +44,7 @@ class SettingsDocuments {
 
 		$section          = ! empty( $section ) ? $section : 'invoice';
 		$option_name      = "wpo_wcpdf_documents_settings_{$section}";
-		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
+		$documents        = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 		$section_document = null;
 
 		foreach ( $documents as $document ) {

@@ -97,7 +97,7 @@ class FontSynchronizer {
 		// rebuild font cache file
 		$cacheData   = wp_json_encode( $local_fonts, JSON_PRETTY_PRINT );
 		// write file with merged cache data
-		WPO_WCPDF()->file_system->put_contents( $destination . $this->font_cache_filename, $cacheData, FS_CHMOD_FILE );
+		WPO_WCPDF()->get_instance( 'file_system' )->put_contents( $destination . $this->font_cache_filename, $cacheData, FS_CHMOD_FILE );
 	}
 
 	/**
@@ -119,7 +119,7 @@ class FontSynchronizer {
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
 
-				if ( WPO_WCPDF()->file_system->exists( $file ) ) {
+				if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $file ) ) {
 					wp_delete_file( $file );
 				} else {
 					wcpdf_log_error( sprintf( "Could not delete font file (%s)", $file ), 'critical' );
@@ -145,7 +145,7 @@ class FontSynchronizer {
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
 
-				if ( WPO_WCPDF()->file_system->is_readable( $file ) ) {
+				if ( WPO_WCPDF()->get_instance( 'file_system' )->is_readable( $file ) ) {
 					$local_filename = $destination . basename( $file );
 
 					if ( ! copy( $file, $local_filename ) ) {
@@ -170,15 +170,16 @@ class FontSynchronizer {
 	 */
 	public function get_local_fonts( string $path ): array {
 		// prepare variables used in the cache list
-		$fontDir           = $path;
-		$rootDir           = $this->get_dompdf_instance()->getOptions()->getRootDir();
-		$cache_file        = trailingslashit( $path ) . $this->font_cache_filename;
-		$legacy_cache_file = trailingslashit( $path ) . 'dompdf_font_family_cache.php'; // Dompdf <2.0
+		$fontDir              = $path;
+		$rootDir              = $this->get_dompdf_instance()->getOptions()->getRootDir();
+		$cache_file           = trailingslashit( $path ) . $this->font_cache_filename;
+		$legacy_cache_file    = trailingslashit( $path ) . 'dompdf_font_family_cache.php'; // Dompdf <2.0
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-		if ( WPO_WCPDF()->file_system->is_readable( $cache_file ) ) {
-			$json_data = WPO_WCPDF()->file_system->get_contents( $cache_file );
+		if ( $file_system_instance->is_readable( $cache_file ) ) {
+			$json_data = $file_system_instance->get_contents( $cache_file );
 			$font_data = json_decode( $json_data, true );
-		} elseif ( WPO_WCPDF()->file_system->is_readable( $legacy_cache_file ) ) {
+		} elseif ( $file_system_instance->is_readable( $legacy_cache_file ) ) {
 			$font_data = include $legacy_cache_file;
 			wp_delete_file( $legacy_cache_file );
 		} else {

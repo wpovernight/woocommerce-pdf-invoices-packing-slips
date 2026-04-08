@@ -32,15 +32,9 @@ class Notices {
 	 * Constructor.
 	 */
 	protected function __construct() {
-		$this->plugin = \WPO_WCPDF();
-		
-		$this->settings = empty( $this->plugin->settings )
-			? Settings::instance()
-			: $this->plugin->settings;
-		
-		$this->main = empty( $this->plugin->main )
-			? Main::instance()
-			: $this->plugin->main;
+		$this->plugin   = \WPO_WCPDF();
+		$this->settings = $this->plugin->get_instance( 'settings' );
+		$this->main     = $this->plugin->get_instance( 'main' );
 		
 		add_action( 'admin_init', array( $this, 'handle_notice_actions' ) );
 		add_action( 'admin_init', array( $this, 'setup_notices' ) );

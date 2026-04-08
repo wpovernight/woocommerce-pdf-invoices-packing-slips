@@ -56,8 +56,9 @@ class SettingsGeneral {
 		$requires_pro           = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 		$states                 = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
 		$missing_template_files = $this->get_missing_template_files();
-		$has_vat_plugin_active  = \WPO_WCPDF()->vat_plugins->has_active();
+		$has_vat_plugin_active  = \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active();
 		$vat_plugin_notice      = '';
+		$settings_instance      = \WPO_WCPDF()->get_instance( 'settings' );
 
 		if ( $has_vat_plugin_active ) {
 			$vat_plugin_notice = '<div class="notice notice-info inline notice-wpo"><p>'
@@ -96,7 +97,7 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
-					'options_callback' => array( WPO_WCPDF()->settings, 'get_installed_templates_list' ),
+					'options_callback' => array( $settings_instance, 'get_installed_templates_list' ),
 					'description'      => sprintf(
 						/* translators: 1: plugin template path, 2: theme template path */
 						_n(
@@ -615,7 +616,8 @@ class SettingsGeneral {
 
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name, $this );
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+		
+		$settings_instance->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
 
 	public function attachment_settings_hint( $active_tab, $active_section ) {
@@ -634,7 +636,7 @@ class SettingsGeneral {
 		}
 
 		if ( $active_tab == 'general' && ! $hide_hint ) {
-			$documents = WPO_WCPDF()->documents->get_documents();
+			$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 			foreach ( $documents as $document ) {
 				if ( $document->get_type() == 'invoice' ) {
@@ -897,9 +899,9 @@ class SettingsGeneral {
 			return $this->missing_template_files;
 		}
 
-		$template_path     = WPO_WCPDF()->settings->get_template_path();
+		$template_path     = WPO_WCPDF()->get_instance( 'settings' )->get_template_path();
 		$template_name     = basename( wp_normalize_path( $template_path ) );
-		$enabled_documents = WPO_WCPDF()->documents->get_documents( 'enabled' );
+		$enabled_documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled' );
 		$missing           = array();
 
 		foreach ( $enabled_documents as $doc ) {
@@ -909,7 +911,7 @@ class SettingsGeneral {
 			// If using Simple OR the located template is not inside /Simple/, and the file exists, skip.
 			if (
 				( 'Simple' === $template_name || false === strpos( $located_template, '/Simple/' ) ) &&
-				WPO_WCPDF()->file_system->exists( $located_template )
+				WPO_WCPDF()->get_instance( 'file_system' )->exists( $located_template )
 			) {
 				continue;
 			}
@@ -953,7 +955,7 @@ class SettingsGeneral {
 
 		// Premium Templates guidance (only if bundle license missing/invalid)
 		if ( function_exists( 'WPO_WCPDF_Templates' ) ) {
-			$license_info = WPO_WCPDF()->settings->get_instance( 'upgrade' )->get_extension_license_infos();
+			$license_info = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'upgrade' )->get_extension_license_infos();
 			$info         = $license_info['bundle'] ?? null;
 
 			if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {

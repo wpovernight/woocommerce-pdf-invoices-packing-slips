@@ -45,7 +45,7 @@ class Frontend {
 
 			if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
 				$file = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
-				if ( \WPO_WCPDF()->file_system->is_readable( $file ) ) {
+				if ( \WPO_WCPDF()->get_instance( 'file_system' )->is_readable( $file ) ) {
 					include_once $file;
 				}
 			}
@@ -116,14 +116,15 @@ class Frontend {
 			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
 			if ( $invoice_allowed || in_array( $order->get_status(), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
 				$name                      = is_callable( array( $invoice, 'get_title' ) ) ? $invoice->get_title() : $document_title;
+				$endpoint_instance         = WPO_WCPDF()->get_instance( 'endpoint' );
 				$actions[ $document_type ] = array(
-					'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
+					'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
 					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice )
 				);
 
 				if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
 					$actions[ $document_type . '_xml' ] = array(
-						'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml', 'my-account' => 'true' ) ),
+						'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'output' => 'xml', 'my-account' => 'true' ) ),
 						'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),
 					);
 				}
@@ -146,14 +147,16 @@ class Frontend {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 
 			if ( isset( $general_settings['download_display'] ) && 'display' === $general_settings['download_display'] ) {
-				$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-				$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+				$suffix               = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+				$file_path            = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+				$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-				if ( WPO_WCPDF()->file_system->exists( $file_path ) ) {
-					$script = WPO_WCPDF()->file_system->get_contents( $file_path );
+				if ( $file_system_instance->exists( $file_path ) ) {
+					$script            = $file_system_instance->get_contents( $file_path );
+					$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
-					if ( $script && WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
-						$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
+					if ( $script && $endpoint_instance->pretty_links_enabled() ) {
+						$script = str_replace( 'generate_wpo_wcpdf', $endpoint_instance->get_identifier(), $script );
 					}
 
 					wp_add_inline_script( 'jquery', $script );
@@ -242,7 +245,7 @@ class Frontend {
 		), $atts );
 
 		$is_document_type_valid = false;
-		$documents              = WPO_WCPDF()->documents->get_documents();
+		$documents              = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() === $values['document_type'] ) {
 				$is_document_type_valid = true;
@@ -286,7 +289,7 @@ class Frontend {
 			return '';
 		}
 
-		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
+		$pdf_url = WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
 
 		if ( 'wcpdf_document_link' === $shortcode_tag ) {
 			return esc_url( $pdf_url );
@@ -740,7 +743,7 @@ class Frontend {
 		}
 
 		// Prevent conflicts with VAT plugins.
-		if ( \WPO_WCPDF()->vat_plugins->has_active() ) {
+		if ( \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active() ) {
 			return false;
 		}
 

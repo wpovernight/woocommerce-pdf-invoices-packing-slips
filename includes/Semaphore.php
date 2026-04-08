@@ -270,7 +270,7 @@ class Semaphore {
 	 */
 	public function log( string $message, string $level = 'info', array $context = array() ): void {
 		$context      = ! empty( $context ) ? $context : $this->context;
-		$logs_enabled = isset( WPO_WCPDF()->settings->debug_settings['semaphore_logs'] );
+		$logs_enabled = isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['semaphore_logs'] );
 
 		if ( ! empty( $this->loggers ) && $logs_enabled ) {
 			foreach ( $this->loggers as $logger ) {
@@ -436,7 +436,7 @@ class Semaphore {
 	 */
 	public static function schedule_semaphore_cleanup(): void {
 		if ( ! self::is_cleanup_scheduled() ) {
-			$frequency     = apply_filters( self::get_cleanup_hook_name() . '_frequency', ( (int) ( WPO_WCPDF()->settings->debug_settings['cleanup_days'] ?? 7 ) ) * DAY_IN_SECONDS );
+			$frequency     = apply_filters( self::get_cleanup_hook_name() . '_frequency', ( (int) ( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['cleanup_days'] ?? 7 ) ) * DAY_IN_SECONDS );
 			$frequency     = apply_filters_deprecated( self::get_cleanup_hook_name() . '_interval', array( $frequency ), '4.7.0', self::get_cleanup_hook_name() . '_frequency' );
 			$error_message = 'Action Scheduler is not available. Cannot schedule the semaphore cleanup action.';
 

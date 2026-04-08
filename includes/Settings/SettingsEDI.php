@@ -543,7 +543,7 @@ class SettingsEDI {
 		);
 
 		$settings_fields = apply_filters( 'wpo_ips_edi_settings', $settings_fields, $page, $option_group, $option_name );
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+		WPO_WCPDF()->get_instance( 'settings' )->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
 
 	/**

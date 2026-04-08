@@ -14,7 +14,7 @@ class EDIMaker {
 
 	public function write( $filename, $contents ) {
 		$full_file_name = $this->get_file_path() . $filename;
-		$status         = WPO_WCPDF()->file_system->put_contents( $full_file_name, $contents, FS_CHMOD_FILE );
+		$status         = WPO_WCPDF()->get_instance( 'file_system' )->put_contents( $full_file_name, $contents, FS_CHMOD_FILE );
 
 		if ( false === $status ) {
 			throw new \Exception( 'Error writing UBL file' );
@@ -32,7 +32,7 @@ class EDIMaker {
 			return $this->tmp_base;
 		}
 
-		$this->tmp_base = trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'xml' ) );
+		$this->tmp_base = trailingslashit( WPO_WCPDF()->get_instance( 'main' )->get_tmp_path( 'xml' ) );
 		return $this->tmp_base;
 	}
 }

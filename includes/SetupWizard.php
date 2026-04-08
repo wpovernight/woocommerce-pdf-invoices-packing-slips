@@ -25,7 +25,7 @@ class SetupWizard {
 	}
 
 	public function __construct() {
-		if ( WPO_WCPDF()->settings->user_can_manage_settings() ) {
+		if ( WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
 			remove_all_actions( 'admin_init' ); // prevents other plugins from adding their own actions
 			add_action( 'admin_init', array( $this, 'setup_wizard' ) );
@@ -350,7 +350,7 @@ class SetupWizard {
 					update_option( $option, $new_settings );
 				}
 			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
-				$orders_column_hidden_key = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled()
+				$orders_column_hidden_key = WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled()
 					? 'managewoocommerce_page_wc-orderscolumnshidden'
 					: 'manageedit-shop_ordercolumnshidden';
 

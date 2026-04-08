@@ -39,6 +39,8 @@ function wcpdf_filter_order_ids( $order_ids, $document_type ) {
  * @return object|false
  */
 function wcpdf_get_document( string $document_type, $order, bool $init = false ) {
+	$documents_instance = WPO_WCPDF()->get_instance( 'documents' );
+	
 	if ( ! empty( $order ) ) {
 		if ( ! is_object( $order ) && ! is_array( $order ) && is_numeric( $order ) ) {
 			$order = array( absint( $order ) ); // convert single order id to array.
@@ -54,7 +56,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
 				// nothing changed, load document with Order object.
 				do_action( 'wpo_wcpdf_process_template_order', $document_type, $order->get_id() );
-				$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+				$document = $documents_instance->get_document( $document_type, $order );
 
 				if ( ! $document || ! is_callable( array( $document, 'is_allowed' ) ) || ! $document->is_allowed() ) {
 					return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
@@ -87,7 +89,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 
 			do_action( 'wpo_wcpdf_process_template_order', $document_type, $order_id );
 
-			$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+			$document = $documents_instance->get_document( $document_type, $order );
 
 			if ( ! $document || ! $document->is_allowed() ) {
 				return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
@@ -103,7 +105,7 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 		}
 	} else {
 		// orderless document (used as wrapper for bulk, for example).
-		$document = WPO_WCPDF()->documents->get_document( $document_type, $order );
+		$document = $documents_instance->get_document( $document_type, $order );
 	}
 
 	return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
@@ -125,7 +127,7 @@ function wcpdf_get_packing_slip( $order, $init = false ) {
 
 function wcpdf_get_bulk_actions() {
 	$actions   = array();
-	$documents = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
+	$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'any' );
 
 	foreach ( $documents as $document ) {
 		foreach ( $document->output_formats as $output_format ) {
@@ -238,9 +240,12 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
+	$main_instance        = WPO_WCPDF()->get_instance( 'main' );
+	$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+	
+	$tmp_path             = $main_instance->get_tmp_path( 'attachments' );
 
-	if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_path ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_path ) ) {
+	if ( ! $file_system_instance->is_dir( $tmp_path ) || ! $file_system_instance->is_writable( $tmp_path ) ) {
 		$error_message = "Couldn't get the attachments temporary folder path: {$tmp_path}.";
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
@@ -253,12 +258,12 @@ function wcpdf_get_document_file( object $document, string $output_format = 'pdf
 	 */
 	$function = "get_document_{$output_format}_attachment";
 
-	if ( ! is_callable( array( WPO_WCPDF()->main, $function ) ) ) {
-		$error_message = "The {$function} method is not callable on WPO_WCPDF()->main.";
+	if ( ! is_callable( array( $main_instance, $function ) ) ) {
+		$error_message = "The {$function} method is not callable on " . get_class( $main_instance ) . ".";
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$file_path = WPO_WCPDF()->main->$function( $document, $tmp_path );
+	$file_path = $main_instance->$function( $document, $tmp_path );
 
 	return apply_filters( 'wpo_wcpdf_get_document_file', $file_path, $document, $output_format );
 }
@@ -719,7 +724,7 @@ function wcpdf_safe_redirect_or_die( $url = '', $message = '' ) {
  * @return array
  */
 function wpo_wcpdf_parse_document_date_for_wp_query( array $wp_query_args, array $query_vars ): array {
-	$documents = WPO_WCPDF()->documents->get_documents();
+	$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 	if ( ! empty( $documents ) ) {
 		foreach ( $documents as $document ) {
@@ -890,7 +895,7 @@ function wpo_wcpdf_base64_encode_file( string $local_path ) {
 		return false;
 	}
 
-	$file_data = WPO_WCPDF()->file_system->get_contents( $local_path );
+	$file_data = WPO_WCPDF()->get_instance( 'file_system' )->get_contents( $local_path );
 
 	return $file_data ? base64_encode( $file_data ) : false;
 }
@@ -936,11 +941,13 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 
 	// Local path file check
 	} else {
-		if ( WPO_WCPDF()->file_system->is_readable( $path ) ) {
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+		
+		if ( $file_system_instance->is_readable( $path ) ) {
 			return true;
 		} else {
 			// Fallback to checking file readability by attempting to open it
-			$file_contents = WPO_WCPDF()->file_system->get_contents( $path );
+			$file_contents = $file_system_instance->get_contents( $path );
 
 			if ( $file_contents ) {
 				return true;
@@ -1078,7 +1085,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	static $logged      = array();
 
 	$cache_key          = md5( $textdomain . '::' . $string );
-	$log_enabled        = ! empty( WPO_WCPDF()->settings->debug_settings['log_missing_translations'] );
+	$log_enabled        = ! empty( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_missing_translations'] );
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = $string;
 
@@ -1213,16 +1220,11 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_eu_vat',        // WooCommerce Eu Vat & B2B (WCEV)
 		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
+	
+	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
 
-	// Maybe add General Checkout Field key
-	if ( empty( WPO_WCPDF()->frontend ) ) {
-		$frontend = \WPO\IPS\Frontend::instance();
-	} else {
-		$frontend = WPO_WCPDF()->frontend;
-	}
-
-	if ( ! empty( $frontend ) && is_callable( array( $frontend, 'checkout_field_is_vat_number' ) ) ) {
-		$checkout_field_is_vat_number = $frontend->checkout_field_is_vat_number();
+	if ( ! empty( $frontend_instance ) && is_callable( array( $frontend_instance, 'checkout_field_is_vat_number' ) ) ) {
+		$checkout_field_is_vat_number = $frontend_instance->checkout_field_is_vat_number();
 
 		if ( $checkout_field_is_vat_number ) {
 			array_unshift( $vat_meta_keys, '_wpo_ips_checkout_field' );

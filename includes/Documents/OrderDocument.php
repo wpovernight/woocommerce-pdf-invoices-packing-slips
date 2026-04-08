@@ -166,8 +166,9 @@ abstract class OrderDocument {
 
 	public function get_settings( $latest = false, $output_format = 'pdf' ) {
 		// get most current settings
-		$common_settings   = WPO_WCPDF()->settings->get_common_document_settings();
-		$document_settings = WPO_WCPDF()->settings->get_document_settings( $this->get_type(), $output_format );
+		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
+		$common_settings   = $settings_instance->get_common_document_settings();
+		$document_settings = $settings_instance->get_document_settings( $this->get_type(), $output_format );
 		$settings          = (array) $document_settings + (array) $common_settings;
 
 		if ( ! $latest ) {
@@ -587,7 +588,7 @@ abstract class OrderDocument {
 	}
 
 	public function printed() {
-		return WPO_WCPDF()->main->is_document_printed( $this );
+		return WPO_WCPDF()->get_instance( 'main' )->is_document_printed( $this );
 	}
 
 	/*
@@ -597,7 +598,7 @@ abstract class OrderDocument {
 	*/
 
 	public function get_printed_data() {
-		return WPO_WCPDF()->main->get_document_printed_data( $this );
+		return WPO_WCPDF()->get_instance( 'main' )->get_document_printed_data( $this );
 	}
 
 	public function get_data( $key, $document_type = '', $order = null, $context = 'view' ) {
@@ -1216,7 +1217,7 @@ abstract class OrderDocument {
 		$css_file_path = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( 'style.css' ) );
 		$css           = '';
 
-		if ( WPO_WCPDF()->file_system->exists( $css_file_path ) ) {
+		if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $css_file_path ) ) {
 			ob_start();
 			include $css_file_path;
 			$css = ob_get_clean();
@@ -1301,7 +1302,7 @@ abstract class OrderDocument {
 				return;
 			}
 
-			$img_src     = isset( WPO_WCPDF()->settings->debug_settings['embed_images'] )
+			$img_src     = isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['embed_images'] )
 				? wpo_wcpdf_get_image_src_in_base64( $src )
 				: $src;
 
@@ -1578,12 +1579,12 @@ abstract class OrderDocument {
 
 	public function get_pdf() {
 		// maybe we need to reinstall fonts first?
-		WPO_WCPDF()->main->maybe_reinstall_fonts();
+		WPO_WCPDF()->get_instance( 'main' )->maybe_reinstall_fonts();
 
 		$pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this );
 
 		if ( $pdf_file ) {
-			$pdf = WPO_WCPDF()->file_system->get_contents( $pdf_file );
+			$pdf = WPO_WCPDF()->get_instance( 'file_system' )->get_contents( $pdf_file );
 		} else {
 			$pdf = null;
 		}
@@ -1620,7 +1621,7 @@ abstract class OrderDocument {
 
 	public function preview_pdf() {
 		// maybe we need to reinstall fonts first?
-		WPO_WCPDF()->main->maybe_reinstall_fonts();
+		WPO_WCPDF()->get_instance( 'main' )->maybe_reinstall_fonts();
 
 		// get last settings
 		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
@@ -1720,9 +1721,11 @@ abstract class OrderDocument {
 		while ( ob_get_level() ) {
 			ob_end_clean();
 		}
+		
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-		if ( WPO_WCPDF()->file_system->exists( $filename_or_contents ) ) {
-			$sent = WPO_WCPDF()->file_system->output_file( $filename_or_contents );
+		if ( $file_system_instance->exists( $filename_or_contents ) ) {
+			$sent = $file_system_instance->output_file( $filename_or_contents );
 			if ( false === $sent ) {
 				wcpdf_log_error( sprintf( 'Could not output XML file (%s)', $filename_or_contents ), 'critical' );
 			}
@@ -1771,7 +1774,7 @@ abstract class OrderDocument {
 	}
 
 	public function get_template_path() {
-		return WPO_WCPDF()->settings->get_template_path();
+		return WPO_WCPDF()->get_instance( 'settings' )->get_template_path();
 	}
 
 	public function locate_template_file( $file ) {
@@ -1779,11 +1782,12 @@ abstract class OrderDocument {
 			$file = $this->type . '.php';
 		}
 
-		$path               = $this->get_template_path();
-		$file_path          = "{$path}/{$file}";
-		$fallback_file_path = WPO_WCPDF()->plugin_path() . '/templates/Simple/' . $file;
+		$path                 = $this->get_template_path();
+		$file_path            = "{$path}/{$file}";
+		$fallback_file_path   = WPO_WCPDF()->plugin_path() . '/templates/Simple/' . $file;
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-		if ( ! WPO_WCPDF()->file_system->exists( $file_path ) && WPO_WCPDF()->file_system->exists( $fallback_file_path ) ) {
+		if ( ! $file_system_instance->exists( $file_path ) && $file_system_instance->exists( $fallback_file_path ) ) {
 			$file_path = $fallback_file_path;
 		}
 
@@ -1800,7 +1804,7 @@ abstract class OrderDocument {
 		}
 
 		ob_start();
-		if ( WPO_WCPDF()->file_system->exists( $file ) ) {
+		if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $file ) ) {
 			include( $file );
 		}
 		return ob_get_clean();
@@ -1888,7 +1892,7 @@ abstract class OrderDocument {
 	 */
 	public function get_sequential_number_store() {
 		$reset_number_yearly = isset( $this->settings['reset_number_yearly'] ) ? true : false;
-		$method              = WPO_WCPDF()->settings->get_sequential_number_store_method();
+		$method              = WPO_WCPDF()->get_instance( 'settings' )->get_sequential_number_store_method();
 		$now                 = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
 
 		// reset: on

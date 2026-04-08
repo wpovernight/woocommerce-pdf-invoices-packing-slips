@@ -96,13 +96,14 @@ class Admin {
 		$this->disable_storing_document_settings();
 
 		$listing_actions = array();
-		$documents       = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
+		$documents       = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'any' );
 
 		foreach ( $documents as $document ) {
-			$document_title = $document->get_title();
-			$document_type  = $document->get_type();
-			$icon           = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
-			$document       = wcpdf_get_document( $document_type, $order ); // reload document with order
+			$document_title    = $document->get_title();
+			$document_type     = $document->get_type();
+			$icon              = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
+			$document          = wcpdf_get_document( $document_type, $order ); // reload document with order
+			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
 			if ( $document ) {
 				foreach ( $document->output_formats as $output_format ) {
@@ -110,7 +111,7 @@ class Admin {
 						default:
 						case 'pdf':
 							if ( $document->is_enabled( $output_format ) ) {
-								$document_url     = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type );
+								$document_url     = $endpoint_instance->get_document_link( $order, $document_type );
 								$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 								$document_exists  = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 								$document_printed = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
@@ -136,7 +137,7 @@ class Admin {
 							break;
 						case 'xml':
 							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() ) {
-								$document_url    = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => $output_format ) );
+								$document_url    = $endpoint_instance->get_document_link( $order, $document_type, array( 'output' => $output_format ) );
 								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 								$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 								$class           = array( $document_type, $output_format );
@@ -216,7 +217,7 @@ class Admin {
 	public function add_invoice_columns( $columns ) {
 		$current_screen = get_current_screen();
 
-		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() && 'woocommerce_page_wc-orders' !== $current_screen->id ) {
+		if ( WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() && 'woocommerce_page_wc-orders' !== $current_screen->id ) {
 			return $columns;
 		}
 
@@ -361,7 +362,7 @@ class Admin {
 	 * @return void
 	 */
 	public function add_meta_boxes( $wc_screen_id, $wc_order ) {
-		if ( WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() ) {
+		if ( WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() ) {
 			$screen_id = wc_get_page_screen_id( 'shop-order' );
 		} else {
 			$screen_id = 'shop_order';
@@ -380,8 +381,10 @@ class Admin {
 			'side',
 			'high'
 		);
+		
+		$documents_instance = \WPO_WCPDF()->get_instance( 'documents' );
 
-		if ( ! empty( \WPO_WCPDF()->documents->get_documents( 'enabled', 'pdf' ) ) ) {
+		if ( ! empty( $documents_instance->get_documents( 'enabled', 'pdf' ) ) ) {
 			// create PDF buttons
 			add_meta_box(
 				'wpo_wcpdf-box',
@@ -404,7 +407,7 @@ class Admin {
 		}
 
 		// create EDI buttons
-		if ( wpo_ips_edi_is_available() && ! empty( \WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' ) ) ) {
+		if ( wpo_ips_edi_is_available() && ! empty( $documents_instance->get_documents( 'enabled', 'xml' ) ) ) {
 			add_meta_box(
 				'wpo_ips-edi-box',
 				__( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -464,22 +467,23 @@ class Admin {
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents        = WPO_WCPDF()->documents->get_documents();
+		$documents        = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 		foreach ( $documents as $document ) {
-			$document_title = $document->get_title();
-			$document       = wcpdf_get_document( $document->get_type(), $order );
+			$document_title    = $document->get_title();
+			$document          = wcpdf_get_document( $document->get_type(), $order );
+			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
 			if ( $document ) {
-				$document_url          = WPO_WCPDF()->endpoint->get_document_link( $order, $document->get_type() );
+				$document_url          = $endpoint_instance->get_document_link( $order, $document->get_type() );
 				$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 				$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 				$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
 				$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : [];
 				$document_settings     = get_option( 'wpo_wcpdf_documents_settings_'.$document->get_type() ); // $document-settings might be not updated with the last settings
-				$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
-				$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
-				$mark_printed_url      = $manually_mark_printed ? WPO_WCPDF()->endpoint->get_document_printed_link( 'mark', $order, $document->get_type() ) : false;
+				$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? $endpoint_instance->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
+				$manually_mark_printed = WPO_WCPDF()->get_instance( 'main' )->document_can_be_manually_marked_printed( $document );
+				$mark_printed_url      = $manually_mark_printed ? $endpoint_instance->get_document_printed_link( 'mark', $order, $document->get_type() ) : false;
 				$class                 = [ $document->get_type() ];
 
 				if ( $document_exists ) {
@@ -569,7 +573,7 @@ class Admin {
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
+		$documents        = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'xml' );
 
 		foreach ( $documents as $document ) {
 			$document_type = $document->get_type();
@@ -932,10 +936,11 @@ class Admin {
 		if ( ! isset( $current['number'] ) ) {
 			$number_settings = $document->get_number_settings();
 			$default_number  = 0;
+			$debug_settings  = \WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
 
 			if (
-				! empty( \WPO_WCPDF()->settings->debug_settings['default_manual_document_number'] ) &&
-				'next_document_number' === \WPO_WCPDF()->settings->debug_settings['default_manual_document_number']
+				! empty( $debug_settings['default_manual_document_number'] ) &&
+				'next_document_number' === $debug_settings['default_manual_document_number']
 			) {
 				$default_number = $document->get_sequential_number_store()->get_next() ?? 0;
 			}
@@ -999,7 +1004,7 @@ class Admin {
 		}
 
 		if ( ! empty( $data['creation_trigger'] ) ) {
-			$document_triggers = WPO_WCPDF()->main->get_document_triggers();
+			$document_triggers = WPO_WCPDF()->get_instance( 'main' )->get_document_triggers();
 			$creation_trigger  = $document->get_creation_trigger();
 			$current['creation_trigger'] = array(
 				'value' => isset( $document_triggers[ $creation_trigger ] ) ? $document_triggers[ $creation_trigger] : '',
@@ -1027,10 +1032,11 @@ class Admin {
 			return;
 		}
 
-		$data = $this->get_current_values_for_document_data( $document, $data );
+		$data              = $this->get_current_values_for_document_data( $document, $data );
+		$settings_instance = \WPO_WCPDF()->get_instance( 'settings' );
 
-		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
-			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
+		$document_data_editing_enabled = $settings_instance->user_can_manage_settings() &&
+			( ! empty( $settings_instance->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
 		?>
 		<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
@@ -1369,10 +1375,12 @@ class Admin {
 				}
 
 				$invoice->save();
+				
+				$main_instance = WPO_WCPDF()->get_instance( 'main' );
 
 				if ( $is_new ) {
-					WPO_WCPDF()->main->log_document_creation_to_order_notes( $invoice, 'document_data' );
-					WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
+					$main_instance->log_document_creation_to_order_notes( $invoice, 'document_data' );
+					$main_instance->mark_document_printed( $invoice, 'document_data' );
 				}
 			}
 
@@ -1537,7 +1545,8 @@ class Admin {
 		);
 
 		try {
-			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
+			$document      = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
+			$main_instance = WPO_WCPDF()->get_instance( 'main' );
 
 			if ( ! empty( $document ) ) {
 
@@ -1552,7 +1561,8 @@ class Admin {
 				// on regenerate
 				if ( 'regenerate' === $action_type && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
-					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true, $request );
+					$main_instance->log_document_creation_trigger_to_order_meta( $document, 'document_data', true, $request );
+					
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
@@ -1582,9 +1592,9 @@ class Admin {
 					$document->save();
 
 					if ( $is_new ) {
-						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
-						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', false, $request );
-						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
+						$main_instance->log_document_creation_to_order_notes( $document, 'document_data' );
+						$main_instance->log_document_creation_trigger_to_order_meta( $document, 'document_data', false, $request );
+						$main_instance->mark_document_printed( $document, 'document_data' );
 					}
 					$response      = array(
 						'message' => $notice_messages[$notice]['success'],
@@ -1635,13 +1645,18 @@ class Admin {
 	}
 
 	public function debug_enabled_warning( $wp_admin_bar ) {
-		if ( isset(WPO_WCPDF()->settings->debug_settings['enable_debug']) && current_user_can( 'administrator' ) ) {
+		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_debug'] ) && current_user_can( 'administrator' ) ) {
 			$status_settings_url = 'admin.php?page=wpo_wcpdf_options_page&tab=debug';
-			$title = __( 'DEBUG output enabled', 'woocommerce-pdf-invoices-packing-slips' );
-			$args = array(
+			$title               = __( 'DEBUG output enabled', 'woocommerce-pdf-invoices-packing-slips' );
+			$args                = array(
 				'id'    => 'admin_bar_wpo_debug_mode',
-				'title' => sprintf( '<a href="%s" style="background-color: red; color: white;">%s</a>', esc_attr( $status_settings_url ), esc_html( $title ) ),
+				'title' => sprintf(
+					'<a href="%s" style="background-color: red; color: white;">%s</a>',
+					esc_attr( $status_settings_url ),
+					esc_html( $title )
+				),
 			);
+			
 			$wp_admin_bar->add_node( $args );
 		}
 	}
@@ -1738,8 +1753,9 @@ class Admin {
 		}
 
 		$key_prefix                    = "_wcpdf_{$document->slug}_";
-		$document_data_editing_enabled = \WPO_WCPDF()->settings->user_can_manage_settings() &&
-			( ! empty( \WPO_WCPDF()->settings->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
+		$settings_instance             = \WPO_WCPDF()->get_instance( 'settings' );
+		$document_data_editing_enabled = $settings_instance->user_can_manage_settings() &&
+			( ! empty( $settings_instance->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
 
 		if ( $document_data_editing_enabled ) {
 			// Number
@@ -1905,7 +1921,7 @@ class Admin {
 		}
 
 		$is_refund_order  = is_a( $order, 'WC_Order_Refund' );
-		$document_url     = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
+		$document_url     = WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
 		$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 		$class            = array( $document_type, 'xml', 'exists' );
 
@@ -2084,7 +2100,7 @@ class Admin {
 	 * @return bool
 	 */
 	private function is_invoice_number_numeric() {
-		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
+		$invoice_settings = WPO_WCPDF()->get_instance( 'settings' )->get_document_settings( 'invoice' );
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
 							( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 

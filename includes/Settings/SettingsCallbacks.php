@@ -897,7 +897,7 @@ class SettingsCallbacks {
 			$store               = $store->store_name;
 		// legacy
 		} else {
-			$number_store_method = WPO_WCPDF()->settings->get_sequential_number_store_method();
+			$number_store_method = WPO_WCPDF()->get_instance( 'settings' )->get_sequential_number_store_method();
 			$number_store        = new SequentialNumberStore( $store, $number_store_method );
 			$next_number         = $number_store->get_next();
 		}

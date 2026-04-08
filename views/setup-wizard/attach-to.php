@@ -19,7 +19,7 @@
 		'default'         => $default,
 	);
 
-	WPO_WCPDF()->settings->get_instance( 'callbacks' )->select( $attach_to_setting );
+	WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'callbacks' )->select( $attach_to_setting );
 
 	?>
 	</table>
