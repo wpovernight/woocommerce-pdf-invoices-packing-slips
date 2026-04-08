@@ -177,9 +177,6 @@ class WPO_WCPDF {
 		$this->vat_plugins         = VatPlugins::instance();
 		$this->order_util          = OrderUtil::instance();
 		$this->file_system         = FileSystem::instance();
-		
-		// Notices
-		$this->notices             = Notices::instance();
 
 		// Plugin classes
 		$this->settings            = Settings::instance();
@@ -191,6 +188,9 @@ class WPO_WCPDF {
 		$this->frontend            = Frontend::instance();
 		$this->install             = Install::instance();
 		$this->font_synchronizer   = FontSynchronizer::instance();
+		
+		// Notices
+		$this->notices             = Notices::instance();
 
 		// EDI classes
 		Peppol::instance();

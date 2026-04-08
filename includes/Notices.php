@@ -10,8 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Notices {
 
 	protected ?\WPO_WCPDF $plugin     = null;
-	protected ?Main $main             = null;
 	protected ?Settings $settings     = null;
+	protected ?Main $main             = null;
 	
 	protected static ?self $_instance = null;
 
@@ -34,13 +34,13 @@ class Notices {
 	protected function __construct() {
 		$this->plugin = \WPO_WCPDF();
 		
-		$this->main = empty( $this->plugin->main )
-			? Main::instance()
-			: $this->plugin->main;
-			
 		$this->settings = empty( $this->plugin->settings )
 			? Settings::instance()
 			: $this->plugin->settings;
+		
+		$this->main = empty( $this->plugin->main )
+			? Main::instance()
+			: $this->plugin->main;
 		
 		add_action( 'admin_init', array( $this, 'handle_notice_actions' ) );
 		add_action( 'admin_init', array( $this, 'setup_notices' ) );
