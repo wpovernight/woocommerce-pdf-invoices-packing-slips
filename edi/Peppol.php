@@ -220,7 +220,6 @@ class Peppol {
 			return;
 		}
 		
-		// Blocks/store-api hooks
 		if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
 			$file = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
 			if ( \WPO_WCPDF()->file_system->is_readable( $file ) ) {
