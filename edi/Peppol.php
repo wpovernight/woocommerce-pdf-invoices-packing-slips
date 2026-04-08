@@ -219,13 +219,6 @@ class Peppol {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
-		
-		if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
-			$file = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
-			if ( \WPO_WCPDF()->file_system->is_readable( $file ) ) {
-				include_once $file;
-			}
-		}
 
 		$input_mode      = wpo_ips_edi_peppol_identifier_input_mode();
 		$visibility_mode = $this->peppol_checkout_visibility_mode();
@@ -234,7 +227,7 @@ class Peppol {
 
 		// Register toggle field only when configured + supported.
 		if ( $can_use_hidden && 'toggle' === $visibility_mode ) {
-			\woocommerce_register_additional_checkout_field(
+			wpo_ips_register_additional_checkout_field(
 				array(
 					'id'       => 'wpo-ips-edi/peppol-invoice',
 					'label'    => __( 'I need a Peppol invoice (business purchase)', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -271,7 +264,7 @@ class Peppol {
 			$args['hidden'] = $conditional_hidden;
 		}
 
-		\woocommerce_register_additional_checkout_field( $args );
+		wpo_ips_register_additional_checkout_field( $args );
 
 		// EAS
 		if ( 'select' === $input_mode ) {
@@ -302,7 +295,7 @@ class Peppol {
 				$args['hidden'] = $conditional_hidden;
 			}
 
-			\woocommerce_register_additional_checkout_field( $args );
+			wpo_ips_register_additional_checkout_field( $args );
 		}
 	}
 

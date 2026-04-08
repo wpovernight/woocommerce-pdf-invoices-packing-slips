@@ -2259,3 +2259,25 @@ function wpo_ips_is_current_page_checkout_page(): bool {
 
 	return $checkout_page_id > 0 && $checkout_page_id === (int) $page_id;
 }
+
+/**
+ * Register an additional checkout block field.
+ *
+ * @param array $options
+ * @return void
+ */
+function wpo_ips_register_additional_checkout_field( array $options ): void {
+	if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
+		$file                 = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
+		$file_system_instance = WPO_WCPDF()->file_system;
+		$file_system_instance = $file_system_instance
+			? $file_system_instance
+			: \WPO\IPS\Compatibility\FileSystem::instance();
+		
+		if ( $file_system_instance->is_readable( $file ) ) {
+			include_once $file;
+		}
+	}
+
+	woocommerce_register_additional_checkout_field( $options );
+}
