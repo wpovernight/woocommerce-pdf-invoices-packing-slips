@@ -6,14 +6,8 @@ defined( 'ABSPATH' ) or exit;
 if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\ThirdPartyPlugins' ) ) :
 
 class ThirdPartyPlugins {
-	
-	protected bool $has_wc_bundles         = false;
-	protected bool $has_wpc_bundles        = false;
-	protected bool $has_yith_bundles       = false;
-	protected bool $has_chained_products   = false;
-	protected bool $has_composite_products = false;
 
-	protected static ?self $_instance      = null;
+	protected static ?self $_instance = null;
 
 	/**
 	 * Singleton instance
@@ -31,54 +25,12 @@ class ThirdPartyPlugins {
 	 * Constructor
 	 */
 	public function __construct() {
-		// WooCommerce Subscriptions compatibility
-		if ( class_exists( 'WC_Subscriptions' ) ) {
-			if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
-				add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
-			} elseif ( version_compare( \WC_Subscriptions::$version, '4.7.0', '<' ) ) {
-				add_filter( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
-				add_filter( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
-			} else {
-				add_filter( 'wc_subscriptions_renewal_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
-				add_filter( 'wc_subscriptions_resubscribe_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
-			}
-		}
-		
-		$this->has_wc_bundles         = class_exists( 'WC_Bundles' );
-		$this->has_wpc_bundles        = class_exists( 'WPCleverWoosb' );
-		$this->has_yith_bundles       = class_exists( 'YITH_WCPB' ) || class_exists( 'YITH_WCPB_Frontend' );
-		$this->has_chained_products   = class_exists( 'SA_WC_Chained_Products' ) || class_exists( 'WC_Chained_Products' );
-		$this->has_composite_products = function_exists( 'wc_cp_is_composited_order_item' ) && function_exists( 'wc_cp_is_composite_container_order_item' );
-
-		if (
-			$this->has_wc_bundles         ||
-			$this->has_wpc_bundles        ||
-			$this->has_yith_bundles       ||
-			$this->has_chained_products   ||
-			$this->has_composite_products
-		) {
-			add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_item_row_classes' ), 10, 4 );
-		}
-
-		// WooCommerce Order Status & Actions Manager emails compatibility
-		if ( class_exists( 'WC_Custom_Status' ) ) {
-			add_filter( 'wpo_wcpdf_wc_emails', array( $this, 'wc_order_status_actions_emails' ), 10, 1 );
-		}
-
-		// Aelia Currency Switcher compatibility
-		$currency_switcher_active = ! empty( $GLOBALS['woocommerce-aelia-currencyswitcher'] );
-		if ( $currency_switcher_active ) {
-			add_action( 'wpo_wcpdf_before_html', array( $this, 'aelia_currency_formatting' ), 10, 2 );
-		}
-
-		// Avoid double images from WooCommerce German Market
-		if ( class_exists( 'WGM_Product' ) ) {
-			add_action( 'wpo_wcpdf_before_html', array( $this, 'remove_wgm_thumbnails' ), 10, 2 );
-			add_action( 'wpo_wcpdf_after_html', array( $this, 'restore_wgm_thumbnails' ), 10, 2 );
-		}
-		
-		// Dokan vendor compatibility
-		add_filter( 'wpo_ips_edi_cii_seller_data', array( $this, 'edi_dokan_vendor_data' ), 10, 2 );
+		$this->register_subscriptions_hooks();
+		$this->register_item_row_class_hooks();
+		$this->register_order_status_hooks();
+		$this->register_aelia_hooks();
+		$this->register_german_market_hooks();
+		$this->register_dokan_hooks();
 	}
 
 	/**
@@ -377,6 +329,107 @@ class ThirdPartyPlugins {
 		}
 
 		return $data;
+	}
+	
+	/**
+	 * Register hooks for WooCommerce Subscriptions compatibility
+	 * 
+	 * @return void
+	 */
+	private function register_subscriptions_hooks(): void {
+		if ( ! class_exists( 'WC_Subscriptions' ) ) {
+			return;
+		}
+
+		if ( version_compare( \WC_Subscriptions::$version, '2.0', '<' ) ) {
+			add_action( 'woocommerce_subscriptions_renewal_order_created', array( $this, 'woocommerce_subscriptions_renewal_order_created' ), 10, 4 );
+		} elseif ( version_compare( \WC_Subscriptions::$version, '4.7.0', '<' ) ) {
+			add_filter( 'wcs_renewal_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+			add_filter( 'wcs_resubscribe_order_meta', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+		} else {
+			add_filter( 'wc_subscriptions_renewal_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+			add_filter( 'wc_subscriptions_resubscribe_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
+		}
+	}
+	
+	/**
+	 * Register hooks to add CSS classes to item rows for compatibility with product bundles, chained products and composite products
+	 * 
+	 * @return void
+	 */
+	private function register_item_row_class_hooks(): void {
+		if (
+			! class_exists( 'WC_Bundles' )             &&
+			! class_exists( 'WPCleverWoosb' )          &&
+			! class_exists( 'YITH_WCPB' )              &&
+			! class_exists( 'YITH_WCPB_Frontend' )     &&
+			! class_exists( 'SA_WC_Chained_Products' ) &&
+			! class_exists( 'WC_Chained_Products' )    &&
+			! ( function_exists( 'wc_cp_is_composited_order_item' ) && function_exists( 'wc_cp_is_composite_container_order_item' ) )
+		) {
+			return;
+		}
+
+		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_item_row_classes' ), 10, 4 );
+	}
+	
+	/**
+	 * Register hooks for WooCommerce Order Status & Actions Manager compatibility
+	 * 
+	 * @return void
+	 */
+	private function register_order_status_hooks(): void {
+		if ( ! class_exists( 'WC_Custom_Status' ) ) {
+			return;
+		}
+
+		add_filter( 'wpo_wcpdf_wc_emails', array( $this, 'wc_order_status_actions_emails' ), 10, 1 );
+	}
+	
+	/**
+	 * Register hooks for Aelia Currency Switcher compatibility
+	 * 
+	 * @return void
+	 */
+	private function register_aelia_hooks(): void {
+		if ( empty( $GLOBALS['woocommerce-aelia-currencyswitcher'] ) ) {
+			return;
+		}
+
+		add_action( 'wpo_wcpdf_before_html', array( $this, 'aelia_currency_formatting' ), 10, 2 );
+	}
+	
+	/**
+	 * Register hooks for German Market compatibility
+	 * 
+	 * @return void
+	 */
+	private function register_german_market_hooks(): void {
+		if ( ! class_exists( 'WGM_Product' ) ) {
+			return;
+		}
+
+		add_action( 'wpo_wcpdf_before_html', array( $this, 'remove_wgm_thumbnails' ), 10, 2 );
+		add_action( 'wpo_wcpdf_after_html', array( $this, 'restore_wgm_thumbnails' ), 10, 2 );
+	}
+	
+	/**
+	 * Register hooks for Dokan compatibility
+	 * 
+	 * @return void
+	 */
+	private function register_dokan_hooks(): void {
+		if (
+			! function_exists( 'dokan_get_seller_id_by_order' ) ||
+			! function_exists( 'dokan_get_store_info' )         ||
+			! function_exists( 'dokan' )                        ||
+			! function_exists( 'wpo_ips_edi_is_available' )     ||
+			! wpo_ips_edi_is_available()
+		) {
+			return;
+		}
+
+		add_filter( 'wpo_ips_edi_cii_seller_data', array( $this, 'edi_dokan_vendor_data' ), 10, 2 );
 	}
 	
 	/**
