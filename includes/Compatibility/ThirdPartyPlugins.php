@@ -66,9 +66,6 @@ class ThirdPartyPlugins {
 			add_action( 'wpo_wcpdf_before_html', array( $this, 'remove_wgm_thumbnails' ), 10, 2 );
 			add_action( 'wpo_wcpdf_after_html', array( $this, 'restore_wgm_thumbnails' ), 10, 2 );
 		}
-
-		add_filter( 'woocommerce_hpos_admin_search_filters', array( $this, 'hpos_admin_search_filters' ) );
-		add_filter( 'woocommerce_shop_order_list_table_prepare_items_query_args', array( $this, 'invoice_number_query_args' ) );
 		
 		// Dokan vendor compatibility
 		add_filter( 'wpo_ips_edi_cii_seller_data', array( $this, 'edi_dokan_vendor_data' ), 10, 2 );
@@ -401,51 +398,6 @@ class ThirdPartyPlugins {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
-	}
-
-	/**
-	 * Adds "Invoice numbers" filter to the search filters available in the admin order search.
-	 *
-	 * @param array $options List of available filters.
-	 *
-	 * @return array
-	 */
-	public function hpos_admin_search_filters( array $options ): array {
-		if ( WPO_WCPDF()->get_instance( 'admin' )->invoice_number_search_enabled() ) {
-			$all = $options['all'];
-			unset( $options['all'] );
-			$options['invoice_numbers'] = __( 'Invoice numbers', 'woocommerce-pdf-invoices-packing-slips' );
-			$options['all'] = $all;
-		}
-
-		return $options;
-	}
-
-	/**
-	 * Modifies the arguments passed to `wc_get_orders()` to support 'invoice_numbers' order search filter.
-	 *
-	 * @param array $order_query_args Arguments to be passed to `wc_get_orders()`.
-	 *
-	 * @return array
-	 */
-	public function invoice_number_query_args( array $order_query_args ): array {
-		if ( isset( $order_query_args['search_filter'] ) && 'invoice_numbers' === $order_query_args['search_filter'] && ! empty( $order_query_args['s'] ) ) {
-			$invoice_numbers = explode( ',', $order_query_args['s'] );
-			$invoice_numbers = array_map( function ( $number ) {
-				return sanitize_text_field( trim( $number ) );
-			}, $invoice_numbers );
-
-			$order_query_args['meta_query']    = $order_query_args['meta_query'] ?? array();
-			$order_query_args['meta_query'][]  = [
-				'key'     => '_wcpdf_invoice_number',
-				'value'   => $invoice_numbers,
-				'compare' => 'IN',
-			];
-			$order_query_args['search_filter'] = 'all';
-			unset( $order_query_args['s'] );
-		}
-
-		return $order_query_args;
 	}
 	
 	/**
