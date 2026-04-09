@@ -13,11 +13,13 @@ if ( ! class_exists( '\\WPO\\IPS\\Admin' ) ) :
 
 class Admin {
 
-	protected ?array $invoice_settings_cache   = null;
-	protected ?array $bulk_actions_cache       = null;
-	protected array $order_list_document_cache = array();
+	protected ?array $invoice_settings_cache           = null;
+	protected ?array $bulk_actions_cache               = null;
+	protected array $order_list_document_cache         = array();
+	protected array $documents_cache                   = array();
+	protected bool $storing_document_settings_disabled = false;
 	
-	protected static $_instance                = null;
+	protected static $_instance                        = null;
 
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
@@ -88,15 +90,15 @@ class Admin {
 
 		$this->disable_storing_document_settings();
 
-		$listing_actions = array();
-		$documents       = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'any' );
+		$listing_actions   = array();
+		$documents         = $this->get_documents_cached( 'enabled', 'any' );
+		$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
 		foreach ( $documents as $document ) {
 			$document_title    = $document->get_title();
 			$document_type     = $document->get_type();
 			$icon              = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
 			$document          = $this->get_cached_order_document( $document_type, $order );
-			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
 			if ( $document ) {
 				foreach ( $document->output_formats as $output_format ) {
@@ -214,7 +216,10 @@ class Admin {
 		
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-		if ( WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() && 'woocommerce_page_wc-orders' !== $screen->id ) {
+		if (
+			WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() &&
+			( ! $screen || 'woocommerce_page_wc-orders' !== $screen->id )
+		) {
 			return $columns;
 		}
 
@@ -260,8 +265,6 @@ class Admin {
 		if ( ! is_object( $order ) && is_numeric( $order ) ) {
 			$order = wc_get_order( absint( $order ) );
 		}
-
-		$this->disable_storing_document_settings();
 
 		switch ( $column ) {
 			case 'invoice_number_column':
@@ -408,10 +411,8 @@ class Admin {
 			'side',
 			'high'
 		);
-		
-		$documents_instance = \WPO_WCPDF()->get_instance( 'documents' );
 
-		if ( ! empty( $documents_instance->get_documents( 'enabled', 'pdf' ) ) ) {
+		if ( ! empty( $this->get_documents_cached( 'enabled', 'pdf' ) ) ) {
 			// create PDF buttons
 			add_meta_box(
 				'wpo_wcpdf-box',
@@ -434,7 +435,7 @@ class Admin {
 		}
 
 		// create EDI buttons
-		if ( wpo_ips_edi_is_available() && ! empty( $documents_instance->get_documents( 'enabled', 'xml' ) ) ) {
+		if ( wpo_ips_edi_is_available() && ! empty( $this->get_documents_cached( 'enabled', 'xml' ) ) ) {
 			add_meta_box(
 				'wpo_ips-edi-box',
 				__( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -494,7 +495,7 @@ class Admin {
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents        = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
+		$documents        = $this->get_documents_cached( 'enabled', 'pdf' );
 
 		foreach ( $documents as $document ) {
 			$document_title    = $document->get_title();
@@ -600,7 +601,7 @@ class Admin {
 		$this->disable_storing_document_settings();
 
 		$meta_box_actions = array();
-		$documents        = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'xml' );
+		$documents        = $this->get_documents_cached( 'enabled', 'xml' );
 
 		foreach ( $documents as $document ) {
 			$document_type = $document->get_type();
@@ -1426,12 +1427,22 @@ class Admin {
 	 * but we don't want to store the settings for uninitialized documents.
 	 * Only use in frontend/backed (page requests), otherwise settings will never be stored!
 	 */
-	public function disable_storing_document_settings() {
+	public function disable_storing_document_settings(): void {
+		if ( $this->storing_document_settings_disabled ) {
+			return;
+		}
+
 		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+		$this->storing_document_settings_disabled = true;
 	}
 
-	public function restore_storing_document_settings() {
+	public function restore_storing_document_settings(): void {
+		if ( ! $this->storing_document_settings_disabled ) {
+			return;
+		}
+
 		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+		$this->storing_document_settings_disabled = false;
 	}
 
 	public function return_false() {
@@ -2136,7 +2147,7 @@ class Admin {
 	 * @return bool
 	 */
 	private function is_invoice_number_numeric() {
-		$invoice_settings = WPO_WCPDF()->get_instance( 'settings' )->get_document_settings( 'invoice' );
+		$invoice_settings = $this->get_invoice_settings();
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
 							( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
@@ -2180,7 +2191,7 @@ class Admin {
 	/**
 	 * Get invoice settings with caching to avoid multiple calls to get_option() during the same request.
 	 * 
-	 * @abstract
+	 * @return array
 	 */
 	private function get_invoice_settings(): array {
 		if ( null === $this->invoice_settings_cache ) {
@@ -2207,6 +2218,24 @@ class Admin {
 		}
 
 		return $this->order_list_document_cache[ $order_id ][ $document_type ];
+	}
+	
+	/**
+	 * Caches document objects per request to avoid repeated `get_documents()` calls.
+	 *
+	 * @param string|null $filter
+	 * @param string|null $output_format
+	 * @return array
+	 */
+	private function get_documents_cached( string $filter = 'enabled', string $output_format = 'pdf' ): array {
+		$cache_key = "{$filter}|{$output_format}";
+
+		if ( ! isset( $this->documents_cache[ $cache_key ] ) ) {
+			$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( $filter, $output_format );
+			$this->documents_cache[ $cache_key ] = is_array( $documents ) ? $documents : array();
+		}
+
+		return $this->documents_cache[ $cache_key ];
 	}
 
 }
