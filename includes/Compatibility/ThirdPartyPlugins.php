@@ -530,10 +530,6 @@ class ThirdPartyPlugins {
 		if ( empty( $item_id ) ) {
 			return $classes;
 		}
-		
-		if ( ! function_exists( 'wc_cp_is_composited_order_item' ) || ! function_exists( 'wc_cp_is_composite_container_order_item' ) ) {
-			return $classes;
-		}
 
 		// get order item object
 		$order_items = $order->get_items();
