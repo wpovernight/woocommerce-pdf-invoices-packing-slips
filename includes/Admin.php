@@ -13,7 +13,11 @@ if ( ! class_exists( '\\WPO\\IPS\\Admin' ) ) :
 
 class Admin {
 
-	protected static $_instance = null;
+	protected ?array $invoice_settings_cache   = null;
+	protected ?array $bulk_actions_cache       = null;
+	protected array $order_list_document_cache = array();
+	
+	protected static $_instance                = null;
 
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
@@ -91,7 +95,7 @@ class Admin {
 			$document_title    = $document->get_title();
 			$document_type     = $document->get_type();
 			$icon              = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
-			$document          = wcpdf_get_document( $document_type, $order ); // reload document with order
+			$document          = $this->get_cached_order_document( $document_type, $order );
 			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
 			if ( $document ) {
@@ -214,9 +218,8 @@ class Admin {
 			return $columns;
 		}
 
-		// get invoice settings
-		$invoice          = wcpdf_get_document( 'invoice', null );
-		$invoice_settings = $invoice->get_settings();
+		// get invoice settings without instantiate the document object
+		$invoice_settings = $this->get_invoice_settings();
 		$invoice_columns  = array(
 			'invoice_number_column' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
 			'invoice_date_column'   => __( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -260,17 +263,40 @@ class Admin {
 
 		$this->disable_storing_document_settings();
 
-		$invoice = wcpdf_get_document( 'invoice', $order );
-
 		switch ( $column ) {
 			case 'invoice_number_column':
-				$invoice_number = ! empty( $invoice ) && ! empty( $invoice->get_number() ) ? $invoice->get_number() : '';
+				$invoice_number = $order->get_meta( '_wcpdf_invoice_number', true );
 				echo esc_html( $invoice_number );
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
 			case 'invoice_date_column':
-				$invoice_date = ! empty( $invoice ) && ! empty( $invoice->get_date() ) ? $invoice->get_date()->date_i18n( wcpdf_date_format( $invoice, 'invoice_date_column' ) ) : '';
-				echo esc_html( $invoice_date );
+				$invoice_timestamp = (int) $order->get_meta( '_wcpdf_invoice_date', true );
+
+				if ( ! $invoice_timestamp ) {
+					echo '&ndash;';
+					do_action( 'wcpdf_invoice_date_column_end', $order );
+					break;
+				}
+
+				$invoice_date = new \WC_DateTime( "@{$invoice_timestamp}", new \DateTimeZone( 'UTC' ) );
+
+				if ( get_option( 'timezone_string' ) ) {
+					$invoice_date->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
+				} else {
+					$invoice_date->set_utc_offset( wc_timezone_offset() );
+				}
+
+				$show_date = $invoice_date->date_i18n(
+					apply_filters( 'woocommerce_admin_order_date_format', __( 'M j, Y', 'woocommerce' ) )
+				);
+
+				printf(
+					'<time datetime="%1$s" title="%2$s">%3$s</time>',
+					esc_attr( $invoice_date->date( 'c' ) ),
+					esc_attr( $invoice_date->date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) ) ),
+					esc_html( $show_date )
+				);
+
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
 			default:
@@ -283,7 +309,7 @@ class Admin {
 	 */
 	public function invoice_columns_enabled() {
 		$is_enabled       = false;
-		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+		$invoice_settings = $this->get_invoice_settings();
 		$invoice_columns  = [
 			'invoice_number_column',
 			'invoice_date_column',
@@ -304,7 +330,7 @@ class Admin {
 	 */
 	public function invoice_number_search_enabled() {
 		$is_enabled       = false;
-		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+		$invoice_settings = $this->get_invoice_settings();
 
 		if ( isset( $invoice_settings['invoice_number_search'] ) ) {
 			$is_enabled = true;
@@ -1315,9 +1341,14 @@ class Admin {
 	 * Add actions to menu, WP3.5+
 	 */
 	public function bulk_actions( $actions ) {
-		foreach ( wcpdf_get_bulk_actions() as $action => $title ) {
-			$actions[$action] = $title;
+		if ( null === $this->bulk_actions_cache ) {
+			$this->bulk_actions_cache = wcpdf_get_bulk_actions();
 		}
+
+		foreach ( $this->bulk_actions_cache as $action => $title ) {
+			$actions[ $action ] = $title;
+		}
+
 		return $actions;
 	}
 
@@ -2144,6 +2175,38 @@ class Admin {
 			</p>
 		</div>
 		<?php
+	}
+	
+	/**
+	 * Get invoice settings with caching to avoid multiple calls to get_option() during the same request.
+	 * 
+	 * @abstract
+	 */
+	private function get_invoice_settings(): array {
+		if ( null === $this->invoice_settings_cache ) {
+			$settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+			$this->invoice_settings_cache = is_array( $settings ) ? $settings : array();
+		}
+
+		return $this->invoice_settings_cache;
+	}
+	
+	/**
+	 * Get cached document for the order list to avoid multiple instances of the same document during the same request.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order $order
+	 * @return OrderDocument|null
+	 */
+	private function get_cached_order_document( string $document_type, \WC_Abstract_Order $order ) {
+		$order_id = $order->get_id();
+
+		if ( ! isset( $this->order_list_document_cache[ $order_id ][ $document_type ] ) ) {
+			$this->disable_storing_document_settings();
+			$this->order_list_document_cache[ $order_id ][ $document_type ] = wcpdf_get_document( $document_type, $order );
+		}
+
+		return $this->order_list_document_cache[ $order_id ][ $document_type ];
 	}
 
 }
