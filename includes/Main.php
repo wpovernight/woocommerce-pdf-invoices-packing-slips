@@ -12,14 +12,12 @@ if ( ! class_exists( '\\WPO\\IPS\\Main' ) ) :
 
 class Main {
 
-	/**
-	 * Temp subfolders
-	 *
-	 * @var array
-	 */
-	private $subfolders = array( 'attachments', 'fonts', 'dompdf' );
+	protected ?string $wp_upload_base_cache = null;
+	protected array $tmp_base_cache         = array();
+	protected array $tmp_path_cache         = array();
+	protected array $subfolders             = array( 'attachments', 'fonts', 'dompdf', 'xml' );
 
-	protected static $_instance = null;
+	protected static $_instance             = null;
 
 	public static function instance() {
 		if ( is_null( self::$_instance ) ) {
@@ -615,26 +613,30 @@ class Main {
 			}
 		}
 	}
-
+	
 	/**
-	 * Return tmp path for different plugin processes
+	 * Return tmp path for different plugin processes.
+	 *
+	 * @param string $type
+	 * @return string|false
 	 */
-	public function get_tmp_path( $type = '' ) {
-		$tmp_base             = $this->get_tmp_base();
-		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+	public function get_tmp_path( string $type = '' ) {
+		$cache_key = (string) $type;
 
-		// don't continue if we don't have an upload dir
-		if ( $tmp_base === false ) {
+		if ( array_key_exists( $cache_key, $this->tmp_path_cache ) ) {
+			return $this->tmp_path_cache[ $cache_key ];
+		}
+
+		$tmp_base = $this->get_tmp_base();
+
+		if ( false === $tmp_base ) {
+			$this->tmp_path_cache[ $cache_key ] = false;
 			return false;
 		}
 
-		// check if tmp folder exists => if not, initialize
-		if ( ! $file_system_instance->is_dir( $tmp_base ) || ! $file_system_instance->is_writable( $tmp_base ) ) {
-			$this->init_tmp();
-		}
-
 		if ( empty( $type ) ) {
-			return $tmp_base;
+			$this->tmp_path_cache[ $cache_key ] = $tmp_base;
+			return $this->tmp_path_cache[ $cache_key ];
 		}
 
 		switch ( $type ) {
@@ -656,41 +658,42 @@ class Main {
 				break;
 		}
 
-		// double check for existence, in case tmp_base was installed, but subfolder not created
-		if ( ! $file_system_instance->is_dir( $tmp_path ) ) {
-			$dir = $file_system_instance->mkdir( $tmp_path );
+		$tmp_path = apply_filters( "wpo_wcpdf_tmp_path_{$type}", $tmp_path );
 
-			if ( ! $dir ) {
-				update_option( 'wpo_wcpdf_no_dir_error', $tmp_path );
-				wcpdf_log_error( "Unable to create folder {$tmp_path}", 'critical' );
-				return false;
-			}
-		} elseif( ! $file_system_instance->is_writable( $tmp_path ) ) {
-			update_option( 'wpo_wcpdf_no_dir_error', $tmp_path );
-			wcpdf_log_error( "Temp folder {$tmp_path} not writable", 'critical' );
-			return false;
-		}
+		$this->tmp_path_cache[ $cache_key ] = $tmp_path;
 
-		return apply_filters( "wpo_wcpdf_tmp_path_{$type}", $tmp_path );
+		return $this->tmp_path_cache[ $cache_key ];
 	}
-
+	
 	/**
-	 * return the base tmp folder (usually uploads)
+	 * Return the base tmp folder path.
+	 *
+	 * @param bool $append_random_string Whether to append the random string to the temp folder name.
+	 * @return string|false
 	 */
-	public function get_tmp_base ( $append_random_string = true ) {
+	public function get_tmp_base( bool $append_random_string = true ) {
 		// wp_upload_dir() is used to set the base temp folder, under which a
 		// 'wpo_wcpdf' folder and several subfolders are created
 		//
 		// wp_upload_dir() will:
 		// * default to WP_CONTENT_DIR/uploads
-		// * UNLESS the ‘UPLOADS’ constant is defined in wp-config (http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder)
+		// * UNLESS the 'UPLOADS' constant is defined in wp-config (http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder)
 		//
 		// May also be overridden by the wpo_wcpdf_tmp_path filter
+		
+		$cache_key = $append_random_string ? 'with_random' : 'without_random';
+
+		if ( array_key_exists( $cache_key, $this->tmp_base_cache ) ) {
+			return $this->tmp_base_cache[ $cache_key ];
+		}
 
 		$wp_upload_base = $this->get_wp_upload_base();
-		if( $wp_upload_base ) {
-			if( $append_random_string && $code = $this->get_random_string() ) {
-				$tmp_base = $wp_upload_base . 'wpo_wcpdf_'.$code.'/';
+
+		if ( $wp_upload_base ) {
+			$code = $this->get_random_string();
+			
+			if ( $append_random_string && $code ) {
+				$tmp_base = $wp_upload_base . 'wpo_wcpdf_' . $code . '/';
 			} else {
 				$tmp_base = $wp_upload_base . 'wpo_wcpdf/';
 			}
@@ -699,25 +702,36 @@ class Main {
 		}
 
 		$tmp_base = apply_filters( 'wpo_wcpdf_tmp_path', $tmp_base );
-		if ($tmp_base !== false) {
+
+		if ( false !== $tmp_base ) {
 			$tmp_base = trailingslashit( $tmp_base );
 		}
 
-		return $tmp_base;
+		$this->tmp_base_cache[ $cache_key ] = $tmp_base;
+
+		return $this->tmp_base_cache[ $cache_key ];
 	}
 
 	/**
-	 * Get WordPress uploads folder base
+	 * Get WordPress uploads folder base.
+	 *
+	 * @return string|false
 	 */
-	public function get_wp_upload_base () {
-		$upload_dir = wp_upload_dir();
-		if ( ! empty($upload_dir['error']) ) {
-			$wp_upload_base = false;
-		} else {
-			$upload_base = trailingslashit( $upload_dir['basedir'] );
-			$wp_upload_base = $upload_base;
+	public function get_wp_upload_base() {
+		if ( null !== $this->wp_upload_base_cache ) {
+			return '' === $this->wp_upload_base_cache ? false : $this->wp_upload_base_cache;
 		}
-		return $wp_upload_base;
+
+		$upload_dir = wp_upload_dir();
+
+		if ( ! empty( $upload_dir['error'] ) || empty( $upload_dir['basedir'] ) ) {
+			$this->wp_upload_base_cache = '';
+			return false;
+		}
+
+		$this->wp_upload_base_cache = trailingslashit( $upload_dir['basedir'] );
+
+		return $this->wp_upload_base_cache;
 	}
 
 	/**
@@ -811,16 +825,18 @@ class Main {
 
 	/**
 	 * Generate random string
+	 * 
+	 * @return void
 	 */
-	public function generate_random_string() {
+	public function generate_random_string(): void {
 		if ( function_exists( 'random_bytes' ) ) {
 			$code = bin2hex( random_bytes( 16 ) );
 		} else {
 			$code = md5( uniqid( wp_rand(), true ) );
 		}
-		
-		// create option
+
 		update_option( 'wpo_wcpdf_random_string', $code );
+		$this->clear_tmp_path_caches();
 	}
 	
 	/**
@@ -862,101 +878,103 @@ class Main {
 
 	/**
 	 * Install/create plugin tmp folders
+	 * 
+	 * @return bool
 	 */
-	public function init_tmp() {
-		// generate random string if don't exist
-		if( ! $this->get_random_string() ) {
+	public function init_tmp(): bool {
+		if ( ! $this->get_random_string() ) {
 			$this->generate_random_string();
 		}
 
-		$tmp_base             = $this->get_tmp_base(); // get tmp base
+		$tmp_base             = $this->get_tmp_base();
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-		// create plugin base temp folder
-		if ( ! $file_system_instance->is_dir( $tmp_base ) ) {
-			$dir = $file_system_instance->mkdir( $tmp_base );
-
-			// don't continue if we don't have an upload dir
-			if ( ! $dir ) {
-				update_option( 'wpo_wcpdf_no_dir_error', $tmp_base );
-				wcpdf_log_error( "Unable to create temp folder {$tmp_base}", 'critical' );
-				return false;
-			}
-		} elseif( ! $file_system_instance->is_writable( $tmp_base ) ) {
-			update_option( 'wpo_wcpdf_no_dir_error', $tmp_base );
-			wcpdf_log_error( "Temp folder {$tmp_base} not writable", 'critical' );
+		if ( false === $tmp_base ) {
 			return false;
 		}
 
-		// create subfolders & protect
-		foreach ( $this->subfolders as $subfolder ) {
-			$path = $tmp_base . $subfolder . '/';
-			if ( ! $file_system_instance->is_dir( $path ) ) {
-				$dir = $file_system_instance->mkdir( $path );
+		if ( ! $this->ensure_tmp_path_exists( $tmp_base ) ) {
+			return false;
+		}
 
-				// check if we have dir
-				if ( ! $dir ) {
-					update_option( 'wpo_wcpdf_no_dir_error', $path );
-					wcpdf_log_error( "Unable to create folder {$path}", 'critical' );
-					return false;
-				}
-			} elseif( ! $file_system_instance->is_writable( $path ) ) {
-				update_option( 'wpo_wcpdf_no_dir_error', $path );
-				wcpdf_log_error( "Temp folder {$path} not writable", 'critical' );
+		foreach ( $this->subfolders as $subfolder ) {
+			$tmp_path = $this->get_tmp_path( $subfolder );
+
+			if ( false === $tmp_path ) {
 				return false;
 			}
 
-			// copy font files
+			$path = trailingslashit( $tmp_path );
+
+			if ( ! $this->ensure_tmp_path_exists( $path ) ) {
+				return false;
+			}
+
 			if ( 'fonts' === $subfolder ) {
 				$this->copy_fonts( $path, false );
 			}
 
-			// create .htaccess file and empty index.php to protect in case an open webfolder is used!
 			$file_system_instance->put_contents( $path . '.htaccess', 'deny from all', FS_CHMOD_FILE );
 			$file_system_instance->put_contents( $path . 'index.php', '', FS_CHMOD_FILE );
 		}
+
+		$this->clear_tmp_dir_error();
+
+		return true;
 	}
 
 	/**
-	 * Copy contents from one directory to another
+	 * Copy contents from one directory to another.
+	 *
+	 * @param string $old_path
+	 * @param string $new_path
+	 * @return bool
 	 */
-	public function copy_directory( $old_path, $new_path ) {
+	public function copy_directory( string $old_path, string $new_path ): bool {
 		if ( empty( $old_path ) || empty( $new_path ) ) {
-			return;
-		}
-		
-		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
-
-		if ( ! $file_system_instance->is_dir( $old_path ) ) {
-			return;
-		}
-
-		if ( ! $file_system_instance->is_dir( $new_path ) ) {
-			$dir = $file_system_instance->mkdir( $new_path );
-
-			// check if we have dir
-			if ( ! $dir ) {
-				update_option( 'wpo_wcpdf_no_dir_error', $new_path );
-				wcpdf_log_error( "Unable to create folder {$new_path}", 'critical' );
-				return false;
-			}
-		} elseif ( ! $file_system_instance->is_writable( $new_path ) ) {
-			update_option( 'wpo_wcpdf_no_dir_error', $new_path );
-			wcpdf_log_error( "Temp folder {$new_path} not writable", 'critical' );
 			return false;
 		}
 
-		// we have the directories, let's try to copy
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+
+		if ( ! $file_system_instance->is_dir( $old_path ) ) {
+			return false;
+		}
+
+		if ( ! $this->ensure_tmp_path_exists( $new_path ) ) {
+			return false;
+		}
+
 		try {
 			$result = copy_dir( $old_path, $new_path );
-			// delete old directory with contents
+
+			if ( is_wp_error( $result ) ) {
+				$this->record_tmp_dir_error(
+					$new_path,
+					sprintf(
+						'Unable to copy directory contents from %1$s to %2$s: %3$s',
+						$old_path,
+						$new_path,
+						$result->get_error_message()
+					)
+				);
+				return false;
+			}
+
 			if ( $result ) {
 				$file_system_instance->delete( $old_path, true );
+				$this->clear_tmp_dir_error();
+				return true;
 			}
 		} catch ( \Error $e ) {
-			wcpdf_log_error( "Unable to copy directory contents: ".$e->getMessage(), 'critical', $e );
-			return;
+			$this->record_tmp_dir_error(
+				$new_path,
+				"Unable to copy directory contents: {$e->getMessage()}"
+			);
+			return false;
 		}
+
+		return false;
 	}
 
 	/**
@@ -965,21 +983,21 @@ class Main {
 	 * @return bool
 	 */
 	public function tmp_folders_exist_and_writable(): bool {
-		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
-
-		// tmp base
 		$tmp_base = $this->get_tmp_base();
-		if ( ! $file_system_instance->is_dir( $tmp_base ) || ! $file_system_instance->is_writable( $tmp_base ) ) {
+
+		if ( false === $tmp_base || ! $this->ensure_tmp_path_exists( $tmp_base ) ) {
 			return false;
 		}
 
-		// subfolders
 		foreach ( $this->subfolders as $type ) {
 			$tmp_path = $this->get_tmp_path( $type );
-			if ( ! $file_system_instance->is_dir( $tmp_path ) || ! $file_system_instance->is_writable( $tmp_path ) ) {
+
+			if ( false === $tmp_path || ! $this->ensure_tmp_path_exists( trailingslashit( $tmp_path ) ) ) {
 				return false;
 			}
 		}
+		
+		$this->clear_tmp_dir_error();
 
 		return true;
 	}
@@ -2065,6 +2083,67 @@ class Main {
 		}
 
 		return $css;
+	}
+	
+	/**
+	 * Ensure a temporary path exists and is writable.
+	 *
+	 * @param string $path
+	 * @return bool
+	 */
+	private function ensure_tmp_path_exists( string $path ): bool {
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+
+		if ( empty( $path ) ) {
+			return false;
+		}
+
+		if ( ! $file_system_instance->is_dir( $path ) ) {
+			$dir = $file_system_instance->mkdir( $path );
+
+			if ( ! $dir ) {
+				$this->record_tmp_dir_error( $path, "Unable to create folder {$path}" );
+				return false;
+			}
+		}
+
+		if ( ! $file_system_instance->is_writable( $path ) ) {
+			$this->record_tmp_dir_error( $path, "Temp folder {$path} not writable" );
+			return false;
+		}
+
+		return true;
+	}
+	
+	/**
+	 * Record an error related to the temporary directory and log it.
+	 * 
+	 * @param string $path The path to the temporary directory that caused the error.
+	 * @param string $message The error message to log.
+	 * @return void
+	 */
+	private function record_tmp_dir_error( string $path, string $message ): void {
+		update_option( 'wpo_wcpdf_no_dir_error', $path );
+		wcpdf_log_error( $message, 'critical' );
+	}
+
+	/**
+	 * Clear the temporary directory error.
+	 *
+	 * @return void
+	 */
+	private function clear_tmp_dir_error(): void {
+		delete_option( 'wpo_wcpdf_no_dir_error' );
+	}
+	
+	/**
+	 * Clear cached temporary paths.
+	 *
+	 * @return void
+	 */
+	private function clear_tmp_path_caches(): void {
+		$this->tmp_base_cache = array();
+		$this->tmp_path_cache = array();
 	}
 
 }
