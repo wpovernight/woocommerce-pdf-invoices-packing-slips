@@ -5,22 +5,31 @@ defined( 'ABSPATH' ) or exit;
 
 if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\ThirdPartyPlugins' ) ) :
 
-/**
- * Third party plugin compatibility class.
- *
- * @since 2.0
- */
 class ThirdPartyPlugins {
+	
+	protected bool $has_wc_bundles         = false;
+	protected bool $has_wpc_bundles        = false;
+	protected bool $has_yith_bundles       = false;
+	protected bool $has_chained_products   = false;
+	protected bool $has_composite_products = false;
 
-	protected static $_instance = null;
+	protected static ?self $_instance      = null;
 
-	public static function instance() {
+	/**
+	 * Singleton instance
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
 		// WooCommerce Subscriptions compatibility
 		if ( class_exists( 'WC_Subscriptions' ) ) {
@@ -34,21 +43,22 @@ class ThirdPartyPlugins {
 				add_filter( 'wc_subscriptions_resubscribe_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 			}
 		}
+		
+		$this->has_wc_bundles         = class_exists( 'WC_Bundles' );
+		$this->has_wpc_bundles        = class_exists( 'WPCleverWoosb' );
+		$this->has_yith_bundles       = class_exists( 'YITH_WCPB' ) || class_exists( 'YITH_WCPB_Frontend' );
+		$this->has_chained_products   = class_exists( 'SA_WC_Chained_Products' ) || class_exists( 'WC_Chained_Products' );
+		$this->has_composite_products = function_exists( 'wc_cp_is_composited_order_item' ) && function_exists( 'wc_cp_is_composite_container_order_item' );
 
-		// WooCommerce Product Bundles compatibility (add row classes)
-		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_product_bundles_classes' ), 10, 4 );
-
-		// WPC Bundles compatibility (add row classes)
-		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_wpc_product_bundles_classes' ), 10, 4 );
-
-		// YITH WooCommerce Product Bundles compatibility (add row classes)
-		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_yith_product_bundles_classes' ), 10, 4 );
-
-		// WooCommerce Chained Products compatibility (add row classes)
-		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_chained_product_class' ), 10, 4 );
-
-		// WooCommerce Composite Products compatibility (add row classes)
-		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_composite_product_class' ), 10, 4 );
+		if (
+			$this->has_wc_bundles         ||
+			$this->has_wpc_bundles        ||
+			$this->has_yith_bundles       ||
+			$this->has_chained_products   ||
+			$this->has_composite_products
+		) {
+			add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_item_row_classes' ), 10, 4 );
+		}
 
 		// WooCommerce Order Status & Actions Manager emails compatibility
 		if ( class_exists( 'WC_Custom_Status' ) ) {
@@ -157,34 +167,77 @@ class ThirdPartyPlugins {
 
 		return $meta;
 	}
-
+	
 	/**
-	 * WooCommerce Product Bundles
-	 * @param string $classes       CSS classes for item row (tr)
-	 * @param string $document_type PDF Document type
-	 * @param object $order         WC_Order order
-	 * @param int    $item_id       WooCommerce Item ID
+	 * Add CSS classes to item rows for compatibility with product bundles, chained products and composite products
+	 * 
+	 * @param string             $classes
+	 * @param string             $document_type
+	 * @param \WC_Abstract_Order $order
+	 * @param int                $item_id
+	 * @return string
 	 */
-	public function add_product_bundles_classes ( $classes, $document_type, $order, $item_id = 0 ) {
-		if ( !class_exists('WC_Bundles') ) {
-			return $classes;
+	public function add_item_row_classes( string $classes, string $document_type, \WC_Abstract_Order $order, int $item_id = 0 ): string {
+		if ( empty( $item_id ) ) {
+			$item_id = $this->get_item_id_from_classes( $classes );
 		}
 
-		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty( $item_id ) ) {
 			return $classes;
 		}
 
-		if ( $bundled_by = wc_get_order_item_meta( $item_id, '_bundled_by', true ) ) {
+		if ( $this->has_wc_bundles ) {
+			$classes = $this->maybe_add_wc_bundles_classes( $classes, $order, $item_id );
+		}
+
+		if ( $this->has_wpc_bundles ) {
+			$classes = $this->maybe_add_wpc_bundles_classes( $classes, $order, $item_id );
+		}
+
+		if ( $this->has_yith_bundles ) {
+			$classes = $this->maybe_add_yith_bundles_classes( $classes, $order, $item_id );
+		}
+
+		if ( $this->has_chained_products ) {
+			$classes = $this->maybe_add_chained_product_class( $classes, $order, $item_id );
+		}
+
+		if ( $this->has_composite_products ) {
+			$classes = $this->maybe_add_composite_product_class( $classes, $order, $item_id );
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * WooCommerce Product Bundles
+	 * 
+	 * @param string             $classes
+	 * @param \WC_Abstract_Order $order
+	 * @param int                $item_id
+	 * @return string
+	 */
+	private function maybe_add_wc_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
+		if ( empty( $item_id ) ) {
+			return $classes;
+		}
+		
+		$bundled_by    = wc_get_order_item_meta( $item_id, '_bundled_by', true );
+		$bundled_items = wc_get_order_item_meta( $item_id, '_bundled_items', true );
+
+		if ( $bundled_by ) {
 			$classes = $classes . ' bundled-item';
+			$hidden  = wc_get_order_item_meta( $item_id, '_bundled_item_hidden', true );
 
 			// check bundled item visibility
-			if ( $hidden = wc_get_order_item_meta( $item_id, '_bundled_item_hidden', true ) ) {
+			if ( $hidden ) {
 				$classes = $classes . ' hidden';
 			}
 
 			return $classes;
-		} elseif ( $bundled_items = wc_get_order_item_meta( $item_id, '_bundled_items', true ) ) {
+			
+		} elseif ( $bundled_items ) {
 			return  $classes . ' product-bundle';
 		}
 
@@ -193,16 +246,13 @@ class ThirdPartyPlugins {
 
 	/**
 	 * WPC Product Bundles
-	 * @param string $classes       CSS classes for item row (tr)
-	 * @param string $document_type PDF Document type
-	 * @param object $order         WC_Order order
-	 * @param int    $item_id       WooCommerce Item ID
+	 * 
+	 * @param string             $classes
+	 * @param \WC_Abstract_Order $order
+	 * @param int                $item_id
+	 * @return string
 	 */
-	public function add_wpc_product_bundles_classes ( $classes, $document_type, $order, $item_id = 0 ) {
-		if ( ! class_exists( 'WPCleverWoosb' ) ) {
-			return $classes;
-		}
-
+	private function maybe_add_wpc_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
 		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
 		if ( empty( $item_id ) ) {
 			return $classes;
@@ -210,11 +260,13 @@ class ThirdPartyPlugins {
 
 		// Add row classes
 		$refunded_item_id = wc_get_order_item_meta( $item_id, '_refunded_item_id', true );
-		$class_item_id = ! empty( $refunded_item_id ) ? $refunded_item_id : $item_id;
+		$class_item_id    = ! empty( $refunded_item_id ) ? $refunded_item_id : $item_id;
+		$bundled_by       = wc_get_order_item_meta( $class_item_id, '_woosb_parent_id', true );
+		$bundled_items    = wc_get_order_item_meta( $class_item_id, '_woosb_ids', true );
 
-		if ( $bundled_by = wc_get_order_item_meta( $class_item_id, '_woosb_parent_id', true ) ) {
+		if ( $bundled_by ) {
 			$classes = $classes . ' bundled-item';
-		} elseif ( $bundled_items = wc_get_order_item_meta( $class_item_id, '_woosb_ids', true ) ) {
+		} elseif ( $bundled_items ) {
 			$classes = $classes . ' product-bundle';
 		}
 
@@ -224,14 +276,12 @@ class ThirdPartyPlugins {
 	/**
 	 * YITH WooCommerce Product Bundles compatibility
 	 *
-	 * @param string $classes CSS classes for item row (tr)
-	 * @param ?string $document_type PDF Document type
-	 * @param ?object $order order
-	 * @param int|string $item_id WooCommerce Item ID
-	 *
+	 * @param string             $classes
+	 * @param \WC_Abstract_Order $order
+	 * @param int                $item_id
 	 * @return string
 	 */
-	public function add_yith_product_bundles_classes( string $classes, ?string $document_type, ?object $order, $item_id = 0 ): string {
+	private function maybe_add_yith_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
 		if ( empty( $order ) ) {
 			return $classes;
 		}
@@ -276,22 +326,21 @@ class ThirdPartyPlugins {
 
 	/**
 	 * WooCommerce Chained Products
-	 * @param string $classes       CSS classes for item row (tr)
-	 * @param string $document_type PDF Document type
-	 * @param object $order         WC_Order order
-	 * @param int    $item_id       WooCommerce Item ID
+	 * 
+	 * @param string             $classes
+	 * @param \WC_Abstract_Order $order
+	 * @param int                $item_id
+	 * @return string
 	 */
-	public function add_chained_product_class ( $classes, $document_type, $order, $item_id = 0 ) {
-		if ( !class_exists('SA_WC_Chained_Products') && !class_exists('WC_Chained_Products') ) {
+	private function maybe_add_chained_product_class( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
+		if ( empty( $item_id ) ) {
 			return $classes;
 		}
+		
+		$chained_product_of = wc_get_order_item_meta( $item_id, '_chained_product_of', true );
 
-		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
-		if ( empty($item_id) ) {
-			return $classes;
-		}
-
-		if ( $chained_product_of = wc_get_order_item_meta( $item_id, '_chained_product_of', true ) ) {
+		if ( $chained_product_of ) {
 			return  $classes . ' chained-product';
 		}
 
@@ -300,25 +349,26 @@ class ThirdPartyPlugins {
 
 	/**
 	 * WooCommerce Composite Products
-	 * @param string $classes       CSS classes for item row (tr)
-	 * @param string $document_type PDF Document type
-	 * @param object $order         WC_Order order
-	 * @param int    $item_id       WooCommerce Item ID
+	 * 
+	 * @param string             $classes
+	 * @param \WC_Abstract_Order $order
+	 * @param int                $item_id
+	 * @return string
 	 */
-	public function add_composite_product_class ( $classes, $document_type, $order, $item_id = 0 ) {
-		if ( !function_exists('wc_cp_is_composited_order_item') || !function_exists('wc_cp_is_composite_container_order_item') ) {
+	private function maybe_add_composite_product_class( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
+		if ( empty( $item_id ) ) {
 			return $classes;
 		}
-
-		$item_id = !empty($item_id) ? $item_id : $this->get_item_id_from_classes( $classes );
-		if ( empty($item_id) ) {
+		
+		if ( ! function_exists( 'wc_cp_is_composited_order_item' ) || ! function_exists( 'wc_cp_is_composite_container_order_item' ) ) {
 			return $classes;
 		}
 
 		// get order item object
 		$order_items = $order->get_items();
-		foreach ($order_items as $order_item_id => $order_item) {
-			if ($order_item_id == $item_id) {
+		foreach ( $order_items as $order_item_id => $order_item ) {
+			if ( absint( $order_item_id ) === $item_id ) {
 				if ( wc_cp_is_composited_order_item( $order_item, $order ) ) {
 					$classes .= ' component_table_item';
 				} elseif ( wc_cp_is_composite_container_order_item( $order_item ) ) {
