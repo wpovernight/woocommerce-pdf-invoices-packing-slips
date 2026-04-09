@@ -210,6 +210,176 @@ class ThirdPartyPlugins {
 	}
 
 	/**
+	 * Backwards compatibility helper function: try to get item ID from row class
+	 * @param string $classes       CSS classes for item row (tr)
+	 */
+	public function get_item_id_from_classes ( $classes ) {
+		$class_array = explode(' ', $classes);
+		foreach ($class_array as $class) {
+			if (is_numeric($class)) {
+				$item_id = $class;
+				break;
+			}
+		}
+
+		// if still empty, we lost the item id somewhere :(
+		if (empty($item_id)) {
+			return false;
+		} else {
+			return $item_id;
+		}
+	}
+
+	/**
+	 * WooCommerce Order Status & Actions Manager emails compatibility
+	 */
+	public function wc_order_status_actions_emails ( $emails ) {
+		// get list of custom statuses from WooCommerce Custom Order Status & Actions
+		// status slug => status name
+		$custom_statuses = \WC_Custom_Status::get_status_list_names();
+		// append _email to slug (=email_id) and add to emails list
+		foreach ($custom_statuses as $status_slug => $status_name) {
+			$emails[$status_slug.'_email'] = $status_name;
+		}
+		return $emails;
+	}
+
+
+	/**
+	 * Aelia Currency Switcher compatibility
+	 * Applies decimal & Thousand separator settings
+	 */
+	public function aelia_currency_formatting( $document_type, $document ) {
+		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
+	}
+
+	public function aelia_currency_price_args( $args ) {
+		if ( !empty( $args['currency'] ) && class_exists("\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher") ) {
+			$cs_settings = \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings();
+			$args['decimal_separator'] = $cs_settings->get_currency_decimal_separator( $args['currency'] );
+			$args['thousand_separator'] = $cs_settings->get_currency_thousand_separator( $args['currency'] );
+		}
+		return $args;
+	}
+
+	/**
+	 * Avoid double images from German Market: remove filter
+	 */
+	public function remove_wgm_thumbnails( $document_type, $document ) {
+		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
+	}
+
+	/**
+	 * Restore above
+	 */
+	public function restore_wgm_thumbnails( $document_type, $document ) {
+		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
+			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
+		}
+	}
+	
+	/**
+	 * Filter callback to add Dokan vendor data as seller/supplier data for CII and UBL documents.
+	 *
+	 * @param array  $data
+	 * @param object $handler
+	 * @return array
+	 */
+	public function edi_dokan_vendor_data( array $data, object $handler ): array {
+		// Dokan not active, bail out.
+		if ( ! function_exists( 'dokan_get_seller_id_by_order' ) || ! function_exists( 'dokan_get_store_info' ) || ! function_exists( 'dokan' ) ) {
+			return $data;
+		}
+
+		// Try to get the order from the handler.
+		if ( empty( $handler ) || ! isset( $handler->document ) || empty( $handler->document->order ) ) {
+			return $data;
+		}
+
+		$order_id = $handler->document->order->get_id();
+		if ( ! $order_id ) {
+			return $data;
+		}
+
+		// Get Dokan vendor ID.
+		$vendor_id = dokan_get_seller_id_by_order( $order_id );
+		if ( ! $vendor_id ) {
+			return $data;
+		}
+
+		$vendor = dokan()->vendor->get( $vendor_id );
+		if ( ! $vendor ) {
+			return $data;
+		}
+
+		// Shop name.
+		$shop_name = $vendor->get_shop_name();
+		if ( ! empty( $shop_name ) ) {
+			$shop_name = wpo_ips_edi_sanitize_string( $shop_name );
+
+			if ( array_key_exists( 'name', $data ) ) {
+				$data['name'] = $shop_name; // CII
+			}
+
+			if ( array_key_exists( 'company', $data ) ) {
+				$data['company'] = $shop_name; // UBL
+			}
+		}
+
+		// Address.
+		$store_info = dokan_get_store_info( $vendor_id );
+		$address    = isset( $store_info['address'] ) && is_array( $store_info['address'] ) ? $store_info['address'] : array();
+
+		if ( ! empty( $address['zip'] ) && array_key_exists( 'postcode', $data ) ) {
+			$data['postcode'] = wpo_ips_edi_sanitize_string( $address['zip'] );
+		}
+
+		if ( ! empty( $address['street_1'] ) ) {
+			$address_line = wpo_ips_edi_sanitize_string( $address['street_1'] );
+
+			if ( array_key_exists( 'address_line', $data ) ) {
+				$data['address_line'] = $address_line; // CII
+			}
+
+			if ( array_key_exists( 'address_line_1', $data ) ) {
+				$data['address_line_1'] = $address_line; // UBL
+			}
+		}
+
+		if ( ! empty( $address['city'] ) && array_key_exists( 'city', $data ) ) {
+			$data['city'] = wpo_ips_edi_sanitize_string( $address['city'] );
+		}
+
+		if ( ! empty( $address['country'] ) && array_key_exists( 'country_code', $data ) ) {
+			$data['country_code'] = wpo_ips_edi_sanitize_string( $address['country'] );
+		}
+
+		// VAT number.
+		if ( array_key_exists( 'vat_number', $data ) ) {
+			$vat_number = get_user_meta( $vendor_id, 'dokan_vat_number', true );
+			if ( ! empty( $vat_number ) ) {
+				$data['vat_number'] = $vat_number;
+			}
+		}
+
+		// CoC number (UBL only, if supported by Dokan).
+		if ( array_key_exists( 'coc_number', $data ) ) {
+			$coc_number = get_user_meta( $vendor_id, 'dokan_coc_number', true );
+
+			if ( empty( $coc_number ) ) {
+				// fallback if another plugin stores it differently
+				$coc_number = get_user_meta( $vendor_id, 'coc_number', true );
+			}
+
+			if ( ! empty( $coc_number ) ) {
+				$data['coc_number'] = $coc_number;
+			}
+		}
+
+		return $data;
+	}
+	
+	/**
 	 * WooCommerce Product Bundles
 	 * 
 	 * @param string             $classes
@@ -379,176 +549,6 @@ class ThirdPartyPlugins {
 		}
 
 		return $classes;
-	}
-
-	/**
-	 * Backwards compatibility helper function: try to get item ID from row class
-	 * @param string $classes       CSS classes for item row (tr)
-	 */
-	public function get_item_id_from_classes ( $classes ) {
-		$class_array = explode(' ', $classes);
-		foreach ($class_array as $class) {
-			if (is_numeric($class)) {
-				$item_id = $class;
-				break;
-			}
-		}
-
-		// if still empty, we lost the item id somewhere :(
-		if (empty($item_id)) {
-			return false;
-		} else {
-			return $item_id;
-		}
-	}
-
-	/**
-	 * WooCommerce Order Status & Actions Manager emails compatibility
-	 */
-	public function wc_order_status_actions_emails ( $emails ) {
-		// get list of custom statuses from WooCommerce Custom Order Status & Actions
-		// status slug => status name
-		$custom_statuses = \WC_Custom_Status::get_status_list_names();
-		// append _email to slug (=email_id) and add to emails list
-		foreach ($custom_statuses as $status_slug => $status_name) {
-			$emails[$status_slug.'_email'] = $status_name;
-		}
-		return $emails;
-	}
-
-
-	/**
-	 * Aelia Currency Switcher compatibility
-	 * Applies decimal & Thousand separator settings
-	 */
-	public function aelia_currency_formatting( $document_type, $document ) {
-		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
-	}
-
-	public function aelia_currency_price_args( $args ) {
-		if ( !empty( $args['currency'] ) && class_exists("\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher") ) {
-			$cs_settings = \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings();
-			$args['decimal_separator'] = $cs_settings->get_currency_decimal_separator( $args['currency'] );
-			$args['thousand_separator'] = $cs_settings->get_currency_thousand_separator( $args['currency'] );
-		}
-		return $args;
-	}
-
-	/**
-	 * Avoid double images from German Market: remove filter
-	 */
-	public function remove_wgm_thumbnails( $document_type, $document ) {
-		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
-	}
-
-	/**
-	 * Restore above
-	 */
-	public function restore_wgm_thumbnails( $document_type, $document ) {
-		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
-			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
-		}
-	}
-	
-	/**
-	 * Filter callback to add Dokan vendor data as seller/supplier data for CII and UBL documents.
-	 *
-	 * @param array  $data
-	 * @param object $handler
-	 * @return array
-	 */
-	public function edi_dokan_vendor_data( array $data, object $handler ): array {
-		// Dokan not active, bail out.
-		if ( ! function_exists( 'dokan_get_seller_id_by_order' ) || ! function_exists( 'dokan_get_store_info' ) || ! function_exists( 'dokan' ) ) {
-			return $data;
-		}
-
-		// Try to get the order from the handler.
-		if ( empty( $handler ) || ! isset( $handler->document ) || empty( $handler->document->order ) ) {
-			return $data;
-		}
-
-		$order_id = $handler->document->order->get_id();
-		if ( ! $order_id ) {
-			return $data;
-		}
-
-		// Get Dokan vendor ID.
-		$vendor_id = dokan_get_seller_id_by_order( $order_id );
-		if ( ! $vendor_id ) {
-			return $data;
-		}
-
-		$vendor = dokan()->vendor->get( $vendor_id );
-		if ( ! $vendor ) {
-			return $data;
-		}
-
-		// Shop name.
-		$shop_name = $vendor->get_shop_name();
-		if ( ! empty( $shop_name ) ) {
-			$shop_name = wpo_ips_edi_sanitize_string( $shop_name );
-
-			if ( array_key_exists( 'name', $data ) ) {
-				$data['name'] = $shop_name; // CII
-			}
-
-			if ( array_key_exists( 'company', $data ) ) {
-				$data['company'] = $shop_name; // UBL
-			}
-		}
-
-		// Address.
-		$store_info = dokan_get_store_info( $vendor_id );
-		$address    = isset( $store_info['address'] ) && is_array( $store_info['address'] ) ? $store_info['address'] : array();
-
-		if ( ! empty( $address['zip'] ) && array_key_exists( 'postcode', $data ) ) {
-			$data['postcode'] = wpo_ips_edi_sanitize_string( $address['zip'] );
-		}
-
-		if ( ! empty( $address['street_1'] ) ) {
-			$address_line = wpo_ips_edi_sanitize_string( $address['street_1'] );
-
-			if ( array_key_exists( 'address_line', $data ) ) {
-				$data['address_line'] = $address_line; // CII
-			}
-
-			if ( array_key_exists( 'address_line_1', $data ) ) {
-				$data['address_line_1'] = $address_line; // UBL
-			}
-		}
-
-		if ( ! empty( $address['city'] ) && array_key_exists( 'city', $data ) ) {
-			$data['city'] = wpo_ips_edi_sanitize_string( $address['city'] );
-		}
-
-		if ( ! empty( $address['country'] ) && array_key_exists( 'country_code', $data ) ) {
-			$data['country_code'] = wpo_ips_edi_sanitize_string( $address['country'] );
-		}
-
-		// VAT number.
-		if ( array_key_exists( 'vat_number', $data ) ) {
-			$vat_number = get_user_meta( $vendor_id, 'dokan_vat_number', true );
-			if ( ! empty( $vat_number ) ) {
-				$data['vat_number'] = $vat_number;
-			}
-		}
-
-		// CoC number (UBL only, if supported by Dokan).
-		if ( array_key_exists( 'coc_number', $data ) ) {
-			$coc_number = get_user_meta( $vendor_id, 'dokan_coc_number', true );
-
-			if ( empty( $coc_number ) ) {
-				// fallback if another plugin stores it differently
-				$coc_number = get_user_meta( $vendor_id, 'coc_number', true );
-			}
-
-			if ( ! empty( $coc_number ) ) {
-				$data['coc_number'] = $coc_number;
-			}
-		}
-
-		return $data;
 	}
 	
 }
