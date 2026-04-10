@@ -11,15 +11,23 @@ if ( ! class_exists( '\\WPO\\IPS\\Assets' ) ) :
 
 class Assets {
 
-	protected static $_instance = null;
-
-	public static function instance() {
+	protected static ?self $_instance = null;
+	
+	/**
+	 * Singleton instance accessor.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
 		add_filter( 'script_loader_tag', array( $this, 'edi_prism_add_data_manual_attr' ), 10, 3 );
@@ -27,8 +35,11 @@ class Assets {
 
 	/**
 	 * Load styles & scripts
+	 * 
+	 * @param string $hook
+	 * @return void
 	 */
-	public function backend_scripts_styles( $hook ) {
+	public function backend_scripts_styles( string $hook ): void {
 		$suffix        = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$pdfjs_version = '4.3.136';
 
@@ -382,7 +393,6 @@ class Assets {
 	 * Build the search index for the current settings tab.
 	 *
 	 * @param string $tab
-	 *
 	 * @return array
 	 */
 	private function get_settings_search_index( string $tab ): array {

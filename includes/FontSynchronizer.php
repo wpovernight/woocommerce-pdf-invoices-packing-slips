@@ -11,33 +11,16 @@ if ( ! class_exists( '\\WPO\\IPS\\FontSynchronizer' ) ) :
 
 class FontSynchronizer {
 
-	/**
-	 * Filename for the dompdf 'font cache'
-	 *
-	 * @var string
-	 */
 	public string $font_cache_filename = 'installed-fonts.json';
-
-	/**
-	 * Vanilla instance of dompdf
-	 *
-	 * @var Dompdf|null
-	 */
-	protected ?Dompdf $dompdf = null;
-
-	/**
-	 * Singleton instance
-	 *
-	 * @var FontSynchronizer|null
-	 */
-	protected static ?self $_instance = null;
+	protected ?Dompdf $dompdf          = null;
+	protected static ?self $_instance  = null;
 
 	/**
 	 * Get singleton instance
 	 *
-	 * @return FontSynchronizer
+	 * @return self
 	 */
-	public static function instance(): FontSynchronizer {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -262,6 +245,7 @@ class FontSynchronizer {
 
 		return $fonts;
 	}
+	
 }
 
 endif; // class_exists

@@ -162,7 +162,6 @@ class Frontend {
 	 *
 	 * @param array $data
 	 * @param \WC_Abstract_Order $order
-	 *
 	 * @return array
 	 */
 	public function add_invoice_number_to_wc_legacy_order_api( array $data, \WC_Abstract_Order $order ): array {
@@ -177,7 +176,6 @@ class Frontend {
 	 * @param \WP_REST_Response $response
 	 * @param \WC_Data $order
 	 * @param \WP_REST_Request $request
-	 *
 	 * @return \WP_REST_Response
 	 */
 	public function add_invoice_number_to_wc_order_api( \WP_REST_Response $response, \WC_Data $order, \WP_REST_Request $request ): \WP_REST_Response {
@@ -191,11 +189,10 @@ class Frontend {
 	/**
 	 * Retrieve formatted invoice number for a given order
 	 *
-	 * @param \WC_Abstract_Order|\WC_Order $order
-	 *
+	 * @param \WC_Abstract_Order $order
 	 * @return string
 	 */
-	private function get_invoice_number( $order ): string {
+	private function get_invoice_number( \WC_Abstract_Order $order ): string {
 		$this->disable_storing_document_settings();
 		$invoice        = wcpdf_get_document( 'invoice', $order );
 		$invoice_number = '';
@@ -393,7 +390,7 @@ class Frontend {
 	 * @param string $key Field key.
 	 * @param mixed $value Field value.
 	 * @param string $group Group name.
-	 * @param object $wc_object WC object (e.g. order).
+	 * @param \WC_Customer|\WC_Order $wc_object
 	 * @return void
 	 */
 	public function checkout_field_save_checkout_block_field( string $key, $value, string $group, object $wc_object ): void {
@@ -654,7 +651,7 @@ class Frontend {
 	 * @param \WP_User  $user
 	 * @return \WP_Error
 	 */
-	public function account_details_validate_checkout_field( \WP_Error $errors, $user ): \WP_Error {
+	public function account_details_validate_checkout_field( \WP_Error $errors, \WP_User $user ): \WP_Error {
 		if ( ! $this->checkout_field_is_my_account_enabled() ) {
 			return $errors;
 		}

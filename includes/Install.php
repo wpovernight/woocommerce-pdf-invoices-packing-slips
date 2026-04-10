@@ -9,15 +9,24 @@ if ( ! class_exists( '\\WPO\\IPS\\Install' ) ) :
 
 class Install {
 
-	protected static $_instance = null;
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get singleton instance
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 */
 	public function __construct() {
 		// run lifecycle methods
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
@@ -25,16 +34,12 @@ class Install {
 		}
 	}
 
-	/** Lifecycle methods *******************************************************
-	 * Because register_activation_hook only runs when the plugin is manually
-	 * activated by the user, we're checking the current version against the
-	 * version stored in the database
-	****************************************************************************/
-
 	/**
 	 * Handles version checking
+	 * 
+	 * @return void
 	 */
-	public function do_install() {
+	public function do_install(): void {
 		// only install when woocommerce is active
 		if ( ! WPO_WCPDF()->is_woocommerce_activated() ) {
 			return;
@@ -80,8 +85,10 @@ class Install {
 
 	/**
 	 * Plugin install method. Perform any installation tasks here
+	 * 
+	 * @return void
 	 */
-	protected function install() {
+	protected function install(): void {
 		// only install when php version or higher
 		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
@@ -156,46 +163,20 @@ class Install {
 		// set default settings
 		$settings_defaults = array(
 			'wpo_wcpdf_settings_general' => array(
-				'download_display'			=> 'display',
-				'template_path'				=> WPO_WCPDF()->plugin_path() . '/templates/Simple',
-				'currency_font'				=> ( in_array( get_woocommerce_currency(), $unsupported_symbols ) ) ? 1 : '',
-				'paper_size'				=> 'a4',
-				// 'header_logo'				=> '',
-				// 'shop_name'					=> array(),
-				// 'shop_address'				=> array(),
-				// 'footer'					=> array(),
-				// 'extra_1'					=> array(),
-				// 'extra_2'					=> array(),
-				// 'extra_3'					=> array(),
+				'download_display' => 'display',
+				'template_path'    => WPO_WCPDF()->plugin_path() . '/templates/Simple',
+				'currency_font'    => ( in_array( get_woocommerce_currency(), $unsupported_symbols, true ) ) ? 1 : '',
+				'paper_size'       => 'a4',
 			),
 			'wpo_wcpdf_documents_settings_invoice' => array(
-				'enabled'					=> 1,
-				// 'attach_to_email_ids'		=> array(),
-				// 'display_shipping_address'	=> '',
-				// 'display_email'				=> '',
-				// 'display_phone'				=> '',
-				// 'display_date'				=> '',
-				// 'display_number'			=> '',
-				// 'number_format'				=> array(),
-				// 'reset_number_yearly'		=> '',
-				// 'my_account_buttons'		=> '',
-				// 'invoice_number_column'		=> '',
-				// 'invoice_date_column'		=> '',
-				// 'disable_free'				=> '',
+				'enabled' => 1,
 			),
 			'wpo_wcpdf_documents_settings_packing-slip' => array(
-				'enabled'					=> 1,
-				// 'display_billing_address'	=> '',
-				// 'display_email'				=> '',
-				// 'display_phone'				=> '',
+				'enabled' => 1,
 			),
 			'wpo_wcpdf_settings_debug' => array(
-				// 'legacy_mode'				=> '',
-				// 'enable_debug'				=> '',
-				// 'html_output'				=> '',
-				// 'html_output'				=> '',
-				'enable_cleanup'				=> 1,
-				'cleanup_days'					=> 7,
+				'enable_cleanup' => 1,
+				'cleanup_days'   => 7,
 			),
 		);
 		foreach ( $settings_defaults as $option => $defaults ) {
@@ -215,8 +196,9 @@ class Install {
 	 * Plugin upgrade method.  Perform any required upgrades here
 	 *
 	 * @param string $installed_version the currently installed ('old') version
+	 * @return void
 	 */
-	protected function upgrade( $installed_version ) {
+	protected function upgrade( string $installed_version ): void {
 		// Only upgrade when php version or higher
 		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
@@ -750,10 +732,10 @@ class Install {
 	/**
 	 * Plugin downgrade method.  Perform any required downgrades here
 	 *
-	 *
 	 * @param string $installed_version the currently installed ('old') version (actually higher since this is a downgrade)
+	 * @return void
 	 */
-	protected function downgrade( $installed_version ) {
+	protected function downgrade( string $installed_version ): void {
 		$main_instance        = WPO_WCPDF()->get_instance( 'main' );
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 		
@@ -765,7 +747,7 @@ class Install {
 
 		// Don't continue if we don't have an upload dir
 		if ( false === $tmp_base ) {
-			return $tmp_base;
+			return;
 		}
 
 		// Check if tmp folder exists => if not, initialize
@@ -788,4 +770,3 @@ class Install {
 }
 
 endif; // class_exists
-

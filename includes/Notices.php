@@ -242,10 +242,9 @@ class Notices {
 	
 	/**
 	 * WooCommerce notice.
-	 * 
-	 * - Called from WPO_WCPDF::dependencies_are_ready()
 	 *
 	 * @return void
+	 * @see WPO_WCPDF::dependencies_are_ready()
 	 */
 	public static function need_woocommerce_notice(): void {
 		$error_message = sprintf(
@@ -266,9 +265,8 @@ class Notices {
 	/**
 	 * PHP version requirement notice
 	 * 
-	 * - Called from WPO_WCPDF::dependencies_are_ready()
-	 * 
 	 * @return void
+	 * @see WPO_WCPDF::dependencies_are_ready()
 	 */
 	public static function required_php_version_notice(): void {
 		$error_message = sprintf(
@@ -294,11 +292,10 @@ class Notices {
 	
 	/**
 	 * Display a notice informing the user that the server requirements are not met.
-	 * 
-	 * - Called from \WPO\IPS\Settings\SettingsDebug::handle_server_requirement_notice()
-	 * - Handling of the dismissal action is done in \WPO\IPS\Settings\SettingsDebug::handle_server_requirement_notice() via self::handle_notice_action()
 	 *
 	 * @return void
+	 * @see \WPO\IPS\Settings\SettingsDebug::handle_server_requirement_notice()
+	 * @see self::handle_notice_action()
 	 */
 	public static function display_server_requirement_notice(): void {
 		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );

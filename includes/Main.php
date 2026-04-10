@@ -3,6 +3,7 @@ namespace WPO\IPS;
 
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
 use WPO\IPS\Documents\OrderDocument;
+use WPO\IPS\Vendor\Dompdf\Dompdf;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -17,15 +18,23 @@ class Main {
 	protected array $tmp_path_cache         = array();
 	protected array $subfolders             = array( 'attachments', 'fonts', 'dompdf', 'xml' );
 
-	protected static $_instance             = null;
+	protected static ?self $_instance       = null;
 
-	public static function instance() {
+	/**
+	 * Singleton instance accessor.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
 		// enable debug mode if set in settings
 		$this->maybe_enable_debug();
@@ -71,8 +80,14 @@ class Main {
 
 	/**
 	 * Attach document to WooCommerce email
+	 * 
+	 * @param array              $attachments
+	 * @param string             $email_id
+	 * @param \WC_Abstract_Order $order
+	 * @param \WC_Email|null     $email
+	 * @return array
 	 */
-	public function attach_document_to_email( $attachments, $email_id, $order, $email = null ) {
+	public function attach_document_to_email( array $attachments, string $email_id, \WC_Abstract_Order $order, ?\WC_Email $email = null ): array {
 		// check if all variables properly set
 		if ( ! is_object( $order ) || ! isset( $email_id ) ) {
 			return $attachments;
@@ -189,7 +204,14 @@ class Main {
 		return $attachments;
 	}
 
-	public function get_document_pdf_attachment( $document, $tmp_path ) {
+	/**
+	 * Get the document PDF attachment path, write the file if it doesn't exist and return the path
+	 *
+	 * @param OrderDocument $document
+	 * @param string        $tmp_path
+	 * @return string|false
+	 */
+	public function get_document_pdf_attachment( OrderDocument $document, string $tmp_path ) {
 		$filename             = $document->get_filename();
 		$pdf_path             = $tmp_path . $filename;
 		$document_type        = $document->get_type();
@@ -254,11 +276,25 @@ class Main {
 		return $pdf_path;
 	}
 
-	public function get_document_xml_attachment( $document, $tmp_path ) {
+	/**
+	 * Get the document XML attachment path, write the file if it doesn't exist and return the path
+	 *
+	 * @param OrderDocument $document
+	 * @param string        $tmp_path
+	 * @return string|false
+	 */
+	public function get_document_xml_attachment( OrderDocument $document, string $tmp_path ) {
 		return wpo_ips_edi_write_file( $document, true );
 	}
 
-	public function get_documents_for_email( $email_id, $order ) {
+	/**
+	 * Get the documents to be attached for a given email and order
+	 *
+	 * @param string $email_id
+	 * @param \WC_Abstract_Order $order
+	 * @return array
+	 */
+	public function get_documents_for_email( string $email_id, \WC_Abstract_Order $order ): array {
 		$documents        = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'any' );
 		$attach_documents = array();
 
@@ -586,8 +622,10 @@ class Main {
 
 	/**
 	 * Include template specific custom functions
+	 * 
+	 * @return void
 	 */
-	private function load_template_functions() {
+	private function load_template_functions(): void {
 		$template_path     = '';
 		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
 
@@ -794,7 +832,6 @@ class Main {
 	 * Maybe reinstall fonts
 	 *
 	 * @param bool $force  force fonts reinstall
-	 *
 	 * @return void
 	 */
 	public function maybe_reinstall_fonts( bool $force = false ): void {
@@ -843,7 +880,6 @@ class Main {
 	 * Regenerate random string and copy contents to new tmp folder
 	 *
 	 * @param bool $reinstall_fonts
-	 *
 	 * @return string|false
 	 */
 	public function regenerate_random_string( bool $reinstall_fonts = true ) {
@@ -866,6 +902,8 @@ class Main {
 
 	/**
 	 * Get random string
+	 * 
+	 * @return string|false
 	 */
 	public function get_random_string () {
 		$code = get_option( 'wpo_wcpdf_random_string', '' );
@@ -1004,8 +1042,12 @@ class Main {
 
 	/**
 	 * Copy DOMPDF fonts to wordpress tmp folder
+	 * 
+	 * @param string $path
+	 * @param bool $merge_with_local Whether to merge with existing fonts in the destination folder (true) or to clear the destination folder before copying (false).
+	 * @return void
 	 */
-	public function copy_fonts( $path = '', $merge_with_local = true ) {
+	public function copy_fonts( string $path = '', bool $merge_with_local = true ): void {
 		// only copy fonts if the bundled dompdf library is used!
 		$default_pdf_maker = '\\WPO\\IPS\\Makers\\PDFMaker';
 
@@ -1034,7 +1076,14 @@ class Main {
 		WPO_WCPDF()->get_instance( 'font_synchronizer' )->sync( $fontDir, $merge_with_local );
 	}
 
-	public function disable_free( $allowed, $document ) {
+	/**
+	 * Disable free orders if the setting is enabled
+	 *
+	 * @param bool $allowed Whether the document generation is allowed
+	 * @param OrderDocument $document The document being generated
+	 * @return bool
+	 */
+	public function disable_free( bool $allowed, OrderDocument $document ): bool {
 		if( ! $document->exists() && ! empty($order = $document->order) ) {
 			if ( ! is_callable( array($order, 'get_total') ) ) {
 				return false;
@@ -1051,7 +1100,14 @@ class Main {
 		}
 	}
 
-	public function disable_anonymized( $allowed, $document ) {
+	/**
+	 * Disable anonymized orders if the setting is enabled
+	 *
+	 * @param bool $allowed Whether the document generation is allowed
+	 * @param OrderDocument $document The document being generated
+	 * @return bool
+	 */
+	public function disable_anonymized( bool $allowed, OrderDocument $document ): bool {
 		if ( ! apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
 			return $allowed;
 		}
@@ -1064,7 +1120,14 @@ class Main {
 		return $allowed;
 	}
 
-	public function test_mode_settings( $use_historical_settings, $document ) {
+	/**
+	 * Disable test mode settings when generating documents to prevent issues with dompdf and other libraries
+	 *
+	 * @param bool $use_historical_settings Whether to use historical settings or not
+	 * @param OrderDocument $document The document being generated
+	 * @return bool
+	 */
+	public function test_mode_settings( bool $use_historical_settings, OrderDocument $document ): bool {
 		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->general_settings['test_mode'] ) ) {
 			$use_historical_settings = false;
 		}
@@ -1073,8 +1136,12 @@ class Main {
 
 	/**
 	 * Adds spans around placeholders to be able to make replacement (page count) and css (page number)
+	 * 
+	 * @param string $html The HTML content of the document
+	 * @param OrderDocument $document The document being generated
+	 * @return string The modified HTML content with placeholders wrapped in spans
 	 */
-	public function format_page_number_placeholders ( $html, $document ) {
+	public function format_page_number_placeholders( string $html, OrderDocument $document ): string {
 		if ( ! empty( $html ) ) {
 			$html = str_replace( '{{PAGE_COUNT}}', '<span class="pagecount">^C^</span>', $html );
 			$html = str_replace( '{{PAGE_NUM}}', '<span class="pagenum"></span>', $html );
@@ -1084,13 +1151,18 @@ class Main {
 
 	/**
 	 * Replace {{PAGE_COUNT}} placeholder with total page count
+	 * 
+	 * @param Dompdf $dompdf The Dompdf instance used for PDF generation
+	 * @param string $html The HTML content of the document
+	 * @return Dompdf The modified Dompdf instance with page count replaced
 	 */
-	public function page_number_replacements ( $dompdf, $html ) {
-		$placeholder = '^C^';
+	public function page_number_replacements( Dompdf $dompdf, string $html ): Dompdf {
+		$placeholder       = '^C^';
 		// create placeholder version with ASCII 0 spaces (dompdf 0.8)
-		$placeholder_0 = '';
-		$placeholder_chars = str_split($placeholder);
-		foreach ($placeholder_chars as $placeholder_char) {
+		$placeholder_0     = '';
+		$placeholder_chars = str_split( $placeholder );
+		
+		foreach ( $placeholder_chars as $placeholder_char ) {
 			$placeholder_0 .= chr(0).$placeholder_char;
 		}
 
@@ -1108,7 +1180,13 @@ class Main {
 		return $dompdf;
 	}
 
-	public function pdf_currency_filters( $filters ) {
+	/**
+	 * Apply currency symbol font to PDF documents when enabled in settings
+	 *
+	 * @param array $filters Array of filters to apply to the PDF generation process
+	 * @return array Modified array of filters with currency symbol font filters added if applicable
+	 */
+	public function pdf_currency_filters( array $filters ): array {
 		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->general_settings['currency_font'] ) ) {
 			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_font' ), 10001, 2 );
 			// 'wpo_wcpdf_custom_styles' is actually an action, but WP handles them with the same functions
@@ -1117,7 +1195,13 @@ class Main {
 		return $filters;
 	}
 
-	public function html_currency_filters( $filters ) {
+	/**
+	 * Apply currency symbol font to HTML documents when enabled in settings and when previewing in admin
+	 *
+	 * @param array $filters Array of filters to apply to the HTML generation process
+	 * @return array Modified array of filters with currency symbol font filters added if applicable
+	 */
+	public function html_currency_filters( array $filters ): array {
 		// Maybe apply currency font when previewing in admin
 		if ( isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$filters = $this->pdf_currency_filters( $filters );
@@ -1133,20 +1217,21 @@ class Main {
 
 	/**
 	 * Use currency symbol font (when enabled in options)
+	 * 
 	 * @param string $currency_symbol Currency symbol
 	 * @param string $currency        Currency
-	 *
 	 * @return string Currency symbol
 	 */
-	public function use_currency_font( $currency_symbol, $currency ) {
-		$currency_symbol = sprintf( '<span class="wcpdf-currency-symbol">%s</span>', $currency_symbol );
-		return $currency_symbol;
+	public function use_currency_font( string $currency_symbol, string $currency ): string {
+		return sprintf( '<span class="wcpdf-currency-symbol">%s</span>', $currency_symbol );
 	}
 
 	/**
 	 * Set currency font CSS
+	 * 
+	 * @return void
 	 */
-	public function currency_symbol_font_styles () {
+	public function currency_symbol_font_styles(): void {
 		?>
 		.wcpdf-currency-symbol { font-family: 'Currencies'; }
 		<?php
@@ -1154,13 +1239,13 @@ class Main {
 
 	/**
 	 * Replace dompdf incompatible (RTL) currencies with the ISO currency code (when default dompdf is used)
+	 * 
 	 * @param string $currency_symbol Currency symbol
 	 * @param string $currency        Currency
-	 *
 	 * @return string Currency symbol
 	 */
-	public function use_currency_code( $currency_symbol, $currency ) {
-		if ( in_array( $currency, $this->get_rtl_currencies() ) ) {
+	public function use_currency_code( string $currency_symbol, string $currency ): string {
+		if ( in_array( $currency, $this->get_rtl_currencies(), true ) ) {
 			$currency_symbol = $currency;
 		}
 		return $currency_symbol;
@@ -1171,27 +1256,36 @@ class Main {
 	 *
 	 * @return array ISO currency codes
 	 */
-	public function get_rtl_currencies() {
+	public function get_rtl_currencies(): array {
 		return array( 'AED', 'BHD', 'DZD', 'IQD', 'IRR', 'JOD', 'KWD', 'LBP', 'LYD', 'MAD', 'MVR', 'OMR', 'QAR', 'SAR', 'SYP', 'TND', 'YER' );
 	}
 
 	/**
 	 * Apply header logo height from settings
+	 * 
+	 * @param string $document_type The type of document being generated
+	 * @param OrderDocument|null $document The document object being generated (if available)
+	 * @return void
 	 */
-	public function set_header_logo_height( $document_type, $document = null ) {
-		if ( !empty($document) && $header_logo_height = $document->get_header_logo_height() ) {
-			?>
-			td.header img {
-				max-height: <?php echo esc_html( $header_logo_height ); ?>;
+	public function set_header_logo_height( string $document_type, ?OrderDocument $document = null ): void {
+		if ( ! empty( $document ) ) {
+			$header_logo_height = $document->get_header_logo_height();
+			if ( $header_logo_height ) {
+				?>
+				td.header img {
+					max-height: <?php echo esc_html( $header_logo_height ); ?>;
+				}
+				<?php
 			}
-			<?php
 		}
 	}
 
 	/**
 	 * Schedule temporary files cleanup from paths older than 1 week (daily, hooked into wp_scheduled_delete )
+	 * 
+	 * @return void
 	 */
-	public function schedule_temporary_files_cleanup() {
+	public function schedule_temporary_files_cleanup(): void {
 		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
 		
 		if ( ! isset( $settings_instance->debug_settings['enable_cleanup'] ) ) {
@@ -1206,8 +1300,8 @@ class Main {
 
 	/**
 	 * Temporary files cleanup from paths
+	 * 
 	 * @param  int    $delete_timestamp timestamp of the date/time before which to clean up files
-	 *
 	 * @return array  Output message
 	 */
 	public function temporary_files_cleanup( int $delete_timestamp = 0 ): array {
@@ -1307,8 +1401,11 @@ class Main {
 
 	/**
 	 * Remove all invoice data when requested
+	 * 
+	 * @param array $meta_to_remove Array of meta keys to remove from the order when requested
+	 * @return array Modified array of meta keys to remove with WCPDF private meta keys added if applicable
 	 */
-	public function remove_order_personal_data_meta( $meta_to_remove ) {
+	public function remove_order_personal_data_meta( array $meta_to_remove ): array {
 		if ( ! apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
 			return $meta_to_remove;
 		}
@@ -1355,8 +1452,11 @@ class Main {
 
 	/**
 	 * Export all invoice data when requested
+	 * 
+	 * @param array $meta_to_export Array of meta keys to export from the order when requested
+	 * @return array Modified array of meta keys to export with WCPDF private meta keys
 	 */
-	public function export_order_personal_data_meta( $meta_to_export ) {
+	public function export_order_personal_data_meta( array $meta_to_export ): array {
 		$private_address_meta = array(
 			// _wcpdf_invoice_number_data & _wcpdf_invoice_date are duplicates of the below and therefore not included
 			'_wcpdf_invoice_number'         => esc_html__( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -1370,17 +1470,24 @@ class Main {
 	 * This avoids issues with the presence of attachments affecting email address validation in some distros of PHP 7.3
 	 * See: https://wordpress.org/support/topic/invalid-address-setfrom/#post-11583815
 	 * Fixed in WP5.5 due to upgrade to newer PHPMailer
+	 * 
+	 * @param array $mailArray The array of mail data being passed to PHPMailer
+	 * @return array The unmodified mail array, after setting the PHPMailer validator
 	 */
-	public function set_phpmailer_validator( $mailArray ) {
-		if ( version_compare( get_bloginfo( 'version' ), '5.5-dev', '<' ) ) {
-			global $phpmailer;
-			if ( ! ( $phpmailer instanceof \PHPMailer ) ) {
-				require_once ABSPATH . WPINC . '/class-phpmailer.php';
-				require_once ABSPATH . WPINC . '/class-smtp.php';
-				$phpmailer = new \PHPMailer( true );
-			}
-			$phpmailer::$validator = 'php';
+	public function set_phpmailer_validator( array $mailArray ): array {
+		if ( version_compare( get_bloginfo( 'version' ), '5.5-dev', '>=' ) ) {
+			return $mailArray;
 		}
+		
+		global $phpmailer;
+		
+		if ( ! $phpmailer instanceof \PHPMailer ) {
+			require_once ABSPATH . WPINC . '/class-phpmailer.php';
+			require_once ABSPATH . WPINC . '/class-smtp.php';
+			$phpmailer = new \PHPMailer( true );
+		}
+		
+		$phpmailer::$validator = 'php';
 
 		return $mailArray;
 	}
@@ -1388,12 +1495,11 @@ class Main {
 	/**
 	 * Log document creation to order notes
 	 *
-	 * @param object $document
+	 * @param OrderDocument $document
 	 * @param string $trigger
-	 *
 	 * @return void
 	 */
-	public function log_document_creation_to_order_notes( object $document, string $trigger ) {
+	public function log_document_creation_to_order_notes( OrderDocument $document, string $trigger ): void {
 		if ( empty( $document ) || empty( $trigger ) || ! isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
 			return;
 		}
@@ -1433,11 +1539,10 @@ class Main {
 	/**
 	 * Log document deletion to order notes.
 	 *
-	 * @param object $document
-	 *
+	 * @param OrderDocument $document
 	 * @return void
 	 */
-	public function log_document_deletion_to_order_notes( object $document ): void {
+	public function log_document_deletion_to_order_notes( OrderDocument $document ): void {
 		if ( ! empty( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
 			$user_note = '';
 			$user      = wp_get_current_user();
@@ -1463,11 +1568,11 @@ class Main {
 	/**
 	 * Log document printed to order notes
 	 *
-	 * @param object $document
+	 * @param OrderDocument $document
 	 * @param string $trigger
 	 * @return void
 	 */
-	public function log_document_printed_to_order_notes( $document, $trigger ) {
+	public function log_document_printed_to_order_notes( OrderDocument $document, string $trigger ): void {
 		$triggers = array_merge(
 			[ 'manually' => __( 'manually', 'woocommerce-pdf-invoices-packing-slips' ) ],
 			$this->get_document_triggers()
@@ -1485,10 +1590,9 @@ class Main {
 	 * Log document unmark printed to order notes
 	 *
 	 * @param object $document
-	 * @param string $trigger
 	 * @return void
 	 */
-	public function log_unmark_document_printed_to_order_notes( $document ) {
+	public function log_unmark_document_printed_to_order_notes( OrderDocument $document ): void {
 		if ( ! empty( $document ) && isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
 			/* translators: 1. document title, 2. creation trigger */
 			$message = __( '%1$s document unmark printed.', 'woocommerce-pdf-invoices-packing-slips' );
@@ -1501,10 +1605,10 @@ class Main {
 	 * Logs to the order notes
 	 *
 	 * @param string $note
-	 * @param object $document
+	 * @param OrderDocument $document
 	 * @return void
 	 */
-	public function log_to_order_notes( $note, $document ) {
+	public function log_to_order_notes( string $note, OrderDocument $document ): void {
 		if ( property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) { // bulk document
 			$order_ids = $document->order_ids;
 		} else {
@@ -1530,13 +1634,13 @@ class Main {
 	/**
 	 * Logs to the order meta
 	 *
-	 * @param object     $document
-	 * @param string     $trigger
-	 * @param bool       $force
-	 * @param array|null $request
+	 * @param OrderDocument $document
+	 * @param string        $trigger
+	 * @param bool          $force
+	 * @param array|null    $request
 	 * @return void
 	 */
-	public function log_document_creation_trigger_to_order_meta( $document, $trigger, $force = false, $request = null ) {
+	public function log_document_creation_trigger_to_order_meta( OrderDocument $document, string $trigger, bool $force = false, ?array $request = null ): void {
 		if ( $trigger == 'bulk' && property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) { // bulk document
 			$order_ids = $document->order_ids;
 		} elseif ( ! is_null( $document->order ) && is_callable( array( $document->order, 'get_id' ) ) ) {
@@ -1574,7 +1678,6 @@ class Main {
 	 * Get the document triggers
 	 *
 	 * @param string $trigger_type The trigger type: 'manual', 'automatic', or 'all'. Defaults to 'all'.
-	 *
 	 * @return array
 	 */
 	public function get_document_triggers( string $trigger_type = 'all' ): array {
@@ -1608,12 +1711,15 @@ class Main {
 	/**
 	 * Mark document printed
 	 *
+	 * @param OrderDocument $document
+	 * @param string $trigger
 	 * @return void
 	 */
-	public function mark_document_printed( $document, $trigger ) {
+	public function mark_document_printed( OrderDocument $document, string $trigger ): void {
 		$triggers = isset( $document->latest_settings['mark_printed'] ) && is_array( $document->latest_settings['mark_printed'] ) ? $document->latest_settings['mark_printed'] : [];
 		if ( ! empty( $document ) && ! $this->is_document_printed( $document ) ) {
-			if ( ! empty( $order = $document->order ) && ! empty( $trigger ) && in_array( $trigger, $triggers ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
+			if ( ! empty( $document->order ) && ! empty( $trigger ) && in_array( $trigger, $triggers ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
+				$order = $document->order;
 				if ( 'shop_order' === $order->get_type() ) {
 					$data = [
 						'date'    => time(),
@@ -1631,11 +1737,13 @@ class Main {
 	/**
 	 * Unmark document printed
 	 *
+	 * @param OrderDocument $document
 	 * @return void
 	 */
-	public function unmark_document_printed( $document ) {
+	public function unmark_document_printed( OrderDocument $document ): void {
 		if ( ! empty( $document ) && $this->is_document_printed( $document ) ) {
-			if ( ! empty( $order = $document->order ) && apply_filters( 'wpo_wcpdf_allow_unmark_document_printed', true, $document ) ) {
+			if ( ! empty( $document->order ) && apply_filters( 'wpo_wcpdf_allow_unmark_document_printed', true, $document ) ) {
+				$order    = $document->order;
 				$meta_key = "_wcpdf_{$document->slug}_printed";
 				if ( 'shop_order' === $order->get_type() && ! empty( $order->get_meta( $meta_key ) ) ) {
 					$order->delete_meta_data( $meta_key );
@@ -1651,7 +1759,7 @@ class Main {
 	 *
 	 * @return void
 	 */
-	public function document_printed_ajax() {
+	public function document_printed_ajax(): void {
 		check_ajax_referer( 'printed_wpo_wcpdf', 'security' );
 
 		$data  = stripslashes_deep( $_REQUEST );
@@ -1661,7 +1769,9 @@ class Main {
 			$document        = wcpdf_get_document( esc_attr( $data['document_type'] ), esc_attr( $data['order_id'] ) );
 			$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( esc_attr( $data['document_type'] ) );
 
-			if ( ! empty( $document ) && ! empty( $order = $document->order ) && $full_permission ) {
+			if ( ! empty( $document ) && ! empty( $document->order ) && $full_permission ) {
+				$order = $document->order;
+				
 				switch ( esc_attr( $data['event'] ) ) {
 					case 'mark':
 						$this->mark_document_printed( $document, esc_attr( $data['trigger'] ) );
@@ -1697,13 +1807,15 @@ class Main {
 	/**
 	 * Check if a document is printed
 	 *
+	 * @param OrderDocument $document
 	 * @return bool
 	 */
-	public function is_document_printed( $document ) {
+	public function is_document_printed( OrderDocument $document ): bool {
 		$is_printed = false;
 
-		if ( ! empty( $document ) && ! empty( $order = $document->order ) ) {
-			if ( 'shop_order' === $order->get_type() && ! empty( $printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {
+		if ( ! empty( $document ) && ! empty( $document->order ) ) {
+			$order = $document->order;
+			if ( 'shop_order' === $order->get_type() && ! empty( $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {
 				$is_printed = true;
 			}
 		}
@@ -1714,9 +1826,10 @@ class Main {
 	/**
 	 * Check if a document can be manually marked as printed
 	 *
+	 * @param OrderDocument $document
 	 * @return bool
 	 */
-	public function document_can_be_manually_marked_printed( $document ) {
+	public function document_can_be_manually_marked_printed( OrderDocument $document ): bool {
 		$can_be_manually_marked_printed = false;
 
 		if ( empty( $document ) || ( property_exists( $document, 'is_bulk' ) && $document->is_bulk ) ) {
@@ -1741,14 +1854,20 @@ class Main {
 	/**
 	 * Get document printed data
 	 *
+	 * @param OrderDocument $document
 	 * @return array
 	 */
-	public function get_document_printed_data( $document ) {
+	public function get_document_printed_data( OrderDocument $document ): array {
 		$data = [];
 
-		if ( ! empty( $document ) && $this->is_document_printed( $document ) && ! empty( $order = $document->order ) ) {
-			if ( 'shop_order' === $order->get_type() && ! empty( $printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed" ) ) ) {
-				$data = $printed_data;
+		if ( ! empty( $document ) && $this->is_document_printed( $document ) && ! empty( $document->order ) ) {
+			$order = $document->order;
+			if ( 'shop_order' === $order->get_type() ) {
+				$printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed", true );
+				
+				$data = $printed_data
+					? $printed_data
+					: $data;
 			}
 		}
 
@@ -1785,7 +1904,6 @@ class Main {
 	 * Adds custom webhook topic events.
 	 *
 	 * @param array $topic_events
-	 *
 	 * @return array
 	 */
 	public function wc_webhook_topic_events( array $topic_events = array() ): array {
@@ -1798,16 +1916,29 @@ class Main {
 		return $topic_events;
 	}
 
-	public function wc_webhook_topics( $topics ) {
+	/**
+	 * Adds custom webhook topics for each document type.
+	 *
+	 * @param array $topics
+	 * @return array
+	 */
+	public function wc_webhook_topics( array $topics ): array {
 		$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
-		foreach ($documents as $document) {
+		foreach ( $documents as $document ) {
 			/* translators: document title */
 			$topics["order.{$document->type}-saved"] = esc_html( sprintf( __( 'Order %s Saved', 'woocommerce-pdf-invoices-packing-slips' ), $document->get_title() ) );
 		}
 		return $topics;
 	}
 
-	public function wc_webhook_trigger( $document, $order ) {
+	/**
+	 * Trigger custom webhook when a document is saved.
+	 *
+	 * @param OrderDocument $document
+	 * @param \WC_Abstract_Order $order
+	 * @return void
+	 */
+	public function wc_webhook_trigger( OrderDocument $document, \WC_Abstract_Order $order ): void {
 		$this->reload_wpo_custom_webhooks();
 		do_action( "wpo_wcpdf_webhook_order_{$document->slug}_saved", $order->get_id() );
 	}
@@ -1827,7 +1958,7 @@ class Main {
 	 *
 	 * @return void
 	 */
-	private function reload_wpo_custom_webhooks() {
+	private function reload_wpo_custom_webhooks(): void {
 		if (
 			! apply_filters( 'wpo_wcpdf_reload_wpo_custom_webhooks', true ) ||
 			! class_exists( 'WC_Data_Store' ) ||
@@ -1930,6 +2061,11 @@ class Main {
 		}
 	}
 
+	/**
+	 * Handle document link in emails.
+	 *
+	 * @return void
+	 */
 	public function handle_document_link_in_emails(): void {
 		$email_hooks = array();
 		$plugin      = WPO_WCPDF();
@@ -1964,7 +2100,6 @@ class Main {
 	 * @param \WC_Abstract_Order $order
 	 * @param bool $sent_to_admin
 	 * @param bool $plain_text
-	 *
 	 * @return void
 	 */
 	public function add_document_link_to_address_section( string $type, \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text ): void {
@@ -1979,7 +2114,6 @@ class Main {
 	 * @param bool $sent_to_admin
 	 * @param bool $plain_text
 	 * @param mixed|\WC_Email $email Some third-parties might send different values.
-	 *
 	 * @return void
 	 */
 	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, $email ): void {
@@ -2149,4 +2283,3 @@ class Main {
 }
 
 endif; // class_exists
-

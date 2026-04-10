@@ -10,75 +10,17 @@ if ( ! class_exists( '\\WPO\\IPS\\Semaphore' ) ) :
 
 class Semaphore {
 
-	/**
-	 * Transient key for caching scheduled cleanup status
-	 *
-	 * @var string
-	 */
-	public const CLEANUP_TRANSIENT_KEY = 'wpo_ips_semaphore_cleanup_scheduled';
-
-	/**
-	 * Prefix for the lock in the WP options table
-	 *
-	 * @var string
-	 */
-	protected static $option_prefix = 'wpo_ips_semaphore_lock_';
-
-	/**
-	 * Legacy option prefix for the lock in the WP options table
-	 *
-	 * @var string
-	 */
-	protected static $legacy_option_prefix = 'updraft_lock_wpo_wcpdf_';
-
-	/**
-	 * Hook name suffix for the cleanup of released locks
-	 *
-	 * @var string
-	 */
-	protected static $hook_name_suffix = 'cleanup';
-
-	/**
-	 * Name for the lock in the WP options table
-	 *
-	 * @var string
-	 */
-	protected $option_name;
-
-	/**
-	 * Time after which the lock will expire (in seconds)
-	 *
-	 * @var int
-	 */
-	protected $locked_for;
-
-	/**
-	 * Number of retries to acquire the lock
-	 *
-	 * @var int
-	 */
-	protected $retries;
-
-	/**
-	 * An array of loggers
-	 *
-	 * @var array
-	 */
-	protected $loggers = array();
-
-	/**
-	 * Context for loggers
-	 *
-	 * @var array
-	 */
-	protected $context = array();
-
-	/**
-	 * Lock status - a boolean
-	 *
-	 * @var boolean
-	 */
-	protected $acquired = false;
+	public const string CLEANUP_TRANSIENT_KEY     = 'wpo_ips_semaphore_cleanup_scheduled';
+	
+	protected string $option_name;
+	protected int $locked_for;
+	protected int $retries;
+	protected static string $option_prefix        = 'wpo_ips_semaphore_lock_';
+	protected static string $legacy_option_prefix = 'updraft_lock_wpo_wcpdf_';
+	protected static string $hook_name_suffix     = 'cleanup';
+	protected array $loggers                      = array();
+	protected array $context                      = array();
+	protected bool $acquired                      = false;
 
 	/**
 	 * Constructor. Instantiating does not lock anything, but sets up the details for future operations.
@@ -139,7 +81,6 @@ class Semaphore {
 	 * Attempt to acquire the lock. If it was already acquired, then nothing extra will be done (the method will be a no-op).
 	 *
 	 * @param int $retries - how many times to retry (after a 1 second sleep each time)
-	 *
 	 * @return bool - whether the lock was successfully acquired or not
 	 */
 	public function lock( int $retries = 0 ): bool {
@@ -265,7 +206,6 @@ class Semaphore {
 	 * @param string $message - the error message
 	 * @param string $level   - the message level (debug, notice, info, warning, error)
 	 * @param array  $context - Optional. Additional information for log handlers.
-	 *
 	 * @return void
 	 */
 	public function log( string $message, string $level = 'info', array $context = array() ): void {
@@ -287,7 +227,6 @@ class Semaphore {
 	 * Sets the list of loggers for this instance (removing any others).
 	 *
 	 * @param array $loggers - the loggers for this task
-	 *
 	 * @return void
 	 */
 	public function set_loggers( array $loggers = array() ): void {
@@ -319,7 +258,6 @@ class Semaphore {
 	 * Cleanup released locks from the database
 	 *
 	 * @param bool $legacy - whether to cleanup legacy locks
-	 *
 	 * @return void
 	 */
 	public static function cleanup_released_locks( bool $legacy = false ): void {
@@ -339,7 +277,6 @@ class Semaphore {
 	 * Count the number of released locks in the database
 	 *
 	 * @param bool $legacy - whether to count legacy locks
-	 *
 	 * @return int - the number of released locks
 	 */
 	public static function count_released_locks( bool $legacy = false ): int {
@@ -474,6 +411,7 @@ class Semaphore {
 			self::schedule_semaphore_cleanup();
 		}
 	}
+	
 }
 
 endif; // class_exists
