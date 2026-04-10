@@ -462,19 +462,18 @@ class Semaphore {
 			return;
 		}
 
-		// Schedule cleanup of released locks
+		// Register the actual cleanup callback
+		add_action( self::get_cleanup_hook_name(), array( __CLASS__, 'cleanup_released_locks' ) );
+
+		// Ensure the recurring cleanup action exists
 		if ( function_exists( 'as_supports' ) && as_supports( 'ensure_recurring_actions_hook' ) ) {
-			// Preferred: runs periodically in the background.
+			// Preferred: Action Scheduler periodically ensures recurring actions exist
 			add_action( 'action_scheduler_ensure_recurring_actions', array( __CLASS__, 'schedule_semaphore_cleanup' ) );
-		} else {
-			// Fallback: runs on every page load
+		} elseif ( is_admin() ) {
+			// Fallback for older Action Scheduler versions: only check from admin requests
 			self::schedule_semaphore_cleanup();
 		}
-
-		// Cleanup released locks
-		\add_action( self::get_cleanup_hook_name(), array( __CLASS__, 'cleanup_released_locks' ) );
 	}
-
 }
 
 endif; // class_exists
