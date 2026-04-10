@@ -9,104 +9,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\\WPO\\IPS\\Documents\\OrderDocument' ) ) :
 
-/**
- * Abstract Document
- *
- * Handles generic pdf document & order data and database interaction
- * which is extended by both Invoices & Packing Slips
- */
-
 abstract class OrderDocument {
 
-	/**
-	 * Document type.
-	 * @var String
-	 */
-	public $type;
+	public string $type;
+	public string $slug;
+	public string $title;
+	public string $icon;
+	public ?\WC_Abstract_Order $order        = null;
+	public ?int $order_id                    = null;
+	public array $settings;
+	public array $latest_settings;
+	public array $order_settings;
+	public bool $enabled;
+	public array $output_formats             = array();
 
-	/**
-	 * Document slug.
-	 * @var String
-	 */
-	public $slug;
-
-	/**
-	 * Document title.
-	 * @var string
-	 */
-	public $title;
-
-	/**
-	 * Document icon.
-	 * @var string
-	 */
-	public $icon;
-
-	/**
-	 * WC Order object
-	 * @var object
-	 */
-	public $order;
-
-	/**
-	 * WC Order ID
-	 * @var int
-	 */
-	public $order_id;
-
-	/**
-	 * PDF document settings.
-	 * @var array
-	 */
-	public $settings;
-
-	/**
-	 * Document latest settings.
-	 * @var array
-	 */
-	public $latest_settings;
-
-	/**
-	 * Order settings.
-	 * @var array
-	 */
-	public $order_settings;
-
-	/**
-	 * TRUE if PDF document is enabled.
-	 * @var bool
-	 */
-	public $enabled;
-
-	/**
-	 * Linked output formats.
-	 * @var array
-	 */
-	public $output_formats = array();
-
-	/**
-	 * Linked documents, used for data retrieval
-	 * @var array
-	 */
-	protected $linked_documents = array();
-
-	/**
-	 * Core data for this object. Name value pairs (name + default value).
-	 * @var array
-	 */
-	protected $data = array();
 	
-	/**
-	 * Resolved settings cache for this document instance.
-	 *
-	 * @var array
-	 */
-	protected $resolved_settings_cache = array();
+	protected array $linked_documents        = array();
+	protected array $data                    = array();
+	protected array $resolved_settings_cache = array();
 
 	/**
 	 * Init/load the order object.
 	 *
-	 * @param  int|object|WC_Order $order Order to init.
+	 * @param int|object|WC_Order $order Order to init.
 	 */
 	public function __construct( $order = 0 ) {
 		if ( is_numeric( $order ) && $order > 0 ) {
@@ -136,10 +61,20 @@ abstract class OrderDocument {
 		$this->enabled = $this->get_setting( 'enabled', false );
 	}
 
-	public function init_settings() {
+	/**
+	 * Get the document title.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
 		return;
 	}
 
+	/**
+	 * Initialize settings data.
+	 *
+	 * @return void
+	 */
 	public function init_settings_data(): void {
 		$this->reset_resolved_settings_cache();
 		
@@ -163,7 +98,12 @@ abstract class OrderDocument {
 		$this->save_settings( $this->maybe_use_latest_settings() );
 	}
 
-	public function get_order_settings() {
+	/**
+	 * Get the order settings.
+	 *
+	 * @return array
+	 */
+	public function get_order_settings(): array {
 		if ( empty( $this->order ) ) {
 			return array();
 		}
@@ -173,7 +113,14 @@ abstract class OrderDocument {
 		return is_array( $order_settings ) ? $order_settings : array();
 	}
 	
-	public function get_settings( $latest = false, $output_format = 'pdf' ) {
+	/**
+	 * Get document settings.
+	 *
+	 * @param bool $latest
+	 * @param string $output_format
+	 * @return array
+	 */
+	public function get_settings( bool $latest = false, string $output_format = 'pdf' ): array {
 		$cache_key = sprintf(
 			'%s|%s',
 			$latest ? 'latest' : 'current',
@@ -214,7 +161,13 @@ abstract class OrderDocument {
 		return $this->resolved_settings_cache[ $cache_key ];
 	}
 
-	public function save_settings( $latest = false ) {
+	/**
+	 * Save document settings.
+	 *
+	 * @param bool $latest
+	 * @return void
+	 */
+	public function save_settings( bool $latest = false ): void {
 		if ( empty( $this->settings ) || empty( $this->latest_settings ) ) {
 			$this->init_settings_data();
 		}
@@ -274,7 +227,6 @@ abstract class OrderDocument {
 	 * Initiate and set document number.
 	 *
 	 * @param bool $force_new_number
-	 *
 	 * @return mixed
 	 */
 	public function initiate_number( bool $force_new_number = false ) {
@@ -316,7 +268,6 @@ abstract class OrderDocument {
 	 * Get the document number.
 	 *
 	 * @param bool $generate
-	 *
 	 * @return mixed
 	 */
 	public function get_document_number( bool $generate = false ) {
@@ -364,34 +315,42 @@ abstract class OrderDocument {
 		return $document_number;
 	}
 
-	public function maybe_use_latest_settings() {
+	/**
+	 * Determine if the latest settings should be used.
+	 *
+	 * @return bool
+	 */
+	public function maybe_use_latest_settings(): bool {
 		return ! $this->use_historical_settings();
 	}
 
-	public function use_historical_settings() {
+	/**
+	 * Determine if historical settings should be used.
+	 *
+	 * @return bool
+	 */
+	public function use_historical_settings(): bool {
 		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', false, $this );
 	}
 
-	public function storing_settings_enabled() {
+	/**
+	 * Determine if the document settings should be stored.
+	 *
+	 * @return bool
+	 */
+	public function storing_settings_enabled(): bool {
 		return apply_filters( 'wpo_wcpdf_document_store_settings', false, $this );
 	}
 
-	public function get_non_historical_settings() {
-		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
-			'enabled',
-			'attach_to_email_ids',
-			'disable_for_statuses',
-			'number_format', // this is stored in the number data already!
-			'my_account_buttons',
-			'my_account_restrict',
-			'invoice_number_column',
-			'invoice_date_column',
-			'paper_size',
-			'font_subsetting',
-		), $this );
-	}
-
-	public function get_setting( $key, $default = '', $output_format = 'pdf' ) {
+	/**
+	 * Get setting value.
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @param string $output_format
+	 * @return mixed
+	 */
+	public function get_setting( string $key, string $default = '', string $output_format = 'pdf' ) {
 		if ( in_array( $output_format, $this->output_formats ) ) {
 			$settings        = $this->get_settings( false, $output_format );
 			$latest_settings = $this->get_settings( true, $output_format );
@@ -411,28 +370,56 @@ abstract class OrderDocument {
 		return $setting;
 	}
 
-	public function get_attach_to_email_ids( $output_format = 'pdf' ) {
+	/**
+	 * Get the IDs of the emails to which the document should be attached based on settings.
+	 *
+	 * @param string $output_format
+	 * @return array
+	 */
+	public function get_attach_to_email_ids( string $output_format = 'pdf' ): array {
 		$settings = $this->get_settings( false, $output_format );
 
 		return isset( $settings['attach_to_email_ids'] ) ? array_keys( array_filter( $settings['attach_to_email_ids'] ) ) : array();
 	}
 
-	public function get_type() {
+	/**
+	 * Get the document type.
+	 *
+	 * @return string
+	 */
+	public function get_type(): string {
 		return $this->type;
 	}
 
-	public function is_enabled( $output_format = 'pdf' ) {
+	/**
+	 * Check if the document type is enabled for output.
+	 *
+	 * @param string $output_format
+	 * @return bool
+	 */
+	public function is_enabled( string $output_format = 'pdf' ): bool {
 		$output_format = ( 'xml' === $output_format ) ? 'pdf' : $output_format; // currently not using separated settings for EDI
 		$is_enabled    = $this->get_setting( 'enabled', false, $output_format );
 
 		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
 	}
 
-	public function get_hook_prefix() {
+	/**
+	 * Get the hook prefix for the document, used for filters and actions.
+	 *
+	 * @return string
+	 */
+	public function get_hook_prefix(): string {
 		return 'wpo_wcpdf_' . $this->slug . '_get_';
 	}
 
-	public function read_data( $order ) {
+	/**
+	 * Read order document data.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return void
+	 */
+	public function read_data( \WC_Abstract_Order $order ): void {
 		$number = $order->get_meta( "_wcpdf_{$this->slug}_number_data" );
 		// fallback to legacy data for number
 		if ( empty( $number ) ) {
@@ -457,7 +444,12 @@ abstract class OrderDocument {
 		return;
 	}
 
-	public function init() {
+	/**
+	 * Initializes the document.
+	 *
+	 * @return void
+	 */
+	public function init(): void {
 		// save settings
 		$this->save_settings();
 
@@ -465,7 +457,13 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_init_document', $this );
 	}
 
-	public function save( $order = null ) {
+	/**
+	 * Save the document data.
+	 *
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function save( ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 		if ( empty( $order ) ) {
 			return; // nowhere to save to...
@@ -506,7 +504,13 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_save_document', $this, $order );
 	}
 
-	public function delete( $order = null ) {
+	/**
+	 * Delete the document data.
+	 *
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function delete( ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 		if ( empty( $order ) ) {
 			return; // nothing to delete
@@ -532,7 +536,14 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_delete_document', $this, $order );
 	}
 
-	public function regenerate( $order = null, $data = null ) {
+	/**
+	 * Regenerate the document data.
+	 *
+	 * @param \WC_Abstract_Order|null $order
+	 * @param array|null $data
+	 * @return void
+	 */
+	public function regenerate( ?\WC_Abstract_Order $order = null, ?array $data = null ): void {
 		$order     = empty( $order ) ? $this->order : $order;
 		$refund_id = false;
 
@@ -580,7 +591,12 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_regenerate_document', $this );
 	}
 
-	public function is_allowed() {
+	/**
+	 * Check if the document is allowed to be generated based on settings and order status.
+	 *
+	 * @return bool
+	 */
+	public function is_allowed(): bool {
 		$allowed = true;
 		// Check if document is enabled
 		if ( ! $this->is_enabled() ) {
@@ -601,25 +617,43 @@ abstract class OrderDocument {
 		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
 	}
 
-	public function exists() {
-		return !empty( $this->data['date'] );
+	/**
+	 * Check if the document exists.
+	 *
+	 * @return bool
+	 */
+	public function exists(): bool {
+		return ! empty( $this->data['date'] );
 	}
 
-	public function printed() {
+	/**
+	 * Check if the document has been printed.
+	 *
+	 * @return bool
+	 */
+	public function printed(): bool {
 		return WPO_WCPDF()->get_instance( 'main' )->is_document_printed( $this );
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| Data getters
-	|--------------------------------------------------------------------------
-	*/
-
-	public function get_printed_data() {
+	/**
+	 * Get the document printed data.
+	 *
+	 * @return array
+	 */
+	public function get_printed_data(): array {
 		return WPO_WCPDF()->get_instance( 'main' )->get_document_printed_data( $this );
 	}
 
-	public function get_data( $key, $document_type = '', $order = null, $context = 'view' ) {
+	/**
+	 * Get document data value.
+	 *
+	 * @param string $key
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @return mixed|null
+	 */
+	public function get_data( string $key, string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view' ) {
 		$document_type = empty( $document_type ) ? $this->type : $document_type;
 		$order         = empty( $order ) ? $this->order : $order;
 
@@ -651,7 +685,16 @@ abstract class OrderDocument {
 		return $value;
 	}
 
-	public function get_number( $document_type = '', $order = null, $context = 'view', $formatted = false ) {
+	/**
+	 * Get the document number.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @param bool $formatted
+	 * @return mixed|null
+	 */
+	public function get_number( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view', bool $formatted = false ) {
 		$number = $this->get_data( 'number', $document_type, $order, $context );
 
 		if ( $number && $formatted ) {
@@ -661,11 +704,26 @@ abstract class OrderDocument {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_number", $number, $document_type, $order, $context, $formatted, $this );
 	}
 
-	public function number( $document_type ) {
+	/**
+	 * Print the document number.
+	 *
+	 * @param string $document_type
+	 * @return void
+	 */
+	public function number( string $document_type ): void {
 		echo esc_html( $this->get_number( $document_type, null, 'view', true ) );
 	}
 
-	public function get_date( $document_type = '', $order = null, $context = 'view', $formatted = false ) {
+	/**
+	 * Get the document date.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @param bool $formatted
+	 * @return mixed|null
+	 */
+	public function get_date( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view', bool $formatted = false ) {
 		$date = $this->get_data( 'date', $document_type, $order, $context );
 
 		if ( $date && $formatted ) {
@@ -675,19 +733,49 @@ abstract class OrderDocument {
 		return apply_filters( "wpo_wcpdf_{$this->slug}_date", $date, $document_type, $order, $context, $formatted, $this );
 	}
 
-	public function date( $document_type ) {
+	/**
+	 * Print the document date.
+	 *
+	 * @param string $document_type
+	 * @return void
+	 */
+	public function date( string $document_type ): void {
 		echo esc_html( $this->get_date( $document_type, null, 'view', true ) );
 	}
 
-	public function get_notes( $document_type = '', $order = null, $context = 'view'  ) {
+	/**
+	 * Get the document notes.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @return mixed|null
+	 */
+	public function get_notes( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ) {
 		return $this->get_data( 'notes', $document_type, $order, $context );
 	}
 
-	public function get_display_date( $document_type = '', $order = null, $context = 'view'  ) {
+	/**
+	 * Get the document display date.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @return mixed|null
+	 */
+	public function get_display_date( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ) {
 		return $this->get_data( 'display_date', $document_type, $order, $context );
 	}
 
-	public function get_creation_trigger( $document_type = '', $order = null, $context = 'view'  ) {
+	/**
+	 * Get the document creation trigger.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @return mixed|null
+	 */
+	public function get_creation_trigger( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ) {
 		return $this->get_data( 'creation_trigger', $document_type, $order, $context );
 	}
 
@@ -696,7 +784,7 @@ abstract class OrderDocument {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	public function get_title(): string {
 		return $this->get_title_for( 'document' );
 	}
 
@@ -705,7 +793,7 @@ abstract class OrderDocument {
 	 *
 	 * @return void
 	 */
-	public function title() {
+	public function title(): void {
 		echo esc_html( $this->get_title() );
 	}
 
@@ -714,7 +802,7 @@ abstract class OrderDocument {
 	 *
 	 * @return string
 	 */
-	public function get_number_title() {
+	public function get_number_title(): string {
 		return $this->get_title_for( 'document_number' );
 	}
 
@@ -723,7 +811,7 @@ abstract class OrderDocument {
 	 *
 	 * @return void
 	 */
-	public function number_title() {
+	public function number_title(): void {
 		echo esc_html( $this->get_number_title() );
 	}
 
@@ -732,7 +820,7 @@ abstract class OrderDocument {
 	 *
 	 * @return string
 	 */
-	public function get_date_title() {
+	public function get_date_title(): string {
 		return $this->get_title_for( 'document_date' );
 	}
 
@@ -741,7 +829,7 @@ abstract class OrderDocument {
 	 *
 	 * @return void
 	 */
-	public function date_title() {
+	public function date_title(): void {
 		echo esc_html( $this->get_date_title() );
 	}
 
@@ -750,7 +838,7 @@ abstract class OrderDocument {
 	 *
 	 * @return string
 	 */
-	public function get_due_date_title() {
+	public function get_due_date_title(): string {
 		return $this->get_title_for( 'document_due_date' );
 	}
 
@@ -759,7 +847,7 @@ abstract class OrderDocument {
 	 *
 	 * @return void
 	 */
-	public function due_date_title() {
+	public function due_date_title(): void {
 		echo esc_html( $this->get_due_date_title() );
 	}
 
@@ -1085,17 +1173,14 @@ abstract class OrderDocument {
 		echo esc_html( $this->get_body_class() );
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| Data setters
-	|--------------------------------------------------------------------------
-	|
-	| Functions for setting order data. These should not update anything in the
-	| order itself and should only change what is stored in the class
-	| object.
-	*/
-
-	public function set_data( $data, $order ) {
+	/**
+	 * Set document data value.
+	 *
+	 * @param array $data
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_data( array $data, ?\WC_Abstract_Order $order ): void {
 		$order = empty( $order ) ? $this->order : $order;
 
 		foreach ( $data as $key => $value ) {
@@ -1109,7 +1194,14 @@ abstract class OrderDocument {
 		}
 	}
 
-	public function set_date( $value, $order = null ) {
+	/**
+	 * Set the document date.
+	 *
+	 * @param mixed $value
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_date( $value, ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 		try {
 			if ( empty( $value ) ) {
@@ -1149,7 +1241,14 @@ abstract class OrderDocument {
 
 	}
 
-	public function set_number( $value, $order = null ) {
+	/**
+	 * Set the document number.
+	 *
+	 * @param mixed $value
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_number( $value, ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 
 		// Ignore incorrectly stored serialized meta and only handle expected value types.
@@ -1178,7 +1277,14 @@ abstract class OrderDocument {
 		$this->data['number'] = $document_number;
 	}
 
-	public function set_notes( $value, $order = null ) {
+	/**
+	 * Set the document notes.
+	 *
+	 * @param mixed $value
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_notes( $value, ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 
 		try {
@@ -1195,7 +1301,14 @@ abstract class OrderDocument {
 		}
 	}
 
-	public function set_display_date( $value, $order = null ) {
+	/**
+	 * Set the document display date.
+	 *
+	 * @param mixed $value
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_display_date( $value, ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 
 		try {
@@ -1212,13 +1325,12 @@ abstract class OrderDocument {
 		}
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| Settings getters / outputters
-	|--------------------------------------------------------------------------
-	*/
-
-	public function get_number_settings() {
+	/**
+	 * Get the document number settings.
+	 *
+	 * @return array
+	 */
+	public function get_number_settings(): array {
 		if ( empty( $this->settings ) ) {
 			$settings        = $this->get_settings( true ); // we always want the latest settings
 			$number_settings = isset( $settings['number_format'] ) ? $settings['number_format'] : array();
@@ -1230,8 +1342,10 @@ abstract class OrderDocument {
 
 	/**
 	 * Output template styles
+	 * 
+	 * @return void
 	 */
-	public function template_styles() {
+	public function template_styles(): void {
 		$css_file_path = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( 'style.css' ) );
 		$css           = '';
 
@@ -1261,7 +1375,12 @@ abstract class OrderDocument {
 		echo esc_html( $css );
 	}
 
-	public function has_header_logo() {
+	/**
+	 * Check if header logo is set
+	 *
+	 * @return bool
+	 */
+	public function has_header_logo(): bool {
 		return ! empty( $this->settings['header_logo'] );
 	}
 
@@ -1279,11 +1398,15 @@ abstract class OrderDocument {
 
 	/**
 	 * Return logo height
+	 *
+	 * @return string|null
 	 */
-	public function get_header_logo_height() {
-		if ( ! empty( $this->settings['header_logo_height'] ) ) {
-			return apply_filters( 'wpo_wcpdf_header_logo_height', str_replace( ' ', '', $this->settings['header_logo_height'] ), $this );
-		}
+	public function get_header_logo_height(): ?string {
+		$logo_height = ! empty( $this->settings['header_logo_height'] )
+			? str_replace( ' ', '', $this->settings['header_logo_height'] )
+			: null;
+		
+		return apply_filters( 'wpo_wcpdf_header_logo_height', $logo_height, $this );
 	}
 
 	/**
@@ -1336,7 +1459,15 @@ abstract class OrderDocument {
 		}
 	}
 
-	public function get_settings_text( $settings_key, $default = false, $autop = true ) {
+	/**
+	 * Return settings text with optional autop and wptexturize
+	 *
+	 * @param string $settings_key
+	 * @param string|false $default
+	 * @param bool $autop
+	 * @return string
+	 */
+	public function get_settings_text( string $settings_key, $default = false, bool $autop = true ): string {
 		$setting = $this->get_setting( $settings_key, $default );
 		// check for 'default' key existence
 		if ( ! empty( $setting ) && is_array( $setting ) && array_key_exists( 'default', $setting ) ) {
@@ -1383,117 +1514,207 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show custom company name or default to blog name
+	 * 
+	 * @return string
 	 */
-	public function get_shop_name() {
+	public function get_shop_name(): string {
 		$default = get_bloginfo( 'name' );
 		return $this->get_settings_text( 'shop_name', $default, false );
 	}
-	public function shop_name() {
+	
+	/**
+	 * Print shop name
+	 *
+	 * @return void
+	 */
+	public function shop_name(): void {
 		echo esc_html( $this->get_shop_name() );
 	}
 
 	/**
 	 * Return/Show company VAT number
+	 * 
+	 * @return string
 	 */
-	public function get_shop_vat_number() {
+	public function get_shop_vat_number(): string {
 		return $this->get_settings_text( 'vat_number', '', false );
 	}
-	public function shop_vat_number() {
+	
+	/**
+	 * Print company VAT number
+	 *
+	 * @return void
+	 */
+	public function shop_vat_number(): void {
 		echo esc_html( $this->get_shop_vat_number() );
 	}
 
 	/**
 	 * Return/Show company COC number
+	 * 
+	 * @return string
 	 */
-	public function get_shop_coc_number() {
+	public function get_shop_coc_number(): string {
 		return $this->get_settings_text( 'coc_number', '', false );
 	}
-	public function shop_coc_number() {
+	
+	/**
+	 * Print company COC number
+	 *
+	 * @return void
+	 */
+	public function shop_coc_number(): void {
 		echo esc_html( $this->get_shop_coc_number() );
 	}
 
 	/**
 	 * Return/Show shop/company address line 1 if provided.
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address_line_1(): string {
 		return $this->get_settings_text( 'shop_address_line_1' );
 	}
+	
+	/**
+	 * Print shop/company address line 1
+	 *
+	 * @return void
+	 */
 	public function shop_address_line_1(): void {
 		echo esc_html( $this->get_shop_address_line_1() );
 	}
 
 	/**
 	 * Return/Show shop/company address line 2 if provided.
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address_line_2(): string {
 		return $this->get_settings_text( 'shop_address_line_2' );
 	}
+	
+	/**
+	 * Print shop/company address line 2
+	 *
+	 * @return void
+	 */
 	public function shop_address_line_2(): void {
 		echo esc_html( $this->get_shop_address_line_2() );
 	}
 
 	/**
 	 * Return/Show shop/company address country if provided.
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address_country(): string {
 		return wpo_wcpdf_get_country_name_from_code( $this->get_shop_address_country_code() );
 	}
+	
+	/**
+	 * Print shop/company address country
+	 *
+	 * @return void
+	 */
 	public function shop_address_country(): void {
 		echo esc_html( $this->get_shop_address_country() );
 	}
 
 	/**
 	 * Return/Show shop/company address country code if provided.
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address_country_code(): string {
 		return $this->get_settings_text( 'shop_address_country', '', false );
 	}
+	
+	/**
+	 * Print shop/company address country code
+	 *
+	 * @return void
+	 */
 	public function shop_address_country_code(): void {
 		echo esc_html( $this->get_shop_address_country_code() );
 	}
 
 	/**
 	 * Return/Show shop/company address state if provided.
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address_state(): string {
 		return $this->get_settings_text( 'shop_address_state' );
 	}
+	
+	/**
+	 * Print shop/company address state
+	 *
+	 * @return void
+	 */
 	public function shop_address_state(): void {
 		echo esc_html( $this->get_shop_address_state() );
 	}
 
 	/**
 	 * Return/Show shop/company address city if provided.
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address_city(): string {
 		return $this->get_settings_text( 'shop_address_city' );
 	}
+	
+	/**
+	 * Print shop/company address city
+	 *
+	 * @return void
+	 */
 	public function shop_address_city(): void {
 		echo esc_html( $this->get_shop_address_city() );
 	}
 
 	/**
 	 * Return/Show shop/company address postcode if provided.
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address_postcode(): string {
 		return $this->get_settings_text( 'shop_address_postcode' );
 	}
+	
+	/**
+	 * Print shop/company address postcode
+	 *
+	 * @return void
+	 */
 	public function shop_address_postcode(): void {
 		echo esc_html( $this->get_shop_address_postcode() );
 	}
 
 	/**
 	 * Return/Show shop/company address additional info if provided.
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address_additional(): string {
 		return $this->get_settings_text( 'shop_address_additional' );
 	}
+	
+	/**
+	 * Print shop/company address additional info
+	 *
+	 * @return void
+	 */
 	public function shop_address_additional(): void {
 		echo wp_kses_post( $this->get_shop_address_additional() );
 	}
 
 	/**
 	 * Return/Show shop/company address if provided
+	 * 
+	 * @return string
 	 */
 	public function get_shop_address(): string {
 		// Preserve legacy shop address, if it exists, when historical settings are enabled
@@ -1520,82 +1741,135 @@ abstract class OrderDocument {
 			$this
 		);
 	}
-	public function shop_address() {
+	
+	/**
+	 * Print shop/company address
+	 *
+	 * @return void
+	 */
+	public function shop_address(): void {
 		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
 	}
 
 	/**
 	 * Return/Show shop/company phone number if provided.
+	 * 
+	 * @return string
 	 */
-	public function get_shop_phone_number() {
+	public function get_shop_phone_number(): string {
 		return $this->get_settings_text( 'shop_phone_number', '', false );
 	}
-	public function shop_phone_number() {
+	
+	/**
+	 * Print shop/company phone number
+	 *
+	 * @return void
+	 */
+	public function shop_phone_number(): void {
 		echo esc_html( $this->get_shop_phone_number() );
 	}
 
 	/**
 	 * Return/Show shop/company email address if provided.
+	 * 
+	 * @return string
 	 */
-	public function get_shop_email_address() {
+	public function get_shop_email_address(): string {
 		return $this->get_settings_text( 'shop_email_address', '', false );
 	}
-	public function shop_email_address() {
+	
+	/**
+	 * Print shop/company email address
+	 *
+	 * @return void
+	 */
+	public function shop_email_address(): void {
 		echo esc_html( $this->get_shop_email_address() );
 	}
 
 	/**
 	 * Return/Show shop/company footer imprint, copyright etc.
+	 * 
+	 * @return string
 	 */
-	public function get_footer() {
+	public function get_footer(): string {
 		ob_start();
 		do_action( 'wpo_wcpdf_before_footer', $this->get_type(), $this->order );
 		echo $this->get_settings_text( 'footer' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		do_action( 'wpo_wcpdf_after_footer', $this->get_type(), $this->order );
 		return ob_get_clean();
 	}
-	public function footer() {
+	
+	/**
+	 * Print shop/company footer imprint, copyright etc.
+	 *
+	 * @return void
+	 */
+	public function footer(): void {
 		echo wp_kses_post( $this->get_footer() );
 	}
 
 	/**
 	 * Return/Show Extra field 1
+	 * 
+	 * @return string
 	 */
-	public function get_extra_1() {
+	public function get_extra_1(): string {
 		return $this->get_settings_text( 'extra_1' );
 
 	}
-	public function extra_1() {
+	
+	/**
+	 * Print Extra field 1
+	 *
+	 * @return void
+	 */
+	public function extra_1(): void {
 		echo wp_kses_post( $this->get_extra_1() );
 	}
 
 	/**
 	 * Return/Show Extra field 2
+	 * 
+	 * @return string
 	 */
-	public function get_extra_2() {
+	public function get_extra_2(): string {
 		return $this->get_settings_text( 'extra_2' );
 	}
-	public function extra_2() {
+	
+	/**
+	 * Print Extra field 2
+	 *
+	 * @return void
+	 */
+	public function extra_2(): void {
 		echo wp_kses_post( $this->get_extra_2() );
 	}
 
 	/**
 	 * Return/Show Extra field 3
+	 * 
+	 * @return string
 	 */
-	public function get_extra_3() {
+	public function get_extra_3(): string {
 		return $this->get_settings_text( 'extra_3' );
 	}
-	public function extra_3() {
+	
+	/**
+	 * Print Extra field 3
+	 *
+	 * @return void
+	 */
+	public function extra_3(): void {
 		echo wp_kses_post( $this->get_extra_3() );
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| Output functions
-	|--------------------------------------------------------------------------
-	*/
-
-	public function get_pdf() {
+	/**
+	 * Get the PDF file contents.
+	 *
+	 * @return string|null
+	 */
+	public function get_pdf(): ?string {
 		// maybe we need to reinstall fonts first?
 		WPO_WCPDF()->get_instance( 'main' )->maybe_reinstall_fonts();
 
@@ -1636,8 +1910,13 @@ abstract class OrderDocument {
 
 		return apply_filters( 'wpo_wcpdf_get_pdf', $pdf, $this );
 	}
-
-	public function preview_pdf() {
+	
+	/**
+	 * Get the PDF file contents for preview.
+	 *
+	 * @return string|null
+	 */
+	public function preview_pdf(): ?string {
 		// maybe we need to reinstall fonts first?
 		WPO_WCPDF()->get_instance( 'main' )->maybe_reinstall_fonts();
 
@@ -1655,7 +1934,13 @@ abstract class OrderDocument {
 		return $pdf;
 	}
 
-	public function get_html( $args = array() ) {
+	/**
+	 * Get the HTML content for the document.
+	 *
+	 * @param array $args
+	 * @return string
+	 */
+	public function get_html( array $args = array() ): string {
 		// temporarily apply filters that need to be removed again after the html is generated
 		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
 		\wpo_ips_add_filters( $html_filters );
@@ -1690,25 +1975,44 @@ abstract class OrderDocument {
 		return apply_filters( 'wpo_wcpdf_get_html', $html, $this );
 	}
 
-	public function output_pdf( $output_mode = 'download' ) {
+	/**
+	 * Output the PDF file to the browser.
+	 *
+	 * @param string $output_mode
+	 */
+	public function output_pdf( string $output_mode = 'download' ) {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
 		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit();
 	}
 
+	/**
+	 * Output the HTML document.
+	 */
 	public function output_html() {
 		echo $this->get_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
-	public function preview_xml() {
+	/**
+	 * Output the XML document for preview.
+	 *
+	 * @return string
+	 */
+	public function preview_xml(): string {
 		// get last settings
 		$this->settings = $this->get_settings( true );
 
 		return $this->output_xml( true );
 	}
 
-	public function output_xml( $contents_only = false ) {
+	/**
+	 * Output the XML document to the browser or return contents if $contents_only is true.
+	 *
+	 * @param bool $contents_only
+	 * @return string|void
+	 */
+	public function output_xml( bool $contents_only = false ) {
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
 		if ( ! $document ) {
@@ -1754,7 +2058,13 @@ abstract class OrderDocument {
 		exit();
 	}
 
-	public function wrap_html_content( $content ) {
+	/**
+	 * Wrap the HTML content in a full HTML document structure.
+	 *
+	 * @param string $content
+	 * @return string
+	 */
+	public function wrap_html_content( string $content ): string {
 		$html = $this->render_template( $this->locate_template_file( "html-document-wrapper.php" ), array(
 				'content' => apply_filters( 'wpo_wcpdf_html_content', $content ),
 			)
@@ -1762,7 +2072,14 @@ abstract class OrderDocument {
 		return $html;
 	}
 
-	public function get_filename( $context = 'download', $args = array() ) {
+	/**
+	 * Get the filename for the document.
+	 *
+	 * @param string $context
+	 * @param array $args
+	 * @return string
+	 */
+	public function get_filename( string $context = 'download', array $args = array() ): string {
 		$order_count = isset($args['order_ids']) ? count($args['order_ids']) : 1;
 
 		$name = $this->get_type();
@@ -1791,11 +2108,22 @@ abstract class OrderDocument {
 		return sanitize_file_name( $filename );
 	}
 
-	public function get_template_path() {
+	/**
+	 * Get the template path for the document.
+	 *
+	 * @return string
+	 */
+	public function get_template_path(): string {
 		return WPO_WCPDF()->get_instance( 'settings' )->get_template_path();
 	}
 
-	public function locate_template_file( $file ) {
+	/**
+	 * Locate the template file for the document, checking for custom templates in the theme first and falling back to the plugin templates.
+	 *
+	 * @param string $file
+	 * @return string
+	 */
+	public function locate_template_file( string $file ): string {
 		if ( empty( $file ) ) {
 			$file = $this->type . '.php';
 		}
@@ -1814,7 +2142,14 @@ abstract class OrderDocument {
 		return $file_path;
 	}
 
-	public function render_template( $file, $args = array() ) {
+	/**
+	 * Render the template file with the given arguments and return the output.
+	 *
+	 * @param string $file
+	 * @param array $args
+	 * @return string
+	 */
+	public function render_template( string $file, array $args = array() ): string {
 		do_action( 'wpo_wcpdf_process_template', $this->get_type(), $this );
 
 		if ( ! empty( $args ) && is_array( $args ) ) {
@@ -1828,18 +2163,12 @@ abstract class OrderDocument {
 		return ob_get_clean();
 	}
 
-	/*
-	|--------------------------------------------------------------------------
-	| Settings helper functions
-	|--------------------------------------------------------------------------
-	*/
-
 	/**
-	 * get all emails registered in WooCommerce
-	 * @param  boolean $remove_defaults switch to remove default woocommerce emails
-	 * @return array   $emails       list of all email ids/slugs and names
+	 * Get all emails registered in WooCommerce
+	 * 
+	 * @return array
 	 */
-	public function get_wc_emails() {
+	public function get_wc_emails(): array {
 		// only run this in the context of the settings page or setup wizard
 		// prevents WPML language mixups
 		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -1849,7 +2178,7 @@ abstract class OrderDocument {
 		}
 
 		// get emails from WooCommerce
-		if (function_exists('WC')) {
+		if ( function_exists( 'WC' ) ) {
 			$mailer = WC()->mailer();
 		} else {
 			global $woocommerce;
@@ -1890,8 +2219,12 @@ abstract class OrderDocument {
 		return apply_filters( 'wpo_wcpdf_wc_emails', $emails );
 	}
 
-	// get list of WooCommerce statuses
-	public function get_wc_order_status_list() {
+	/**
+	 * Get list of WooCommerce statuses
+	 *
+	 * @return array
+	 */
+	public function get_wc_order_status_list(): array {
 		$order_statuses = array();
 		$statuses       = function_exists('wc_get_order_statuses') ? wc_get_order_statuses() : array();
 
@@ -1908,7 +2241,7 @@ abstract class OrderDocument {
 	 *
 	 * @return SequentialNumberStore
 	 */
-	public function get_sequential_number_store() {
+	public function get_sequential_number_store(): SequentialNumberStore {
 		$reset_number_yearly = isset( $this->settings['reset_number_yearly'] ) ? true : false;
 		$method              = WPO_WCPDF()->get_instance( 'settings' )->get_sequential_number_store_method();
 		$now                 = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
@@ -1944,9 +2277,12 @@ abstract class OrderDocument {
 	 * and whether the number should be reset yearly. When the number is reset yearly, numbered
 	 * stores are used for non-current years, adding the year as the suffix
 	 *
+	 * @param \WC_DateTime $date
+	 * @param string $method
+	 * @param bool $reset_number_yearly
 	 * @return string $number_store_name
 	 */
-	public function get_sequential_number_store_name( $date, $method, $reset_number_yearly ) {
+	public function get_sequential_number_store_name( \WC_DateTime $date, string $method, bool $reset_number_yearly ): string {
 		$store_base_name    = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
 		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
 		$current_store_year = $this->get_number_store_year( $default_table_name );
@@ -1975,12 +2311,12 @@ abstract class OrderDocument {
 
 	/**
 	 * Get the default table name of the Sequential Number Store
+	 * 
 	 * @param  string $store_base_name
 	 * @param  string $method
-	 *
 	 * @return string $table_name
 	 */
-	public function get_number_store_table_default_name( $store_base_name, $method ) {
+	public function get_number_store_table_default_name( string $store_base_name, string $method ): string {
 		global $wpdb;
 		return apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
 	}
@@ -1996,9 +2332,12 @@ abstract class OrderDocument {
 	 *
 	 * returns requested year if any error occurs, so that the current store table will be used
 	 *
+	 * @param \WC_DateTime $date date used to determine the year for which the store is requested (usually document date or 'now')
+	 * @param string $store_base_name base name of the store (e.g. 'invoice_number')
+	 * @param string $method method of the store (e.g. 'meta' or 'table')
 	 * @return int $year year of the current number store
 	 */
-	public function maybe_retire_number_store( $date, $store_base_name, $method ) {
+	public function maybe_retire_number_store( \WC_DateTime $date, string $store_base_name, string $method ): int {
 		global $wpdb;
 
 		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
@@ -2190,7 +2529,6 @@ abstract class OrderDocument {
 	 * Calculate the due date.
 	 *
 	 * @param int $due_date_days
-	 *
 	 * @return int Due date timestamp.
 	 */
 	public function calculate_due_date( int $due_date_days ): int {
@@ -2237,6 +2575,26 @@ abstract class OrderDocument {
 	}
 	
 	/**
+	 * Get non historical settings keys.
+	 *
+	 * @return array
+	 */
+	private function get_non_historical_settings(): array {
+		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
+			'enabled',
+			'attach_to_email_ids',
+			'disable_for_statuses',
+			'number_format', // this is stored in the number data already!
+			'my_account_buttons',
+			'my_account_restrict',
+			'invoice_number_column',
+			'invoice_date_column',
+			'paper_size',
+			'font_subsetting',
+		), $this );
+	}
+	
+	/**
 	 * Reset the resolved settings cache.
 	 *
 	 * @return void
@@ -2245,17 +2603,35 @@ abstract class OrderDocument {
 		$this->resolved_settings_cache = array();
 	}
 
-	protected function add_filters( $filters ) {
+	/**
+	 * Add filters.
+	 *
+	 * @param array $filters
+	 * @return array
+	 */
+	protected function add_filters( array $filters ): array {
 		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_add_filters' );
 		return wpo_ips_add_filters( $filters );
 	}
 
-	protected function remove_filters( $filters ) {
+	/**
+	 * Remove filters.
+	 *
+	 * @param array $filters
+	 * @return array
+	 */
+	protected function remove_filters( array $filters ): array {
 		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_remove_filters' );
 		return wpo_ips_remove_filters( $filters );
 	}
 
-	protected function normalize_filter_args( $filter ) {
+	/**
+	 * Normalize filter arguments.
+	 *
+	 * @param array $filter
+	 * @return array
+	 */
+	protected function normalize_filter_args( array $filter ): array {
 		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_normalize_filter_args' );
 		return wpo_ips_normalize_filter_args( $filter );
 	}

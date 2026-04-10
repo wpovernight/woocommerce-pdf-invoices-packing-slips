@@ -637,7 +637,13 @@ class Settings {
 		return $template_list;
 	}
 
-	public function get_template_path( string $template_path = '' ) {
+	/**
+	 * Get template path by template name or path.
+	 *
+	 * @param string $template_path Template name or path.
+	 * @return string
+	 */
+	public function get_template_path( string $template_path = '' ): string {
 		$selected_template = $template_path
 			? sanitize_text_field( $template_path )
 			: ( $this->general_settings['template_path'] ?? '' );

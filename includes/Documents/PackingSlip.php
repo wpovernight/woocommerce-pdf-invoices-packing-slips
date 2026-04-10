@@ -70,7 +70,14 @@ class PackingSlip extends OrderDocumentMethods {
 		return apply_filters( 'wpo_wcpdf_document_date_title', $title, $this );
 	}
 
-	public function get_filename( $context = 'download', $args = array() ) {
+	/**
+	 * Get the filename for the document.
+	 *
+	 * @param string $context
+	 * @param array $args
+	 * @return string
+	 */
+	public function get_filename( string $context = 'download', array $args = array() ): string {
 		$order_count = isset($args['order_ids']) ? count($args['order_ids']) : 1;
 
 		$name = _n( 'packing-slip', 'packing-slips', $order_count, 'woocommerce-pdf-invoices-packing-slips' );

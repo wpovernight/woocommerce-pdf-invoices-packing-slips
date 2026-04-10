@@ -7,16 +7,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\\WPO\\IPS\\Documents\\Invoice' ) ) :
 
-/**
- * Invoice Document
- */
-
 class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Init/load the order object.
 	 *
-	 * @param  int|object|WC_Order $order Order to init.
+	 * @param int|object|WC_Order $order Order to init.
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
@@ -42,7 +38,7 @@ class Invoice extends OrderDocumentMethods {
 	/**
 	 * Checks if Invoice uses historical settings
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function use_historical_settings(): bool {
 		return apply_filters(
@@ -55,7 +51,7 @@ class Invoice extends OrderDocumentMethods {
 	/**
 	 * Checks if Invoice has storing settings enabled
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function storing_settings_enabled(): bool {
 		return apply_filters(
@@ -70,7 +66,7 @@ class Invoice extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	public function get_title(): string {
 		// override/not using $this->title to allow for language switching!
 		$title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_title' ); // deprecated
@@ -82,7 +78,7 @@ class Invoice extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_number_title() {
+	public function get_number_title(): string {
 		// override to allow for language switching!
 		$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' ); // deprecated
@@ -94,7 +90,7 @@ class Invoice extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_date_title() {
+	public function get_date_title(): string {
 		// override to allow for language switching!
 		$title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' ); // deprecated
@@ -111,7 +107,12 @@ class Invoice extends OrderDocumentMethods {
 		return apply_filters( 'wpo_wcpdf_document_shipping_address_title', __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
 	}
 
-	public function init() {
+	/**
+	 * Initializes the document.
+	 *
+	 * @return void
+	 */
+	public function init(): void {
 		// save settings
 		$this->save_settings();
 		$this->initiate_date();
@@ -120,26 +121,25 @@ class Invoice extends OrderDocumentMethods {
 		do_action( 'wpo_wcpdf_init_document', $this );
 	}
 
-	public function exists() {
+	/**
+	 * Checks if the document exists.
+	 *
+	 * @return bool
+	 */
+	public function exists(): bool {
 		return ! empty( $this->data['number'] );
 	}
 
 	/**
-	 * Legacy function < v3.8.0
-	 *
-	 * Still being used by third party plugins.
-	 *
-	 * @return mixed
+	 * Get the document filename.
+	 * 
+	 * @param string $context
+	 * @param array $args
+	 * @return string
 	 */
-	public function init_number() {
-		wcpdf_deprecated_function( 'init_number', '3.8.0', 'initiate_number' );
-		return $this->initiate_number();
-	}
-
-	public function get_filename( $context = 'download', $args = array() ) {
-		$order_count = isset($args['order_ids']) ? count($args['order_ids']) : 1;
-
-		$name = _n( 'invoice', 'invoices', $order_count, 'woocommerce-pdf-invoices-packing-slips' );
+	public function get_filename( string $context = 'download', array $args = array() ): string {
+		$order_count = isset( $args['order_ids'] ) ? count( $args['order_ids'] ) : 1;
+		$name        = _n( 'invoice', 'invoices', $order_count, 'woocommerce-pdf-invoices-packing-slips' );
 
 		if ( $order_count == 1 ) {
 			if ( isset( $this->settings['display_number'] ) && $this->settings['display_number'] == 'invoice_number' ) {
@@ -181,8 +181,10 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Initialise settings
+	 * 
+	 * @return void
 	 */
-	public function init_settings() {
+	public function init_settings(): void {
 		do_action( "wpo_wcpdf_before_{$this->type}_init_settings", $this );
 
 		foreach ( $this->output_formats as $output_format ) {
@@ -212,8 +214,11 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * PDF settings fields
+	 * 
+	 * @param string $option_name
+	 * @return array
 	 */
-	public function get_pdf_settings_fields( $option_name ) {
+	public function get_pdf_settings_fields( string $option_name ): array {
 		$settings_fields = array(
 			array(
 				'type'			=> 'section',
@@ -632,7 +637,6 @@ class Invoice extends OrderDocumentMethods {
 	 * Get the settings categories.
 	 *
 	 * @param string $output_format
-	 *
 	 * @return array
 	 */
 	public function get_settings_categories( string $output_format ): array {
@@ -690,6 +694,18 @@ class Invoice extends OrderDocumentMethods {
 		);
 
 		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ] ?? array(), $output_format, $this );
+	}
+	
+	/**
+	 * Legacy function < v3.8.0
+	 *
+	 * Still being used by third party plugins.
+	 *
+	 * @return mixed
+	 */
+	public function init_number() {
+		wcpdf_deprecated_function( 'init_number', '3.8.0', 'initiate_number' );
+		return $this->initiate_number();
 	}
 
 }
