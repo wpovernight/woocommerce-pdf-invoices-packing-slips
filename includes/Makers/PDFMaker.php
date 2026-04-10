@@ -16,6 +16,13 @@ class PDFMaker {
 	public array $settings;
 	public ?object $document;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param string $html The HTML content to convert to PDF.
+	 * @param array $settings Optional settings for PDF generation.
+	 * @param object|null $document Optional document object related to the PDF.
+	 */
 	public function __construct( string $html, array $settings = array(), ?object $document = null ) {
 		$this->html     = $html;
 		$this->document = $document;
