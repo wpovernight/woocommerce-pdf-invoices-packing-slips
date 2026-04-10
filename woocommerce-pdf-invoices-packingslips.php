@@ -424,7 +424,10 @@ class WPO_WCPDF {
 				? sanitize_text_field( wp_unslash( $_POST['option_page'] ) )
 				: '';
 
-			return 0 === strpos( $option_page, 'wpo_wcpdf_' );
+			return (
+				0 === strpos( $option_page, 'wpo_wcpdf_' ) ||
+				0 === strpos( $option_page, 'wpo_ips_' )
+			);
 		}
 
 		return false;
