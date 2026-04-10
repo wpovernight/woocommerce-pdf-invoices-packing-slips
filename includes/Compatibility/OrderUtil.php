@@ -1,13 +1,9 @@
 <?php
-/**
- * WooCommerce OrderUtil compatibility class.
- *
- * @since 3.5
- */
-
 namespace WPO\IPS\Compatibility;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\OrderUtil' ) ) :
 
@@ -16,13 +12,21 @@ class OrderUtil {
 	public $wc_order_util_class_object;
 	protected static $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
 		$this->wc_order_util_class_object = $this->get_wc_order_util_class();
 	}
@@ -75,6 +79,7 @@ class OrderUtil {
 			is_callable( array( '\\Automattic\\WooCommerce\\Admin\\PageController', 'is_admin_or_embed_page' ) ) &&
 			\Automattic\WooCommerce\Admin\PageController::is_admin_or_embed_page();
 	}
+	
 }
 
 endif; // Class exists check

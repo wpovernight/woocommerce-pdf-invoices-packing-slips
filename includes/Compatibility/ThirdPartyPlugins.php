@@ -1,7 +1,9 @@
 <?php
 namespace WPO\IPS\Compatibility;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\ThirdPartyPlugins' ) ) :
 
@@ -36,24 +38,16 @@ class ThirdPartyPlugins {
 	/**
 	 * Reset invoice data for WooCommerce subscription renewal orders
 	 * https://wordpress.org/support/topic/subscription-renewal-duplicate-invoice-number?replies=6#post-6138110
+	 * 
+	 * @param \WC_Order $renewal_order The renewal order being created
+	 * @param \WC_Order $original_order The original parent order for the subscription
+	 * @param int $product_id The product ID for the subscription being renewed
+	 * @param string $new_order_role The role of the new order (renewal or resubscribe)
+	 * @return \WC_Order The renewal order with reset invoice data
 	 */
-	public function woocommerce_subscriptions_renewal_order_created ( $renewal_order, $original_order, $product_id, $new_order_role ) {
+	public function woocommerce_subscriptions_renewal_order_created( $renewal_order, $original_order, $product_id, $new_order_role ) {
 		$this->reset_invoice_data( $renewal_order );
 		return $renewal_order;
-	}
-
-	public function reset_invoice_data ( $order ) {
-		if ( ! is_object( $order ) ) {
-			$order = wc_get_order( $order );
-		}
-		// delete invoice number, invoice date & invoice exists meta
-		$order->delete_meta_data( '_wcpdf_invoice_number' );
-		$order->delete_meta_data( '_wcpdf_invoice_number_data' );
-		$order->delete_meta_data( '_wcpdf_formatted_invoice_number' );
-		$order->delete_meta_data( '_wcpdf_invoice_date' );
-		$order->delete_meta_data( '_wcpdf_invoice_exists' );
-
-		$order->save_meta_data();
 	}
 
 	/**
@@ -162,37 +156,20 @@ class ThirdPartyPlugins {
 	}
 
 	/**
-	 * Backwards compatibility helper function: try to get item ID from row class
-	 * @param string $classes       CSS classes for item row (tr)
-	 */
-	public function get_item_id_from_classes ( $classes ) {
-		$class_array = explode(' ', $classes);
-		foreach ($class_array as $class) {
-			if (is_numeric($class)) {
-				$item_id = $class;
-				break;
-			}
-		}
-
-		// if still empty, we lost the item id somewhere :(
-		if (empty($item_id)) {
-			return false;
-		} else {
-			return $item_id;
-		}
-	}
-
-	/**
 	 * WooCommerce Order Status & Actions Manager emails compatibility
+	 * 
+	 * @param array $emails Array of email IDs and names
+	 * @return array Filtered array of email IDs and names, with custom statuses from WooCommerce Order Status & Actions Manager added
 	 */
-	public function wc_order_status_actions_emails ( $emails ) {
+	public function wc_order_status_actions_emails( array $emails ): array {
 		// get list of custom statuses from WooCommerce Custom Order Status & Actions
 		// status slug => status name
 		$custom_statuses = \WC_Custom_Status::get_status_list_names();
 		// append _email to slug (=email_id) and add to emails list
-		foreach ($custom_statuses as $status_slug => $status_name) {
-			$emails[$status_slug.'_email'] = $status_name;
+		foreach ( $custom_statuses as $status_slug => $status_name ) {
+			$emails[ $status_slug . '_email' ] = $status_name;
 		}
+		
 		return $emails;
 	}
 
@@ -200,31 +177,50 @@ class ThirdPartyPlugins {
 	/**
 	 * Aelia Currency Switcher compatibility
 	 * Applies decimal & Thousand separator settings
+	 * 
+	 * @param string $document_type
+	 * @param \WPO\IPS\Documents\Document $document
+	 * @return void
 	 */
-	public function aelia_currency_formatting( $document_type, $document ) {
+	public function aelia_currency_formatting( string $document_type, \WPO\IPS\Documents\Document $document ): void {
 		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
 	}
 
-	public function aelia_currency_price_args( $args ) {
-		if ( !empty( $args['currency'] ) && class_exists("\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher") ) {
+	/**
+	 * Filter callback to apply Aelia Currency Switcher formatting settings to prices in documents.
+	 *
+	 * @param array $args The arguments for wc_price formatting.
+	 * @return array The modified arguments with Aelia Currency Switcher settings applied if relevant.
+	 */
+	public function aelia_currency_price_args( array $args ): array {
+		if ( ! empty( $args['currency'] ) && class_exists( "\\Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher" ) ) {
 			$cs_settings = \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher::settings();
-			$args['decimal_separator'] = $cs_settings->get_currency_decimal_separator( $args['currency'] );
+			$args['decimal_separator']  = $cs_settings->get_currency_decimal_separator( $args['currency'] );
 			$args['thousand_separator'] = $cs_settings->get_currency_thousand_separator( $args['currency'] );
 		}
+		
 		return $args;
 	}
 
 	/**
-	 * Avoid double images from German Market: remove filter
+	 * Avoid double images from German Market
+	 * 
+	 * @param string $document_type
+	 * @param \WPO\IPS\Documents\Document $document
+	 * @return void
 	 */
-	public function remove_wgm_thumbnails( $document_type, $document ) {
+	public function remove_wgm_thumbnails( string $document_type, \WPO\IPS\Documents\Document $document ): void {
 		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 	}
 
 	/**
-	 * Restore above
+	 * Restore above filter after document generation
+	 * 
+	 * @param string $document_type
+	 * @param \WPO\IPS\Documents\Document $document
+	 * @return void
 	 */
-	public function restore_wgm_thumbnails( $document_type, $document ) {
+	public function restore_wgm_thumbnails( string $document_type, \WPO\IPS\Documents\Document $document ): void {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
@@ -598,6 +594,49 @@ class ThirdPartyPlugins {
 		}
 
 		return $classes;
+	}
+	
+	/**
+	 * Reset invoice data for a given order.
+	 *
+	 * @param \WC_Order|int $order The order object or ID.
+	 * @return void
+	 */
+	private function reset_invoice_data ( $order ) {
+		if ( ! is_object( $order ) ) {
+			$order = wc_get_order( $order );
+		}
+		// delete invoice number, invoice date & invoice exists meta
+		$order->delete_meta_data( '_wcpdf_invoice_number' );
+		$order->delete_meta_data( '_wcpdf_invoice_number_data' );
+		$order->delete_meta_data( '_wcpdf_formatted_invoice_number' );
+		$order->delete_meta_data( '_wcpdf_invoice_date' );
+		$order->delete_meta_data( '_wcpdf_invoice_exists' );
+
+		$order->save_meta_data();
+	}
+	
+	/**
+	 * Backwards compatibility helper function: try to get item ID from row class
+	 * 
+	 * @param string $classes  CSS classes for item row (tr)
+	 * @return int|false Item ID if found, false if not found
+	 */
+	private function get_item_id_from_classes( string $classes ) {
+		$class_array = explode( ' ', $classes );
+		foreach ( $class_array as $class ) {
+			if ( is_numeric( $class ) ) {
+				$item_id = $class;
+				break;
+			}
+		}
+
+		// if still empty, we lost the item id somewhere :(
+		if ( empty( $item_id ) ) {
+			return false;
+		} else {
+			return $item_id;
+		}
 	}
 	
 }

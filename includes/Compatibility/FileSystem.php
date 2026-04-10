@@ -1,13 +1,9 @@
 <?php
-/**
- * WordPress FileSystem compatibility class.
- *
- * @since 4.2
- */
-
 namespace WPO\IPS\Compatibility;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) :
 
