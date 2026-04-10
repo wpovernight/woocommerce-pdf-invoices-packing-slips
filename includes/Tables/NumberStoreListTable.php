@@ -14,27 +14,11 @@ if ( ! class_exists( '\\WPO\\IPS\\Tables\\NumberStoreListTable' ) ) :
 
 class NumberStoreListTable extends \WP_List_Table {
 
-	/**
-	 * Number of items per page
-	 *
-	 * @var int
-	 * @since 2.0
-	 */
-	public $per_page = 50;
+	public int $per_page = 50;
+	public array $args   = array();
 
 	/**
-	 * The arguments for the data set
-	 *
-	 * @var array
-	 * @since 2.0
-	 */
-	public $args = array();
-
-	/**
-	 * Get things started
-	 *
-	 * @since 2.0
-	 * @see WP_List_Table::__construct()
+	 * Constructor.
 	 */
 	public function __construct() {
 		parent::__construct( array(
@@ -46,8 +30,6 @@ class NumberStoreListTable extends \WP_List_Table {
 
 	/**
 	 * This function renders most of the columns in the list table.
-	 *
-	 * @since 2.0
 	 *
 	 * @param object $item Contains all the data of the numbers
 	 * @param string $column_name The name of the column
@@ -153,7 +135,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	/**
 	 * Retrieve the table columns
 	 *
-	 * @since 2.0
 	 * @return array $columns Array of all the list table columns
 	 */
 	public function get_columns() {
@@ -176,7 +157,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	/**
 	 * Get the sortable columns
 	 *
-	 * @since 2.0
 	 * @return array Array of all the sortable columns
 	 */
 	public function get_sortable_columns() {
@@ -188,8 +168,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	/**
 	 * Retrieve the bulk actions
 	 *
-	 * @access public
-	 * @since 2.0
 	 * @return array Array of the bulk actions
 	 */
 	public function get_bulk_actions() {
@@ -199,7 +177,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	/**
 	 * Retrieve the current page number
 	 *
-	 * @since 2.0
 	 * @return int Current page number
 	 */
 	public function get_paged( $request ) {
@@ -209,7 +186,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	/**
 	 * Build all the number data
 	 *
-	 * @since 2.0
 	 * @return array $numbers All the data for number list table
 	 */
 	public function get_numbers() {
@@ -295,7 +271,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	/**
 	 * Setup the final data for the table
 	 *
-	 * @since 2.0
 	 * @uses self::get_columns()
 	 * @uses WP_List_Table::get_sortable_columns()
 	 * @uses self::get_pagenum()
@@ -329,7 +304,6 @@ class NumberStoreListTable extends \WP_List_Table {
 	/**
 	 * Get the parent order for refunds
 	 *
-	 * @since 2.4
 	 * @param $order WC_Order
 	 * @return $order WC_Order
 	 */

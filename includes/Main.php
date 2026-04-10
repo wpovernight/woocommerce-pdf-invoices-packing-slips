@@ -1532,7 +1532,7 @@ class Main {
 	 *
 	 * @param object     $document
 	 * @param string     $trigger
-	 * @param boolean    $force
+	 * @param bool       $force
 	 * @param array|null $request
 	 * @return void
 	 */
