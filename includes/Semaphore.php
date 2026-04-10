@@ -10,7 +10,7 @@ if ( ! class_exists( '\\WPO\\IPS\\Semaphore' ) ) :
 
 class Semaphore {
 
-	public const string CLEANUP_TRANSIENT_KEY     = 'wpo_ips_semaphore_cleanup_scheduled';
+	public const CLEANUP_TRANSIENT_KEY     = 'wpo_ips_semaphore_cleanup_scheduled';
 	
 	protected string $option_name;
 	protected int $locked_for;
