@@ -61,6 +61,9 @@ class WPO_WCPDF {
 	public ?Peppol $peppol                         = null;
 	public ?Notices $notices                       = null;
 
+	protected ?bool $dependencies_ready            = null;
+	protected ?bool $woocommerce_activated         = null;
+	
 	protected static ?self $_instance              = null;
 
 	/**
@@ -205,29 +208,31 @@ class WPO_WCPDF {
 
 	/**
 	 * Load the translation / textdomain files
-	 *
-	 * Note: the first-loaded translation file overrides any following ones if the same translation is present
 	 * 
 	 * @return void
 	 */
 	public function translations(): void {
-		$locale      = $this->determine_locale();
-		$dir         = trailingslashit( WP_LANG_DIR );
-		$textdomains = array( 'woocommerce-pdf-invoices-packing-slips' );
+		static $loaded = false;
 
-		/**
-		 * Frontend/global Locale. Looks in:
-		 * - WP_LANG_DIR/woocommerce-pdf-invoices-packing-slips/woocommerce-pdf-invoices-packing-slips-LOCALE.mo
-		 * - WP_LANG_DIR/plugins/woocommerce-pdf-invoices-packing-slips-LOCALE.mo
-		 * - woocommerce-pdf-invoices-packing-slips/languages/woocommerce-pdf-invoices-packing-slips-LOCALE.mo (which if not found falls back to:)
-		 * - WP_LANG_DIR/plugins/woocommerce-pdf-invoices-packing-slips-LOCALE.mo
-		 */
-		foreach ( $textdomains as $textdomain ) {
-			unload_textdomain( $textdomain );
-			load_textdomain( $textdomain, $dir . 'woocommerce-pdf-invoices-packing-slips/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
-			load_textdomain( $textdomain, $dir . 'plugins/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
-			load_plugin_textdomain( $textdomain, false, dirname( $this->plugin_basename ) . '/languages' );
+		if ( $loaded ) {
+			return;
 		}
+
+		$textdomain = 'woocommerce-pdf-invoices-packing-slips';
+
+		if ( is_textdomain_loaded( $textdomain ) ) {
+			$loaded = true;
+			return;
+		}
+
+		$locale = $this->determine_locale();
+		$dir    = trailingslashit( WP_LANG_DIR );
+
+		load_textdomain( $textdomain, $dir . 'woocommerce-pdf-invoices-packing-slips/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
+		load_textdomain( $textdomain, $dir . 'plugins/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
+		load_plugin_textdomain( $textdomain, false, dirname( $this->plugin_basename ) . '/languages' );
+
+		$loaded = true;
 	}
 
 	/**
@@ -253,20 +258,24 @@ class WPO_WCPDF {
 	 * @return bool
 	 */
 	public function dependencies_are_ready(): bool {
+		if ( null !== $this->dependencies_ready ) {
+			return $this->dependencies_ready;
+		}
+	
 		// Check if WooCommerce is activated and meets the minimum version
 		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
 			Notices::maybe_add_admin_notice( array( Notices::class, 'need_woocommerce_notice' ) );
-			return false;
+			return $this->dependencies_ready = false;
 		}
 
 		// Check if PHP version is supported
 		if ( ! has_filter( 'wpo_wcpdf_pdf_maker' ) && ! $this->is_dependency_version_supported( 'php' ) ) {
 			add_filter( 'wpo_wcpdf_document_is_allowed', '__return_false', 99999 );
 			Notices::maybe_add_admin_notice( array( Notices::class, 'required_php_version_notice' ) );
-			return false;
+			return $this->dependencies_ready = false;
 		}
 
-		return true;
+		return $this->dependencies_ready = true;
 	}
 
 	/**
@@ -275,15 +284,17 @@ class WPO_WCPDF {
 	 * @return bool
 	 */
 	public function is_woocommerce_activated(): bool {
-		$blog_plugins    = (array) get_option( 'active_plugins', array() );
-		$site_plugins    = is_multisite() ? (array) get_site_option( 'active_sitewide_plugins', array() ) : array();
-		$is_wc_activated = false;
-
-		if ( in_array( 'woocommerce/woocommerce.php', $blog_plugins, true ) || isset( $site_plugins['woocommerce/woocommerce.php'] ) ) {
-			$is_wc_activated = true;
+		if ( null !== $this->woocommerce_activated ) {
+			return $this->woocommerce_activated;
 		}
 
-		return apply_filters( 'wpo_wcpdf_is_woocommerce_activated', $is_wc_activated );
+		$blog_plugins    = (array) get_option( 'active_plugins', array() );
+		$site_plugins    = is_multisite() ? (array) get_site_option( 'active_sitewide_plugins', array() ) : array();
+		$is_wc_activated = in_array( 'woocommerce/woocommerce.php', $blog_plugins, true ) || isset( $site_plugins['woocommerce/woocommerce.php'] );
+
+		$this->woocommerce_activated = (bool) apply_filters( 'wpo_wcpdf_is_woocommerce_activated', $is_wc_activated );
+
+		return $this->woocommerce_activated;
 	}
 
 	/**
