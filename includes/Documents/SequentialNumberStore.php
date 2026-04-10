@@ -7,10 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\\WPO\\IPS\\Documents\\SequentialNumberStore' ) ) :
 
-/**
- * Class handling database interaction for sequential numbers
- */
-
 class SequentialNumberStore {
 
 	private ?\wpdb  $wpdb      = null;

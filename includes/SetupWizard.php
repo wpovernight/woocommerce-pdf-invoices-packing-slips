@@ -319,12 +319,13 @@ class SetupWizard {
 	 * @param int $delta Direction to move in the steps array (1 for next, -1 for previous).
 	 * @return string|false The key of the next/previous step, or false if there is no such step.
 	 */
-	public function get_step( int $delta ): string|false {
-		$step_keys = array_keys( $this->steps );
+	public function get_step( int $delta ) {
+		$step_keys        = array_keys( $this->steps );
 		$current_step_pos = array_search( $this->step, $step_keys );
-		$new_step_pos = $current_step_pos + $delta;
-		if ( isset( $step_keys[$new_step_pos] ) ) {
-			return $step_keys[$new_step_pos];
+		$new_step_pos     = $current_step_pos + $delta;
+		
+		if ( isset( $step_keys[ $new_step_pos ] ) ) {
+			return $step_keys[ $new_step_pos ];
 		} else {
 			return false;
 		}
