@@ -15,8 +15,10 @@ class SettingsCallbacks {
 
 	/**
 	 * Instance of this class.
+	 * 
+	 * @return self
 	 */
-	public static function instance(): ?self {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}

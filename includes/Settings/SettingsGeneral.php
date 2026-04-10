@@ -13,13 +13,21 @@ class SettingsGeneral {
 	protected ?array $missing_template_files = null;
 	protected static ?self $_instance        = null;
 
-	public static function instance() {
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
 		// WP
 		if ( \WPO_WCPDF()->is_settings_page() ) {
@@ -34,7 +42,14 @@ class SettingsGeneral {
 		add_action( 'wp_ajax_wcpdf_get_country_states', array( $this, 'ajax_get_shop_country_states' ) );
 	}
 
-	public function output( $section, $nonce ) {
+	/**
+	 * Output the general settings.
+	 *
+	 * @param string $section
+	 * @param string $nonce
+	 * @return void
+	 */
+	public function output( string $section, string $nonce ): void {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
@@ -45,7 +60,12 @@ class SettingsGeneral {
 		submit_button();
 	}
 
-	public function init_settings() {
+	/**
+	 * Initialize general settings.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
 		$page = $option_group = $option_name = $this->option_name;
 
 		$template_base_path     = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
@@ -620,7 +640,14 @@ class SettingsGeneral {
 		$settings_instance->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
 
-	public function attachment_settings_hint( $active_tab, $active_section ) {
+	/**
+	 * Display a hint to set up attachments for invoice emails if no attachments are set, and allow hiding the hint
+	 *
+	 * @param string $active_tab
+	 * @param string $active_section
+	 * @return void
+	 */
+	public function attachment_settings_hint( string $active_tab, string $active_section ): void {
 		// save or check option to hide attachments settings hint
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_attachments_hint'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
@@ -635,14 +662,14 @@ class SettingsGeneral {
 			$hide_hint = get_option( 'wpo_wcpdf_hide_attachments_hint' );
 		}
 
-		if ( $active_tab == 'general' && ! $hide_hint ) {
+		if ( 'general' === $active_tab && ! $hide_hint ) {
 			$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 			foreach ( $documents as $document ) {
-				if ( $document->get_type() == 'invoice' ) {
+				if ( 'invoice' === $document->get_type() ) {
 					$invoice_email_ids = $document->get_attach_to_email_ids();
 					if ( empty( $invoice_email_ids ) ) {
-						include_once( WPO_WCPDF()->plugin_path() . '/views/attachment-settings-hint.php' );
+						include_once WPO_WCPDF()->plugin_path() . '/views/attachment-settings-hint.php';
 					}
 				}
 			}
@@ -738,9 +765,10 @@ class SettingsGeneral {
 
 	/**
 	 * List templates in plugin folder, theme folder & child theme folder
-	 * @return array		template path => template name
+	 * 
+	 * @return array
 	 */
-	public function find_templates() {
+	public function find_templates(): array {
 		$installed_templates = array();
 		// get base paths
 		$template_base_path  = ( function_exists( 'WC' ) && is_callable( array( WC(), 'template_path' ) ) ) ? WC()->template_path() : apply_filters( 'woocommerce_template_path', 'woocommerce/' );
@@ -821,8 +849,10 @@ class SettingsGeneral {
 
 	/**
 	 * Get the states for a given country code via AJAX.
+	 * 
+	 * @return void
 	 */
-	public function ajax_get_shop_country_states() {
+	public function ajax_get_shop_country_states(): void {
 		// Accept either the settings nonce or the setup-wizard nonce.
 		$valid = check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security', false )
 			|| check_ajax_referer( 'wpo_wcpdf_setup_nonce', 'security', false );

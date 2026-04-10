@@ -9,15 +9,23 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsDocuments' ) ) :
 
 class SettingsDocuments {
 
-	protected static $_instance = null;
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
 		// WP
 		if ( \WPO_WCPDF()->is_settings_page() ) {
@@ -28,7 +36,12 @@ class SettingsDocuments {
 		add_action( 'wpo_wcpdf_settings_output_documents', array( $this, 'output' ), 10, 2 );
 	}
 
-	public function init_settings() {
+	/**
+	 * Initialize document settings.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
 		$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 		foreach ( $documents as $document ) {
 			if ( is_callable( array( $document, 'init_settings' ) ) ) {
@@ -37,7 +50,14 @@ class SettingsDocuments {
 		}
 	}
 
-	public function output( $section, $nonce ) {
+	/**
+	 * Output the document settings.
+	 *
+	 * @param string $section
+	 * @param string $nonce
+	 * @return void
+	 */
+	public function output( string $section, string $nonce ): void {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}

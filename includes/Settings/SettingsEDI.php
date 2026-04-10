@@ -17,7 +17,7 @@ class SettingsEDI {
 	/**
 	 * Get the singleton instance of the SettingsEDI class.
 	 *
-	 * @return SettingsEDI
+	 * @return self
 	 */
 	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
