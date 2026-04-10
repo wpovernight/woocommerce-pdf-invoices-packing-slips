@@ -2267,7 +2267,7 @@ function wpo_ips_is_current_page_checkout_page(): bool {
  * @return void
  */
 function wpo_ips_register_additional_checkout_field( array $options ): void {
-	if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '8.9.0', '<' ) ) {
+	if ( ! defined( 'WC_VERSION' ) || version_compare( WC_VERSION, '8.9.0', '<' ) ) {
 		return;
 	}
 	
