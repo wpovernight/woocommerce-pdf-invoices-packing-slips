@@ -7,10 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\\WPO\\IPS\\Documents\\PackingSlip' ) ) :
 
-/**
- * Packing Slip Document
- */
-
 class PackingSlip extends OrderDocumentMethods {
 
 	/**
@@ -39,7 +35,7 @@ class PackingSlip extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	public function get_title(): string {
 		// override/not using $this->title to allow for language switching!
 		$title = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_title' ); // deprecated
@@ -51,7 +47,7 @@ class PackingSlip extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_number_title() {
+	public function get_number_title(): string {
 		// override to allow for language switching!
 		$title = __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' ); // deprecated
@@ -63,7 +59,7 @@ class PackingSlip extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_date_title() {
+	public function get_date_title(): string {
 		// override to allow for language switching!
 		$title = __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' ); // deprecated
@@ -109,7 +105,12 @@ class PackingSlip extends OrderDocumentMethods {
 		return sanitize_file_name( $filename );
 	}
 
-	public function init_settings() {
+	/**
+	 * Init the settings for the document.
+	 * 
+	 * @return void
+	 */
+	public function init_settings(): void {
 		// Register settings.
 		$page = $option_group = $option_name = 'wpo_wcpdf_documents_settings_packing-slip';
 
@@ -228,7 +229,6 @@ class PackingSlip extends OrderDocumentMethods {
 	 * Get the settings categories.
 	 *
 	 * @param string $output_format
-	 *
 	 * @return array
 	 */
 	public function get_settings_categories( string $output_format ): array {
