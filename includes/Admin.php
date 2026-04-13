@@ -83,7 +83,7 @@ class Admin {
 	 * @return void
 	 */
 	public function setup_wizard(): void {
-		if ( get_transient( 'wpo_wcpdf_new_install' ) !== false && ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			delete_transient( 'wpo_wcpdf_new_install' );
 			WPO_WCPDF()->get_instance( 'setup_wizard' );
 		}

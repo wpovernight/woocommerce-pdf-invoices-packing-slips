@@ -33,6 +33,7 @@ use WPO\IPS\Install;
 use WPO\IPS\FontSynchronizer;
 use WPO\IPS\EDI\Peppol;
 use WPO\IPS\Notices;
+use WPO\IPS\SetupWizard;
 
 if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
