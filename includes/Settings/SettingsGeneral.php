@@ -50,7 +50,7 @@ class SettingsGeneral {
 	 * @return void
 	 */
 	public function output( string $section, string $nonce ): void {
-		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			return;
 		}
 

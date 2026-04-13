@@ -64,10 +64,6 @@ class SettingsDebug {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
-			return;
-		}
-
 		$active_section = ! empty( $active_section ) ? $active_section : 'settings';
 		$sections       = $this->get_settings_sections();
 
