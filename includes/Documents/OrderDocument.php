@@ -346,11 +346,11 @@ abstract class OrderDocument {
 	 * Get setting value.
 	 *
 	 * @param string $key
-	 * @param string $default
+	 * @param mixed $default
 	 * @param string $output_format
 	 * @return mixed
 	 */
-	public function get_setting( string $key, string $default = '', string $output_format = 'pdf' ) {
+	public function get_setting( string $key, $default = '', string $output_format = 'pdf' ) {
 		if ( in_array( $output_format, $this->output_formats ) ) {
 			$settings        = $this->get_settings( false, $output_format );
 			$latest_settings = $this->get_settings( true, $output_format );
