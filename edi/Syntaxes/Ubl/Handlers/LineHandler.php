@@ -77,7 +77,7 @@ class LineHandler extends AbstractUblHandler {
 			$net_unit      = $this->format_decimal( $net_unit_f, 2 );
 			$unit_discount = $this->format_decimal( $unit_discount_f, 2 );
 
-			// Default: keep current behaviour.
+			// Per-line rounded unit price
 			$xml_net_unit = $net_unit;
 
 			// When WooCommerce rounds tax at subtotal level, the rounded per-unit net amount
