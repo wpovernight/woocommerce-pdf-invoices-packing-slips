@@ -74,13 +74,27 @@ class LineHandler extends AbstractUblHandler {
 			$net_unit_f = $gross_unit_f - $unit_discount_f;
 
 			$gross_unit    = $this->format_decimal( $gross_unit_f, 2 );
-			$net_unit      = $this->format_decimal( $net_unit_f,   2 );
+			$net_unit      = $this->format_decimal( $net_unit_f, 2 );
 			$unit_discount = $this->format_decimal( $unit_discount_f, 2 );
+
+			// Per-line rounded unit price
+			$xml_net_unit = $net_unit;
+
+			// When WooCommerce rounds tax at subtotal level, the rounded per-unit net amount
+			// can become inconsistent with the actual line total for multi-quantity lines.
+			// In that case, derive the XML unit price from the line net total.
+			if ( 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' ) ) {
+				$qty = (float) $parts['qty'];
+
+				if ( $qty > 0 ) {
+					$xml_net_unit = $this->format_decimal( (float) $parts['net_total'] / $qty, 4 );
+				}
+			}
 
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => abs( $net_unit ), // unit price always positive (Credit Notes as well)
+					'value'      => abs( $xml_net_unit ), // unit price always positive (Credit Notes as well)
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
