@@ -23,58 +23,168 @@ function wpo_ips_edi_sanitize_string( string $string ): string {
 }
 
 /**
- * Get EDI tax data from fallback
+ * Determine whether the given category can be used for a zero-tax classification.
  *
- * @param string                  $key      Can be category, scheme, or reason
- * @param int|null                $rate_id  The tax rate ID
- * @param \WC_Abstract_Order|null $order    The order object
+ * @param string $category Category code.
+ * @return bool
+ */
+function wpo_ips_edi_is_zero_tax_category( string $category ): bool {
+	return apply_filters(
+		'wpo_ips_edi_is_zero_tax_category',
+		in_array(
+			strtoupper( trim( $category ) ),
+			array( 'AE', 'E', 'G', 'K', 'O', 'Z' ),
+			true
+		),
+		$category
+	);
+}
+
+/**
+ * Get the preferred zero-tax row from the configured zero-rate settings.
+ * 
+ * Preference order:
+ * 1. First specific zero-tax category that is not Z
+ * 2. First generic Z row
+ *
+ * @param array  $edi_tax_settings EDI tax settings.
+ * @param string $key              Can be category, scheme, or reason.
  * @return string
  */
-function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\WC_Abstract_Order $order ): string {
+function wpo_ips_edi_get_preferred_zero_rate_tax_data( array $edi_tax_settings, string $key ): string {
 	$result = '';
 
-	if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ) ) ) {
-		return $result;
-	}
+	if ( empty( $edi_tax_settings['class']['zero-rate'][ $key ] ) || 'default' !== $edi_tax_settings['class']['zero-rate'][ $key ] ) {
+		$class_value = $edi_tax_settings['class']['zero-rate'][ $key ] ?? '';
 
-	$tax_rate_class   = '';
-	$edi_tax_settings = wpo_ips_edi_get_tax_settings();
-
-	if ( ! is_null( $rate_id ) && class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
-		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
-
-		if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-			$result         = isset( $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] ) ? $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] : '';
-			$tax_rate_class = $tax_rate->tax_rate_class;
+		if ( ! empty( $class_value ) && 'default' !== $class_value ) {
+			$result = $class_value;
 		}
 	}
 
-	if ( empty( $tax_rate_class ) ) {
-		$tax_rate_class = 'standard';
+	$generic_row_value  = '';
+	$specific_row_value = '';
+
+	if ( empty( $edi_tax_settings['rate'] ) || ! is_array( $edi_tax_settings['rate'] ) ) {
+		return $result;
 	}
 
-	if ( empty( $result ) || 'default' === $result ) {
-		$result = isset( $edi_tax_settings['class'][ $tax_rate_class ][ $key ] ) ? $edi_tax_settings['class'][ $tax_rate_class ][ $key ] : '';
+	foreach ( $edi_tax_settings['rate'] as $rate_settings ) {
+		if ( ! is_array( $rate_settings ) ) {
+			continue;
+		}
+
+		$category = strtoupper( trim( (string) ( $rate_settings['category'] ?? '' ) ) );
+
+		if ( ! wpo_ips_edi_is_zero_tax_category( $category ) ) {
+			continue;
+		}
+
+		$value = isset( $rate_settings[ $key ] ) ? (string) $rate_settings[ $key ] : '';
+
+		if ( '' === $value || 'default' === $value ) {
+			continue;
+		}
+
+		if ( 'Z' === $category ) {
+			if ( '' === $generic_row_value ) {
+				$generic_row_value = $value;
+			}
+		} else {
+			if ( '' === $specific_row_value ) {
+				$specific_row_value = $value;
+			}
+		}
 	}
 
-	// check if order is tax exempt
-	if ( wpo_wcpdf_order_is_vat_exempt( $order ) ) {
+	if ( '' !== $specific_row_value ) {
+		return $specific_row_value;
+	}
+
+	if ( '' !== $generic_row_value ) {
+		return $generic_row_value;
+	}
+
+	return $result;
+}
+
+/**
+ * Get EDI tax data from fallback.
+ *
+ * @param string                  $key      Can be category, scheme, or reason.
+ * @param int|null                $rate_id  The tax rate ID.
+ * @param \WC_Abstract_Order|null $order    The order object.
+ * @return string
+ */
+function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\WC_Abstract_Order $order ): string {
+	if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ), true ) ) {
+		return '';
+	}
+
+	$is_empty_or_default = static function ( $value ): bool {
+		return '' === $value || 'default' === $value;
+	};
+
+	$vat_exempt_defaults = array(
+		'scheme'   => 'VAT',
+		'category' => 'AE',
+		'reason'   => 'VATEX-EU-AE',
+	);
+
+	$result           = '';
+	$tax_rate_class   = '';
+	$edi_tax_settings = wpo_ips_edi_get_tax_settings();
+	$is_vat_exempt    = $order instanceof \WC_Abstract_Order && wpo_wcpdf_order_is_vat_exempt( $order );
+
+	if ( ! is_null( $rate_id ) && class_exists( '\WC_Tax' ) && is_callable( array( '\WC_Tax', '_get_tax_rate' ) ) ) {
+		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
+
+		if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
+			$result         = isset( $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] )
+				? (string) $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ]
+				: '';
+			$tax_rate_class = (string) $tax_rate->tax_rate_class;
+		}
+	}
+
+	// For VAT-exempt orders, generic lookups should resolve from the zero-rate
+	// configuration instead of the standard class.
+	if ( $is_vat_exempt && is_null( $rate_id ) ) {
+		$result = (string) wpo_ips_edi_get_preferred_zero_rate_tax_data( $edi_tax_settings, $key );
+
+		if ( 'category' === $key && ! $is_empty_or_default( $result ) && ! wpo_ips_edi_is_zero_tax_category( $result ) ) {
+			$result = '';
+		}
+	}
+
+	if ( '' === $tax_rate_class ) {
+		$tax_rate_class = $is_vat_exempt ? 'zero-rate' : 'standard';
+	}
+
+	if ( $is_empty_or_default( $result ) ) {
+		$result = isset( $edi_tax_settings['class'][ $tax_rate_class ][ $key ] )
+			? (string) $edi_tax_settings['class'][ $tax_rate_class ][ $key ]
+			: '';
+	}
+
+	if ( $is_vat_exempt ) {
+		$preferred_zero_rate = (string) wpo_ips_edi_get_preferred_zero_rate_tax_data( $edi_tax_settings, $key );
+
 		switch ( $key ) {
-			case 'scheme':
-				if ( empty( $result ) || 'default' === $result ) {
-					$result = 'VAT';
-				}
-				break;
-
 			case 'category':
-				if ( empty( $result ) || 'default' === $result ) {
-					$result = 'AE';
+				if ( $is_empty_or_default( $result ) || ! wpo_ips_edi_is_zero_tax_category( $result ) ) {
+					$result = ( ! $is_empty_or_default( $preferred_zero_rate ) && wpo_ips_edi_is_zero_tax_category( $preferred_zero_rate ) )
+						? $preferred_zero_rate
+						: $vat_exempt_defaults['category'];
 				}
 				break;
 
+			case 'scheme':
 			case 'reason':
-				if ( empty( $result ) || 'default' === $result ) {
-					$result = 'VATEX-EU-AE';
+				if ( $is_empty_or_default( $result ) ) {
+					$result = ! $is_empty_or_default( $preferred_zero_rate )
+						? $preferred_zero_rate
+						: $vat_exempt_defaults[ $key ];
 				}
 				break;
 		}
@@ -82,7 +192,7 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 		$result = apply_filters( 'wpo_ips_edi_get_tax_data_from_fallback_vat_exempt', $result, $key, $rate_id, $order );
 	}
 
-	return $result;
+	return (string) $result;
 }
 
 /**

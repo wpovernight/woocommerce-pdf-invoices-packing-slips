@@ -278,7 +278,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order );
 		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $order );
 
-		$zero_meta     = $this->get_zero_tax_meta( $order );
+		$zero_meta     = $this->get_preferred_zero_tax_meta( $order );
 		$zero_category = $zero_meta['category'];
 		$zero_scheme   = $zero_meta['scheme'];
 		$zero_reason   = $zero_meta['reason'];
@@ -375,7 +375,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array Updated grouped tax data.
 	 */
 	protected function ensure_one_zero_tax_group( array $grouped_tax_data ): array {
-		$zero_meta     = $this->get_zero_tax_meta( $this->document->order );
+		$zero_meta     = $this->get_preferred_zero_tax_meta( $this->document->order );
 		$zero_category = $zero_meta['category'];
 		$zero_scheme   = $zero_meta['scheme'];
 		$zero_reason   = $zero_meta['reason'];
@@ -582,9 +582,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get the tax rows bucket for an order item ('subtotal' for products, 'total' otherwise).
+	 * Get the tax rows bucket for an order item.
 	 *
-	 * @param \WC_Order_Item $item
+	 * @param \WC_Order_Item $item Order item instance.
 	 * @return array
 	 */
 	protected function get_item_tax_rows( \WC_Order_Item $item ): array {
@@ -598,47 +598,155 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Resolve tax meta (scheme/category/percentage) for an item by inspecting its first non-zero tax row.
+	 * Get the preferred zero-tax metadata for the current order context.
 	 *
-	 * @param \WC_Order_Item $item
+	 * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
 	 * @return array
 	 */
-	protected function resolve_item_tax_meta( \WC_Order_Item $item ): array {
-		$order_tax_data = $this->document->order_tax_data;
+	protected function get_preferred_zero_tax_meta( $context = null ): array {
+		$zero_meta = $this->get_zero_tax_meta( $context );
+		$order     = $this->document->order;
 
-		$scheme   = 'VAT';
-		$category = null;
-		$percent  = 0.0;
-		$rows     = $this->get_item_tax_rows( $item );
+		if ( ! wpo_wcpdf_order_is_vat_exempt( $order ) ) {
+			return $zero_meta;
+		}
 
-		foreach ( $rows as $tax_id => $tax_amt ) {
+		$scheme   = strtoupper( trim( (string) wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order ) ) );
+		$category = strtoupper( trim( (string) wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order ) ) );
+		$reason   = strtoupper( trim( (string) wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order ) ) );
+
+		if ( '' === $scheme || 'DEFAULT' === $scheme ) {
+			$scheme = $zero_meta['scheme'];
+		}
+
+		if ( '' === $category || 'DEFAULT' === $category ) {
+			$category = $zero_meta['category'];
+		}
+
+		if ( '' === $reason || 'DEFAULT' === $reason ) {
+			$reason = (
+				$category === $zero_meta['category'] &&
+				$scheme === $zero_meta['scheme']
+			) ? $zero_meta['reason'] : 'NONE';
+		}
+
+		return compact( 'scheme', 'category', 'reason' );
+	}
+
+	/**
+	 * Determine whether the given tax metadata represents the generic zero-tax classification.
+	 *
+	 * @param array $tax_meta Tax metadata to inspect.
+	 * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
+	 * @return bool
+	 */
+	protected function is_generic_zero_tax_meta( array $tax_meta, $context = null ): bool {
+		$zero_meta  = $this->get_zero_tax_meta( $context );
+		$scheme     = strtoupper( trim( (string) ( $tax_meta['scheme'] ?? '' ) ) );
+		$category   = strtoupper( trim( (string) ( $tax_meta['category'] ?? '' ) ) );
+		$percentage = (float) ( $tax_meta['percentage'] ?? 0 );
+
+		return (
+			0.0 === $percentage &&
+			$scheme === $zero_meta['scheme'] &&
+			$category === $zero_meta['category']
+		);
+	}
+
+	/**
+	 * Build the list of tax classification candidates for an order item.
+	 *
+	 * @param \WC_Order_Item $item Order item instance.
+	 * @return array[]
+	 */
+	protected function get_item_tax_candidates( \WC_Order_Item $item ): array {
+		$candidates = array();
+
+		foreach ( $this->get_item_tax_rows( $item ) as $tax_id => $tax_amt ) {
 			if ( ! is_numeric( $tax_amt ) ) {
 				continue;
 			}
 
-			$row      = $order_tax_data[ $tax_id ]   ?? array();
-			$scheme   = strtoupper( $row['scheme']   ?? 'VAT' );
-			$category = strtoupper( $row['category'] ?? 'Z'   );
-			$percent  = (float) ( $row['percentage'] ?? 0     );
-			$reason   = strtoupper( $row['reason']   ?? 'NONE' );
-			break;
+			$row = $this->document->order_tax_data[ $tax_id ] ?? array();
+
+			$candidates[] = array(
+				'tax_id'     => $tax_id,
+				'scheme'     => strtoupper( $row['scheme']   ?? 'VAT' ),
+				'category'   => strtoupper( $row['category'] ?? 'Z' ),
+				'percentage' => (float) ( $row['percentage'] ?? 0 ),
+				'reason'     => strtoupper( $row['reason']   ?? 'NONE' ),
+				'tax_amount' => (float) $tax_amt,
+			);
 		}
 
-		// Fallback: no non-zero rows -> use zero-tax meta (0%).
-		if ( null === $category ) {
-			$percent   = 0.0;
-			$zero_meta = $this->get_zero_tax_meta( $item );
+		return $candidates;
+	}
 
-			$scheme    = $zero_meta['scheme'];
-			$category  = $zero_meta['category'];
-			$reason    = $zero_meta['reason'];
+	/**
+	 * Select the final tax classification candidate for an order item.
+	 * 
+	 * @param \WC_Order_Item $item Order item instance.
+	 * @param array[]        $candidates Candidate tax classifications for the item.
+	 * @return array
+	 */
+	protected function select_item_tax_classification( \WC_Order_Item $item, array $candidates ): array {
+		$first_candidate        = null;
+		$first_non_generic_zero = null;
+
+		foreach ( $candidates as $candidate ) {
+			if ( null === $first_candidate ) {
+				$first_candidate = $candidate;
+			}
+
+			if ( ! $this->is_generic_zero_tax_meta( $candidate, $item ) && null === $first_non_generic_zero ) {
+				$first_non_generic_zero = $candidate;
+			}
+		}
+
+		if ( null !== $first_non_generic_zero ) {
+			return $first_non_generic_zero;
+		}
+
+		if ( null !== $first_candidate ) {
+			return $first_candidate;
+		}
+
+		$zero_meta = $this->get_preferred_zero_tax_meta( $item );
+
+		return array(
+			'scheme'     => $zero_meta['scheme'],
+			'category'   => $zero_meta['category'],
+			'percentage' => 0.0,
+			'reason'     => $zero_meta['reason'],
+		);
+	}
+
+	/**
+	 * Resolve tax metadata for an order item.
+	 *
+	 * @param \WC_Order_Item $item Order item instance.
+	 * @return array
+	 */
+	protected function resolve_item_tax_meta( \WC_Order_Item $item ): array {
+		$candidates = $this->get_item_tax_candidates( $item );
+		$resolved   = $this->select_item_tax_classification( $item, $candidates );
+
+		if ( $this->is_generic_zero_tax_meta( $resolved, $item ) ) {
+			$zero_meta = $this->get_preferred_zero_tax_meta( $item );
+
+			return array(
+				'scheme'     => $zero_meta['scheme'],
+				'category'   => $zero_meta['category'],
+				'percentage' => 0.0,
+				'reason'     => $zero_meta['reason'],
+			);
 		}
 
 		return array(
-			'scheme'     => $scheme,
-			'category'   => $category,
-			'percentage' => $percent,
-			'reason'     => $reason,
+			'scheme'     => strtoupper( trim( (string) ( $resolved['scheme'] ?? 'VAT' ) ) ),
+			'category'   => strtoupper( trim( (string) ( $resolved['category'] ?? 'Z' ) ) ),
+			'percentage' => (float) ( $resolved['percentage'] ?? 0.0 ),
+			'reason'     => strtoupper( trim( (string) ( $resolved['reason'] ?? 'NONE' ) ) ),
 		);
 	}
 
