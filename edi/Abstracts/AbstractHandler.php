@@ -728,6 +728,25 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function resolve_item_tax_meta( \WC_Order_Item $item ): array {
+		$order = $this->document->order;
+
+		// Free lines should resolve to the generic zero-tax category instead of
+		// inheriting the original product tax class.
+		// Keep VAT-exempt orders out of this override so AE/K/etc. can still apply.
+		if (
+			! wpo_wcpdf_order_is_vat_exempt( $order ) &&
+			$this->is_zero_value_item( $item )
+		) {
+			$zero_meta = $this->get_zero_tax_meta( $item );
+
+			return array(
+				'scheme'     => $zero_meta['scheme'],
+				'category'   => $zero_meta['category'],
+				'percentage' => 0.0,
+				'reason'     => $zero_meta['reason'],
+			);
+		}
+
 		$candidates = $this->get_item_tax_candidates( $item );
 		$resolved   = $this->select_item_tax_classification( $item, $candidates );
 
@@ -880,6 +899,31 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		return $rows;
+	}
+	
+	/**
+	 * Determine whether the order item is a zero-value line for tax classification.
+	 *
+	 * @param \WC_Order_Item $item Order item instance.
+	 * @return bool
+	 */
+	protected function is_zero_value_item( \WC_Order_Item $item ): bool {
+		$parts     = $this->compute_item_price_parts( $item, false );
+		$net_total = (float) $this->format_decimal( $parts['net_total'], 2 );
+		$tax_total = 0.0;
+		$tax_rows  = $item->get_taxes()['total'] ?? array();
+
+		if ( is_array( $tax_rows ) ) {
+			foreach ( $tax_rows as $tax_amt ) {
+				if ( is_numeric( $tax_amt ) ) {
+					$tax_total += (float) $tax_amt;
+				}
+			}
+		}
+
+		$tax_total = (float) $this->format_decimal( $tax_total, 2 );
+
+		return 0.0 === $net_total && 0.0 === $tax_total;
 	}
 
 }
