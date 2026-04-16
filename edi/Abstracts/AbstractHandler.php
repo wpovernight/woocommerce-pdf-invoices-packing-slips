@@ -275,8 +275,8 @@ abstract class AbstractHandler implements HandlerInterface {
 		$line_items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
 		$order_category = wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order );
-		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason',   null, $order );
-		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme',   null, $order );
+		$order_reason   = wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order );
+		$order_scheme   = wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order );
 
 		$zero_meta     = $this->get_preferred_zero_tax_meta( $order );
 		$zero_category = $zero_meta['category'];
@@ -287,16 +287,11 @@ abstract class AbstractHandler implements HandlerInterface {
 			$parts     = $this->compute_item_price_parts( $item, false );
 			$net_total = (float) $this->format_decimal( $parts['net_total'], 2 );
 
-			// Skip zero-value lines for grouping; Z group will be enforced separately.
-			if ( 0.0 === $net_total ) {
-				continue;
-			}
-
 			// Tax meta (scheme, category, percentage).
 			$tax_meta   = $this->resolve_item_tax_meta( $item );
-			$percentage = (float) $tax_meta['percentage'];
+			$percentage = (float) ( $tax_meta['percentage'] ?? 0.0 );
 			$category   = strtoupper( trim( (string) ( $tax_meta['category'] ?? $order_category ) ) );
-			$scheme     = strtoupper( trim( (string) ( $tax_meta['scheme']   ?? $order_scheme   ) ) );
+			$scheme     = strtoupper( trim( (string) ( $tax_meta['scheme'] ?? $order_scheme ) ) );
 
 			if ( '' === $scheme ) {
 				$scheme = 'VAT';
@@ -306,8 +301,7 @@ abstract class AbstractHandler implements HandlerInterface {
 				$category = ( 0.0 === $percentage ) ? $zero_category : 'S';
 			}
 
-			// Reason
-			$reason = strtoupper( trim( (string) ( $tax_meta['reason'] ?? $order_reason   ) ) );
+			$reason = strtoupper( trim( (string) ( $tax_meta['reason'] ?? $order_reason ) ) );
 			if ( '' === $reason || 'NONE' === $reason ) {
 				if ( 0.0 === $percentage && $category === $zero_category && $scheme === $zero_scheme ) {
 					$reason = $zero_reason;
@@ -318,8 +312,8 @@ abstract class AbstractHandler implements HandlerInterface {
 
 			$key = implode( '|', array( $percentage, $category, $reason, $scheme ) );
 
-			// Item tax = sum of item tax rows (matching Woo's own storage).
-			$item_tax_rows = $this->get_item_tax_rows( $item );
+			// Sum tax amounts for the item across all tax rows to get the total tax for this line.
+			$item_tax_rows = $this->get_item_final_tax_rows( $item );
 			$item_tax      = 0.0;
 
 			foreach ( $item_tax_rows as $tax_amt ) {
@@ -344,7 +338,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$groups[ $key ]['total_tax'] += $item_tax;
 		}
 
-		// No tax lines at all: one zero-tax group with whole net.
+		// Fallback only when there are really no grouped lines at all.
 		if ( empty( $groups ) ) {
 			$lines_net = $this->get_lines_net_total( $order );
 
@@ -359,82 +353,52 @@ abstract class AbstractHandler implements HandlerInterface {
 			);
 		}
 
-		// Enforce exactly one zero tax group if needed.
 		$groups = $this->ensure_one_zero_tax_group( $groups );
-
-		// Reindex so callers get a numeric array.
 		$groups = array_values( $groups );
 
 		return apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
 	}
 
 	/**
-	 * Consolidate and ensure exactly one zero tax group in the grouped tax data.
+	 * Consolidate existing preferred zero-tax groups without creating new ones.
 	 *
 	 * @param array $grouped_tax_data Grouped tax data.
 	 * @return array Updated grouped tax data.
 	 */
 	protected function ensure_one_zero_tax_group( array $grouped_tax_data ): array {
 		$zero_meta     = $this->get_preferred_zero_tax_meta( $this->document->order );
-		$zero_category = $zero_meta['category'];
-		$zero_scheme   = $zero_meta['scheme'];
-		$zero_reason   = $zero_meta['reason'];
+		$zero_category = strtoupper( $zero_meta['category'] );
+		$zero_scheme   = strtoupper( $zero_meta['scheme'] );
+		$zero_reason   = strtoupper( $zero_meta['reason'] );
 
-		$z_first_key = null;
+		$first_zero_key = null;
 
-		// Consolidate any existing "zero tax" groups from $grouped_tax_data.
-		foreach ( $grouped_tax_data as $key => $g ) {
-			if (
-				strtoupper( $g['category'] ?? '' ) === strtoupper( $zero_category ) &&
-				(float) ( $g['percentage'] ?? 0 ) === 0.0 &&
-				strtoupper( $g['scheme'] ?? '' ) === strtoupper( $zero_scheme )
-			) {
-				if ( is_null( $z_first_key ) ) {
-					$z_first_key = $key;
-				} else {
-					unset( $grouped_tax_data[ $key ] );
-				}
-			}
-		}
+		foreach ( $grouped_tax_data as $key => $group ) {
+			$group_category = strtoupper( (string) ( $group['category'] ?? '' ) );
+			$group_scheme   = strtoupper( (string) ( $group['scheme'] ?? '' ) );
+			$group_reason   = strtoupper( (string) ( $group['reason'] ?? 'NONE' ) );
+			$group_rate     = (float) ( $group['percentage'] ?? 0.0 );
 
-		// Compute the zero-tax taxable basis strictly from lines.
-		$z_basis_from_lines = 0.0;
-		$has_z_line         = false;
-
-		foreach ( $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) ) as $item ) {
-			$line_total  = (float) $item->get_total();
-			$tax_meta    = $this->resolve_item_tax_meta( $item );
-			$item_cat    = strtoupper( $tax_meta['category'] ?? '' );
-			$item_rate   = (float) ( $tax_meta['percentage'] ?? 0 );
-			$item_scheme = strtoupper( $tax_meta['scheme'] ?? '' );
-
-			$line_is_z = (
-				0.0 === $item_rate &&
-				$item_cat === strtoupper( $zero_category ) &&
-				$item_scheme === strtoupper( $zero_scheme )
+			$is_preferred_zero_group = (
+				0.0 === $group_rate &&
+				$group_category === $zero_category &&
+				$group_scheme === $zero_scheme &&
+				$group_reason === $zero_reason
 			);
 
-			if ( $line_is_z ) {
-				$has_z_line          = true;
-				$z_basis_from_lines += $line_total;
+			if ( ! $is_preferred_zero_group ) {
+				continue;
 			}
-		}
 
-		// Ensure exactly one zero-tax group if there is any zero-tax line (even with basis 0).
-		if ( $has_z_line || $z_first_key ) {
-			$z_key = $z_first_key ?: sprintf( '0|%s|%s|%s', $zero_category, $zero_reason, $zero_scheme );
+			if ( null === $first_zero_key ) {
+				$first_zero_key = $key;
+				continue;
+			}
 
-			$grouped_tax_data[ $z_key ] = array(
-				'total_ex'   => $this->format_decimal( wc_round_tax_total( $z_basis_from_lines ) ),
-				'total_tax'  => '0.00',
-				'percentage' => '0.0',
-				'category'   => $zero_category,
-				'reason'     => $zero_reason,
-				'scheme'     => $zero_scheme,
-				'name'       => ( ! is_null( $z_first_key ) && isset( $grouped_tax_data[ $z_first_key ]['name'] ) )
-					? $grouped_tax_data[ $z_first_key ]['name']
-					: '',
-			);
+			$grouped_tax_data[ $first_zero_key ]['total_ex']  += (float) ( $group['total_ex'] ?? 0.0 );
+			$grouped_tax_data[ $first_zero_key ]['total_tax'] += (float) ( $group['total_tax'] ?? 0.0 );
+
+			unset( $grouped_tax_data[ $key ] );
 		}
 
 		return $grouped_tax_data;
@@ -582,7 +546,10 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get the tax rows bucket for an order item.
+	 * Get the tax rows used for item tax classification.
+	 *
+	 * Product items use the subtotal bucket so the original tax class can still be
+	 * detected on fully discounted lines. Other item types use the total bucket.
 	 *
 	 * @param \WC_Order_Item $item Order item instance.
 	 * @return array
@@ -594,6 +561,22 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return ( isset( $taxes[ $tax_bucket ] ) && is_array( $taxes[ $tax_bucket ] ) )
 			? $taxes[ $tax_bucket ]
+			: array();
+	}
+
+	/**
+	 * Get the final tax rows for an order item.
+	 *
+	 * These rows reflect the final tax amounts stored on the line after discounts.
+	 *
+	 * @param \WC_Order_Item $item Order item instance.
+	 * @return array
+	 */
+	protected function get_item_final_tax_rows( \WC_Order_Item $item ): array {
+		$taxes = $item->get_taxes();
+
+		return ( isset( $taxes['total'] ) && is_array( $taxes['total'] ) )
+			? $taxes['total']
 			: array();
 	}
 
@@ -654,6 +637,19 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
+	 * Determine whether the resolved tax metadata is invalid for standard-rated VAT.
+	 *
+	 * @param array $tax_meta Tax metadata.
+	 * @return bool
+	 */
+	protected function is_invalid_standard_tax_meta( array $tax_meta ): bool {
+		$category   = strtoupper( trim( (string) ( $tax_meta['category'] ?? '' ) ) );
+		$percentage = (float) ( $tax_meta['percentage'] ?? 0.0 );
+
+		return 'S' === $category && $percentage <= 0.0;
+	}
+
+	/**
 	 * Build the list of tax classification candidates for an order item.
 	 *
 	 * @param \WC_Order_Item $item Order item instance.
@@ -684,7 +680,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 	/**
 	 * Select the final tax classification candidate for an order item.
-	 * 
+	 *
 	 * @param \WC_Order_Item $item Order item instance.
 	 * @param array[]        $candidates Candidate tax classifications for the item.
 	 * @return array
@@ -728,27 +724,15 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function resolve_item_tax_meta( \WC_Order_Item $item ): array {
-		$order = $this->document->order;
+		$candidates = $this->get_item_tax_candidates( $item );
 
-		// Free lines should resolve to the generic zero-tax category instead of
-		// inheriting the original product tax class.
-		// Keep VAT-exempt orders out of this override so AE/K/etc. can still apply.
-		if (
-			! wpo_wcpdf_order_is_vat_exempt( $order ) &&
-			$this->is_zero_value_item( $item )
-		) {
-			$zero_meta = $this->get_zero_tax_meta( $item );
-
-			return array(
-				'scheme'     => $zero_meta['scheme'],
-				'category'   => $zero_meta['category'],
-				'percentage' => 0.0,
-				'reason'     => $zero_meta['reason'],
-			);
+		// If there are no usable tax candidates on the item, fall back to the
+		// configured item tax class before using generic zero-tax handling.
+		if ( empty( $candidates ) ) {
+			return $this->get_item_tax_class_fallback_meta( $item );
 		}
 
-		$candidates = $this->get_item_tax_candidates( $item );
-		$resolved   = $this->select_item_tax_classification( $item, $candidates );
+		$resolved = $this->select_item_tax_classification( $item, $candidates );
 
 		if ( $this->is_generic_zero_tax_meta( $resolved, $item ) ) {
 			$zero_meta = $this->get_preferred_zero_tax_meta( $item );
@@ -900,30 +884,140 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		return $rows;
 	}
-	
+
 	/**
-	 * Determine whether the order item is a zero-value line for tax classification.
+	 * Resolve fallback tax metadata from the order item's tax class.
+	 *
+	 * This is used when the item has no usable tax rows to classify from, such as
+	 * products with a final price of zero or fully discounted items where WooCommerce
+	 * no longer provides meaningful tax row data for export classification.
 	 *
 	 * @param \WC_Order_Item $item Order item instance.
-	 * @return bool
+	 * @return array
 	 */
-	protected function is_zero_value_item( \WC_Order_Item $item ): bool {
-		$parts     = $this->compute_item_price_parts( $item, false );
-		$net_total = (float) $this->format_decimal( $parts['net_total'], 2 );
-		$tax_total = 0.0;
-		$tax_rows  = $item->get_taxes()['total'] ?? array();
+	protected function get_item_tax_class_fallback_meta( \WC_Order_Item $item ): array {
+		$order = $this->document->order;
 
-		if ( is_array( $tax_rows ) ) {
-			foreach ( $tax_rows as $tax_amt ) {
-				if ( is_numeric( $tax_amt ) ) {
-					$tax_total += (float) $tax_amt;
+		if ( wpo_wcpdf_order_is_vat_exempt( $order ) ) {
+			$zero_meta = $this->get_preferred_zero_tax_meta( $item );
+
+			return array(
+				'scheme'     => $zero_meta['scheme'],
+				'category'   => $zero_meta['category'],
+				'percentage' => 0.0,
+				'reason'     => $zero_meta['reason'],
+			);
+		}
+
+		// Only product items should fall back to their stored tax class.
+		// Shipping/fee items without usable tax rows should not be forced into S.
+		if ( 'line_item' !== $item->get_type() ) {
+			$zero_meta = $this->get_zero_tax_meta( $item );
+
+			return array(
+				'scheme'     => $zero_meta['scheme'],
+				'category'   => $zero_meta['category'],
+				'percentage' => 0.0,
+				'reason'     => $zero_meta['reason'],
+			);
+		}
+
+		$tax_class = is_callable( array( $item, 'get_tax_class' ) )
+			? (string) $item->get_tax_class()
+			: '';
+
+		if ( '' === $tax_class ) {
+			$tax_class = 'standard';
+		}
+
+		$settings          = (array) wpo_ips_edi_get_tax_settings();
+		$class_settings    = isset( $settings['class'][ $tax_class ] ) && is_array( $settings['class'][ $tax_class ] )
+			? $settings['class'][ $tax_class ]
+			: array();
+		$standard_settings = isset( $settings['class']['standard'] ) && is_array( $settings['class']['standard'] )
+			? $settings['class']['standard']
+			: array();
+
+		$scheme = strtoupper( trim( (string) ( $class_settings['scheme'] ?? '' ) ) );
+		if ( '' === $scheme || 'DEFAULT' === $scheme ) {
+			$scheme = strtoupper( trim( (string) ( $standard_settings['scheme'] ?? 'VAT' ) ) );
+		}
+
+		$category = strtoupper( trim( (string) ( $class_settings['category'] ?? '' ) ) );
+		if ( '' === $category || 'DEFAULT' === $category ) {
+			$category = strtoupper( trim( (string) ( $standard_settings['category'] ?? 'S' ) ) );
+		}
+
+		$reason = strtoupper( trim( (string) ( $class_settings['reason'] ?? '' ) ) );
+		if ( '' === $reason || 'DEFAULT' === $reason ) {
+			$reason = strtoupper( trim( (string) ( $standard_settings['reason'] ?? 'NONE' ) ) );
+		}
+
+		if ( '' === $category ) {
+			$zero_meta = $this->get_zero_tax_meta( $item );
+
+			return array(
+				'scheme'     => $zero_meta['scheme'],
+				'category'   => $zero_meta['category'],
+				'percentage' => 0.0,
+				'reason'     => $zero_meta['reason'],
+			);
+		}
+
+		$percentage = 0.0;
+
+		if ( class_exists( '\WC_Tax' ) && is_callable( array( '\WC_Tax', 'find_rates' ) ) ) {
+			$country  = $order->get_shipping_country();
+			$state    = $order->get_shipping_state();
+			$postcode = $order->get_shipping_postcode();
+			$city     = $order->get_shipping_city();
+
+			if ( '' === $country ) {
+				$country  = $order->get_billing_country();
+				$state    = $order->get_billing_state();
+				$postcode = $order->get_billing_postcode();
+				$city     = $order->get_billing_city();
+			}
+
+			$rates = \WC_Tax::find_rates(
+				array(
+					'country'   => $country,
+					'state'     => $state,
+					'postcode'  => $postcode,
+					'city'      => $city,
+					'tax_class' => 'standard' === $tax_class ? '' : $tax_class,
+				)
+			);
+
+			if ( ! empty( $rates ) ) {
+				$first_rate = reset( $rates );
+
+				if ( is_array( $first_rate ) && isset( $first_rate['rate'] ) && is_numeric( $first_rate['rate'] ) ) {
+					$percentage = (float) $first_rate['rate'];
 				}
 			}
 		}
 
-		$tax_total = (float) $this->format_decimal( $tax_total, 2 );
+		$fallback = array(
+			'scheme'     => '' !== $scheme ? $scheme : 'VAT',
+			'category'   => $category,
+			'percentage' => $percentage,
+			'reason'     => '' !== $reason ? $reason : 'NONE',
+		);
 
-		return 0.0 === $net_total && 0.0 === $tax_total;
+		// Never return S with a zero or missing percentage.
+		if ( $this->is_invalid_standard_tax_meta( $fallback ) ) {
+			$zero_meta = $this->get_zero_tax_meta( $item );
+
+			return array(
+				'scheme'     => $zero_meta['scheme'],
+				'category'   => $zero_meta['category'],
+				'percentage' => 0.0,
+				'reason'     => $zero_meta['reason'],
+			);
+		}
+
+		return $fallback;
 	}
 
 }
