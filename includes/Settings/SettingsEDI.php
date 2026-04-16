@@ -1049,7 +1049,7 @@ class SettingsEDI {
 								foreach ( EN16931::get_vatex_remarks() as $field => $remarks ) {
 									foreach ( array( 'scheme', 'category', 'reason' ) as $f ) {
 										if ( isset( $remarks[ ${$f} ] ) ) {
-											echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . esc_html( $remarks[ ${$f} ] ) . '</p>';
+											echo '<p><code>' . esc_html( ${$f} ) . '</code>: ' . wp_kses_post( $remarks[ ${$f} ] ) . '</p>';
 										}
 									}
 								}
