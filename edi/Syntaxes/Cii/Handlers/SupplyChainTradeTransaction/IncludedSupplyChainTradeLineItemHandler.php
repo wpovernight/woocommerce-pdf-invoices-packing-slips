@@ -24,48 +24,104 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 			// Resolve tax meta for this line
 			$meta = $this->resolve_item_tax_meta( $item );
 
+			$tax_children = array(
+				array(
+					'name'  => 'ram:TypeCode',
+					'value' => $meta['scheme'],
+				),
+				array(
+					'name'  => 'ram:CategoryCode',
+					'value' => $meta['category'],
+				),
+			);
+
+			// For VAT category O ("Not subject to VAT"), do NOT emit RateApplicablePercent.
+			if ( 'O' !== strtoupper( (string) ( $meta['category'] ?? '' ) ) && isset( $meta['percentage'] ) && '' !== $meta['percentage'] ) {
+				$tax_children[] = array(
+					'name'  => 'ram:RateApplicablePercent',
+					'value' => $this->format_decimal( $meta['percentage'], 1 ),
+				);
+			}
+
 			$tax_nodes = array(
 				array(
 					'name'  => 'ram:ApplicableTradeTax',
-					'value' => array(
-						array(
-							'name'  => 'ram:TypeCode',
-							'value' => $meta['scheme'],
-						),
-						array(
-							'name'  => 'ram:CategoryCode',
-							'value' => $meta['category'],
-						),
-						array(
-							'name'  => 'ram:RateApplicablePercent',
-							'value' => $this->format_decimal( $meta['percentage'], 1 ),
-						),
-					),
+					'value' => $tax_children,
 				),
 			);
 
 			// Price parts
 			$parts = $this->compute_item_price_parts( $item, false );
 
-			// Round gross/net units first (numeric), then derive discount, then recompute net.
-			$gross_unit_f = (float) $this->format_decimal( $parts['gross_unit'], 2 );
-			$net_unit_f   = (float) $this->format_decimal( $parts['net_unit'],   2 );
+			$price_decimal_places = 2;
+			$qty                  = (float) $parts['qty'];
 
-			$unit_discount_f = $gross_unit_f - $net_unit_f;
-			if ( $unit_discount_f < 0 ) {
-				$unit_discount_f = 0.0;
+			// When WooCommerce rounds tax at subtotal level, derive the XML unit
+			// prices from the line totals to keep the line prices consistent with the
+			// final line total amount.
+			if ( 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' ) && $qty > 0 ) {
+				$price_decimal_places = 4;
 			}
 
-			$unit_discount_f = (float) $this->format_decimal( $unit_discount_f, 2 );
+			$xml_gross_unit_f = $qty > 0
+				? (float) $this->format_decimal( (float) $parts['gross_total'] / $qty, $price_decimal_places )
+				: 0.0;
+
+			$xml_net_unit_f = $qty > 0
+				? (float) $this->format_decimal( (float) $parts['net_total'] / $qty, $price_decimal_places )
+				: (float) $this->format_decimal( $parts['net_total'], $price_decimal_places );
+
+			$xml_unit_discount_f = $xml_gross_unit_f - $xml_net_unit_f;
+			if ( $xml_unit_discount_f < 0 ) {
+				$xml_unit_discount_f = 0.0;
+			}
+
+			$xml_unit_discount_f = (float) $this->format_decimal( $xml_unit_discount_f, $price_decimal_places );
 
 			// Recompute net from gross - discount to guarantee equality in XML.
-			$net_unit_f = $gross_unit_f - $unit_discount_f;
+			$xml_net_unit_f = $xml_gross_unit_f - $xml_unit_discount_f;
 
-			$gross_unit    = $this->format_decimal( $gross_unit_f, 2 );
-			$net_unit      = $this->format_decimal( $net_unit_f,   2 );
-			$unit_discount = $this->format_decimal( $unit_discount_f, 2 );
+			$gross_unit    = $this->format_decimal( $xml_gross_unit_f, $price_decimal_places );
+			$net_unit      = $this->format_decimal( $xml_net_unit_f, $price_decimal_places );
+			$unit_discount = $this->format_decimal( $xml_unit_discount_f, $price_decimal_places );
 
-			$price_children = array(
+			$gross_price_children = array(
+				array(
+					'name'  => 'ram:ChargeAmount',
+					'value' => $gross_unit,
+				),
+				array(
+					'name'       => 'ram:BasisQuantity',
+					'value'      => 1,
+					'attributes' => array(
+						'unitCode' => 'C62',
+					),
+				),
+			);
+
+			// Emit price-level allowance on the gross price for discounted product lines.
+			if ( $xml_unit_discount_f > 0 && $xml_gross_unit_f > 0 && is_a( $item, 'WC_Order_Item_Product' ) ) {
+				$gross_price_children[] = array(
+					'name'  => 'ram:AppliedTradeAllowanceCharge',
+					'value' => array(
+						array(
+							'name'  => 'ram:ChargeIndicator',
+							'value' => array(
+								array(
+									'name'  => 'udt:Indicator',
+									'value' => 'false',
+								),
+							),
+						),
+						array(
+							'name'  => 'ram:ActualAmount',
+							'value' => $unit_discount,
+						),
+					),
+				);
+			}
+
+			$net_price_children = array(
 				array(
 					'name'  => 'ram:ChargeAmount',
 					'value' => $net_unit,
@@ -74,36 +130,10 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 					'name'       => 'ram:BasisQuantity',
 					'value'      => 1,
 					'attributes' => array(
-						'unitCode' => 'C62'
-					)
+						'unitCode' => 'C62',
+					),
 				),
 			);
-
-			// Only products can have a price-level discount (already reflected in net price)
-			// if ( $unit_discount > 0 && is_a( $item, 'WC_Order_Item_Product' ) ) {
-			// 	$price_children[] = array(
-			// 		'name'  => 'ram:AppliedTradeAllowanceCharge',
-			// 		'value' => array(
-			// 			array(
-			// 				'name'  => 'ram:ChargeIndicator',
-			// 				'value' => array(
-			// 					array(
-			// 						'name'  => 'udt:Indicator',
-			// 						'value' => 'false'
-			// 					),
-			// 				),
-			// 			),
-			// 			array(
-			// 				'name'  => 'ram:ActualAmount',
-			// 				'value' => $unit_discount,
-			// 			),
-			// 			array(
-			// 				'name'  => 'ram:BasisAmount',
-			// 				'value' => $gross_unit,
-			// 			),
-			// 		),
-			// 	);
-			// }
 
 			// Build SpecifiedTradeProduct
 			$product_value = array(
@@ -149,7 +179,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'name'  => 'ram:AssociatedDocumentLineDocument',
 						'value' => array(
 							array(
-								'name' => 'ram:LineID',
+								'name'  => 'ram:LineID',
 								'value' => $item_id,
 							),
 						),
@@ -162,8 +192,12 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'name'  => 'ram:SpecifiedLineTradeAgreement',
 						'value' => array(
 							array(
+								'name'  => 'ram:GrossPriceProductTradePrice',
+								'value' => $gross_price_children,
+							),
+							array(
 								'name'  => 'ram:NetPriceProductTradePrice',
-								'value' => $price_children,
+								'value' => $net_price_children,
 							),
 						),
 					),
