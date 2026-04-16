@@ -135,11 +135,19 @@ class LineHandler extends AbstractUblHandler {
 				);
 			}
 
+			$item_name = apply_filters(
+				'wpo_ips_edi_ubl_item_name',
+				wpo_ips_edi_normalize_text( $item->get_name() ),
+				$item,
+				$this->document->order,
+				$this
+			);
+
 			// Build base Item node
 			$item_value = array(
 				array(
 					'name'  => 'cbc:Name',
-					'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
+					'value' => $item_name,
 				),
 				array(
 					'name'  => 'cac:ClassifiedTaxCategory',
