@@ -141,67 +141,70 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_trade_tax(): ?array {
-		$tax_reasons       = EN16931::get_vatex();
-		$grouped_tax_data  = $this->get_grouped_order_tax_data();
-		$trade_tax         = array();
+		$tax_reasons      = EN16931::get_vatex();
+		$grouped_tax_data = $this->get_grouped_order_tax_data();
+		$trade_tax        = array();
 
 		foreach ( $grouped_tax_data as $item ) {
-			$percent  = (float) ( $item['percentage']            ?? 0        );
-			$category = strtoupper( (string) ( $item['category'] ?? ''     ) );
-			$reason   = strtoupper( (string) ( $item['reason']   ?? 'NONE' ) );
-			$scheme   = strtoupper( (string) ( $item['scheme']   ?? 'VAT'  ) );
+			$percent  = (float) ( $item['percentage'] ?? 0 );
+			$category = strtoupper( (string) ( $item['category'] ?? '' ) );
+			$reason   = strtoupper( (string) ( $item['reason'] ?? 'NONE' ) );
+			$scheme   = strtoupper( (string) ( $item['scheme'] ?? 'VAT' ) );
 
 			$basis_raw = (float) ( $item['total_ex'] ?? 0 );
 			$basis     = wc_round_tax_total( $basis_raw );
 			$tax       = wc_round_tax_total( $basis_raw * $percent / 100 );
 
-			// Skip empty non-Z groups.
-			$is_z = ( 'Z' === $category );
-			if ( 0.0 === $basis && 0.0 === $tax && ! $is_z ) {
+			// Skip only groups that are effectively unusable.
+			if ( '' === $category ) {
 				continue;
 			}
 
-			$node = array(
-				'name'  => 'ram:ApplicableTradeTax',
-				'value' => array(
-					array(
-						'name'  => 'ram:CalculatedAmount',
-						'value' => $this->format_decimal( $tax ),
-					),
-					array(
-						'name'  => 'ram:TypeCode',
-						'value' => $scheme ?: 'VAT',
-					),
-					array(
-						'name'  => 'ram:BasisAmount',
-						'value' => $this->format_decimal( $basis ),
-					),
-					array(
-						'name'  => 'ram:CategoryCode',
-						'value' => $category ?: 'Z',
-					),
-					array(
-						'name'  => 'ram:RateApplicablePercent',
-						'value' => $this->format_decimal( $percent, 1 ),
-					),
+			$node_value = array(
+				array(
+					'name'  => 'ram:CalculatedAmount',
+					'value' => $this->format_decimal( $tax ),
+				),
+				array(
+					'name'  => 'ram:TypeCode',
+					'value' => $scheme ?: 'VAT',
+				),
+				array(
+					'name'  => 'ram:BasisAmount',
+					'value' => $this->format_decimal( $basis ),
+				),
+				array(
+					'name'  => 'ram:CategoryCode',
+					'value' => $category,
 				),
 			);
 
-			// Only emit exemption data for 0% non-Z with an explicit reason.
-			if ( 0.0 === $percent && 'Z' !== $category && 'NONE' !== $reason ) {
-				$reason_mapped = ! empty( $tax_reasons[ $reason ] ) ? $tax_reasons[ $reason ] : $reason;
-
-				$node['value'][] = array(
-					'name'  => 'ram:ExemptionReasonCode',
-					'value' => $reason_mapped,
-				);
-				$node['value'][] = array(
-					'name'  => 'ram:ExemptionReason',
-					'value' => $reason_mapped,
+			// For category O ("Not subject to VAT"), do not emit RateApplicablePercent.
+			if ( 'O' !== $category ) {
+				$node_value[] = array(
+					'name'  => 'ram:RateApplicablePercent',
+					'value' => $this->format_decimal( $percent, 1 ),
 				);
 			}
 
-			$trade_tax[] = $node;
+			// Only emit exemption data for 0% non-Z with an explicit reason.
+			if ( 0.0 === $percent && 'Z' !== $category && 'NONE' !== $reason ) {
+				$reason_label = ! empty( $tax_reasons[ $reason ] ) ? $tax_reasons[ $reason ] : $reason;
+
+				$node_value[] = array(
+					'name'  => 'ram:ExemptionReasonCode',
+					'value' => $reason,
+				);
+				$node_value[] = array(
+					'name'  => 'ram:ExemptionReason',
+					'value' => $reason_label,
+				);
+			}
+
+			$trade_tax[] = array(
+				'name'  => 'ram:ApplicableTradeTax',
+				'value' => $node_value,
+			);
 		}
 
 		if ( empty( $trade_tax ) ) {

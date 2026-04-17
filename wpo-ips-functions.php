@@ -2278,6 +2278,10 @@ function wpo_ips_is_current_page_checkout_page(): bool {
  * @return void
  */
 function wpo_ips_register_additional_checkout_field( array $options ): void {
+	if ( ! defined( 'WC_VERSION' ) || version_compare( WC_VERSION, '8.9.0', '<' ) ) {
+		return;
+	}
+	
 	if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
 		$file = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
 		if ( WPO_WCPDF()->get_instance( 'file_system' )->is_readable( $file ) ) {
