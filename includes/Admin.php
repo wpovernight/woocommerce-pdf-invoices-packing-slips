@@ -2382,9 +2382,18 @@ class Admin {
 	private function get_cached_order_document( string $document_type, \WC_Abstract_Order $order ): ?OrderDocument {
 		$order_id = $order->get_id();
 
-		if ( ! isset( $this->order_list_document_cache[ $order_id ][ $document_type ] ) ) {
+		if ( ! isset( $this->order_list_document_cache[ $order_id ] ) ) {
+			$this->order_list_document_cache[ $order_id ] = array();
+		}
+
+		if ( ! array_key_exists( $document_type, $this->order_list_document_cache[ $order_id ] ) ) {
 			$this->disable_storing_document_settings();
-			$this->order_list_document_cache[ $order_id ][ $document_type ] = wcpdf_get_document( $document_type, $order );
+
+			$document = wcpdf_get_document( $document_type, $order );
+
+			$this->order_list_document_cache[ $order_id ][ $document_type ] = $document instanceof OrderDocument
+				? $document
+				: null;
 		}
 
 		return $this->order_list_document_cache[ $order_id ][ $document_type ];
