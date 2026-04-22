@@ -18,7 +18,7 @@ class LineHandler extends AbstractUblHandler {
 	 */
 	public function handle( array $data, array $options = array() ): array {
 		$root_element         = $this->document->get_root_element();
-		$quantity_role		  = $this->document->get_quantity_role();
+		$quantity_role        = $this->document->get_quantity_role();
 		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
 		$items                = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 		$currency             = $this->document->order->get_currency();
@@ -59,42 +59,42 @@ class LineHandler extends AbstractUblHandler {
 			// Price parts
 			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon_lines );
 
-			// Round gross/net units first (numeric), then derive discount, then recompute net.
-			$gross_unit_f = (float) $this->format_decimal( $parts['gross_unit'], 2 );
-			$net_unit_f   = (float) $this->format_decimal( $parts['net_unit'],   2 );
+			$price_decimal_places = 2;
+			$qty                  = (float) $parts['qty'];
 
-			$unit_discount_f = $gross_unit_f - $net_unit_f;
-			if ( $unit_discount_f < 0 ) {
-				$unit_discount_f = 0.0;
+			// When WooCommerce rounds tax at subtotal level, derive the XML unit
+			// prices from the line totals to keep PriceAmount consistent with the
+			// final line extension amount.
+			if ( 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' ) && $qty > 0 ) {
+				$price_decimal_places = 4;
 			}
 
-			$unit_discount_f = (float) $this->format_decimal( $unit_discount_f, 2 );
+			$xml_gross_unit_f = $qty > 0
+				? (float) $this->format_decimal( (float) $parts['gross_total'] / $qty, $price_decimal_places )
+				: 0.0;
+
+			$xml_net_unit_f = $qty > 0
+				? (float) $this->format_decimal( (float) $parts['net_total'] / $qty, $price_decimal_places )
+				: (float) $this->format_decimal( $parts['net_total'], $price_decimal_places );
+
+			$xml_unit_discount_f = $xml_gross_unit_f - $xml_net_unit_f;
+			if ( $xml_unit_discount_f < 0 ) {
+				$xml_unit_discount_f = 0.0;
+			}
+
+			$xml_unit_discount_f = (float) $this->format_decimal( $xml_unit_discount_f, $price_decimal_places );
 
 			// Recompute net from gross - discount to guarantee equality in XML.
-			$net_unit_f = $gross_unit_f - $unit_discount_f;
+			$xml_net_unit_f = $xml_gross_unit_f - $xml_unit_discount_f;
 
-			$gross_unit    = $this->format_decimal( $gross_unit_f, 2 );
-			$net_unit      = $this->format_decimal( $net_unit_f, 2 );
-			$unit_discount = $this->format_decimal( $unit_discount_f, 2 );
-
-			// Per-line rounded unit price
-			$xml_net_unit = $net_unit;
-
-			// When WooCommerce rounds tax at subtotal level, the rounded per-unit net amount
-			// can become inconsistent with the actual line total for multi-quantity lines.
-			// In that case, derive the XML unit price from the line net total.
-			if ( 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' ) ) {
-				$qty = (float) $parts['qty'];
-
-				if ( $qty > 0 ) {
-					$xml_net_unit = $this->format_decimal( (float) $parts['net_total'] / $qty, 4 );
-				}
-			}
+			$gross_unit    = $this->format_decimal( $xml_gross_unit_f, $price_decimal_places );
+			$net_unit      = $this->format_decimal( $xml_net_unit_f, $price_decimal_places );
+			$unit_discount = $this->format_decimal( $xml_unit_discount_f, $price_decimal_places );
 
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => abs( $xml_net_unit ), // unit price always positive (Credit Notes as well)
+					'value'      => abs( (float) $net_unit ), // unit net price always positive (Credit Notes as well)
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
@@ -108,60 +108,46 @@ class LineHandler extends AbstractUblHandler {
 				),
 			);
 
-			/**
-			* NOTE ABOUT DISABLING cac:Price/cac:AllowanceCharge FOR PEPPOL
-			*
-			* We intentionally do not emit price-level AllowanceCharge elements for Peppol BIS invoices.
-			*
-			* Reason: While BT-147 (Item price discount) and BT-148 (Gross price) are optional in EN16931,
-			* the Peppol validator interprets cac:Price/cac:AllowanceCharge as a line-level allowance and
-			* applies BR-24 and BR-42 rules. This caused the validator to:
-			*
-			*   - subtract the discount again from the already-net PriceAmount, and
-			*   - require a reason code (BT-139/BT-140) for each price allowance,
-			*
-			* resulting in validation failures and incorrect recalculated line totals.
-			*
-			* To avoid double-discounting and maintain correct monetary values, we emit only:
-			*
-			*   PriceAmount (net unit price) + LineExtensionAmount (net line amount)
-			*
-			* This is fully compliant with Peppol BIS Billing 3.0 since BT-147/BT-148 are optional.
-			*
-			* If explicit gross/discount information is needed in the future, this can be reintroduced.
-			*/
-			// Only show AllowanceCharge when there is a discount at price level (already reflected in net price)
-			// if ( $unit_discount > 0 ) {
-			// 	$price_value[] = array(
-			// 		'name'  => 'cac:AllowanceCharge',
-			// 		'value' => array(
-			// 			array(
-			// 				'name'  => 'cbc:ChargeIndicator',
-			// 				'value' => 'false',
-			// 			),
-			// 			array(
-			// 				'name'       => 'cbc:Amount',
-			// 				'value'      => $unit_discount,
-			// 				'attributes' => array(
-			// 					'currencyID' => $currency,
-			// 				),
-			// 			),
-			// 			array(
-			// 				'name'       => 'cbc:BaseAmount',
-			// 				'value'      => $gross_unit,
-			// 				'attributes' => array(
-			// 					'currencyID' => $currency,
-			// 				),
-			// 			),
-			// 		),
-			// 	);
-			// }
+			// Emit price-level AllowanceCharge when there is a discount at item price level.
+			if ( $xml_unit_discount_f > 0 && $xml_gross_unit_f > 0 ) {
+				$price_value[] = array(
+					'name'  => 'cac:AllowanceCharge',
+					'value' => array(
+						array(
+							'name'  => 'cbc:ChargeIndicator',
+							'value' => 'false',
+						),
+						array(
+							'name'       => 'cbc:Amount',
+							'value'      => abs( (float) $unit_discount ),
+							'attributes' => array(
+								'currencyID' => $currency,
+							),
+						),
+						array(
+							'name'       => 'cbc:BaseAmount',
+							'value'      => abs( (float) $gross_unit ),
+							'attributes' => array(
+								'currencyID' => $currency,
+							),
+						),
+					),
+				);
+			}
+
+			$item_name = apply_filters(
+				'wpo_ips_edi_ubl_item_name',
+				wpo_ips_edi_sanitize_string( $item->get_name() ),
+				$item,
+				$this->document->order,
+				$this
+			);
 
 			// Build base Item node
 			$item_value = array(
 				array(
 					'name'  => 'cbc:Name',
-					'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
+					'value' => $item_name,
 				),
 				array(
 					'name'  => 'cac:ClassifiedTaxCategory',
