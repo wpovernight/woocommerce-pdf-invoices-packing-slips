@@ -948,7 +948,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_checkout_field_title(): string {
-		return $this->get_title_for( 'document_checkout_field' );
+		return $this->get_title_for( 'checkout_field' );
 	}
 
 	/**
@@ -1024,7 +1024,7 @@ abstract class OrderDocument {
 			case 'customer_notes':
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
 				break;
-			case 'document_checkout_field':
+			case 'checkout_field':
 				$title = wpo_ips_checkout_field_get_label() . ':';
 				break;
 			default:
