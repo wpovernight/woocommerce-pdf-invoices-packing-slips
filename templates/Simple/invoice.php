@@ -100,6 +100,12 @@
 						<td><?php $this->payment_method(); ?></td>
 					</tr>
 				<?php endif; ?>
+				<?php if ( $this->show_checkout_field() ) : ?>
+					<tr class="checkout-field">
+						<th><?php $this->checkout_field_title(); ?></th>
+						<td><?php $this->checkout_field(); ?></td>
+					</tr>
+				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
 			</table>
 		</td>
