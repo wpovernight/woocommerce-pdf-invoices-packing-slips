@@ -2236,21 +2236,12 @@ abstract class OrderDocument {
 	}
 
 	/**
-	 * Check if the checkout field should be shown on the document.
-	 *
-	 * @return bool
-	 */
-	public function show_checkout_field(): bool {
-		return $this->get_setting( 'display_checkout_field' );
-	}
-
-	/**
 	 * Return the value of the checkout field.
 	 *
 	 * @return string
 	 */
 	public function get_checkout_field(): string {
-		if ( empty( $this->order ) ) {
+		if ( empty( $this->get_setting( 'display_checkout_field' ) ) || empty( $this->order ) ) {
 			return '';
 		}
 

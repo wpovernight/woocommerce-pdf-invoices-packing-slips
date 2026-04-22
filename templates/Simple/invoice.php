@@ -100,7 +100,7 @@
 						<td><?php $this->payment_method(); ?></td>
 					</tr>
 				<?php endif; ?>
-				<?php if ( $this->show_checkout_field() ) : ?>
+				<?php if ( $this->get_checkout_field() ) : ?>
 					<tr class="checkout-field">
 						<th><?php $this->checkout_field_title(); ?></th>
 						<td><?php $this->checkout_field(); ?></td>
