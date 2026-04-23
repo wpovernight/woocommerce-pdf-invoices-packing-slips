@@ -104,47 +104,77 @@ abstract class AbstractHandler implements HandlerInterface {
 	 */
 	protected function get_payment_means_data(): array {
 		$order     = \wpo_ips_edi_get_parent_order( $this->document->order );
-		$method_id = $order ? $order->get_payment_method() : '';
-		$title     = $order ? $order->get_payment_method_title() : '';
+		$method_id = $order ? (string) $order->get_payment_method() : '';
+		$title     = $order ? (string) $order->get_payment_method_title() : '';
 
-
-		$mapping = apply_filters( 'wpo_ips_edi_payment_means_code_mapping', array(
-			'cheque'  => '20', // Cheque
-			'bacs'    => '58', // SEPA Credit Transfer
-			'paypal'  => '68', // Online payment
-			'stripe'  => '54', // Credit card
-			'cod'     => '46', // Interbank debit transfer
-			'default' => '97', // Clearing between partners
-		), $method_id, EN16931::get_payment(), $this );
+		$mapping = apply_filters(
+			'wpo_ips_edi_payment_means_code_mapping',
+			array(
+				'cheque'  => '20', // Cheque
+				'bacs'    => '58', // SEPA Credit Transfer
+				'paypal'  => '68', // Online payment
+				'stripe'  => '54', // Credit card
+				'cod'     => '46', // Interbank debit transfer
+				'default' => '97', // Clearing between partners
+			),
+			$method_id,
+			EN16931::get_payment(),
+			$this
+		);
 
 		$type_code = $mapping[ $method_id ] ?? $mapping['default'];
 
 		$data = array(
-			'type_code' => $type_code,
-			'method'    => $method_id,
-			'title'     => $title,
+			'type_code'      => $type_code,
+			'method'         => $method_id,
+			'title'          => $title,
+			'iban'           => '',
+			'bic'            => '',
+			'account_name'   => '',
+			'transaction_id' => '',
 		);
 
-		switch ( $method_id ) {
-			case 'bacs':
-				$accounts = get_option( 'woocommerce_bacs_accounts', array() );
+		$payment_methods_with_bank_details = \wpo_ips_edi_get_settings( 'supplier_bank_details' );
 
-				if ( empty( $accounts ) ) {
-					break;
+		if ( null === $payment_methods_with_bank_details ) {
+			$payment_methods_with_bank_details = array( 'bacs' );
+		}
+
+		$show_supplier_bank_details = in_array( $method_id, (array) $payment_methods_with_bank_details, true );
+
+		if ( $show_supplier_bank_details ) {
+			$accounts = get_option( 'woocommerce_bacs_accounts', array() );
+
+			if ( ! empty( $accounts ) && is_array( $accounts ) ) {
+				$selected_account_index = \wpo_ips_edi_get_settings( 'supplier_bacs_account' );
+
+				if ( null !== $selected_account_index && isset( $accounts[ $selected_account_index ] ) ) {
+					$account = $accounts[ $selected_account_index ];
+				} else {
+					$account = reset( $accounts );
 				}
 
-				$account  = apply_filters( 'wpo_ips_edi_payment_means_bacs_default_account', reset( $accounts ), $accounts, $this );
-				$data     = array_merge( $data, $account );
-				break;
+				$account = apply_filters( 'wpo_ips_edi_payment_means_bacs_default_account', $account, $accounts, $this );
 
+				$data = array_merge(
+					$data,
+					array(
+						'iban'         => isset( $account['iban'] )         ? (string) $account['iban']         : '',
+						'bic'          => isset( $account['bic'] )          ? (string) $account['bic']          : '',
+						'account_name' => isset( $account['account_name'] ) ? (string) $account['account_name'] : '',
+					)
+				);
+			}
+		}
+
+		switch ( $method_id ) {
 			case 'paypal':
-				$data['transaction_id'] = $order->get_transaction_id();
+				$data['transaction_id'] = $order ? (string) $order->get_transaction_id() : '';
 				break;
 
 			case 'stripe':
-				$data['transaction_id'] = $order->get_meta( '_stripe_source_id', true );
+				$data['transaction_id'] = $order ? (string) $order->get_meta( '_stripe_source_id', true ) : '';
 				break;
-
 		}
 
 		return apply_filters( 'wpo_ips_edi_payment_means_data', $data, $method_id, $order, $this );

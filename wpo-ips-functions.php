@@ -2285,3 +2285,59 @@ function wpo_ips_register_additional_checkout_field( array $options ): void {
 
 	woocommerce_register_additional_checkout_field( $options );
 }
+
+/**
+ * Get WooCommerce payment method options.
+ *
+ * @return array
+ */
+function wpo_ips_get_payment_method_options(): array {
+	$payment_methods = array();
+
+	if ( ! function_exists( 'WC' ) || ! WC()->payment_gateways() ) {
+		return $payment_methods;
+	}
+
+	foreach ( WC()->payment_gateways()->payment_gateways() as $gateway_id => $gateway ) {
+		$payment_methods[ $gateway_id ] = ! empty( $gateway->method_title )
+			? $gateway->method_title
+			: $gateway_id;
+	}
+
+	return $payment_methods;
+}
+
+/**
+ * Get WooCommerce BACS account options.
+ *
+ * @return array
+ */
+function wpo_ips_get_bacs_account_options(): array {
+	$bacs_accounts        = get_option( 'woocommerce_bacs_accounts', array() );
+	$bacs_account_options = array();
+
+	if ( empty( $bacs_accounts ) || ! is_array( $bacs_accounts ) ) {
+		return $bacs_account_options;
+	}
+
+	foreach ( $bacs_accounts as $index => $account ) {
+		$account_name = ! empty( $account['account_name'] )
+			? $account['account_name']
+			: __( 'Unnamed account', 'woocommerce-pdf-invoices-packing-slips' );
+
+		$iban = ! empty( $account['iban'] ) ? $account['iban'] : '';
+		$bic  = ! empty( $account['bic'] ) ? $account['bic'] : '';
+
+		$label = $account_name;
+
+		if ( ! empty( $iban ) ) {
+			$label .= ' - ' . $iban;
+		} elseif ( ! empty( $bic ) ) {
+			$label .= ' - ' . $bic;
+		}
+
+		$bacs_account_options[ (string) $index ] = $label;
+	}
+
+	return $bacs_account_options;
+}
