@@ -2080,20 +2080,22 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_filename( string $context = 'download', array $args = array() ): string {
-		$order_count = isset($args['order_ids']) ? count($args['order_ids']) : 1;
+		$order_count = isset( $args['order_ids'] )
+			? count( $args['order_ids'] )
+			: 1;
 
 		$name = $this->get_type();
 
-		if ( is_callable( array( $this->order, 'get_type' ) ) && $this->order->get_type() == 'shop_order_refund' ) {
+		if ( is_callable( array( $this->order, 'get_type' ) ) && 'shop_order_refund' === $this->order->get_type() ) {
 			$number = $this->order_id;
 		} else {
 			$number = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';
 		}
 
-		if ( $order_count == 1 ) {
+		if ( $order_count === 1 ) {
 			$suffix = $number;
 		} else {
-			$suffix = gmdate('Y-m-d'); // 2020-11-11
+			$suffix = date_i18n( 'Y-m-d' ); // 2024-12-31
 		}
 
 		// get filename
