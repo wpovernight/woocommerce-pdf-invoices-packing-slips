@@ -42,8 +42,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 
 		$parent_order_id = $this->get_refund_parent_id( $order );
-		$order = wc_get_order( $parent_order_id );
-		return $order;
+		if ( ! $parent_order_id ) {
+			return null;
+		}
+		
+		return wc_get_order( $parent_order_id );
 	}
 
 	/**
