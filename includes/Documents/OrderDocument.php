@@ -2240,7 +2240,7 @@ abstract class OrderDocument {
 	 *
 	 * @return string
 	 */
-	public function get_checkout_field(): string {
+	public function get_checkout_field_value(): string {
 		if (
 			! wpo_ips_checkout_field_is_enabled() ||
 			empty( $this->get_setting( 'display_checkout_field' ) ) ||
@@ -2260,8 +2260,8 @@ abstract class OrderDocument {
 	 *
 	 * @return void
 	 */
-	public function checkout_field(): void {
-		echo esc_html( $this->get_checkout_field() );
+	public function checkout_field_value(): void {
+		echo esc_html( $this->get_checkout_field_value() );
 	}
 
 	protected function add_filters( $filters ) {
