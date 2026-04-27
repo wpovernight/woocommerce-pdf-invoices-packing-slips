@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.10.0-beta.2\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.10.0-rc.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-17T07:48:46+00:00\n"
+"POT-Creation-Date: 2026-04-23T10:11:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -79,7 +79,7 @@ msgstr ""
 #: edi/Peppol.php:145
 #: edi/Peppol.php:490
 #: includes/Settings/SettingsEDI.php:242
-#: includes/Settings/SettingsEDI.php:1144
+#: includes/Settings/SettingsEDI.php:1194
 #: views/advanced-tools.php:273
 #: views/advanced-tools.php:321
 msgid "Select"
@@ -221,7 +221,7 @@ msgid "Services outside scope of tax"
 msgstr ""
 
 #: edi/Standards/EN16931.php:50
-#: includes/Settings/SettingsEDI.php:795
+#: includes/Settings/SettingsEDI.php:845
 msgid "Standard rate"
 msgstr ""
 
@@ -2575,7 +2575,7 @@ msgstr ""
 #: includes/Admin.php:2143
 #: includes/Admin.php:2185
 #: includes/Assets.php:345
-#: includes/Settings/SettingsEDI.php:714
+#: includes/Settings/SettingsEDI.php:764
 msgid "Missing"
 msgstr ""
 
@@ -2583,12 +2583,12 @@ msgstr ""
 #: includes/Admin.php:2144
 #: includes/Admin.php:2186
 #: includes/Assets.php:346
-#: includes/Settings/SettingsEDI.php:715
+#: includes/Settings/SettingsEDI.php:765
 msgid "Optional"
 msgstr ""
 
 #: includes/Admin.php:2155
-#: includes/Settings/SettingsEDI.php:723
+#: includes/Settings/SettingsEDI.php:773
 msgid "VAT number is missing the country prefix"
 msgstr ""
 
@@ -2727,12 +2727,12 @@ msgid "<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools."
 msgstr ""
 
 #: includes/Assets.php:341
-#: includes/Settings/SettingsEDI.php:919
-#: includes/Settings/SettingsEDI.php:929
-#: includes/Settings/SettingsEDI.php:939
-#: includes/Settings/SettingsEDI.php:1037
-#: includes/Settings/SettingsEDI.php:1041
-#: includes/Settings/SettingsEDI.php:1045
+#: includes/Settings/SettingsEDI.php:969
+#: includes/Settings/SettingsEDI.php:979
+#: includes/Settings/SettingsEDI.php:989
+#: includes/Settings/SettingsEDI.php:1087
+#: includes/Settings/SettingsEDI.php:1091
+#: includes/Settings/SettingsEDI.php:1095
 msgid "Code"
 msgstr ""
 
@@ -3488,7 +3488,7 @@ msgid "Upgrade"
 msgstr ""
 
 #: includes/Settings.php:271
-#: includes/Settings/SettingsEDI.php:635
+#: includes/Settings/SettingsEDI.php:685
 msgid "Order not found!"
 msgstr ""
 
@@ -3618,7 +3618,7 @@ msgid "Extensions' license cache cleared successfully!"
 msgstr ""
 
 #: includes/Settings/SettingsDebug.php:397
-#: includes/Settings/SettingsEDI.php:655
+#: includes/Settings/SettingsEDI.php:705
 msgid "Invalid request."
 msgstr ""
 
@@ -4294,7 +4294,7 @@ msgid "Customer Peppol Endpoint ID field location"
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:279
-#: includes/Settings/SettingsEDI.php:1132
+#: includes/Settings/SettingsEDI.php:1182
 msgid "None"
 msgstr ""
 
@@ -4394,180 +4394,202 @@ msgstr ""
 msgid "Embed the encrypted PDF invoice file within the e-document."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:480
+#: includes/Settings/SettingsEDI.php:482
+msgid "Show supplier bank details"
+msgstr ""
+
+#. translators: %1$s: open link anchor, %2$s: close link anchor
+#: includes/Settings/SettingsEDI.php:492
+#, php-format
+msgid "Select the payment methods for which the supplier bank details should be included in the exported Peppol invoice. Bank details are taken from the %1$sWooCommerce Direct bank transfer accounts%2$s."
+msgstr ""
+
+#: includes/Settings/SettingsEDI.php:498
+msgid "Select one or more payment methods"
+msgstr ""
+
+#: includes/Settings/SettingsEDI.php:513
+msgid "Supplier bank account"
+msgstr ""
+
+#: includes/Settings/SettingsEDI.php:518
+msgid "Select which WooCommerce Direct bank transfer account should be used for the supplier bank details in the exported Peppol invoice."
+msgstr ""
+
+#: includes/Settings/SettingsEDI.php:530
 msgid "Send Attachments"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:486
+#: includes/Settings/SettingsEDI.php:536
 msgid "When sending a document by e-mail, automatically include the electronic version attachment along with the PDF."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:493
+#: includes/Settings/SettingsEDI.php:543
 msgid "Include Item Meta Data"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:501
+#: includes/Settings/SettingsEDI.php:551
 msgid "Include item meta data in the e-document."
 msgstr ""
 
 #. translators: 1: opening link tag, 2: closing link tag
-#: includes/Settings/SettingsEDI.php:504
+#: includes/Settings/SettingsEDI.php:554
 #, php-format
 msgid "Advanced customization is possible, see the %1$sdocumentation page%2$s for details."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:515
+#: includes/Settings/SettingsEDI.php:565
 msgid "Enable XML Preview"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:521
+#: includes/Settings/SettingsEDI.php:571
 msgid "Enable the XML preview for electronic documents."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:528
+#: includes/Settings/SettingsEDI.php:578
 msgid "Enable Debug Logs"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:534
+#: includes/Settings/SettingsEDI.php:584
 msgid "Enable logging for debugging purposes."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:622
-#: includes/Settings/SettingsEDI.php:673
+#: includes/Settings/SettingsEDI.php:672
+#: includes/Settings/SettingsEDI.php:723
 #: includes/Settings/SettingsGeneral.php:860
 msgid "Invalid nonce."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:629
+#: includes/Settings/SettingsEDI.php:679
 msgid "Order ID is required."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:663
+#: includes/Settings/SettingsEDI.php:713
 msgid "Tax settings saved successfully."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:700
+#: includes/Settings/SettingsEDI.php:750
 msgid "Supplier"
 msgstr ""
 
 #. translators: General settings link
-#: includes/Settings/SettingsEDI.php:736
+#: includes/Settings/SettingsEDI.php:786
 #, php-format
 msgid "Missing details can be completed in the %s."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:737
+#: includes/Settings/SettingsEDI.php:787
 #: includes/Settings/SettingsGeneral.php:664
 msgid "Shop Information"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:757
+#: includes/Settings/SettingsEDI.php:807
 msgid "Customer"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:762
+#: includes/Settings/SettingsEDI.php:812
 msgid "Order ID"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:763
+#: includes/Settings/SettingsEDI.php:813
 msgid "Search"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:770
+#: includes/Settings/SettingsEDI.php:820
 msgid "Retrieve customer identifiers by loading an order."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:825
+#: includes/Settings/SettingsEDI.php:875
 msgid "To ensure compliance with e-invoicing requirements, please complete the Taxes Classification. This information is essential for accurately generating legally compliant invoices."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:837
+#: includes/Settings/SettingsEDI.php:887
 msgid "Save Taxes"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:894
+#: includes/Settings/SettingsEDI.php:944
 msgid "Configure default tax classifications"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:897
+#: includes/Settings/SettingsEDI.php:947
 msgid "These defaults will be applied when \"Default\" is selected for individual tax rates."
 msgstr ""
 
 #. translators: %1$s: open link anchor, %2$s: close link anchor
-#: includes/Settings/SettingsEDI.php:907
+#: includes/Settings/SettingsEDI.php:957
 #, php-format
 msgid "For more information on setting up the tax table, please see our %1$sarticle%2$s."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:915
+#: includes/Settings/SettingsEDI.php:965
 msgid "Tax Scheme"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:925
+#: includes/Settings/SettingsEDI.php:975
 msgid "Tax Category"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:935
 #: includes/Settings/SettingsEDI.php:985
+#: includes/Settings/SettingsEDI.php:1035
 msgid "Reason"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:978
+#: includes/Settings/SettingsEDI.php:1028
 msgid "Country code"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:979
+#: includes/Settings/SettingsEDI.php:1029
 msgid "State code"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:980
+#: includes/Settings/SettingsEDI.php:1030
 msgid "Postcode / ZIP"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:981
+#: includes/Settings/SettingsEDI.php:1031
 #: wpo-ips-functions-edi.php:802
 #: wpo-ips-functions-edi.php:878
 msgid "City"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:982
+#: includes/Settings/SettingsEDI.php:1032
 msgid "Rate"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:983
+#: includes/Settings/SettingsEDI.php:1033
 msgid "Scheme"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:984
+#: includes/Settings/SettingsEDI.php:1034
 msgid "Category"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:986
+#: includes/Settings/SettingsEDI.php:1036
 msgid "Remarks"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1061
+#: includes/Settings/SettingsEDI.php:1111
 msgid "No taxes found for this class."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1077
+#: includes/Settings/SettingsEDI.php:1127
 msgid "Send your documents through supported delivery networks directly from the plugin."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1079
+#: includes/Settings/SettingsEDI.php:1129
 msgid "Network Products"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1085
+#: includes/Settings/SettingsEDI.php:1135
 msgid "Peppol is a network for electronic document exchange, enabling businesses to send and receive electronic invoices and other documents securely and efficiently."
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1086
+#: includes/Settings/SettingsEDI.php:1136
 #: views/upgrade-table.php:159
 msgid "Buy now"
 msgstr ""
 
-#: includes/Settings/SettingsEDI.php:1121
+#: includes/Settings/SettingsEDI.php:1171
 msgid "Default"
 msgstr ""
 
@@ -6122,4 +6144,8 @@ msgstr ""
 
 #: wpo-ips-functions.php:367
 msgid "Error creating PDF, please contact the site owner."
+msgstr ""
+
+#: wpo-ips-functions.php:2326
+msgid "Unnamed account"
 msgstr ""
