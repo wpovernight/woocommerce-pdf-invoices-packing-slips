@@ -1025,7 +1025,7 @@ abstract class OrderDocument {
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
 				break;
 			case 'checkout_field':
-				$title = wpo_ips_checkout_field_get_label() . ':';
+				$title = WPO_WCPDF()->checkout_field->get_label() . ':';
 				break;
 			default:
 				$title = '';
@@ -2242,14 +2242,14 @@ abstract class OrderDocument {
 	 */
 	public function get_checkout_field_value(): string {
 		if (
-			! wpo_ips_checkout_field_is_enabled() ||
+			! WPO_WCPDF()->checkout_field->is_enabled() ||
 			empty( $this->get_setting( 'display_checkout_field' ) ) ||
 			empty( $this->order )
 		) {
 			return '';
 		}
 
-		$checkout_field_value = $this->order->get_meta( '_wpo_ips_checkout_field', true );
+		$checkout_field_value = $this->order->get_meta( \WPO\IPS\CheckoutField::ORDER_META_KEY, true );
 		$checkout_field_value = trim( $checkout_field_value );
 
 		return apply_filters( 'wpo_wcpdf_checkout_field_value', $checkout_field_value, $this );

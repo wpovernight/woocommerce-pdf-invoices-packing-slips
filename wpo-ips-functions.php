@@ -1215,8 +1215,8 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 	), $order );
 
 	// Maybe add General Checkout Field key
-	if ( wpo_ips_checkout_field_is_vat_number() ) {
-		array_unshift( $vat_meta_keys, '_wpo_ips_checkout_field' );
+	if ( WPO_WCPDF()->checkout_field->is_vat_number() ) {
+		array_unshift( $vat_meta_keys, \WPO\IPS\CheckoutField::ORDER_META_KEY );
 	}
 
 	$vat_number = null;
@@ -1236,67 +1236,6 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 	}
 
 	return apply_filters( 'wpo_wcpdf_order_customer_vat_number', $vat_number, $order, $meta_key ?? null );
-}
-
-/**
- * Check if the custom checkout field is enabled in general settings.
- *
- * @return bool
- */
-function wpo_ips_checkout_field_is_enabled(): bool {
-	$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-	return ! empty( $general_settings['checkout_field_enable'] ?? '' );
-}
-
-/**
- * Check if the custom checkout field is editable on the My Account page.
- *
- * @return bool
- */
-function wpo_ips_checkout_field_is_my_account_enabled(): bool {
-	if ( ! wpo_ips_checkout_field_is_enabled() ) {
-		return false;
-	}
-
-	$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-	return ! empty( $general_settings['checkout_field_enable_my_account'] ?? '' );
-}
-
-/**
- * Check if the custom checkout field should be treated as a VAT number.
- *
- * @return bool
- */
-function wpo_ips_checkout_field_is_vat_number(): bool {
-	$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-
-	if ( empty( $general_settings['checkout_field_as_vat_number'] ) ) {
-		return false;
-	}
-
-	// Prevent conflicts with VAT plugins.
-	if ( ! empty( WPO_WCPDF()->vat_plugins ) && WPO_WCPDF()->vat_plugins->has_active() ) {
-		return false;
-	}
-
-	return true;
-}
-
-/**
- * Get the configured label for the custom checkout field.
- *
- * @return string
- */
-function wpo_ips_checkout_field_get_label(): string {
-	$default          = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
-	$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-	$label            = trim( $general_settings['checkout_field_label'] ?? '' );
-
-	if ( '' === $label ) {
-		$label = $default;
-	}
-
-	return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
 }
 
 /**
@@ -2321,14 +2260,14 @@ function wpo_ips_register_additional_checkout_field( array $options ): void {
 	if ( ! defined( 'WC_VERSION' ) || version_compare( WC_VERSION, '8.9.0', '<' ) ) {
 		return;
 	}
-	
+
 	if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
 		$file                 = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
 		$file_system_instance = WPO_WCPDF()->file_system ?? null;
 		$file_system_instance = $file_system_instance
 			? $file_system_instance
 			: \WPO\IPS\Compatibility\FileSystem::instance();
-		
+
 		if ( $file_system_instance->is_readable( $file ) ) {
 			include_once $file;
 		}
