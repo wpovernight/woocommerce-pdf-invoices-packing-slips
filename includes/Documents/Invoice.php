@@ -320,6 +320,22 @@ class Invoice extends OrderDocumentMethods {
 			),
 			array(
 				'type'			=> 'setting',
+				'id'			=> 'display_checkout_field',
+				'title'			=> __( 'Display checkout field', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'		=> 'checkbox',
+				'section'		=> $this->type,
+				'args'			=> array(
+					'option_name'	=> $option_name,
+					'id'			=> 'display_checkout_field',
+					'description'   => sprintf(
+						/* translators: %s: General settings link */
+						__( 'Display the value of the custom checkout field on the document. The field must first be enabled in the %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general#checkout_field' ) ) . '" target="_blank">' . esc_html__( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+					),
+				)
+			),
+			array(
+				'type'			=> 'setting',
 				'id'			=> 'display_date',
 				'title'			=> __( 'Display invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback'		=> 'select',
@@ -671,6 +687,7 @@ class Invoice extends OrderDocumentMethods {
 						'display_email',
 						'display_phone',
 						'display_customer_notes',
+						'display_checkout_field',
 						'display_shipping_address',
 						'display_number',
 						'next_invoice_number', // this should follow 'display_number'

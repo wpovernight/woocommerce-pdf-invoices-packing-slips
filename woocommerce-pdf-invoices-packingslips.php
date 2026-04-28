@@ -41,6 +41,7 @@ class WPO_WCPDF {
 	public $frontend;
 	public $install;
 	public $font_synchronizer;
+	public $checkout_field;
 
 	protected static $_instance = null;
 
@@ -178,6 +179,7 @@ class WPO_WCPDF {
 		$this->frontend            = \WPO\IPS\Frontend::instance();
 		$this->install             = \WPO\IPS\Install::instance();
 		$this->font_synchronizer   = \WPO\IPS\FontSynchronizer::instance();
+		$this->checkout_field      = \WPO\IPS\CheckoutField::instance();
 
 		// EDI classes
 		\WPO\IPS\EDI\Peppol::instance();
