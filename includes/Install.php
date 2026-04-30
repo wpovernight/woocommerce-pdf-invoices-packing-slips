@@ -724,6 +724,32 @@ class Install {
 				update_option( 'wpo_ips_edi_settings', $edi_settings );
 			}
 		}
+		
+		// 5.10.0-i1490.1: migrate EDI setting
+		if ( version_compare( $installed_version, '5.10.0-i1490.1', '<' ) ) {
+			$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+			$updated      = false;
+
+			// Migrate supplier bank details payment methods setting.
+			if ( ! isset( $edi_settings['supplier_bank_details'] ) ) {
+				$edi_settings['supplier_bank_details'] = array( 'bacs' );
+				$updated = true;
+			}
+
+			// Migrate selected BACS account setting when multiple accounts exist.
+			if ( ! isset( $edi_settings['supplier_bacs_account'] ) ) {
+				$bacs_account_options = wpo_ips_get_bacs_account_options();
+
+				if ( count( $bacs_account_options ) > 1 ) {
+					$edi_settings['supplier_bacs_account'] = (string) array_key_first( $bacs_account_options );
+					$updated = true;
+				}
+			}
+
+			if ( $updated ) {
+				update_option( 'wpo_ips_edi_settings', $edi_settings );
+			}
+		}
 
 		// Maybe reinstall fonts
 		$main_instance->maybe_reinstall_fonts( true );

@@ -482,6 +482,56 @@ class SettingsEDI {
 				),
 			)
 		);
+		
+		$payment_methods = wpo_ips_get_payment_method_options();
+
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'supplier_bank_details',
+			'title'    => __( 'Show supplier bank details', 'woocommerce-pdf-invoices-packing-slips' ),
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'option_name'     => $option_name,
+				'id'              => 'supplier_bank_details',
+				'default'         => array( 'bacs' ),
+				'options'         => $payment_methods,
+				'description'     => sprintf(
+					/* translators: %1$s: open link anchor, %2$s: close link anchor */
+					__( 'Select the payment methods for which the supplier bank details should be included in the exported Peppol invoice. Bank details are taken from the %1$sWooCommerce Direct bank transfer accounts%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<a href="' . esc_url( admin_url( 'admin.php?page=wc-settings&tab=checkout&path=%2Foffline%2Fbacs' ) ) . '" target="_blank">',
+					'</a>'
+				),
+				'multiple'        => true,
+				'enhanced_select' => true,
+				'placeholder'     => __( 'Select one or more payment methods', 'woocommerce-pdf-invoices-packing-slips' ),
+				'class'           => 'edi-multiple',
+			),
+		);
+		
+		$bacs_account_options = wpo_ips_get_bacs_account_options();
+		
+		if ( count( $bacs_account_options ) > 1 ) {
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => 'supplier_bacs_account',
+				'title'    => '',
+				'callback' => 'select',
+				'section'  => $section,
+				'args'     => array(
+					'title'             => __( 'Supplier bank account', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'       => $option_name,
+					'id'                => 'supplier_bacs_account',
+					'default'           => (string) array_key_first( $bacs_account_options ),
+					'options'           => $bacs_account_options,
+					'description'       => __( 'Select which WooCommerce Direct bank transfer account should be used for the supplier bank details in the exported Peppol invoice.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[supplier_bank_details]',
+						'data-show_for_option_values' => wp_json_encode( array_keys( $payment_methods ) ),
+					),
+				),
+			);
+		}
 
 		$settings_fields[] = array(
 			'type'     => 'setting',

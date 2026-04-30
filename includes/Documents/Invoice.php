@@ -286,7 +286,6 @@ class Invoice extends OrderDocumentMethods {
 						'when_different'=> __( 'Only when different from billing address' , 'woocommerce-pdf-invoices-packing-slips' ),
 						'always'		=> __( 'Always' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
-					// 'description'		=> __( 'Display shipping address (in addition to the default billing address) if different from billing address', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -423,7 +422,14 @@ class Invoice extends OrderDocumentMethods {
 							'size'        => 20,
 							'type'        => 'number',
 							/* translators: document type */
-							'description' => sprintf( __( 'Enter the number of digits you want to use as padding. For instance, enter <code>6</code> to display the %s number <code>123</code> as <code>000123</code>, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ) ),
+							'description' => sprintf(
+								/* translators: 1. example number, 2. document type, 3. example number without padding, 4. example number with padding */
+								__( 'Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ),
+								'<code>6</code>',
+								__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<code>123</code>',
+								'<code>000123</code>'
+							),
 						),
 					),
 					'description' => sprintf(
