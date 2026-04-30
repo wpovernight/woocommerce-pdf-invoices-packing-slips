@@ -9,23 +9,27 @@ if ( ! class_exists( '\\WPO\\IPS\\SetupWizard' ) ) :
 
 class SetupWizard {
 
-	/** @var string Current Step */
-	private $step   = '';
+	private string $step              = '';
+	private array $steps              = array();
+	protected static ?self $_instance = null;
 
-	/** @var array Steps for the setup wizard */
-	private $steps  = array();
-
-	protected static $_instance = null;
-
-	public static function instance() {
+	/**
+	 * Singleton instance accessor.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		if ( WPO_WCPDF()->settings->user_can_manage_settings() ) {
+		if ( WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
 			remove_all_actions( 'admin_init' ); // prevents other plugins from adding their own actions
 			add_action( 'admin_init', array( $this, 'setup_wizard' ) );
@@ -34,8 +38,10 @@ class SetupWizard {
 
 	/**
 	 * Add admin menus/screens.
+	 * 
+	 * @return void
 	 */
-	public function admin_menus() {
+	public function admin_menus(): void {
 		add_dashboard_page( '', '', 'manage_options', 'wpo-wcpdf-setup', '' );
 	}
 
@@ -205,8 +211,10 @@ class SetupWizard {
 
 	/**
 	 * Setup Wizard Header.
+	 * 
+	 * @return void
 	 */
-	public function setup_wizard_header() {
+	public function setup_wizard_header(): void {
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?> class="wpo-wizard">
@@ -228,8 +236,10 @@ class SetupWizard {
 
 	/**
 	 * Output the steps.
+	 * 
+	 * @return void
 	 */
-	public function setup_wizard_steps() {
+	public function setup_wizard_steps(): void {
 		$output_steps = $this->steps;
 		// array_shift( $output_steps );
 		?>
@@ -251,8 +261,10 @@ class SetupWizard {
 
 	/**
 	 * Output the content for the current step.
+	 * 
+	 * @return void
 	 */
-	public function setup_wizard_content() {
+	public function setup_wizard_content(): void {
 		echo '<div class="wpo-setup-content">';
 		include( $this->steps[ $this->step ]['view'] );
 		echo '</div>';
@@ -260,8 +272,10 @@ class SetupWizard {
 
 	/**
 	 * Setup Wizard Footer.
+	 * 
+	 * @return void
 	 */
-	public function setup_wizard_footer() {
+	public function setup_wizard_footer(): void {
 		?>
 						<input type="hidden" name="wpo_wcpdf_step" value="<?php echo esc_attr( $this->step ); ?>">
 						<div class="wpo-setup-buttons">
@@ -285,7 +299,13 @@ class SetupWizard {
 		<?php
 	}
 
-	public function get_step_link( $step ) {
+	/**
+	 * Get the link for a specific step.
+	 *
+	 * @param string $step Step key to get the link for.
+	 * @return string URL for the specified step.
+	 */
+	public function get_step_link( string $step ): string {
 		$step_keys = array_keys( $this->steps );
 		if ( end( $step_keys ) === $this->step && empty( $step ) ) {
 			return admin_url('admin.php?page=wpo_wcpdf_options_page&tab=general');
@@ -293,19 +313,30 @@ class SetupWizard {
 		return esc_url_raw( add_query_arg( 'step', $step ) );
 	}
 
-
-	public function get_step( $delta ) {
-		$step_keys = array_keys( $this->steps );
+	/**
+	 * Get the next or previous step key.
+	 *
+	 * @param int $delta Direction to move in the steps array (1 for next, -1 for previous).
+	 * @return string|false The key of the next/previous step, or false if there is no such step.
+	 */
+	public function get_step( int $delta ) {
+		$step_keys        = array_keys( $this->steps );
 		$current_step_pos = array_search( $this->step, $step_keys );
-		$new_step_pos = $current_step_pos + $delta;
-		if ( isset( $step_keys[$new_step_pos] ) ) {
-			return $step_keys[$new_step_pos];
+		$new_step_pos     = $current_step_pos + $delta;
+		
+		if ( isset( $step_keys[ $new_step_pos ] ) ) {
+			return $step_keys[ $new_step_pos ];
 		} else {
 			return false;
 		}
 	}
 
-	public function save_step() {
+	/**
+	 * Save the current step's data.
+	 * 
+	 * @return void
+	 */
+	public function save_step(): void {
 		$request = stripslashes_deep( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ( isset( $this->steps[ $this->step ]['handler'] ) ) {
@@ -350,7 +381,7 @@ class SetupWizard {
 					update_option( $option, $new_settings );
 				}
 			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
-				$orders_column_hidden_key = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled()
+				$orders_column_hidden_key = WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled()
 					? 'managewoocommerce_page_wc-orderscolumnshidden'
 					: 'manageedit-shop_ordercolumnshidden';
 

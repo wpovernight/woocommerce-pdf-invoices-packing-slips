@@ -16,6 +16,13 @@ class PDFMaker {
 	public array $settings;
 	public ?object $document;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param string $html The HTML content to convert to PDF.
+	 * @param array $settings Optional settings for PDF generation.
+	 * @param object|null $document Optional document object related to the PDF.
+	 */
 	public function __construct( string $html, array $settings = array(), ?object $document = null ) {
 		$this->html     = $html;
 		$this->document = $document;
@@ -37,21 +44,23 @@ class PDFMaker {
 		if ( empty( $this->html ) ) {
 			return null;
 		}
+		
+		$main_instance = WPO_WCPDF()->get_instance( 'main' );
 
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
-			'tempDir'                 => WPO_WCPDF()->main->get_tmp_path( 'dompdf' ),
-			'fontDir'                 => WPO_WCPDF()->main->get_tmp_path( 'fonts' ),
-			'fontCache'               => WPO_WCPDF()->main->get_tmp_path( 'fonts' ),
+			'tempDir'                 => $main_instance->get_tmp_path( 'dompdf' ),
+			'fontDir'                 => $main_instance->get_tmp_path( 'fonts' ),
+			'fontCache'               => $main_instance->get_tmp_path( 'fonts' ),
 			'chroot'                  => $this->get_chroot_paths(),
-			'logOutputFile'           => WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) . "/log.htm",
+			'logOutputFile'           => $main_instance->get_tmp_path( 'dompdf' ) . "/log.htm",
 			'defaultFont'             => 'dejavu sans',
 			'isRemoteEnabled'         => true,
 			'isHtml5ParserEnabled'    => true,
 			'isFontSubsettingEnabled' => (bool) $this->settings['font_subsetting'],
 		) ) );
 		
-		if ( isset( WPO_WCPDF()->settings->debug_settings['enable_debug'] ) ) {
+		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_debug'] ) ) {
 			$this->set_additional_debug_options( $options );
 		}
 		
@@ -73,8 +82,9 @@ class PDFMaker {
 	 */
 	private function get_chroot_paths(): array {
 		$chroot         = array( WP_CONTENT_DIR ); // default
-		$wp_upload_base = WPO_WCPDF()->main->get_wp_upload_base();
-		$tmp_base       = WPO_WCPDF()->main->get_tmp_base();
+		$main_instance  = WPO_WCPDF()->get_instance( 'main' );
+		$wp_upload_base = $main_instance->get_wp_upload_base();
+		$tmp_base       = $main_instance->get_tmp_base();
 
 		if ( ! empty( $wp_upload_base ) ) {
 			$chroot[] = $wp_upload_base;

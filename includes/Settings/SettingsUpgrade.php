@@ -9,26 +9,40 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsUpgrade' ) ) :
 
 class SettingsUpgrade {
 
-	public           $extensions;
-	protected static $_instance = null;
+	public array $extensions          = array( 'pro', 'templates' );
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		$this->extensions = array( 'pro', 'templates' );
-
+		// IPS
 		add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'extensions_license_cache_notice' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
 		add_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing', array( $this, 'clear_extensions_license_cache' ) );
 	}
 
-	public function extensions_license_cache_notice( $tab, $active_section ) {
-		if ( 'upgrade' === $tab && WPO_WCPDF()->settings->upgrade->get_extensions_license_data() ) {
+	/**
+	 * Display a notice about the extensions license cache on the upgrade tab
+	 *
+	 * @param string $tab
+	 * @param string $active_section
+	 * @return void
+	 */
+	public function extensions_license_cache_notice( string $tab, string $active_section ): void {
+		if ( 'upgrade' === $tab && $this->get_extensions_license_data() ) {
 			$message = sprintf(
 				/* translators: 1. open anchor tag, 2. close anchor tag */
 				__( 'Kindly be aware that the extensions\' license data is currently stored in cache, impeding the instant update of the information displayed below. To access the latest details, we recommend clearing the cache %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -39,7 +53,14 @@ class SettingsUpgrade {
 		}
 	}
 
-	public function extension_overview( $tab, $section ) {
+	/**
+	 * Display an overview of the extensions on the upgrade tab
+	 *
+	 * @param string $tab
+	 * @param string $section
+	 * @return void
+	 */
+	public function extension_overview( string $tab, string $section ): void {
 		if ( 'upgrade' === $tab ) {
 			$features = array(
 				array(
@@ -191,10 +212,10 @@ class SettingsUpgrade {
 	/**
 	 * Check if a PDF extension is enabled
 	 *
-	 * @param  string  $extension  can be 'pro' or 'templates'
-	 * @return boolean
+	 * @param string $extension  can be 'pro' or 'templates'
+	 * @return bool
 	 */
-	public function extension_is_enabled( $extension ) {
+	public function extension_is_enabled( string $extension ): bool {
 		$is_enabled = false;
 
 		if ( ! empty( $extension ) || ! in_array( $extension, $this->extensions ) ) {
@@ -210,10 +231,10 @@ class SettingsUpgrade {
 	/**
 	 * Get PDF extensions license info
 	 *
-	 * @param  bool  $ignore_cache
+	 * @param bool $ignore_cache
 	 * @return array
 	 */
-	public function get_extension_license_infos( $ignore_cache = false ) {
+	public function get_extension_license_infos( bool $ignore_cache = false ): array {
 		$extensions   = $this->extensions;
 		$license_info = ! $ignore_cache ? $this->get_extensions_license_data( 'cached' ) : array();
 
@@ -362,7 +383,7 @@ class SettingsUpgrade {
 	 *
 	 * @return void
 	 */
-	public function clear_extensions_license_cache() {
+	public function clear_extensions_license_cache(): void {
 		delete_option( 'wpo_wcpdf_extensions_license_cache' );
 	}
 
@@ -395,7 +416,7 @@ class SettingsUpgrade {
 	 *
 	 * @return bool
 	 */
-	public function are_any_extensions_installed() {
+	public function are_any_extensions_installed(): bool {
 		$installed = false;
 
 		foreach ( $this->extensions as $extension ) {

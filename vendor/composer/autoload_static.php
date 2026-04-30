@@ -125,6 +125,7 @@ class ComposerStaticInit799089b7d5c8c7fc7a692559c75d6491
         'WPO\\IPS\\Main' => __DIR__ . '/../..' . '/includes/Main.php',
         'WPO\\IPS\\Makers\\EDIMaker' => __DIR__ . '/../..' . '/includes/Makers/EDIMaker.php',
         'WPO\\IPS\\Makers\\PDFMaker' => __DIR__ . '/../..' . '/includes/Makers/PDFMaker.php',
+        'WPO\\IPS\\Notices' => __DIR__ . '/../..' . '/includes/Notices.php',
         'WPO\\IPS\\Semaphore' => __DIR__ . '/../..' . '/includes/Semaphore.php',
         'WPO\\IPS\\Settings' => __DIR__ . '/../..' . '/includes/Settings.php',
         'WPO\\IPS\\Settings\\SettingsCallbacks' => __DIR__ . '/../..' . '/includes/Settings/SettingsCallbacks.php',

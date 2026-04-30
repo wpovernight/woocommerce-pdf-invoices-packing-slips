@@ -7,10 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\\WPO\\IPS\\Documents\\PackingSlip' ) ) :
 
-/**
- * Packing Slip Document
- */
-
 class PackingSlip extends OrderDocumentMethods {
 
 	/**
@@ -39,7 +35,7 @@ class PackingSlip extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	public function get_title(): string {
 		// override/not using $this->title to allow for language switching!
 		$title = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_title' ); // deprecated
@@ -51,7 +47,7 @@ class PackingSlip extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_number_title() {
+	public function get_number_title(): string {
 		// override to allow for language switching!
 		$title = __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' ); // deprecated
@@ -63,14 +59,21 @@ class PackingSlip extends OrderDocumentMethods {
 	 *
 	 * @return string
 	 */
-	public function get_date_title() {
+	public function get_date_title(): string {
 		// override to allow for language switching!
 		$title = __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' ); // deprecated
 		return apply_filters( 'wpo_wcpdf_document_date_title', $title, $this );
 	}
 
-	public function get_filename( $context = 'download', $args = array() ) {
+	/**
+	 * Get the filename for the document.
+	 *
+	 * @param string $context
+	 * @param array $args
+	 * @return string
+	 */
+	public function get_filename( string $context = 'download', array $args = array() ): string {
 		$order_count = isset($args['order_ids']) ? count($args['order_ids']) : 1;
 
 		$name = _n( 'packing-slip', 'packing-slips', $order_count, 'woocommerce-pdf-invoices-packing-slips' );
@@ -102,7 +105,12 @@ class PackingSlip extends OrderDocumentMethods {
 		return sanitize_file_name( $filename );
 	}
 
-	public function init_settings() {
+	/**
+	 * Init the settings for the document.
+	 * 
+	 * @return void
+	 */
+	public function init_settings(): void {
 		// Register settings.
 		$page = $option_group = $option_name = 'wpo_wcpdf_documents_settings_packing-slip';
 
@@ -177,6 +185,8 @@ class PackingSlip extends OrderDocumentMethods {
 				)
 			),
 		);
+		
+		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
 
 		if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) {
 			ob_start();
@@ -201,7 +211,7 @@ class PackingSlip extends OrderDocumentMethods {
 					)
 				),
 			);
-			$settings_fields = WPO_WCPDF()->settings->move_setting_after_id( $settings_fields, $pro_notice, 'enabled' );
+			$settings_fields = $settings_instance->move_setting_after_id( $settings_fields, $pro_notice, 'enabled' );
 		}
 
 		// Legacy filter to allow plugins to alter settings fields.
@@ -211,7 +221,7 @@ class PackingSlip extends OrderDocumentMethods {
 		$settings_fields = apply_filters( "wpo_wcpdf_settings_fields_documents_{$this->type}_pdf", $settings_fields, $page, $option_group, $option_name, $this );
 
 		if ( ! empty( $settings_fields ) ) {
-			WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+			$settings_instance->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 		}
 	}
 
@@ -219,7 +229,6 @@ class PackingSlip extends OrderDocumentMethods {
 	 * Get the settings categories.
 	 *
 	 * @param string $output_format
-	 *
 	 * @return array
 	 */
 	public function get_settings_categories( string $output_format ): array {

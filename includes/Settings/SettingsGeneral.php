@@ -9,29 +9,48 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsGeneral' ) ) :
 
 class SettingsGeneral {
 
-	protected $option_name = 'wpo_wcpdf_settings_general';
+	protected string $option_name            = 'wpo_wcpdf_settings_general';
+	protected ?array $missing_template_files = null;
+	protected static ?self $_instance        = null;
 
-	protected static $_instance = null;
-
-	public static function instance() {
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
-	public function __construct()	{
-		add_action( 'admin_init', array( $this, 'init_settings' ) );
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		// WP
+		if ( \WPO_WCPDF()->is_settings_page() ) {
+			add_action( 'admin_init', array( $this, 'init_settings' ) );
+		}
+		
+		// IPS
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
+		
+		// AJAX
 		add_action( 'wp_ajax_wcpdf_get_country_states', array( $this, 'ajax_get_shop_country_states' ) );
-
-		// Display an admin notice if shop address fields are empty.
-		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
 	}
 
-	public function output( $section, $nonce ) {
-		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+	/**
+	 * Output the general settings.
+	 *
+	 * @param string $section
+	 * @param string $nonce
+	 * @return void
+	 */
+	public function output( string $section, string $nonce ): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			return;
 		}
 
@@ -41,7 +60,12 @@ class SettingsGeneral {
 		submit_button();
 	}
 
-	public function init_settings() {
+	/**
+	 * Initialize general settings.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
 		$page = $option_group = $option_name = $this->option_name;
 
 		$template_base_path     = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
@@ -52,8 +76,9 @@ class SettingsGeneral {
 		$requires_pro           = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
 		$states                 = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
 		$missing_template_files = $this->get_missing_template_files();
-		$has_vat_plugin_active  = \WPO_WCPDF()->vat_plugins->has_active();
+		$has_vat_plugin_active  = \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active();
 		$vat_plugin_notice      = '';
+		$settings_instance      = \WPO_WCPDF()->get_instance( 'settings' );
 
 		if ( $has_vat_plugin_active ) {
 			$vat_plugin_notice = '<div class="notice notice-info inline notice-wpo"><p>'
@@ -92,7 +117,7 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
-					'options_callback' => array( WPO_WCPDF()->settings, 'get_installed_templates_list' ),
+					'options_callback' => array( $settings_instance, 'get_installed_templates_list' ),
 					'description'      => sprintf(
 						/* translators: 1: plugin template path, 2: theme template path */
 						_n(
@@ -611,10 +636,18 @@ class SettingsGeneral {
 
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name, $this );
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+		
+		$settings_instance->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
 
-	public function attachment_settings_hint( $active_tab, $active_section ) {
+	/**
+	 * Display a hint to set up attachments for invoice emails if no attachments are set, and allow hiding the hint
+	 *
+	 * @param string $active_tab
+	 * @param string $active_section
+	 * @return void
+	 */
+	public function attachment_settings_hint( string $active_tab, string $active_section ): void {
 		// save or check option to hide attachments settings hint
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_attachments_hint'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
@@ -629,14 +662,14 @@ class SettingsGeneral {
 			$hide_hint = get_option( 'wpo_wcpdf_hide_attachments_hint' );
 		}
 
-		if ( $active_tab == 'general' && ! $hide_hint ) {
-			$documents = WPO_WCPDF()->documents->get_documents();
+		if ( 'general' === $active_tab && ! $hide_hint ) {
+			$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 			foreach ( $documents as $document ) {
-				if ( $document->get_type() == 'invoice' ) {
+				if ( 'invoice' === $document->get_type() ) {
 					$invoice_email_ids = $document->get_attach_to_email_ids();
 					if ( empty( $invoice_email_ids ) ) {
-						include_once( WPO_WCPDF()->plugin_path() . '/views/attachment-settings-hint.php' );
+						include_once WPO_WCPDF()->plugin_path() . '/views/attachment-settings-hint.php';
 					}
 				}
 			}
@@ -732,9 +765,10 @@ class SettingsGeneral {
 
 	/**
 	 * List templates in plugin folder, theme folder & child theme folder
-	 * @return array		template path => template name
+	 * 
+	 * @return array
 	 */
-	public function find_templates() {
+	public function find_templates(): array {
 		$installed_templates = array();
 		// get base paths
 		$template_base_path  = ( function_exists( 'WC' ) && is_callable( array( WC(), 'template_path' ) ) ) ? WC()->template_path() : apply_filters( 'woocommerce_template_path', 'woocommerce/' );
@@ -779,37 +813,24 @@ class SettingsGeneral {
 
 		return apply_filters( 'wpo_wcpdf_templates', $installed_templates );
 	}
-
-	public function display_admin_notice_for_shop_address(): void {
-		// Return if the notice has been dismissed.
-		if ( get_option( 'wpo_wcpdf_dismiss_shop_address_notice', false ) ) {
-			return;
-		}
-
-		// Handle dismissal action.
-		if ( isset( $_GET['wpo_dismiss_shop_address_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_shop_address_notice' ) ) {
-				update_option( 'wpo_wcpdf_dismiss_shop_address_notice', true );
-				wp_safe_redirect( remove_query_arg( array( 'wpo_dismiss_shop_address_notice', '_wpnonce' ) ) );
-				exit;
-			} else {
-				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
-				return;
-			}
-		}
-
-		$general_settings = WPO_WCPDF()->settings->general;
-		$display_notice   = false;
-		$languages_data   = wpo_wcpdf_get_multilingual_languages();
-		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
+	
+	/**
+	 * Check if the shop address is incomplete.
+	 *
+	 * @return bool True if the shop address is incomplete, false otherwise.
+	 */
+	public function maybe_shop_address_is_incomplete(): bool {
+		$incomplete     = false;
+		$languages_data = \wpo_wcpdf_get_multilingual_languages();
+		$languages      = $languages_data ? array_keys( $languages_data ) : array( 'default' );
 
 		foreach ( $languages as $language ) {
-			$line_1   = $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '';
-			$country  = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
-			$states   = wpo_wcpdf_get_country_states( $country );
-			$state    = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
-			$city     = $general_settings->get_setting( 'shop_address_city', $language ) ?? '';
-			$postcode = $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '';
+			$line_1   = $this->get_setting( 'shop_address_line_1', $language ) ?? '';
+			$country  = $this->get_setting( 'shop_address_country', $language ) ?? '';
+			$states   = \wpo_wcpdf_get_country_states( $country );
+			$state    = ! empty( $states ) ? $this->get_setting( 'shop_address_state', $language ) : '';
+			$city     = $this->get_setting( 'shop_address_city', $language ) ?? '';
+			$postcode = $this->get_setting( 'shop_address_postcode', $language ) ?? '';
 
 			if (
 				empty( $line_1 ) ||
@@ -818,40 +839,20 @@ class SettingsGeneral {
 				empty( $city ) ||
 				empty( $postcode )
 			) {
-				$display_notice = true;
+				$incomplete = true;
 				break;
 			}
 		}
-
-		if ( $display_notice ) {
-			$general_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
-			$dismiss_url      = wp_nonce_url( add_query_arg( 'wpo_dismiss_shop_address_notice', true ), 'dismiss_shop_address_notice' );
-			$notice_message   = sprintf(
-				/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
-				__( '%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-				'<a href="' . esc_url( $general_page_url ) . '">',
-				'</a>'
-			);
-
-			?>
-
-			<div class="notice notice-warning">
-				<p><?php echo wp_kses_post( $notice_message ); ?></p>
-				<p><a href="<?php echo esc_url( $dismiss_url ); ?>"
-					  class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-				</p>
-			</div>
-
-			<?php
-		}
-
+		
+		return $incomplete;
 	}
 
 	/**
 	 * Get the states for a given country code via AJAX.
+	 * 
+	 * @return void
 	 */
-	public function ajax_get_shop_country_states() {
+	public function ajax_get_shop_country_states(): void {
 		// Accept either the settings nonce or the setup-wizard nonce.
 		$valid = check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security', false )
 			|| check_ajax_referer( 'wpo_wcpdf_setup_nonce', 'security', false );
@@ -924,11 +925,14 @@ class SettingsGeneral {
 	 * @return string[] Array of document titles.
 	 */
 	private function get_missing_template_files(): array {
-		$template_path       = WPO_WCPDF()->settings->get_template_path();
-		$template_path_array = explode( '/', $template_path );
-		$template_name       = end( $template_path_array );
-		$enabled_documents   = WPO_WCPDF()->documents->get_documents( 'enabled' );
-		$missing             = array();
+		if ( null !== $this->missing_template_files ) {
+			return $this->missing_template_files;
+		}
+
+		$template_path     = WPO_WCPDF()->get_instance( 'settings' )->get_template_path();
+		$template_name     = basename( wp_normalize_path( $template_path ) );
+		$enabled_documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled' );
+		$missing           = array();
 
 		foreach ( $enabled_documents as $doc ) {
 			$filename         = $doc->get_type() . '.php';
@@ -937,7 +941,7 @@ class SettingsGeneral {
 			// If using Simple OR the located template is not inside /Simple/, and the file exists, skip.
 			if (
 				( 'Simple' === $template_name || false === strpos( $located_template, '/Simple/' ) ) &&
-				WPO_WCPDF()->file_system->exists( $located_template )
+				WPO_WCPDF()->get_instance( 'file_system' )->exists( $located_template )
 			) {
 				continue;
 			}
@@ -945,7 +949,9 @@ class SettingsGeneral {
 			$missing[] = $doc->get_title();
 		}
 
-		return $missing;
+		$this->missing_template_files = $missing;
+
+		return $this->missing_template_files;
 	}
 
 	/**
@@ -979,7 +985,7 @@ class SettingsGeneral {
 
 		// Premium Templates guidance (only if bundle license missing/invalid)
 		if ( function_exists( 'WPO_WCPDF_Templates' ) ) {
-			$license_info = WPO_WCPDF()->settings->upgrade->get_extension_license_infos();
+			$license_info = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'upgrade' )->get_extension_license_infos();
 			$info         = $license_info['bundle'] ?? null;
 
 			if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {
