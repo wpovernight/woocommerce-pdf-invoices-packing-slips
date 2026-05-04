@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.10.0-rc.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.10.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-23T10:11:22+00:00\n"
+"POT-Creation-Date: 2026-05-04T08:02:13+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2211,14 +2211,14 @@ msgstr ""
 #: includes/Admin.php:361
 #: includes/Admin.php:1972
 #: includes/Assets.php:374
-#: includes/Documents/Invoice.php:359
+#: includes/Documents/Invoice.php:364
 #: includes/Main.php:1352
 #: views/setup-wizard/display-options.php:83
 msgid "Invoice Number"
 msgstr ""
 
 #: includes/Admin.php:362
-#: includes/Documents/Invoice.php:327
+#: includes/Documents/Invoice.php:332
 #: includes/Main.php:1353
 #: views/setup-wizard/display-options.php:62
 msgid "Invoice Date"
@@ -2380,15 +2380,15 @@ msgid "Number prefix"
 msgstr ""
 
 #: includes/Admin.php:1266
-#: includes/Documents/Invoice.php:395
+#: includes/Documents/Invoice.php:400
 msgid "If set, this value will be used as number prefix."
 msgstr ""
 
 #. translators: 1. document slug, 2-3 placeholders
 #: includes/Admin.php:1269
 #: includes/Admin.php:1289
-#: includes/Documents/Invoice.php:397
-#: includes/Documents/Invoice.php:406
+#: includes/Documents/Invoice.php:402
+#: includes/Documents/Invoice.php:411
 #, php-format
 msgid "You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively."
 msgstr ""
@@ -2398,7 +2398,7 @@ msgid "Number suffix"
 msgstr ""
 
 #: includes/Admin.php:1286
-#: includes/Documents/Invoice.php:404
+#: includes/Documents/Invoice.php:409
 msgid "If set, this value will be used as number suffix."
 msgstr ""
 
@@ -2406,15 +2406,16 @@ msgstr ""
 msgid "Number padding"
 msgstr ""
 
-#. translators: %1$s: code, %2$s: document title, %3$s: number, %4$s: padded number
+#. translators: 1. example number, 2. document type, 3. example number without padding, 4. example number with padding
 #: includes/Admin.php:1306
+#: includes/Documents/Invoice.php:422
 #, php-format
 msgid "Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
 #: includes/Admin.php:1322
-#: includes/Documents/Invoice.php:420
+#: includes/Documents/Invoice.php:432
 #, php-format
 msgid "For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article: %1$sNumber format explained%2$s"
 msgstr ""
@@ -2793,12 +2794,11 @@ msgstr ""
 msgid "Ship To:"
 msgstr ""
 
-#. translators: document type
 #: includes/Documents/Invoice.php:142
-#: includes/Documents/Invoice.php:398
-#: includes/Documents/Invoice.php:407
-#: includes/Documents/Invoice.php:415
-#: includes/Documents/Invoice.php:426
+#: includes/Documents/Invoice.php:403
+#: includes/Documents/Invoice.php:412
+#: includes/Documents/Invoice.php:424
+#: includes/Documents/Invoice.php:438
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] ""
@@ -2815,27 +2815,27 @@ msgstr ""
 msgid "Attach to:"
 msgstr ""
 
-#. translators: directory path
-#: includes/Documents/Invoice.php:246
+#. translators: 1. directory path
+#: includes/Documents/Invoice.php:249
 #, php-format
 msgid "It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices."
 msgstr ""
 
-#: includes/Documents/Invoice.php:252
+#: includes/Documents/Invoice.php:258
 msgid "Disable for:"
 msgstr ""
 
-#: includes/Documents/Invoice.php:261
+#: includes/Documents/Invoice.php:267
 msgid "Select one or more statuses"
 msgstr ""
 
-#: includes/Documents/Invoice.php:267
+#: includes/Documents/Invoice.php:273
 msgid "Display shipping address"
 msgstr ""
 
-#: includes/Documents/Invoice.php:274
-#: includes/Documents/Invoice.php:326
-#: includes/Documents/Invoice.php:358
+#: includes/Documents/Invoice.php:280
+#: includes/Documents/Invoice.php:331
+#: includes/Documents/Invoice.php:363
 #: includes/Documents/PackingSlip.php:137
 #: views/advanced-status.php:156
 #: views/advanced-status.php:160
@@ -2847,112 +2847,106 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: includes/Documents/Invoice.php:275
+#: includes/Documents/Invoice.php:281
 #: views/setup-wizard/display-options.php:21
 msgid "Only when different from billing address"
 msgstr ""
 
-#: includes/Documents/Invoice.php:276
-#: includes/Documents/Invoice.php:453
+#: includes/Documents/Invoice.php:282
+#: includes/Documents/Invoice.php:465
 #: includes/Documents/PackingSlip.php:139
 #: includes/Settings/SettingsEDI.php:307
 #: views/setup-wizard/display-options.php:22
 msgid "Always"
 msgstr ""
 
-#: includes/Documents/Invoice.php:284
+#: includes/Documents/Invoice.php:289
 #: includes/Documents/PackingSlip.php:147
 msgid "Display email address"
 msgstr ""
 
-#: includes/Documents/Invoice.php:295
+#: includes/Documents/Invoice.php:300
 #: includes/Documents/PackingSlip.php:158
 msgid "Display phone number"
 msgstr ""
 
-#: includes/Documents/Invoice.php:306
+#: includes/Documents/Invoice.php:311
 #: includes/Documents/PackingSlip.php:169
 msgid "Display customer notes"
 msgstr ""
 
-#: includes/Documents/Invoice.php:319
+#: includes/Documents/Invoice.php:324
 msgid "Display invoice date"
 msgstr ""
 
-#: includes/Documents/Invoice.php:328
+#: includes/Documents/Invoice.php:333
 #: includes/Documents/OrderDocumentMethods.php:1360
 #: views/setup-wizard/display-options.php:63
 msgid "Order Date"
 msgstr ""
 
-#: includes/Documents/Invoice.php:335
+#: includes/Documents/Invoice.php:340
 msgid "Display due date"
 msgstr ""
 
 #. translators: number of days
-#: includes/Documents/Invoice.php:342
+#: includes/Documents/Invoice.php:347
 #, php-format
 msgid "%s days"
 msgstr ""
 
-#: includes/Documents/Invoice.php:351
+#: includes/Documents/Invoice.php:356
 msgid "Display invoice number"
 msgstr ""
 
-#: includes/Documents/Invoice.php:360
+#: includes/Documents/Invoice.php:365
 #: views/setup-wizard/display-options.php:84
 msgid "Order Number"
 msgstr ""
 
-#: includes/Documents/Invoice.php:364
+#: includes/Documents/Invoice.php:369
 #: includes/Settings/SettingsCallbacks.php:39
 msgid "Warning!"
 msgstr ""
 
-#: includes/Documents/Invoice.php:365
+#: includes/Documents/Invoice.php:370
 msgid "Using the Order Number as invoice number is not recommended as this may lead to gaps in the invoice number sequence (even when order numbers are sequential)."
 msgstr ""
 
-#: includes/Documents/Invoice.php:366
+#: includes/Documents/Invoice.php:371
 msgid "More information"
 msgstr ""
 
-#: includes/Documents/Invoice.php:373
+#: includes/Documents/Invoice.php:378
 msgid "Next invoice number (without prefix/suffix etc.)"
 msgstr ""
 
-#: includes/Documents/Invoice.php:379
+#: includes/Documents/Invoice.php:384
 msgid "This is the number that will be used for the next document. By default, numbering starts from 1 and increases for every new document. Note that if you override this and set it lower than the current/highest number, this could create duplicate numbers!"
 msgstr ""
 
-#: includes/Documents/Invoice.php:385
+#: includes/Documents/Invoice.php:390
 msgid "Number format"
 msgstr ""
 
-#: includes/Documents/Invoice.php:393
+#: includes/Documents/Invoice.php:398
 msgid "Prefix"
 msgstr ""
 
-#: includes/Documents/Invoice.php:399
-#: includes/Documents/Invoice.php:408
+#: includes/Documents/Invoice.php:404
+#: includes/Documents/Invoice.php:413
 msgid "Check the Docs article below to see all the available placeholders for prefix/suffix."
 msgstr ""
 
-#: includes/Documents/Invoice.php:402
+#: includes/Documents/Invoice.php:407
 msgid "Suffix"
 msgstr ""
 
-#: includes/Documents/Invoice.php:411
+#: includes/Documents/Invoice.php:416
 msgid "Padding"
 msgstr ""
 
-#. translators: document type
-#: includes/Documents/Invoice.php:415
-#, php-format
-msgid "Enter the number of digits you want to use as padding. For instance, enter <code>6</code> to display the %s number <code>123</code> as <code>000123</code>, filling it with zeros until the number set as padding is reached."
-msgstr ""
-
-#: includes/Documents/Invoice.php:423
+#: includes/Documents/Invoice.php:435
 #: includes/Settings/SettingsDebug.php:962
 #: includes/Settings/SettingsDebug.php:998
 #: includes/Settings/SettingsGeneral.php:407
@@ -2964,180 +2958,180 @@ msgid "Note"
 msgstr ""
 
 #. translators: document type
-#: includes/Documents/Invoice.php:425
+#: includes/Documents/Invoice.php:437
 #, php-format
 msgid "Changes made to the number format will only be reflected on new orders. Also, if you have already created a custom %s number format with a filter, the above settings will be ignored."
 msgstr ""
 
-#: includes/Documents/Invoice.php:433
+#: includes/Documents/Invoice.php:445
 msgid "Reset invoice number yearly"
 msgstr ""
 
-#: includes/Documents/Invoice.php:444
+#: includes/Documents/Invoice.php:456
 msgid "Allow My Account invoice download"
 msgstr ""
 
-#: includes/Documents/Invoice.php:451
+#: includes/Documents/Invoice.php:463
 msgid "Only when an invoice is already created/emailed"
 msgstr ""
 
-#: includes/Documents/Invoice.php:452
+#: includes/Documents/Invoice.php:464
 msgid "Only for specific order statuses (define below)"
 msgstr ""
 
-#: includes/Documents/Invoice.php:454
+#: includes/Documents/Invoice.php:466
 msgid "Never"
 msgstr ""
 
-#: includes/Documents/Invoice.php:469
+#: includes/Documents/Invoice.php:481
 msgid "Enable invoice number column in the orders list"
 msgstr ""
 
-#: includes/Documents/Invoice.php:480
+#: includes/Documents/Invoice.php:492
 msgid "Enable invoice date column in the orders list"
 msgstr ""
 
-#: includes/Documents/Invoice.php:491
+#: includes/Documents/Invoice.php:503
 msgid "Enable invoice number search in the orders list"
 msgstr ""
 
-#: includes/Documents/Invoice.php:497
+#: includes/Documents/Invoice.php:509
 msgid "The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href=\"https://woocommerce.com/document/high-performance-order-storage/\" target=\"_blank\">HPOS</a> feature to search for orders by invoice numbers using the search type selector. Additionally, it allows you to search for multiple orders using a comma-separated list of invoice numbers."
 msgstr ""
 
-#: includes/Documents/Invoice.php:503
+#: includes/Documents/Invoice.php:515
 msgid "Disable for free orders"
 msgstr ""
 
 #. translators: zero number
-#: includes/Documents/Invoice.php:510
+#: includes/Documents/Invoice.php:522
 #, php-format
 msgid "Disable document when the order total is %s"
 msgstr ""
 
-#: includes/Documents/Invoice.php:516
+#: includes/Documents/Invoice.php:528
 msgid "Mark as printed"
 msgstr ""
 
-#: includes/Documents/Invoice.php:524
+#: includes/Documents/Invoice.php:536
 msgid "Manually"
 msgstr ""
 
-#: includes/Documents/Invoice.php:527
+#: includes/Documents/Invoice.php:539
 msgid "On single order action"
 msgstr ""
 
-#: includes/Documents/Invoice.php:528
+#: includes/Documents/Invoice.php:540
 msgid "On bulk order action"
 msgstr ""
 
-#: includes/Documents/Invoice.php:529
+#: includes/Documents/Invoice.php:541
 msgid "On my account"
 msgstr ""
 
-#: includes/Documents/Invoice.php:530
+#: includes/Documents/Invoice.php:542
 msgid "On email attachment"
 msgstr ""
 
-#: includes/Documents/Invoice.php:531
+#: includes/Documents/Invoice.php:543
 msgid "On order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Documents/Invoice.php:536
+#: includes/Documents/Invoice.php:548
 msgid "Allows you to mark the document as printed, manually (in the order page) or automatically (based on the document creation context you have selected)."
 msgstr ""
 
-#: includes/Documents/Invoice.php:542
+#: includes/Documents/Invoice.php:554
 msgid "Unmark as printed"
 msgstr ""
 
-#: includes/Documents/Invoice.php:548
+#: includes/Documents/Invoice.php:560
 msgid "Adds a link in the order page to allow to remove the printed mark."
 msgstr ""
 
-#: includes/Documents/Invoice.php:554
+#: includes/Documents/Invoice.php:566
 msgid "Always use most current settings"
 msgstr ""
 
-#: includes/Documents/Invoice.php:562
+#: includes/Documents/Invoice.php:574
 msgid "When enabled, the document will always reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings."
 msgstr ""
 
-#: includes/Documents/Invoice.php:563
+#: includes/Documents/Invoice.php:575
 msgid "Caution: Enabling this will also mean that if you change your company name or address in the future, previously generated documents will also be affected."
 msgstr ""
 
-#: includes/Documents/Invoice.php:565
+#: includes/Documents/Invoice.php:577
 msgid "Learn more about this setting"
 msgstr ""
 
-#: includes/Documents/Invoice.php:575
+#: includes/Documents/Invoice.php:587
 msgid "Include document link in emails"
 msgstr ""
 
-#: includes/Documents/Invoice.php:584
+#: includes/Documents/Invoice.php:596
 msgid "Select emails to include the document link."
 msgstr ""
 
-#: includes/Documents/Invoice.php:591
+#: includes/Documents/Invoice.php:603
 msgid "Document link position in emails"
 msgstr ""
 
-#: includes/Documents/Invoice.php:598
+#: includes/Documents/Invoice.php:610
 msgid "Order details"
 msgstr ""
 
-#: includes/Documents/Invoice.php:599
+#: includes/Documents/Invoice.php:611
 msgid "Order meta"
 msgstr ""
 
-#: includes/Documents/Invoice.php:600
+#: includes/Documents/Invoice.php:612
 msgid "Before order table"
 msgstr ""
 
-#: includes/Documents/Invoice.php:601
+#: includes/Documents/Invoice.php:613
 msgid "After order table"
 msgstr ""
 
-#: includes/Documents/Invoice.php:602
+#: includes/Documents/Invoice.php:614
 msgid "Customer address section"
 msgstr ""
 
-#: includes/Documents/Invoice.php:603
+#: includes/Documents/Invoice.php:615
 msgid "Customer details"
 msgstr ""
 
-#: includes/Documents/Invoice.php:605
+#: includes/Documents/Invoice.php:617
 msgid "Select the placement of the document link in the guest customer emails."
 msgstr ""
 
-#: includes/Documents/Invoice.php:618
+#: includes/Documents/Invoice.php:630
 msgid "Invoice numbers are created by a third-party extension."
 msgstr ""
 
 #. translators: link
-#: includes/Documents/Invoice.php:621
+#: includes/Documents/Invoice.php:633
 #, php-format
 msgid "Configure it <a href=\"%s\">here</a>."
 msgstr ""
 
-#: includes/Documents/Invoice.php:646
+#: includes/Documents/Invoice.php:658
 #: includes/Documents/PackingSlip.php:233
 #: includes/Settings.php:180
 #: includes/Settings/SettingsDebug.php:832
 msgid "General"
 msgstr ""
 
-#: includes/Documents/Invoice.php:657
+#: includes/Documents/Invoice.php:669
 #: includes/Documents/PackingSlip.php:240
 msgid "Document details"
 msgstr ""
 
-#: includes/Documents/Invoice.php:671
+#: includes/Documents/Invoice.php:683
 msgid "Admin"
 msgstr ""
 
-#: includes/Documents/Invoice.php:679
+#: includes/Documents/Invoice.php:691
 #: includes/Settings.php:195
 #: includes/Settings/SettingsCallbacks.php:812
 msgid "Advanced"

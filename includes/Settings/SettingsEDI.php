@@ -285,7 +285,7 @@ class SettingsEDI {
 				'id'                => 'peppol_endpoint_id_field_location',
 				'default'           => 'none',
 				'options'           => array(
-					'none '      => __( 'None', 'woocommerce-pdf-invoices-packing-slips' ),
+					'none'       => __( 'None', 'woocommerce-pdf-invoices-packing-slips' ),
 					'checkout'   => __( 'Checkout only', 'woocommerce-pdf-invoices-packing-slips' ),
 					'my_account' => __( 'My Account only', 'woocommerce-pdf-invoices-packing-slips' ),
 					'both'       => __( 'Both Checkout and My Account', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -482,7 +482,7 @@ class SettingsEDI {
 				),
 			)
 		);
-		
+
 		$payment_methods = wpo_ips_get_payment_method_options();
 
 		$settings_fields[] = array(
@@ -508,9 +508,9 @@ class SettingsEDI {
 				'class'           => 'edi-multiple',
 			),
 		);
-		
+
 		$bacs_account_options = wpo_ips_get_bacs_account_options();
-		
+
 		if ( count( $bacs_account_options ) > 1 ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
