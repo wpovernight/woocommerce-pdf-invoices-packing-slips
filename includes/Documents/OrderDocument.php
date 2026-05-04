@@ -615,7 +615,7 @@ abstract class OrderDocument {
 			}
 		}
 
-		return apply_filters( 'wpo_ips_document_is_allowed_in_my_account', $allowed, $button_setting, $default, $output_format, $this );
+		return apply_filters( 'wpo_ips_document_is_allowed_in_my_account', $allowed, $default, $output_format, $this );
 	}
 
 	public function exists() {
