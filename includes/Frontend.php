@@ -70,55 +70,46 @@ class Frontend {
 	/**
 	 * Display My Account invoice actions.
 	 *
-	 * @param array $actions
+	 * @param array              $actions
 	 * @param \WC_Abstract_Order $order
 	 * @return array
 	 */
 	public function my_account_invoice_actions( array $actions, \WC_Abstract_Order $order ): array {
 		$this->disable_storing_document_settings();
 
-		$document_type   = 'invoice';
-		$document_title  = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$invoice         = wcpdf_get_document( $document_type, $order );
-		$invoice_allowed = false;
+		$document_type  = 'invoice';
+		$document_title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$invoice        = wcpdf_get_document( $document_type, $order );
 
-		if ( $invoice && $invoice->is_enabled() ) {
-			// check my account button settings
-			$button_setting = $invoice->get_setting( 'my_account_buttons', 'available' );
+		if ( ! $invoice ) {
+			return apply_filters( 'wpo_wcpdf_myaccount_actions', $actions, $order );
+		}
 
-			switch ( $button_setting ) {
-				case 'available':
-					$invoice_allowed = $invoice->exists();
-					break;
-				case 'always':
-					$invoice_allowed = true;
-					break;
-				case 'custom':
-					$allowed_statuses = $invoice->get_setting( 'my_account_restrict', array() );
+		$invoice_allowed = $invoice->is_my_account_allowed( 'available' );
 
-					if ( ! empty( $allowed_statuses ) && in_array( $order->get_status(), array_keys( $allowed_statuses ), true ) ) {
-						$invoice_allowed = true;
-					}
-					break;
-				case 'never':
-				default:
-					break;
-			}
+		// Backward compatibility with the existing status-based filter.
+		if ( ! $invoice_allowed ) {
+			$invoice_allowed = in_array(
+				$order->get_status(),
+				apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ),
+				true
+			);
+		}
 
-			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
-			if ( $invoice_allowed || in_array( $order->get_status(), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
-				$name                      = is_callable( array( $invoice, 'get_title' ) ) ? $invoice->get_title() : $document_title;
-				$actions[ $document_type ] = array(
-					'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
-					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice )
+		if ( $invoice_allowed ) {
+			$name              = is_callable( array( $invoice, 'get_title' ) ) ? $invoice->get_title() : $document_title;
+			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
+
+			$actions[ $document_type ] = array(
+				'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
+				'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice ),
+			);
+
+			if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
+				$actions[ $document_type . '_xml' ] = array(
+					'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'output' => 'xml', 'my-account' => 'true' ) ),
+					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),
 				);
-
-				if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
-					$actions[ $document_type . '_xml' ] = array(
-						'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml', 'my-account' => 'true' ) ),
-						'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),
-					);
-				}
 			}
 		}
 
