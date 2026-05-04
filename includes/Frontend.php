@@ -98,7 +98,7 @@ class Frontend {
 
 		if ( $invoice_allowed ) {
 			$name              = is_callable( array( $invoice, 'get_title' ) ) ? $invoice->get_title() : $document_title;
-			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
+			$endpoint_instance = WPO_WCPDF()->endpoint;
 
 			$actions[ $document_type ] = array(
 				'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
