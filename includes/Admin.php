@@ -739,7 +739,7 @@ class Admin {
 		if ( empty( $meta_box_actions ) ) {
 			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require that the PDF version of the same document type is generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
 		}
-		
+
 		if (
 			( $order->get_cart_tax() > 0 || $order->get_shipping_tax() > 0 ) &&
 			empty( wpo_ips_edi_get_tax_settings() )
@@ -827,7 +827,7 @@ class Admin {
 												esc_html__( 'Send %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 												esc_html( $alt )
 											);
-											
+
 											$send_button = \wpo_ips_edi_generate_action_button_html(
 												$dispatch_url,
 												'button button-primary xml send' . $send_disabled,
@@ -845,7 +845,7 @@ class Admin {
 											esc_html__( 'Resend %s to Network', 'woocommerce-pdf-invoices-packing-slips' ),
 											esc_html( $alt )
 										);
-										
+
 										$resend_button = \wpo_ips_edi_generate_action_button_html(
 											$dispatch_url,
 											'button button-primary xml resend' . $send_disabled,
@@ -858,7 +858,7 @@ class Admin {
 											esc_html__( 'Update %s', 'woocommerce-pdf-invoices-packing-slips' ),
 											esc_html( $alt )
 										);
-										
+
 										$update_button = \wpo_ips_edi_generate_action_button_html(
 											$update_status_url,
 											'button xml update ' . $class,
@@ -1302,7 +1302,7 @@ class Admin {
 											<?php esc_html_e( 'Number padding', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 											<?php
 												$tip_text = sprintf(
-													/* translators: %1$s: code, %2$s: document title, %3$s: number, %4$s: padded number */
+													/* translators: 1. example number, 2. document type, 3. example number without padding, 4. example number with padding */
 													__( 'Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ),
 													'<code>6</code>',
 													esc_html( $document->get_title() ),
@@ -2105,7 +2105,7 @@ class Admin {
 								if ( 'vat_number' === $key ) {
 									continue;
 								}
-								
+
 								$value    = $identifier['value'];
 								$required = $identifier['required'];
 								$display  = $value ?: sprintf(
