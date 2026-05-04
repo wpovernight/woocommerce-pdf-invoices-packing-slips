@@ -589,28 +589,33 @@ abstract class OrderDocument {
 	 * @param string $output_format
 	 * @return bool
 	 */
-	public function is_my_account_allowed( string $default = '', string $output_format = 'pdf' ): bool {
-		if ( ! $this->is_enabled() ) {
-			return false;
+	public function is_allowed_in_my_account( string $default = '', string $output_format = 'pdf' ): bool {
+		$allowed = false;
+
+		if ( $this->is_enabled() ) {
+			$button_setting = $this->get_setting( 'my_account_buttons', $default, $output_format );
+
+			switch ( $button_setting ) {
+				case 'available':
+					$allowed = $this->exists();
+					break;
+				case 'always':
+					$allowed = true;
+					break;
+				case 'custom':
+					$allowed_statuses = $this->get_setting( 'my_account_restrict', array(), $output_format );
+					$order_status     = is_callable( array( $this->order, 'get_status' ) )
+						? $this->order->get_status()
+						: false;
+
+					$allowed = ! empty( $allowed_statuses )
+						&& $order_status
+						&& in_array( $order_status, array_keys( $allowed_statuses ), true );
+					break;
+			}
 		}
 
-		$button_setting = $this->get_setting( 'my_account_buttons', $default, $output_format );
-		$allowed        = false;
-
-		switch ( $button_setting ) {
-			case 'available':
-				$allowed = $this->exists();
-				break;
-			case 'always':
-				$allowed = true;
-				break;
-			case 'custom':
-				$allowed_statuses = $this->get_setting( 'my_account_restrict', array(), $output_format );
-				$allowed          = ! empty( $allowed_statuses ) && $this->order && in_array( $this->order->get_status(), array_keys( $allowed_statuses ), true );
-				break;
-		}
-
-		return apply_filters( 'wpo_ips_document_is_my_account_allowed', $allowed, $button_setting, $default, $output_format, $this );
+		return apply_filters( 'wpo_ips_document_is_allowed_in_my_account', $allowed, $button_setting, $default, $output_format, $this );
 	}
 
 	public function exists() {

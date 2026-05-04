@@ -85,7 +85,7 @@ class Frontend {
 			return apply_filters( 'wpo_wcpdf_myaccount_actions', $actions, $order );
 		}
 
-		$invoice_allowed = $invoice->is_my_account_allowed( 'available' );
+		$invoice_allowed = $invoice->is_allowed_in_my_account( 'available' );
 
 		// Backward compatibility with the existing status-based filter.
 		if ( ! $invoice_allowed ) {
@@ -97,7 +97,10 @@ class Frontend {
 		}
 
 		if ( $invoice_allowed ) {
-			$name              = is_callable( array( $invoice, 'get_title' ) ) ? $invoice->get_title() : $document_title;
+			$name = is_callable( array( $invoice, 'get_title' ) )
+				? $invoice->get_title()
+				: $document_title;
+
 			$endpoint_instance = WPO_WCPDF()->endpoint;
 
 			$actions[ $document_type ] = array(
