@@ -1023,10 +1023,18 @@ jQuery( function( $ ) {
 	} );
 
 	function toggle_conditional_visibility( e ) {
-		const $this  = $( e.target );
-		let name     = $this.prop( 'name' ).replace( '[]', '' ); // normalize multiselect
+		const $this = $( e.target );
+		let name    = ( $this.prop( 'name' ) || '' ).replace( /\[\]$/, '' );
+
+		if ( ! name ) {
+			return;
+		}
+
 		let value    = $this.val();
 		let checkbox = false;
+
+		const $controllerRow     = $this.closest( 'tr' );
+		const controllerIsVisible = ! $controllerRow.length || $controllerRow.is( ':visible' );
 
 		if ( $this.is( ':checkbox' ) ) {
 			value    = $this.is( ':checked' );
@@ -1034,37 +1042,53 @@ jQuery( function( $ ) {
 		}
 
 		$( "[data-show_for_option_name='" + name + "']" ).each( function() {
-			let show       = false;
-			let show_for   = $( this ).data( 'show_for_option_values' );
-			let keep_value = $( this ).data( 'keep_current_value' );
+			const $conditional = $( this );
+			const $row         = $conditional.closest( 'tr' );
 
-			if ( checkbox ) {
-				show = value; // for checkboxes, checked = show
-			} else if ( Array.isArray( value ) ) { // Multiselect
-				show = value.some( item => show_for.includes( item ) );
-			} else {
-				show = show_for.includes( value );
+			let show       = false;
+			let show_for   = $conditional.data( 'show_for_option_values' );
+			let keep_value = $conditional.data( 'keep_current_value' );
+
+			if ( ! Array.isArray( show_for ) ) {
+				show_for = [ show_for ];
 			}
 
-			let $row = $( this ).closest( 'tr' );
+			show_for = show_for.map( String );
+
+			if ( ! controllerIsVisible ) {
+				show = false;
+			} else if ( checkbox ) {
+				show = value;
+			} else if ( Array.isArray( value ) ) {
+				show = value.some( item => show_for.includes( String( item ) ) );
+			} else {
+				show = show_for.includes( String( value ) );
+			}
 
 			if ( show ) {
+				const wasHidden = ! $row.is( ':visible' );
+
 				$row.show();
 
 				if ( checkbox ) {
 					$row.find( ':input[type=checkbox]' ).val( '1' );
+				}
+
+				// Re-evaluate nested conditionals when this row becomes visible.
+				if ( wasHidden ) {
+					$row.find( ':input' ).trigger( 'change' );
 				}
 			} else {
 				$row.hide()
 					.find( ':input' ).each( function () {
 						const $input = $( this );
 
-						// Don't reset value
+						// Even when keeping the value, trigger change so child conditionals are hidden too.
 						if ( keep_value ) {
+							$input.trigger( 'change' );
 							return;
 						}
 
-						// Reset the input value
 						if ( $input.is( 'select' ) ) {
 							if ( $input.prop( 'multiple' ) ) {
 								$input.val( [] );
