@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 5.11.0-i1504.1
+Stable tag: 5.11.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,12 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.11.0 (2026-05-05) =
+- New: My Account display helper to order documents
+- Fix: EDI delivery date serialization
+- Fix: Show supplier bank account setting for single BACS account
+- Translations: Updated translation template (POT)
 
 = 5.10.0 (2026-05-04) =
 - New: Add support for subtotal tax rounding in UBL line prices
