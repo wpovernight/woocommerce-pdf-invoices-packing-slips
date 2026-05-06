@@ -509,9 +509,9 @@ class Invoice extends OrderDocumentMethods {
 				'callback'		=> 'checkbox',
 				'section'		=> $this->type,
 				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'invoice_number_search',
-					'description'   => __( 'The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href="https://woocommerce.com/document/high-performance-order-storage/" target="_blank">HPOS</a> feature to search for orders by invoice numbers using the search type selector. Additionally, it allows you to search for multiple orders using a comma-separated list of invoice numbers.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name' => $option_name,
+					'id'          => 'invoice_number_search',
+					'description' => __( 'Enables searching orders by invoice number. On HPOS stores, this adds an "Invoice numbers" option to the order search type selector and supports searching multiple invoice numbers using a comma-separated list. The search process may be slower on non-HPOS stores.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
