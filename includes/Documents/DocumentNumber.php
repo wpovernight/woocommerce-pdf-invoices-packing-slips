@@ -52,7 +52,6 @@ class DocumentNumber {
 	 * Loads number data values into the object, applying casting and normalization.
 	 *
 	 * @param array $data Associative array of values to load into object properties.
-	 *
 	 * @return void
 	 */
 	public function load_number_data( array $data ): void {
@@ -161,6 +160,7 @@ class DocumentNumber {
 	public function to_array(): array {
 		return (array) $this;
 	}
+	
 }
 
 endif; // class_exists

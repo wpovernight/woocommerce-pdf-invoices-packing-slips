@@ -105,10 +105,11 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 
 		<div class="preview-document">
 			<?php
-				$documents     = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
-				$document_type = 'invoice';
-				$document      = null;
-				$output_format = 'pdf';
+				$documents_instance = WPO_WCPDF()->get_instance( 'documents' );
+				$documents          = $documents_instance->get_documents( 'enabled', 'any' );
+				$document_type      = 'invoice';
+				$document           = null;
+				$output_format      = 'pdf';
 
 				if ( ! empty( $_GET['section'] ) ) {
 					$document_type = sanitize_text_field( wp_unslash( $_GET['section'] ) );
@@ -117,7 +118,7 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 				}
 
 				if ( $document_type ) {
-					$document = WPO_WCPDF()->documents->get_document( $document_type, null );
+					$document = $documents_instance->get_document( $document_type, null );
 				}
 
 				if ( ! empty( $_GET['output_format'] ) ) {

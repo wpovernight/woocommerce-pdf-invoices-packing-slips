@@ -9,22 +9,15 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents' ) ) :
 
 class Documents {
 
-	/** @var array Array of document classes */
-	public $documents = array();
-
-	/** @var Documents The single instance of the class */
-	protected static $_instance = null;
+	public array $documents           = array();
+	protected static ?self $_instance = null;
 
 	/**
-	 * Main Documents Instance.
+	 * Singleton instance accessor.
 	 *
-	 * Ensures only one instance of Documents is loaded or can be loaded.
-	 *
-	 * @since 2.0
-	 * @static
-	 * @return Documents Main instance
+	 * @return self
 	 */
-	public static function instance() {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -32,17 +25,21 @@ class Documents {
 	}
 
 	/**
-	 * Constructor for the document class hooks in all documents that can be created.
+	 * Constructor.
 	 *
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ), 15 ); // after regular 10 actions but before most 'follow-up' actions (usually 20+)
+		if ( WPO_WCPDF()->is_order_page() || WPO_WCPDF()->is_settings_page() || WPO_WCPDF()->is_account_page() ) {
+			add_action( 'init', array( $this, 'init' ), 15 ); // after regular 10 actions but before most 'follow-up' actions (usually 20+)
+		}
 	}
 
 	/**
 	 * Init document classes.
+	 * 
+	 * @return void
 	 */
-	public function init() {
+	public function init(): void {
 		// Load Invoice & Packing Slip
 		$this->documents['\WPO\IPS\Documents\Invoice']     = new \WPO\IPS\Documents\Invoice();
 		$this->documents['\WPO\IPS\Documents\PackingSlip'] = new \WPO\IPS\Documents\PackingSlip();
@@ -56,12 +53,11 @@ class Documents {
 	/**
 	 * Return the document classes - used in admin to load settings.
 	 *
-	 * @param $filter
-	 * @param $output_format  Can be 'pdf', 'xml' or anything for all
-	 *
+	 * @param string $filter
+	 * @param string $output_format  Can be 'pdf', 'xml' or anything for all
 	 * @return array
 	 */
-	public function get_documents( $filter = 'enabled', $output_format = 'pdf' ) {
+	public function get_documents( string $filter = 'enabled', string $output_format = 'pdf' ): array {
 		if ( empty( $this->documents ) ) {
 			$this->init();
 		}
@@ -101,7 +97,14 @@ class Documents {
 		return apply_filters( 'wpo_wcpdf_get_documents', $documents, $filter, $output_format, $this );
 	}
 
-	public function get_document( $document_type, $order ) {
+	/**
+	 * Return an instance of the document class for a given document type and order.
+	 *
+	 * @param string $document_type
+	 * @param int|object|\WC_Order $order
+	 * @return OrderDocument|false
+	 */
+	public function get_document( string $document_type, $order ) {
 		foreach ( $this->get_documents( 'all' ) as $class_name => $document ) {
 			if ( $document->get_type() == $document_type && class_exists( $class_name ) ) {
 				return new $class_name( $order );
@@ -111,7 +114,12 @@ class Documents {
 		return false;
 	}
 
-	public function get_document_titles() {
+	/**
+	 * Return an array of document titles, indexed by document type.
+	 *
+	 * @return array
+	 */
+	public function get_document_titles(): array {
 		$documents       = $this->get_documents();
 		$document_titles = array();
 
