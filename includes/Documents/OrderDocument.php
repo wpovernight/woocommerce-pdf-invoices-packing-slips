@@ -1930,9 +1930,9 @@ abstract class OrderDocument {
 		\wpo_ips_add_filters( $pdf_filters );
 
 		$pdf_settings = array(
-			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
-			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
-			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
+			'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+			'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+			'font_subsetting'   => $this->get_setting( 'font_subsetting', false ),
 		);
 		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
 		$pdf          = $pdf_maker->output();
@@ -1960,9 +1960,9 @@ abstract class OrderDocument {
 		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
 
 		$pdf_settings = array(
-			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
-			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
-			'font_subsetting'	=> $this->get_setting( 'font_subsetting', false ),
+			'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+			'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+			'font_subsetting'   => $this->get_setting( 'font_subsetting', false ),
 		);
 		$pdf_maker = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
 		$pdf       = $pdf_maker->output();
@@ -1984,7 +1984,7 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
 
 		$default_args = array (
-			'wrap_html_content'	=> true,
+			'wrap_html_content' => true,
 		);
 		$args = $args + $default_args;
 

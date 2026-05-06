@@ -87,9 +87,9 @@ class BulkDocument {
 
 		$html = $this->get_html();
 		$pdf_settings = array(
-			'paper_size'		=> apply_filters( 'wpo_wcpdf_paper_format', $this->wrapper_document->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
-			'paper_orientation'	=> apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
-			'font_subsetting'	=> $this->wrapper_document->get_setting( 'font_subsetting', false ),
+			'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->wrapper_document->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+			'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+			'font_subsetting'   => $this->wrapper_document->get_setting( 'font_subsetting', false ),
 		);
 		$pdf_maker = wcpdf_get_pdf_maker( $html, $pdf_settings, $this );
 		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf_maker->output(), $this );

@@ -1932,32 +1932,32 @@ class Admin {
 		if ( isset( $form_data["{$key_prefix}notes"] ) ) {
 			// allowed HTML
 			$allowed_html = array(
-				'a'		=> array(
-					'href' 	=> array(),
+				'a'      => array(
+					'href'  => array(),
 					'title' => array(),
-					'id' 	=> array(),
-					'class'	=> array(),
-					'style'	=> array(),
-				),
-				'br'	=> array(),
-				'em'	=> array(),
-				'strong'=> array(),
-				'div'	=> array(
-					'id'	=> array(),
-					'class' => array(),
-					'style'	=> array(),
-				),
-				'span'	=> array(
-					'id' 	=> array(),
-					'class'	=> array(),
-					'style'	=> array(),
-				),
-				'p'		=> array(
-					'id' 	=> array(),
+					'id'    => array(),
 					'class' => array(),
 					'style' => array(),
 				),
-				'b'		=> array(),
+				'br'     => array(),
+				'em'     => array(),
+				'strong' => array(),
+				'div'	 => array(
+					'id'    => array(),
+					'class' => array(),
+					'style' => array(),
+				),
+				'span'   => array(
+					'id'    => array(),
+					'class' => array(),
+					'style' => array(),
+				),
+				'p'      => array(
+					'id'    => array(),
+					'class' => array(),
+					'style' => array(),
+				),
+				'b'      => array(),
 			);
 
 			$data['notes'] = wp_kses( $form_data["{$key_prefix}notes"], $allowed_html );

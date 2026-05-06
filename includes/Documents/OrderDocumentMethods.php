@@ -1203,8 +1203,8 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		$subtotal = ! empty( $subtotal ) && ( $pos = strpos( $subtotal, ' <small' ) ) ? substr( $subtotal, 0, $pos ) : $subtotal; //removing the 'excluding tax' text
 
 		$subtotal = array (
-			'label'	=> __('Subtotal', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'	=> $subtotal,
+			'label' => __( 'Subtotal', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value' => $subtotal,
 		);
 
 		return apply_filters( 'wpo_wcpdf_order_subtotal', $subtotal, $tax, $discount, $this );
@@ -1239,9 +1239,9 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 
 		$shipping = array (
-			'label'	=> __('Shipping', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'	=> $formatted_shipping_cost,
-			'tax'	=> $this->format_price( $shipping_tax ),
+			'label' => __( 'Shipping', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value' => $formatted_shipping_cost,
+			'tax'   => $this->format_price( $shipping_tax ),
 		);
 		return apply_filters( 'wpo_wcpdf_order_shipping', $shipping, $tax, $this );
 	}
@@ -1281,9 +1281,9 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 
 		$discount = array (
-			'label'		=> __( 'Discount', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'		=> $this->format_price( $discount_value ),
-			'raw_value'	=> $discount_value,
+			'label'     => __( 'Discount', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value'     => $this->format_price( $discount_value ),
+			'raw_value' => $discount_value,
 		);
 
 		if ( round( $discount_value, 3 ) != 0 ) {
@@ -1380,7 +1380,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 		$grand_total = array(
 			'label' => $label,
-			'value'	=> $total,
+			'value' => $total,
 		);
 
 		return apply_filters( 'wpo_wcpdf_order_grand_total', $grand_total, $tax, $this );

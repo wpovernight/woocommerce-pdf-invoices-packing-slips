@@ -28,9 +28,9 @@ class PDFMaker {
 		$this->document = $document;
 
 		$default_settings = array(
-			'paper_size'		=> 'A4',
-			'paper_orientation'	=> 'portrait',
-			'font_subsetting'	=> false,
+			'paper_size'        => 'A4',
+			'paper_orientation' => 'portrait',
+			'font_subsetting'   => false,
 		);
 		$this->settings = $settings + $default_settings;
 	}

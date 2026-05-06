@@ -62,32 +62,32 @@ class SetupWizard {
 
 		$this->steps = array(
 			'shop-name' => array(
-				'name'	=> __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/shop-name.php',
+				'name' => __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/shop-name.php',
 			),
 			'logo' => array(
-				'name'	=> __( 'Your logo', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/logo.php',
+				'name' => __( 'Your logo', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/logo.php',
 			),
 			'attach-to' => array(
-				'name'	=> __( 'Attachments', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/attach-to.php',
+				'name' => __( 'Attachments', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/attach-to.php',
 			),
 			'display-options' => array(
-				'name'	=> __( 'Display options', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/display-options.php',
+				'name' => __( 'Display options', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/display-options.php',
 			),
 			'paper-format' => array(
-				'name'	=> __( 'Paper format', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/paper-format.php',
+				'name' => __( 'Paper format', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/paper-format.php',
 			),
 			'show-action-buttons' => array(
-				'name'	=> __( 'Action buttons', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/show-action-buttons.php',
+				'name' => __( 'Action buttons', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/show-action-buttons.php',
 			),
 			'good-to-go' => array(
-				'name'	=> __( 'Ready!', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/good-to-go.php',
+				'name' => __( 'Ready!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/good-to-go.php',
 			),
 		);
 		$this->step = isset( $request['step'] ) ? sanitize_text_field( $request['step'] ) : current( array_keys( $this->steps ) );

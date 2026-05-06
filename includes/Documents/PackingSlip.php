@@ -116,72 +116,71 @@ class PackingSlip extends OrderDocumentMethods {
 
 		$settings_fields = array(
 			array(
-				'type'			=> 'section',
-				'id'			=> 'packing_slip',
-				'title'			=> '',
-				'callback'		=> 'section',
+				'type'     => 'section',
+				'id'       => 'packing_slip',
+				'title'    => '',
+				'callback' => 'section',
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'enabled',
-				'title'			=> __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'packing_slip',
-				'args'			=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'enabled',
+				'type'     => 'setting',
+				'id'       => 'enabled',
+				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'packing_slip',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'enabled',
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'display_billing_address',
-				'title'			=> __( 'Display billing address', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'select',
-				'section'		=> 'packing_slip',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'display_billing_address',
-					'options' 		=> array(
-						''				=> __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
-						'when_different'=> __( 'Only when different from shipping address' , 'woocommerce-pdf-invoices-packing-slips' ),
-						'always'		=> __( 'Always' , 'woocommerce-pdf-invoices-packing-slips' ),
+				'type'     => 'setting',
+				'id'       => 'display_billing_address',
+				'title'    => __( 'Display billing address', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'packing_slip',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'display_billing_address',
+					'options'     => array(
+						''               => __( 'No' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'when_different' => __( 'Only when different from shipping address' , 'woocommerce-pdf-invoices-packing-slips' ),
+						'always'         => __( 'Always' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
-					// 'description'	=> __( 'Display billing address (in addition to the default shipping address) if different from shipping address', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'display_email',
-				'title'			=> __( 'Display email address', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'packing_slip',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'display_email',
+				'type'     => 'setting',
+				'id'       => 'display_email',
+				'title'    => __( 'Display email address', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'packing_slip',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'display_email',
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'display_phone',
-				'title'			=> __( 'Display phone number', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'packing_slip',
-				'args'			=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'display_phone',
+				'type'     => 'setting',
+				'id'       => 'display_phone',
+				'title'    => __( 'Display phone number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'packing_slip',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'display_phone',
 				)
 			),
 			array(
-				'type'			=> 'setting',
-				'id'			=> 'display_customer_notes',
-				'title'			=> __( 'Display customer notes', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback'		=> 'checkbox',
-				'section'		=> 'packing_slip',
-				'args'			=> array(
-					'option_name'		=> $option_name,
-					'id'				=> 'display_customer_notes',
-					'store_unchecked'	=> true,
-					'default'			=> 1,
+				'type'     => 'setting',
+				'id'       => 'display_customer_notes',
+				'title'    => __( 'Display customer notes', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'packing_slip',
+				'args'     => array(
+					'option_name'     => $option_name,
+					'id'              => 'display_customer_notes',
+					'store_unchecked' => true,
+					'default'         => 1,
 				)
 			),
 		);
@@ -199,12 +198,12 @@ class PackingSlip extends OrderDocumentMethods {
 
 			$pro_notice = array(
 				array(
-					'type'			=> 'setting',
-					'id'			=> 'attach_to_email_ids',
-					'title'			=> __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
-					'callback'		=> 'html_section',
-					'section'		=> 'packing_slip',
-					'args'			=> array(
+					'type'     => 'setting',
+					'id'       => 'attach_to_email_ids',
+					'title'    => __( 'Attach to:', 'woocommerce-pdf-invoices-packing-slips' ),
+					'callback' => 'html_section',
+					'section'  => 'packing_slip',
+					'args'     => array(
 						'option_name' => $option_name,
 						'id'          => 'attach_to_email_ids',
 						'html'        => $html,

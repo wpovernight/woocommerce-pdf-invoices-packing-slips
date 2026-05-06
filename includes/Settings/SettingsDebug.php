@@ -1338,7 +1338,7 @@ class SettingsDebug {
 				'result'   => $fileinfo,
 				'fallback' => __( 'fileinfo disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
-			'base64_decode'	=> array (
+			'base64_decode' => array (
 				'required' => __( 'To compress and decompress font and image data', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'	   => null,
 				'result'   => function_exists( 'base64_decode' ),
@@ -2054,9 +2054,9 @@ class SettingsDebug {
 		}
 
 		$pdf_settings = array(
-			'paper_size'		=> 'A4',
-			'paper_orientation'	=> 'portrait',
-			'font_subsetting'	=> false,
+			'paper_size'        => 'A4',
+			'paper_orientation' => 'portrait',
+			'font_subsetting'   => false,
 		);
 		$pdf_maker = \wcpdf_get_pdf_maker( $report_html, $pdf_settings, $this );
 		$pdf       = $pdf_maker->output();
