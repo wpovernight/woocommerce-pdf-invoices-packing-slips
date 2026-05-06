@@ -511,7 +511,7 @@ class SettingsEDI {
 
 		$bacs_account_options = wpo_ips_get_bacs_account_options();
 
-		if ( count( $bacs_account_options ) > 1 ) {
+		if ( count( $bacs_account_options ) > 0 ) {
 			$settings_fields[] = array(
 				'type'     => 'setting',
 				'id'       => 'supplier_bacs_account',

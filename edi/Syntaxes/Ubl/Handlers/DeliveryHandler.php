@@ -31,11 +31,12 @@ class DeliveryHandler extends AbstractUblHandler {
 		$country_code  = '';
 
 		if ( $has_k_category ) {
-			$delivery_date = $this->document->order->get_date_completed();
+			$completed_date = $this->document->order->get_date_completed();
+			$delivery_date  = ! empty( $completed_date ) ? $this->normalize_date( $completed_date, 'Y-m-d' ) : '';
 
-			if ( ! $delivery_date ) {
-				$date_instance = $this->document->order_document->get_date();
-				$delivery_date = ! empty( $date_instance ) ? $date_instance->date_i18n( 'Y-m-d' ) : '';
+			if ( '' === $delivery_date ) {
+				$date_instance  = $this->document->order_document->get_date();
+				$delivery_date = ! empty( $date_instance ) ? $this->normalize_date( $date_instance, 'Y-m-d' ) : '';
 			}
 
 			$country_code = strtoupper( (string) $this->document->order->get_shipping_country() );

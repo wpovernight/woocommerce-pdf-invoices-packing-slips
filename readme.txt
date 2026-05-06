@@ -110,6 +110,24 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.11.0 (2026-05-05) =
+- New: My Account display helper to order documents
+- Fix: EDI delivery date serialization
+- Fix: Show supplier bank account setting for single BACS account
+- Translations: Updated translation template (POT)
+
+= 5.10.0 (2026-05-04) =
+- New: Add support for subtotal tax rounding in UBL line prices
+- New: Add search settings feature
+- Tweak: Improve EDI supplier bank details handling across formats
+- Fix: Peppol settings visibility when switching formats
+- Fix: Escaping context in PDF templates
+- Fix: CII invoice XML for discounted and free lines
+- Fix: Error on calling `woocommerce_register_additional_checkout_field()` on older Woo versions
+- Fix: Handling of zero product/VAT categories in EN16931 UBL output
+- Fix: Fatal error during Peppol checkout field initialization
+- Translations: Updated translation template (POT)
+
 = 5.9.2 (2026-03-31) =
 - New: Added Composer installation support
 - Tested: Compatibility confirmed with WooCommerce 10.7

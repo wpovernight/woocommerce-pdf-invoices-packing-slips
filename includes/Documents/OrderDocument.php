@@ -618,6 +618,42 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Check if document is allowed to be displayed on the My Account page.
+	 *
+	 * @param string $default
+	 * @param string $output_format
+	 * @return bool
+	 */
+	public function is_allowed_in_my_account( string $default = '', string $output_format = 'pdf' ): bool {
+		$allowed = false;
+
+		if ( $this->is_enabled() ) {
+			$button_setting = $this->get_setting( 'my_account_buttons', $default, $output_format );
+
+			switch ( $button_setting ) {
+				case 'available':
+					$allowed = $this->exists();
+					break;
+				case 'always':
+					$allowed = true;
+					break;
+				case 'custom':
+					$allowed_statuses = $this->get_setting( 'my_account_restrict', array(), $output_format );
+					$order_status     = is_callable( array( $this->order, 'get_status' ) )
+						? $this->order->get_status()
+						: false;
+
+					$allowed = ! empty( $allowed_statuses )
+						&& $order_status
+						&& in_array( $order_status, array_keys( $allowed_statuses ), true );
+					break;
+			}
+		}
+
+		return apply_filters( 'wpo_ips_document_is_allowed_in_my_account', $allowed, $default, $output_format, $this );
+	}
+
+	/**
 	 * Check if the document exists.
 	 *
 	 * @return bool
