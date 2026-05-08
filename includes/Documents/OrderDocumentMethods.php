@@ -1258,37 +1258,37 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	}
 
 	/**
-	 * Return/show the total discount
-	 * 
-	 * @param string $type set to 'total' to get the total discount, otherwise the total discount for cart and order discounts combined
-	 * @param string $tax set to 'incl' to include tax, 'excl' to exclude tax
-	 * @return array $discount
+	 * Return/show the total discount.
+	 *
+	 * @param string $type Set to 'total' to get the total discount, otherwise the total discount for cart and order discounts combined.
+	 * @param string $tax  Set to 'incl' to include tax, 'excl' to exclude tax.
+	 * @return array|null Discount data, or null when there is no discount.
 	 */
-	public function get_order_discount( string $type = 'total', string $tax = 'incl' ): array {
+	public function get_order_discount( string $type = 'total', string $tax = 'incl' ): ?array {
 		if ( 'incl' === $tax ) {
 			switch ( $type ) {
 				case 'total':
-					// Total Discount
-					$discount_value = $this->order->get_total_discount( false ); // $ex_tax = false
+					$discount_value = $this->order->get_total_discount( false );
 					break;
 				default:
-					// Total Discount - Cart & Order Discounts combined
 					$discount_value = $this->order->get_total_discount();
 					break;
 			}
-		} else { // calculate discount excluding tax
-			$discount_value = $this->order->get_total_discount( true ); // $ex_tax = true
+		} else {
+			$discount_value = $this->order->get_total_discount( true );
 		}
 
-		$discount = array (
+		if ( round( $discount_value, 3 ) == 0 ) {
+			return apply_filters( 'wpo_wcpdf_order_discount', null, $type, $tax, $this );
+		}
+
+		$discount = array(
 			'label'     => __( 'Discount', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'     => $this->format_price( $discount_value ),
 			'raw_value' => $discount_value,
 		);
 
-		if ( round( $discount_value, 3 ) != 0 ) {
-			return apply_filters( 'wpo_wcpdf_order_discount', $discount, $type, $tax, $this );
-		}
+		return apply_filters( 'wpo_wcpdf_order_discount', $discount, $type, $tax, $this );
 	}
 	
 	/**
@@ -1300,7 +1300,9 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function order_discount( string $type = 'total', string $tax = 'incl' ): void {
 		$discount = $this->get_order_discount( $type, $tax );
-		echo esc_html( $discount['value'] );
+		if ( $discount ) {
+			echo esc_html( $discount['value'] );
+		}
 	}
 
 	/**
