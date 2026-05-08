@@ -1278,15 +1278,15 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$discount_value = $this->order->get_total_discount( true );
 		}
 
-		if ( round( $discount_value, 3 ) == 0 ) {
-			return apply_filters( 'wpo_wcpdf_order_discount', null, $type, $tax, $this );
-		}
+		$discount = null;
 
-		$discount = array(
-			'label'     => __( 'Discount', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'     => $this->format_price( $discount_value ),
-			'raw_value' => $discount_value,
-		);
+		if ( round( $discount_value, 3 ) != 0 ) {
+			$discount = array(
+				'label'     => __( 'Discount', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'     => $this->format_price( $discount_value ),
+				'raw_value' => $discount_value,
+			);
+		}
 
 		return apply_filters( 'wpo_wcpdf_order_discount', $discount, $type, $tax, $this );
 	}
