@@ -39,11 +39,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return string|null
 	 */
 	protected function get_order_customer_vat_number( \WC_Order $order ): ?string {
-		return apply_filters(
-			'wpo_ips_edi_order_customer_vat_number',
-			wpo_wcpdf_get_order_customer_vat_number( $order ),
-			$order
-		);
+		return wpo_ips_edi_get_order_customer_vat_number( $order );
 	}
 
 	/**
@@ -60,7 +56,18 @@ abstract class AbstractHandler implements HandlerInterface {
 			$language = 'default';
 		}
 
-		return $general_settings->get_setting( $key, $language ) ?: '';
+		$value = $general_settings->get_setting( $key, $language ) ?: '';
+
+		if ( 'vat_number' === $key && '' !== $value ) {
+			$country = $general_settings->get_setting( 'shop_address_country', $language ) ?: '';
+
+			$value = wpo_ips_edi_format_vat_number(
+				(string) $value,
+				(string) $country
+			);
+		}
+
+		return (string) $value;
 	}
 
 	/**

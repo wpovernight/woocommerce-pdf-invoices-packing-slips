@@ -154,7 +154,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 		$values   = array();
 		$values[] = array(
 			'name'  => 'cbc:CompanyID',
-			'value' => strtoupper( preg_replace( '/\s+/', '', $vat_number ) ),
+			'value' => $vat_number,
 		);
 		$values[] = array(
 			'name'  => 'cac:TaxScheme',
@@ -216,7 +216,7 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			}
 			$values[] = array(
 				'name'  => 'cbc:CompanyID',
-				'value' => strtoupper( preg_replace( '/\s+/', '', $vat_number ) ),
+				'value' => $vat_number,
 			);
 		}
 
