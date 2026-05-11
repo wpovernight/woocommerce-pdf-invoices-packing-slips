@@ -88,6 +88,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		add_action( 'admin_notices', array( $this, 'unstable_option_announcement_notice' ) );
 		add_action( 'admin_notices', array( $this, 'new_unstable_version_available_notice' ) );
+		add_action( 'admin_notices', array( $this, 'php_81_upgrade_notice' ) );
 		add_action( 'wpo_wcpdf_new_github_prerelease_available', array( $this, 'set_new_unstable_version_available_option' ), 10, 3 );
 		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
@@ -292,6 +293,78 @@ class WPO_WCPDF {
 		$message .= '</div>';
 
 		echo wp_kses_post( $message );
+	}
+	
+	/**
+	 * Upcoming PHP 8.1 requirement notice.
+	 *
+	 * @return void
+	 */
+	public function php_81_upgrade_notice(): void {
+		$dismiss_option = 'wpo_wcpdf_dismiss_php_81_upgrade_notice';
+		$dismiss_arg    = 'wpo_wcpdf_dismiss_php_81_upgrade_notice';
+		$nonce_action   = 'wcpdf_dismiss_php_81_upgrade_notice';
+
+		if ( version_compare( PHP_VERSION, '8.1', '>=' ) ) {
+			return;
+		}
+
+		if ( ! empty( $this->settings ) && method_exists( $this->settings, 'user_can_manage_settings' ) ) {
+			if ( ! $this->settings->user_can_manage_settings() ) {
+				return;
+			}
+		} elseif ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( isset( $_GET[ $dismiss_arg ], $_GET['_wpnonce'] ) ) {
+			if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), $nonce_action ) ) {
+				update_option( $dismiss_option, 'yes' );
+			} else {
+				wcpdf_log_error( 'Invalid nonce while dismissing PHP 8.1 upgrade notice.' );
+			}
+
+			wp_safe_redirect( remove_query_arg( array( $dismiss_arg, '_wpnonce' ) ) );
+			exit;
+		}
+
+		if ( 'yes' === get_option( $dismiss_option, 'no' ) ) {
+			return;
+		}
+
+		$dismiss_url = wp_nonce_url(
+			add_query_arg( $dismiss_arg, '1' ),
+			$nonce_action
+		);
+		?>
+		<div class="notice notice-warning">
+			<p>
+				<strong><?php esc_html_e( 'Upcoming PHP requirement change', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong>
+			</p>
+			<p>
+				<?php
+					printf(
+						/* translators: 1. current PHP version, 2. plugin name, 3. future required PHP version */
+						esc_html__( 'Your site is currently running PHP %1$s. In the upcoming major version 6 of %2$s, planned for release in a couple of weeks, the minimum required PHP version will be raised to %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_html( PHP_VERSION ),
+						'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+						'8.1'
+					);
+				?>
+			</p>
+			<p>
+				<?php esc_html_e( 'To avoid any disruption, please contact your hosting provider and ask them to upgrade PHP, or update PHP yourself if you manage the server.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</p>
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( 'https://docs.wpovernight.com/general/how-to-update-your-php-version/' ); ?>" target="_blank" rel="noopener noreferrer">
+					<?php esc_html_e( 'Learn how to update PHP', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+				<a class="button" href="<?php echo esc_url( $dismiss_url ); ?>">
+					<?php esc_html_e( 'Dismiss this notice', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+			</p>
+		</div>
+		<?php
 	}
 
 	/**
