@@ -345,8 +345,9 @@ class WPO_WCPDF {
 				<?php
 					printf(
 						/* translators: 1. current PHP version, 2. future required PHP version */
-						esc_html__( 'Your site is currently running PHP %1$s. In the upcoming major version 6 of PDF Invoices & Packing Slips for WooCommerce, planned for release in a couple of weeks, the minimum required PHP version will be raised to %2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_html__( 'Your site is currently running PHP %1$s. In the upcoming major version 6 of %2$s, planned for release in a couple of weeks, the minimum required PHP version will be raised to %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						esc_html( PHP_VERSION ),
+						'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
 						'8.1'
 					);
 				?>
