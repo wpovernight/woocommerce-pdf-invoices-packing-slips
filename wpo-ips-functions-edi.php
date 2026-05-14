@@ -1037,7 +1037,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		),
 		'vat_number' => array(
 			'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => apply_filters( 'wpo_ips_edi_order_customer_vat_number', wpo_ips_edi_get_order_customer_vat_number( $order ), $order ),
+			'value'    => wpo_ips_edi_get_order_customer_vat_number( $order ),
 			'required' => true,
 		),
 		'email' => array(

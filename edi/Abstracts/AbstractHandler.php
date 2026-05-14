@@ -33,16 +33,6 @@ abstract class AbstractHandler implements HandlerInterface {
 	abstract public function handle( array $data, array $options = array() ): array;
 
 	/**
-	 * Get the order customer VAT number.
-	 *
-	 * @param \WC_Order $order
-	 * @return string|null
-	 */
-	protected function get_order_customer_vat_number( \WC_Order $order ): ?string {
-		return wpo_ips_edi_get_order_customer_vat_number( $order );
-	}
-
-	/**
 	 * Get the supplier identifiers data.
 	 *
 	 * @param string $key The data key (e.g., 'shop_name', 'coc_number', 'shop_address_line_1', 'shop_address_postcode').
