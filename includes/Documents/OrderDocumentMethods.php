@@ -1451,12 +1451,12 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	/**
 	 * Gets price - formatted for display.
 	 *
-	 * @param array $item
+	 * @param mixed $item
 	 * @param string $type
 	 * @param string $tax_display
 	 * @return string
 	 */
-	public function get_formatted_item_price( array $item, string $type, string $tax_display = '' ): string {
+	public function get_formatted_item_price( mixed $item, string $type, string $tax_display = '' ): string {
 		if ( ! isset( $item['line_subtotal'] ) || ! isset( $item['line_subtotal_tax'] ) ) {
 			return '';
 		}
