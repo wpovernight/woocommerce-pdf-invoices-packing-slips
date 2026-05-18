@@ -640,9 +640,12 @@ function wpo_ips_edi_log( string $message, string $level = 'info', ?\Throwable $
  * @return bool True if the prefix is valid, false otherwise.
  */
 function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
-	$vat_number = strtoupper( trim( $vat_number ) );
+	$vat_number = wpo_ips_edi_normalize_vat_number( $vat_number );
 
-	// Special handling for Greece
+	if ( strlen( $vat_number ) <= 2 ) {
+		return false;
+	}
+
 	if ( 'EL' === substr( $vat_number, 0, 2 ) ) {
 		return true;
 	}
@@ -672,6 +675,135 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
 }
 
 /**
+ * Normalize a VAT country code for EDI/VIES-style output.
+ *
+ * Greece uses EL as VAT prefix, while WooCommerce stores the country as GR.
+ *
+ * @param string $country_code Country code.
+ * @return string
+ */
+function wpo_ips_edi_normalize_vat_country_code( string $country_code ): string {
+	$country_code = strtoupper( trim( $country_code ) );
+
+	if ( 'GR' === $country_code ) {
+		return 'EL';
+	}
+
+	return $country_code;
+}
+
+/**
+ * Normalize a VAT number while keeping the country prefix if present.
+ *
+ * @param string $vat_number VAT number.
+ * @return string
+ */
+function wpo_ips_edi_normalize_vat_number( string $vat_number ): string {
+	$vat_number = wpo_ips_edi_sanitize_string( $vat_number );
+	$vat_number = strtoupper( trim( $vat_number ) );
+
+	if ( '' === $vat_number ) {
+		return '';
+	}
+
+	// Remove spaces, dots, dashes, slashes and other non-alphanumeric characters.
+	return preg_replace( '/[^A-Z0-9]/', '', $vat_number ) ?: '';
+}
+
+/**
+ * Split a VAT number into country prefix and identifier.
+ *
+ * Examples:
+ * - "BE0203430576" => array( 'country' => 'BE', 'id' => '0203430576' )
+ * - "0203430576"   => array( 'country' => '',   'id' => '0203430576' )
+ *
+ * @param string $vat_number VAT number.
+ * @return array
+ */
+function wpo_ips_edi_split_vat_number( string $vat_number ): array {
+	$vat_number = wpo_ips_edi_normalize_vat_number( $vat_number );
+
+	if ( '' === $vat_number ) {
+		return array(
+			'country' => '',
+			'id'      => '',
+		);
+	}
+
+	$prefix = substr( $vat_number, 0, 2 );
+
+	if (
+		strlen( $vat_number ) > 2 &&
+		1 === preg_match( '/^[A-Z]{2}$/', $prefix ) &&
+		wpo_ips_edi_vat_number_has_country_prefix( $vat_number )
+	) {
+		return array(
+			'country' => wpo_ips_edi_normalize_vat_country_code( $prefix ),
+			'id'      => substr( $vat_number, 2 ),
+		);
+	}
+
+	return array(
+		'country' => '',
+		'id'      => $vat_number,
+	);
+}
+
+/**
+ * Format a VAT number for EDI output.
+ *
+ * @param string $vat_number      VAT number.
+ * @param string $billing_country Billing country code.
+ * @return string
+ */
+function wpo_ips_edi_format_vat_number( string $vat_number, string $billing_country = '' ): string {
+	$parts = wpo_ips_edi_split_vat_number( $vat_number );
+
+	if ( '' === $parts['id'] ) {
+		return '';
+	}
+
+	$country = $parts['country'];
+
+	if ( '' === $country ) {
+		$country = wpo_ips_edi_normalize_vat_country_code( $billing_country );
+	}
+
+	$formatted = '' !== $country ? $country . $parts['id'] : $parts['id'];
+
+	return apply_filters(
+		'wpo_ips_edi_format_vat_number',
+		$formatted,
+		$vat_number,
+		$billing_country,
+		$parts
+	);
+}
+
+/**
+ * Get the formatted customer VAT number for EDI output.
+ *
+ * @param \WC_Order $order Order object.
+ * @return string|null
+ */
+function wpo_ips_edi_get_order_customer_vat_number( \WC_Order $order ): ?string {
+	$vat_number = wpo_wcpdf_get_order_customer_vat_number( $order );
+
+	if ( ! empty( $vat_number ) ) {
+		$vat_number = wpo_ips_edi_format_vat_number(
+			(string) $vat_number,
+			$order->get_billing_country()
+		);
+	}
+
+	return apply_filters(
+		'wpo_ips_edi_order_customer_vat_number',
+		! empty( $vat_number ) ? $vat_number : null,
+		$order
+	);
+}
+
+/**
  * Build PEPPOL endpoint ID from VAT number.
  *
  * @param string $billing_country The billing country code (ISO 3166-1 alpha-2).
@@ -680,44 +812,48 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
  */
 function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, string $vat_number ): array {
 	$billing_country = strtoupper( trim( $billing_country ) );
-	$vat_number      = strtoupper( trim( $vat_number ) );
+	$vat_number      = wpo_ips_edi_normalize_vat_number( $vat_number );
 
 	if ( '' === $billing_country || '' === $vat_number ) {
 		return array();
 	}
 
-	// If VAT looks like it has a prefix, ensure it's a plausible ISO prefix.
+	$prefix = substr( $vat_number, 0, 2 );
+
+	// If VAT looks like it has a prefix, ensure it's valid.
 	if (
-		strlen( $vat_number ) >= 2 &&
-		ctype_alpha( substr( $vat_number, 0, 2 ) ) &&
+		strlen( $vat_number ) > 2 &&
+		1 === preg_match( '/^[A-Z]{2}$/', $prefix ) &&
 		! wpo_ips_edi_vat_number_has_country_prefix( $vat_number )
 	) {
 		return array();
 	}
 
+	$parts = wpo_ips_edi_split_vat_number( $vat_number );
+
+	// If the VAT number has a country prefix, make sure it matches the billing country.
+	if ( '' !== $parts['country'] ) {
+		$billing_vat_country = wpo_ips_edi_normalize_vat_country_code( $billing_country );
+
+		if ( $parts['country'] !== $billing_vat_country ) {
+			return array();
+		}
+	}
+
 	$mappings = wpo_ips_edi_get_peppol_vat_mappings();
+
 	if ( empty( $mappings[ $billing_country ] ) ) {
 		return array();
 	}
 
-	$cfg = $mappings[ $billing_country ];
+	$cfg   = $mappings[ $billing_country ];
+	$value = $parts['id'];
 
-	// Normalize separators first.
-	$normalized = preg_replace( '/[\s\.\-]/', '', $vat_number ) ?? $vat_number;
-
-	// Strip configured prefixes.
-	if ( ! empty( $cfg['strip_prefixes'] ) && is_array( $cfg['strip_prefixes'] ) ) {
-		foreach ( $cfg['strip_prefixes'] as $prefix ) {
-			$prefix = strtoupper( (string) $prefix );
-			if ( '' !== $prefix && 0 === strpos( $normalized, $prefix ) ) {
-				$normalized = substr( $normalized, strlen( $prefix ) );
-				break;
-			}
-		}
+	if ( '' === $value ) {
+		return array();
 	}
 
 	// Keep only what the country expects.
-	$value = $normalized;
 	if ( ! empty( $cfg['keep_pattern'] ) && is_string( $cfg['keep_pattern'] ) ) {
 		if ( preg_match_all( $cfg['keep_pattern'], $value, $m ) ) {
 			$value = implode( '', $m[0] );
@@ -727,25 +863,24 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 	}
 
 	$value = trim( $value );
+
 	if ( '' === $value ) {
 		return array();
 	}
 
-	// Sanity constraints.
 	if ( ! empty( $cfg['length'] ) && is_int( $cfg['length'] ) && strlen( $value ) !== $cfg['length'] ) {
 		return array();
 	}
 
 	$eas = (string) ( $cfg['eas'] ?? '' );
+
 	if ( '' === $eas ) {
 		return array();
 	}
 
-	$endpointid = sprintf( '%s:%s', $eas, $value );
-
 	return array(
 		'eas'         => $eas,
-		'endpoint_id' => $endpointid,
+		'endpoint_id' => sprintf( '%s:%s', $eas, $value ),
 	);
 }
 
@@ -776,6 +911,17 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings = WPO_WCPDF()->settings->general;
 	$language         = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
+	
+	$supplier_country = $general_settings->get_setting( 'shop_address_country', $language );
+	$supplier_vat     = $general_settings->get_setting( 'vat_number', $language );
+
+	if ( ! empty( $supplier_vat ) ) {
+		$supplier_vat = wpo_ips_edi_format_vat_number(
+			(string) $supplier_vat,
+			(string) $supplier_country
+		);
+	}
+	
 	$data             = array();
 
 	if ( empty( $language ) ) {
@@ -815,7 +961,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 		),
 		'vat_number' => array(
 			'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'vat_number', $language ),
+			'value'    => $supplier_vat,
 			'required' => true,
 		),
 		'coc_number' => array(
@@ -891,7 +1037,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		),
 		'vat_number' => array(
 			'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => apply_filters( 'wpo_ips_edi_order_customer_vat_number', wpo_wcpdf_get_order_customer_vat_number( $order ), $order ),
+			'value'    => wpo_ips_edi_get_order_customer_vat_number( $order ),
 			'required' => true,
 		),
 		'email' => array(
