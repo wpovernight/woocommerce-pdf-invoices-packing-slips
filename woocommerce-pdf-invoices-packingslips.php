@@ -40,7 +40,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 class WPO_WCPDF {
 
 	public string $version                         = '6.0.0-i1482.1';
-	public string $version_php                     = '7.4';
+	public string $version_php                     = '8.1';
 	public string $version_woo                     = '3.3';
 	public string $version_wp                      = '4.4';
 	public ?string $plugin_basename                = null;
