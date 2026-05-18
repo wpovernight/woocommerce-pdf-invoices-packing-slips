@@ -14,7 +14,7 @@ class Invoice extends OrderDocumentMethods {
 	 *
 	 * @param int|object|null $order Order to init.
 	 */
-	public function __construct( int|object|null $order = 0 ) {
+	public function __construct( $order = 0 ) {
 		// set properties
 		$this->type  = 'invoice';
 		$this->title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );

@@ -33,7 +33,7 @@ abstract class OrderDocument {
 	 *
 	 * @param int|object|null $order Order to init.
 	 */
-	public function __construct( int|object|null $order = 0 ) {
+	public function __construct( $order = 0 ) {
 		if ( is_numeric( $order ) && $order > 0 ) {
 			$this->order_id = absint( $order );
 			$this->order    = wc_get_order( $this->order_id );
