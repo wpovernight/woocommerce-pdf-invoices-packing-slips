@@ -33,20 +33,6 @@ abstract class AbstractHandler implements HandlerInterface {
 	abstract public function handle( array $data, array $options = array() ): array;
 
 	/**
-	 * Get the order customer VAT number.
-	 *
-	 * @param \WC_Order $order
-	 * @return string|null
-	 */
-	protected function get_order_customer_vat_number( \WC_Order $order ): ?string {
-		return apply_filters(
-			'wpo_ips_edi_order_customer_vat_number',
-			wpo_wcpdf_get_order_customer_vat_number( $order ),
-			$order
-		);
-	}
-
-	/**
 	 * Get the supplier identifiers data.
 	 *
 	 * @param string $key The data key (e.g., 'shop_name', 'coc_number', 'shop_address_line_1', 'shop_address_postcode').
@@ -60,7 +46,18 @@ abstract class AbstractHandler implements HandlerInterface {
 			$language = 'default';
 		}
 
-		return $general_settings_instance->get_setting( $key, $language ) ?: '';
+		$value = $general_settings_instance->get_setting( $key, $language ) ?: '';
+
+		if ( 'vat_number' === $key && '' !== $value ) {
+			$country = $general_settings_instance->get_setting( 'shop_address_country', $language ) ?: '';
+
+			$value = wpo_ips_edi_format_vat_number(
+				(string) $value,
+				(string) $country
+			);
+		}
+
+		return (string) $value;
 	}
 
 	/**

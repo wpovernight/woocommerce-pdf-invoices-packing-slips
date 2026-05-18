@@ -110,6 +110,16 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.12.1 (2026-05-18) =
+- Tweak: Normalize VAT numbers for EDI output
+- Fix: Preview document selection panel can't be closed
+- Translations: Updated translation template (POT)
+
+= 5.12.0 (2026-05-11) =
+- New: Add PHP 8.1 upgrade notice for version 6
+- Tweak: Remove "PDF" prefix from document title in order meta box
+- Translations: Updated translation template (POT)
+
 = 5.11.0 (2026-05-05) =
 - New: My Account display helper to order documents
 - Fix: EDI delivery date serialization

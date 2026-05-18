@@ -1101,6 +1101,7 @@ button.button-edi-save-taxes {
 .preview-document .preview-data-wrapper .preview-document-type {
 	float: right;
 	margin-right: 26px;
+	position: relative;
 }
 
 .preview-document .preview-data-wrapper .preview-document-type ul > li {
@@ -1193,7 +1194,7 @@ button.button-edi-save-taxes {
 .preview-document .preview-data ul {
 	position: absolute;
 	right: 0;
-	top: 4em;
+	top: 100%;
 	background: white;
 	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	-webkit-box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
@@ -1246,7 +1247,7 @@ button.button-edi-save-taxes {
 	display: none;
 	position: absolute;
 	right: 0;
-	top: 4em;
+	top: 100%;
 	width: 300px;
 	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	-webkit-box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);

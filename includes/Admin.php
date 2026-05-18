@@ -556,8 +556,8 @@ class Admin {
 
 				$meta_box_actions[$document->get_type()] = array(
 					'url'                   => esc_url( $document_url ),
-					'alt'                   => "PDF " . $document_title,
-					'title'                 => "PDF " . $document_title,
+					'alt'                   => $document_title,
+					'title'                 => $document_title,
 					'exists'                => $document_exists,
 					'printed'               => $document_printed,
 					'printed_data'          => $document_printed_data,
