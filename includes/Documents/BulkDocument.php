@@ -160,20 +160,22 @@ class BulkDocument {
 	 * Output the PDF document.
 	 *
 	 * @param string $output_mode
+	 * @return never
 	 */
-	public function output_pdf( string $output_mode = 'download' ) {
+	public function output_pdf( string $output_mode = 'download' ): never {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
 		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		die();
+		exit();
 	}
 
 	/**
 	 * Output the HTML document.
+	 * 
+	 * @return void
 	 */
-	public function output_html() {
+	public function output_html(): void {
 		echo $this->get_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		die();
 	}
 
 	/**

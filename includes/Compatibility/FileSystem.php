@@ -23,7 +23,7 @@ class FileSystem {
 	 * 
 	 * @return self
 	 */
-	public static function instance() {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -120,7 +120,7 @@ class FileSystem {
 	 * @param string $filename
 	 * @return string|bool
 	 */
-	public function get_contents( string $filename ) {
+	public function get_contents( string $filename ): string|bool {
 		if ( empty( $filename ) ) {
 			return false;
 		}
@@ -152,7 +152,7 @@ class FileSystem {
 	 * @param int|false $mode
 	 * @return int|bool
 	 */
-	public function put_contents( string $filename, string $contents, $mode = false ) {
+	public function put_contents( string $filename, string $contents, int|false $mode = false ): int|bool {
 		if ( empty( $filename ) || empty( $contents ) ) {
 			return false;
 		}
@@ -286,7 +286,7 @@ class FileSystem {
 	 * @param string $path
 	 * @return array|bool
 	 */
-	public function dirlist( string $path ) {
+	public function dirlist( string $path ): array|bool {
 		if ( empty( $path ) ) {
 			return false;
 		}
@@ -301,7 +301,7 @@ class FileSystem {
 	 * @param string $filename
 	 * @return int|bool
 	 */
-	public function mtime( string $filename ) {
+	public function mtime( string $filename ): int|bool {
 		if ( empty( $filename ) ) {
 			return false;
 		}

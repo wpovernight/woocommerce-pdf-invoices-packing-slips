@@ -303,7 +303,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @param string $field_name
 	 * @return mixed
 	 */
-	public function get_custom_field( string $field_name ) {
+	public function get_custom_field( string $field_name ): mixed {
 		if ( ! $this->is_order_prop( $field_name ) ) {
 			$custom_field = $this->order->get_meta( $field_name );
 		}
@@ -464,7 +464,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @param \WC_Product $product
 	 * @return string|false
 	 */
-	public function get_product_attribute( string $attribute_name, \WC_Product $product ) {
+	public function get_product_attribute( string $attribute_name, \WC_Product $product ): string|false {
 		// first, check the text attributes
 		$attributes    = $product->get_attributes();
 		$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
@@ -832,7 +832,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @param  bool $force_calculation force calculation of rates rather than retrieving from db
 	 * @return string $tax_rates imploded list of tax rates
 	 */
-	public function get_tax_rate( $item, $order, bool $force_calculation = false ): string {
+	public function get_tax_rate( object $item, object $order, bool $force_calculation = false ): string {
 		$type               = $item->get_type();
 		$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
 		$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
@@ -920,7 +920,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @param  \WC_Abstract_Order|null $order    optional order
 	 * @return float|bool              $rate     percentage rate
 	 */
-	public function get_tax_rate_by_id( int $rate_id, ?\WC_Abstract_Order $order = null ) {
+	public function get_tax_rate_by_id( int $rate_id, ?\WC_Abstract_Order $order = null ): float|bool {
 		global $wpdb;
 
 		// WC 3.7+ stores rate in tax items!
@@ -949,7 +949,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @param \WC_Abstract_Order|null $order
 	 * @return array|bool array of rate_id => rate_percent, or false if not available
 	 */
-	public function get_tax_rates_from_order( ?\WC_Abstract_Order $order = null ) {
+	public function get_tax_rates_from_order( ?\WC_Abstract_Order $order = null ): array|bool {
 		if (
 			! empty( $order )                                     &&
 			is_callable( array( $order, 'get_version' ) )         &&
@@ -1015,7 +1015,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @param \WC_Product $product
 	 * @return int|false
 	 */
-	public function get_thumbnail_id( \WC_Product $product ) {
+	public function get_thumbnail_id( \WC_Product $product ): int|false {
 		$product_id = $product->get_id();
 
 		if ( has_post_thumbnail( $product_id ) ) {
@@ -1451,11 +1451,12 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	/**
 	 * Gets price - formatted for display.
 	 *
-	 * @access public
-	 * @param mixed $item
+	 * @param array $item
+	 * @param string $type
+	 * @param string $tax_display
 	 * @return string
 	 */
-	public function get_formatted_item_price( $item, $type, $tax_display = '' ) {
+	public function get_formatted_item_price( array $item, string $type, string $tax_display = '' ): string {
 		if ( ! isset( $item['line_subtotal'] ) || ! isset( $item['line_subtotal_tax'] ) ) {
 			return '';
 		}

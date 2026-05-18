@@ -2324,17 +2324,6 @@ class SettingsDebug {
 
 		if ( false !== stripos( $server_info, 'MariaDB' ) ) {
 			$type = 'MariaDB';
-
-			// Older PHP/mysqlnd may report MariaDB as 5.5.5-10.x.x-MariaDB.
-			if (
-				'5.5.5' === $version        &&
-				defined( 'PHP_VERSION_ID' ) &&
-				PHP_VERSION_ID < 80016      &&
-				! empty( $server_info )
-			) {
-				$normalized = preg_replace( '/^5\.5\.5-(.*)$/', '$1', $server_info );
-				$version    = preg_replace( '/[^0-9.].*/', '', $normalized );
-			}
 		} elseif ( false !== stripos( $server_info, 'SQLite' ) ) {
 			$type = 'SQLite';
 		} elseif ( false !== stripos( $server_info, 'MySQL' ) || ! empty( $version ) ) {

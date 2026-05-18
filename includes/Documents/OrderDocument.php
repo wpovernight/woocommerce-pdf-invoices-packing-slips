@@ -31,9 +31,9 @@ abstract class OrderDocument {
 	/**
 	 * Init/load the order object.
 	 *
-	 * @param int|object|WC_Order $order Order to init.
+	 * @param int|object|null $order Order to init.
 	 */
-	public function __construct( $order = 0 ) {
+	public function __construct( int|object|null $order = 0 ) {
 		if ( is_numeric( $order ) && $order > 0 ) {
 			$this->order_id = absint( $order );
 			$this->order    = wc_get_order( $this->order_id );
@@ -229,7 +229,7 @@ abstract class OrderDocument {
 	 * @param bool $force_new_number
 	 * @return mixed
 	 */
-	public function initiate_number( bool $force_new_number = false ) {
+	public function initiate_number( bool $force_new_number = false ): mixed {
 		$semaphore       = new Semaphore( "initiate_{$this->slug}_number" );
 		$document_number = $force_new_number
 			? null
@@ -270,7 +270,7 @@ abstract class OrderDocument {
 	 * @param bool $generate
 	 * @return mixed
 	 */
-	public function get_document_number( bool $generate = false ) {
+	public function get_document_number( bool $generate = false ): mixed {
 		$document_number = null;
 
 		// If a third-party plugin claims to generate document numbers, trigger this instead
@@ -350,7 +350,7 @@ abstract class OrderDocument {
 	 * @param string $output_format
 	 * @return mixed
 	 */
-	public function get_setting( string $key, $default = '', string $output_format = 'pdf' ) {
+	public function get_setting( string $key, mixed $default = '', string $output_format = 'pdf' ): mixed {
 		if ( in_array( $output_format, $this->output_formats ) ) {
 			$settings        = $this->get_settings( false, $output_format );
 			$latest_settings = $this->get_settings( true, $output_format );
@@ -687,9 +687,9 @@ abstract class OrderDocument {
 	 * @param string $document_type
 	 * @param \WC_Abstract_Order|null $order
 	 * @param string $context
-	 * @return mixed|null
+	 * @return mixed
 	 */
-	public function get_data( string $key, string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view' ) {
+	public function get_data( string $key, string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view' ): mixed {
 		$document_type = empty( $document_type ) ? $this->type : $document_type;
 		$order         = empty( $order ) ? $this->order : $order;
 
@@ -728,9 +728,9 @@ abstract class OrderDocument {
 	 * @param \WC_Abstract_Order|null $order
 	 * @param string $context
 	 * @param bool $formatted
-	 * @return mixed|null
+	 * @return mixed
 	 */
-	public function get_number( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view', bool $formatted = false ) {
+	public function get_number( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view', bool $formatted = false ): mixed {
 		$number = $this->get_data( 'number', $document_type, $order, $context );
 
 		if ( $number && $formatted ) {
@@ -757,9 +757,9 @@ abstract class OrderDocument {
 	 * @param \WC_Abstract_Order|null $order
 	 * @param string $context
 	 * @param bool $formatted
-	 * @return mixed|null
+	 * @return mixed
 	 */
-	public function get_date( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view', bool $formatted = false ) {
+	public function get_date( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view', bool $formatted = false ): mixed {
 		$date = $this->get_data( 'date', $document_type, $order, $context );
 
 		if ( $date && $formatted ) {
@@ -785,9 +785,9 @@ abstract class OrderDocument {
 	 * @param string $document_type
 	 * @param \WC_Abstract_Order|null $order
 	 * @param string $context
-	 * @return mixed|null
+	 * @return mixed
 	 */
-	public function get_notes( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ) {
+	public function get_notes( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ): mixed {
 		return $this->get_data( 'notes', $document_type, $order, $context );
 	}
 
@@ -797,9 +797,9 @@ abstract class OrderDocument {
 	 * @param string $document_type
 	 * @param \WC_Abstract_Order|null $order
 	 * @param string $context
-	 * @return mixed|null
+	 * @return mixed
 	 */
-	public function get_display_date( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ) {
+	public function get_display_date( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ): mixed {
 		return $this->get_data( 'display_date', $document_type, $order, $context );
 	}
 
@@ -809,9 +809,9 @@ abstract class OrderDocument {
 	 * @param string $document_type
 	 * @param \WC_Abstract_Order|null $order
 	 * @param string $context
-	 * @return mixed|null
+	 * @return mixed
 	 */
-	public function get_creation_trigger( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ) {
+	public function get_creation_trigger( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ): mixed {
 		return $this->get_data( 'creation_trigger', $document_type, $order, $context );
 	}
 
@@ -1237,7 +1237,7 @@ abstract class OrderDocument {
 	 * @param \WC_Abstract_Order|null $order
 	 * @return void
 	 */
-	public function set_date( $value, ?\WC_Abstract_Order $order = null ): void {
+	public function set_date( mixed $value, ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 		try {
 			if ( empty( $value ) ) {
@@ -1284,7 +1284,7 @@ abstract class OrderDocument {
 	 * @param \WC_Abstract_Order|null $order
 	 * @return void
 	 */
-	public function set_number( $value, ?\WC_Abstract_Order $order = null ): void {
+	public function set_number( mixed $value, ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 
 		// Ignore incorrectly stored serialized meta and only handle expected value types.
@@ -1320,7 +1320,7 @@ abstract class OrderDocument {
 	 * @param \WC_Abstract_Order|null $order
 	 * @return void
 	 */
-	public function set_notes( $value, ?\WC_Abstract_Order $order = null ): void {
+	public function set_notes( mixed $value, ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 
 		try {
@@ -1344,7 +1344,7 @@ abstract class OrderDocument {
 	 * @param \WC_Abstract_Order|null $order
 	 * @return void
 	 */
-	public function set_display_date( $value, ?\WC_Abstract_Order $order = null ): void {
+	public function set_display_date( mixed $value, ?\WC_Abstract_Order $order = null ): void {
 		$order = empty( $order ) ? $this->order : $order;
 
 		try {
@@ -1503,7 +1503,7 @@ abstract class OrderDocument {
 	 * @param bool $autop
 	 * @return string
 	 */
-	public function get_settings_text( string $settings_key, $default = false, bool $autop = true ): string {
+	public function get_settings_text( string $settings_key, string|false $default = false, bool $autop = true ): string {
 		$setting = $this->get_setting( $settings_key, $default );
 		// check for 'default' key existence
 		if ( ! empty( $setting ) && is_array( $setting ) && array_key_exists( 'default', $setting ) ) {
@@ -2015,8 +2015,9 @@ abstract class OrderDocument {
 	 * Output the PDF file to the browser.
 	 *
 	 * @param string $output_mode
+	 * @return never
 	 */
-	public function output_pdf( string $output_mode = 'download' ) {
+	public function output_pdf( string $output_mode = 'download' ): never {
 		$pdf = $this->get_pdf();
 		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
 		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -2025,8 +2026,10 @@ abstract class OrderDocument {
 
 	/**
 	 * Output the HTML document.
+	 * 
+	 * @return void
 	 */
-	public function output_html() {
+	public function output_html(): void {
 		echo $this->get_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
@@ -2046,9 +2049,9 @@ abstract class OrderDocument {
 	 * Output the XML document to the browser or return contents if $contents_only is true.
 	 *
 	 * @param bool $contents_only
-	 * @return string|void
+	 * @return string
 	 */
-	public function output_xml( bool $contents_only = false ) {
+	public function output_xml( bool $contents_only = false ): string {
 		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
 
 		if ( ! $document ) {

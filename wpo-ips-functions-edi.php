@@ -326,7 +326,7 @@ function wpo_ips_edi_get_maker(): ?WPO\IPS\Makers\EDIMaker {
  * @param string|null $key
  * @return array|string|null
  */
-function wpo_ips_edi_get_settings( ?string $key = null ) {
+function wpo_ips_edi_get_settings( ?string $key = null ): array|string|null {
 	$settings = get_option( 'wpo_ips_edi_settings', array() );
 	return $key ? ( $settings[ $key ] ?? null ) : $settings;
 }
@@ -369,7 +369,7 @@ function wpo_ips_edi_peppol_is_available(): bool {
  *
  * @return string|false
  */
-function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
+function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ): string|false {
 	$edi_maker = wpo_ips_edi_get_maker();
 
 	if ( ! $edi_maker ) {
@@ -433,7 +433,7 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
  * @param int|false $size
  * @return void
  */
-function wpo_ips_edi_file_headers( string $filename, $size ): void {
+function wpo_ips_edi_file_headers( string $filename, int|false $size ): void {
 	$charset = apply_filters( 'wpo_ips_edi_file_header_content_type_charset', 'UTF-8' );
 
 	header( 'Content-Description: File Transfer' );
@@ -464,7 +464,7 @@ function wpo_ips_edi_get_current_syntax(): ?string {
  * @param bool $full_details Optional. If true, returns full format details.
  * @return string|array|null
  */
-function wpo_ips_edi_get_current_format( bool $full_details = false ) {
+function wpo_ips_edi_get_current_format( bool $full_details = false ): string|array|null {
 	$syntax = wpo_ips_edi_get_settings( 'syntax' );
 	$format = null;
 

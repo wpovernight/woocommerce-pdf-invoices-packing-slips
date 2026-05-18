@@ -3,16 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Document getter functions
-|--------------------------------------------------------------------------
-|
-| Global functions to get the document object for an order
-|
-*/
-
-function wcpdf_filter_order_ids( $order_ids, $document_type ) {
+/**
+ * Filter order IDs for a document type, allowing plugins to modify the list of orders that are included in a document.
+ *
+ * @param array $order_ids
+ * @param string $document_type
+ * @return array
+ */
+function wcpdf_filter_order_ids( array $order_ids, string $document_type ): array {
 	$order_ids = apply_filters( 'wpo_wcpdf_process_order_ids', $order_ids, $document_type );
 	// filter out trashed orders.
 	foreach ( $order_ids as $key => $order_id ) {
@@ -38,7 +36,7 @@ function wcpdf_filter_order_ids( $order_ids, $document_type ) {
  *
  * @return object|false
  */
-function wcpdf_get_document( string $document_type, $order, bool $init = false ) {
+function wcpdf_get_document( string $document_type, mixed $order, bool $init = false ): object|false {
 	$documents_instance = WPO_WCPDF()->get_instance( 'documents' );
 	
 	if ( ! empty( $order ) ) {
@@ -111,21 +109,47 @@ function wcpdf_get_document( string $document_type, $order, bool $init = false )
 	return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
 }
 
-function wcpdf_get_bulk_document( $document_type, $order_ids ) {
+/**
+ * Get a bulk document object for multiple orders
+ *
+ * @param string $document_type
+ * @param array $order_ids
+ * @return \WPO\IPS\Documents\BulkDocument
+ */
+function wcpdf_get_bulk_document( string $document_type, array $order_ids ): \WPO\IPS\Documents\BulkDocument {
 	return new \WPO\IPS\Documents\BulkDocument( $document_type, $order_ids );
 }
 
-function wcpdf_get_invoice( $order, $init = false ) {
+/**
+ * Deprecated functions to get the document object for an order, kept for backward compatibility.
+ *
+ * @param mixed $order
+ * @param bool $init
+ * @return object|false
+ */
+function wcpdf_get_invoice( mixed $order, bool $init = false ): object|false {
 	wcpdf_deprecated_function( __FUNCTION__, '4.6.3', 'wcpdf_get_document( \'invoice\', $order, $init )' );
 	return wcpdf_get_document( 'invoice', $order, $init );
 }
 
-function wcpdf_get_packing_slip( $order, $init = false ) {
+/**
+ * Deprecated functions to get the document object for an order, kept for backward compatibility.
+ *
+ * @param mixed $order
+ * @param bool $init
+ * @return object|false
+ */
+function wcpdf_get_packing_slip( mixed $order, bool $init = false ): object|false {
 	wcpdf_deprecated_function( __FUNCTION__, '4.6.3', 'wcpdf_get_document( \'packing-slip\', $order, $init )' );
 	return wcpdf_get_document( 'packing-slip', $order, $init );
 }
 
-function wcpdf_get_bulk_actions() {
+/**
+ * Get the available bulk actions for documents, which can be used in the admin order list or other places where bulk actions are needed.
+ *
+ * @return array
+ */
+function wcpdf_get_bulk_actions(): array {
 	$actions   = array();
 	$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'any' );
 
@@ -155,12 +179,12 @@ function wcpdf_get_bulk_actions() {
  * Load HTML into (pluggable) PDF library, DomPDF 1.0.2 by default
  * Use wpo_wcpdf_pdf_maker filter to change the PDF class (which can wrap another PDF library).
  *
- * @param string       $html
- * @param array        $settings
- * @param null|object  $document
- * @return WPO\IPS\Makers\PDFMaker
+ * @param string $html
+ * @param array  $settings
+ * @param null|\WPO\IPS\Documents\OrderDocument $document
+ * @return \WPO\IPS\Makers\PDFMaker
  */
-function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
+function wcpdf_get_pdf_maker( string $html, array $settings = array(), ?\WPO\IPS\Documents\OrderDocument $document = null ): \WPO\IPS\Makers\PDFMaker {
 	$class = '\\WPO\\IPS\\Makers\\PDFMaker';
 
 	if ( ! class_exists( $class ) ) {
@@ -177,7 +201,7 @@ function wcpdf_get_pdf_maker( $html, $settings = array(), $document = null ) {
  *
  * @return bool whether the PDF maker is the default or not
  */
-function wcpdf_pdf_maker_is_default() {
+function wcpdf_pdf_maker_is_default(): bool {
 	$default_pdf_maker = '\\WPO\\IPS\\Makers\\PDFMaker';
 
 	return $default_pdf_maker == apply_filters( 'wpo_wcpdf_pdf_maker', $default_pdf_maker );
@@ -189,8 +213,9 @@ function wcpdf_pdf_maker_is_default() {
  * @param string      $filename PDF file name
  * @param string      $mode     Delivery mode ('inline' or 'download')
  * @param string|null $pdf      PDF string
+ * @return void
  */
-function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $pdf = null ) {
+function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $pdf = null ): void {
 	// Decide whether to display inline or prompt a download
 	$disposition  = ( $mode === 'download' ) ? 'attachment' : 'inline';
 	$content_type = ( $mode === 'download' ) ? 'application/octet-stream' : 'application/pdf';
@@ -213,12 +238,12 @@ function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $
 /**
  * Get the document file
  *
- * @param  object $document
+ * @param  \WPO\IPS\Documents\OrderDocument $document
  * @param  string $output_format
  * @param  string $error_handling
  * @return string|false
  */
-function wcpdf_get_document_file( object $document, string $output_format = 'pdf', string $error_handling = 'exception' ) {
+function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument $document, string $output_format = 'pdf', string $error_handling = 'exception' ): string|false {
 	$default_output_format = 'pdf';
 
 	if ( ! $document ) {
@@ -286,12 +311,12 @@ function wcpdf_get_document_output_format_extension( string $output_format ): st
 /**
  * Wrapper for deprecated functions so we can apply some extra logic.
  *
- * @since  2.0
- * @param  string $function
- * @param  string $version
- * @param  string $replacement
+ * @param string $function
+ * @param string $version
+ * @param string|null $replacement
+ * @return void
  */
-function wcpdf_deprecated_function( $function, $version, $replacement = null ) {
+function wcpdf_deprecated_function( string $function, string $version, ?string $replacement = null ): void {
 	if ( apply_filters( 'wcpdf_disable_deprecation_notices', false ) ) {
 		return;
 	}
@@ -417,21 +442,22 @@ function wcpdf_error_handling( string $message, string $handling_type = 'excepti
 /**
  * Date formatting function
  *
- * @param object $document
- * @param string $date_type Optional. A date type to be filtered eg. 'invoice_date', 'order_date_created', 'order_date_modified', 'order_date', 'order_date_paid', 'order_date_completed', 'current_date', 'document_date', 'packing_slip_date'.
+ * @param \WPO\IPS\Documents\OrderDocument|null $document
+ * @param string|null $date_type Optional. A date type to be filtered eg. 'invoice_date', 'order_date_created', 'order_date_modified', 'order_date', 'order_date_paid', 'order_date_completed', 'current_date', 'document_date', 'packing_slip_date'.
+ * @return string
  */
-function wcpdf_date_format( $document = null, $date_type = null ) {
+function wcpdf_date_format( ?\WPO\IPS\Documents\OrderDocument $document = null, ?string $date_type = null ): string {
 	return apply_filters( 'wpo_wcpdf_date_format', wc_date_format(), $document, $date_type );
 }
 
 /**
  * Catch MySQL errors from $wpdb and log them.
  *
- * @param  \wpdb  $wpdb
+ * @param  wpdb  $wpdb
  * @param  string $context Optional prefix for messages (e.g. __METHOD__).
  * @return array  List of error strings logged.
  */
-function wcpdf_catch_db_object_errors( \wpdb $wpdb, string $context = '' ): array {
+function wcpdf_catch_db_object_errors( wpdb $wpdb, string $context = '' ): array {
 	global $EZSQL_ERROR;
 
 	static $seen = array(); // avoid duplicate logs in the same request
@@ -503,7 +529,7 @@ function wcpdf_catch_db_object_errors( \wpdb $wpdb, string $context = '' ): arra
  * @param  string $tool
  * @return string
  */
-function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
+function wcpdf_convert_encoding( string $string, string $tool = 'mb_convert_encoding' ): string {
 	if ( empty( $string ) ) {
 		return $string;
 	}
@@ -525,7 +551,7 @@ function wcpdf_convert_encoding( $string, $tool = 'mb_convert_encoding' ) {
 			$to_encoding = apply_filters( 'wpo_wcpdf_convert_to_encoding', 'HTML-ENTITIES', $tool );
 
 			// only for PHP 8.2+.
-			if ( version_compare( PHP_VERSION, '8.1', '>' ) && class_exists( 'UConverter' ) && extension_loaded( 'intl' ) ) {
+			if ( version_compare( PHP_VERSION, '8.2', '>=' ) && class_exists( 'UConverter' ) && extension_loaded( 'intl' ) ) {
 				$string = UConverter::transcode( $string, $to_encoding, $from_encoding );
 			}
 			break;
@@ -703,14 +729,17 @@ function wpo_wcpdf_sanitize_phone_number( string $text ): string {
  * Safe redirect or die.
  *
  * @param  string          $url
- * @param  string|WP_Error $message
+ * @param  string|\WP_Error $message
  * @return void
  */
-function wcpdf_safe_redirect_or_die( $url = '', $message = '' ) {
+function wcpdf_safe_redirect_or_die( string $url = '', string|\WP_Error $message = '' ): void {
 	if ( ! empty( $url ) ) {
 		wp_safe_redirect( $url );
 		exit;
 	} else {
+		if ( is_wp_error( $message ) ) {
+			$message = $message->get_error_message();
+		}
 		wp_die( esc_html( $message ) );
 	}
 }
@@ -793,10 +822,6 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 		if ( $finfo ) {
 			$mime_type = finfo_file( $finfo, $src );
-
-			if ( PHP_VERSION_ID < 80100 ) {
-				finfo_close( $finfo );
-			}
 		}
 	}
 
@@ -836,10 +861,6 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 				if ( $finfo ) {
 					$mime_type = finfo_buffer( $finfo, $image_data );
-
-					if ( PHP_VERSION_ID < 80100 ) {
-						finfo_close( $finfo );
-					}
 				}
 			}
 		}
@@ -887,10 +908,9 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
  * Base64 encode file from local path
  *
  * @param string $local_path
- *
  * @return string|bool
  */
-function wpo_wcpdf_base64_encode_file( string $local_path ) {
+function wpo_wcpdf_base64_encode_file( string $local_path ): string|bool {
 	if ( empty( $local_path ) ) {
 		return false;
 	}
@@ -963,7 +983,6 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
  * Get image source in base64 format
  *
  * @param string $src
- *
  * @return string
  */
 function wpo_wcpdf_get_image_src_in_base64( string $src ): string {
@@ -1017,10 +1036,10 @@ function wpo_wcpdf_checkout_is_block(): bool {
 /**
  * Get the default table headers for the Simple template.
  *
- * @param object $document
+ * @param \WPO\IPS\Documents\OrderDocument $document
  * @return array
  */
-function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array {
+function wpo_wcpdf_get_simple_template_default_table_headers( \WPO\IPS\Documents\OrderDocument $document ): array {
 	$headers = array(
 		'product'  => __( 'Product', 'woocommerce-pdf-invoices-packing-slips' ),
 		'quantity' => __( 'Quantity', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -1037,10 +1056,10 @@ function wpo_wcpdf_get_simple_template_default_table_headers( $document ): array
 /**
  * Get the WP_Filesystem instance
  *
- * @return WP_Filesystem|false
+ * @return \WP_Filesystem|false
  * @throws RuntimeException
  */
-function wpo_wcpdf_get_wp_filesystem() {
+function wpo_wcpdf_get_wp_filesystem(): \WP_Filesystem|false {
 	wcpdf_deprecated_function( 'wpo_wcpdf_get_wp_filesystem', '4.2.0', '\WPO\IPS\Compatibility\FileSystem::instance()->wp_filesystem' );
 
 	if ( class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) {
@@ -1443,7 +1462,7 @@ function wpo_wcpdf_get_latest_releases_from_github( string $owner = 'wpovernight
  * @param string $plugin_slug
  * @return string|false
  */
-function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ) {
+function wpo_wcpdf_get_latest_plugin_version( string $plugin_slug ): string|false {
 	// Ensure plugin update info is loaded
 	if ( ! function_exists( 'get_site_transient' ) ) {
 		require_once ABSPATH . 'wp-includes/option.php';
@@ -1747,8 +1766,8 @@ function wpo_wcpdf_format_document_number(
  * This is a customized version of the WooCommerce function `wc_display_item_meta()`,
  * which uses the `get_all_formatted_meta_data()` method instead of `get_formatted_meta_data()`.
  *
- * @param WC_Order_Item $item Order item object.
- * @param array         $args Optional. Display arguments.
+ * @param \WC_Order_Item $item Order item object.
+ * @param array $args Optional. Display arguments.
  *
  * @return string|void Meta data HTML output or void if echoed directly.
  */
@@ -1801,7 +1820,6 @@ function wpo_ips_display_item_meta( \WC_Order_Item $item, array $args = array() 
  * Check if the order has a local pickup shipping method.
  *
  * @param \WC_Abstract_Order $order
- *
  * @return bool
  */
 function wpo_ips_order_has_local_pickup_method( \WC_Abstract_Order $order ): bool {
@@ -1907,10 +1925,10 @@ function wpo_ips_normalize_filter_args( array $filter ): array {
 /**
  * Get refund IDs for given order IDs or order object.
  *
- * @param \WC_Order|int|int[] $order_or_ids Order object or order ID(s).
+ * @param mixed $order_or_ids Order object or order ID(s).
  * @return int[] Unique array of refund IDs.
  */
-function wpo_ips_get_refund_ids( $order_or_ids ) {
+function wpo_ips_get_refund_ids( mixed $order_or_ids ): array {
 	$refund_ids = array();
 
 	// Normalize input to an array of IDs.
@@ -1944,7 +1962,7 @@ function wpo_ips_get_refund_ids( $order_or_ids ) {
  * @param mixed $value
  * @return string
  */
-function wpo_ips_format_report_setting_value( $value ): string {
+function wpo_ips_format_report_setting_value( mixed $value ): string {
 	// Booleans
 	if ( is_bool( $value ) ) {
 		return $value
@@ -2194,7 +2212,7 @@ function wpo_ips_current_page_has_checkout_block(): bool {
 	}
 
 	$post = get_post( $page_id );
-	if ( ! $post instanceof WP_Post ) {
+	if ( ! $post instanceof \WP_Post ) {
 		return (bool) apply_filters(
 			'wpo_ips_current_page_has_checkout_block',
 			false,

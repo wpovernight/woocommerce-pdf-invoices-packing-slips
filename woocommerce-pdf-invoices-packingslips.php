@@ -155,7 +155,7 @@ class WPO_WCPDF {
 	 *
 	 * @return object|null
 	 */
-	public function get_instance( string $property ) {
+	public function get_instance( string $property ): ?object {
 		$map = array(
 			'third_party_plugins' => ThirdPartyPlugins::class,
 			'vat_plugins'         => VatPlugins::class,
@@ -500,10 +500,10 @@ class WPO_WCPDF {
 	 * Define constant if not already set
 	 * 
 	 * @param  string $name
-	 * @param  string|bool $value
+	 * @param  mixed $value
 	 * @return void
 	 */
-	private function define( string $name, $value ): void {
+	private function define( string $name, mixed $value ): void {
 		if ( ! defined( $name ) ) {
 			define( $name, $value );
 		}
@@ -618,7 +618,7 @@ endif; // class_exists
  * @since  1.6
  * @return WPO_WCPDF
  */
-function WPO_WCPDF() {
+function WPO_WCPDF(): WPO_WCPDF {
 	return WPO_WCPDF::instance();
 }
 
