@@ -248,6 +248,7 @@ class Assets {
 						'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
 						'error'   => __( 'Error loading', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
+					'xml_document_types'        => $this->get_xml_document_types(),
 				)
 			);
 
@@ -412,6 +413,24 @@ class Assets {
 		}
 
 		return WPO_WCPDF()->settings->get_search_index( $page );
+	}
+
+	/**
+	 * Get document types that support XML output format.
+	 *
+	 * @return array
+	 */
+	private function get_xml_document_types(): array {
+		$xml_types = array();
+		$documents = WPO_WCPDF()->documents->get_documents();
+
+		foreach ( $documents as $document ) {
+			if ( in_array( 'xml', $document->output_formats, true ) ) {
+				$xml_types[] = $document->get_type();
+			}
+		}
+
+		return $xml_types;
 	}
 
 	/**
