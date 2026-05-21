@@ -153,36 +153,36 @@ jQuery( function( $ ) {
 	}
 
 	function setPreviewOrderIdInUrl( orderId ) {
-		const params = new URLSearchParams( window.location.search );
-		if ( orderId ) {
-			params.set( 'preview_order', orderId );
-		} else {
-			params.delete( 'preview_order' );
+		function updateParams( params ) {
+			if ( orderId ) {
+				params.set( 'preview_order', orderId );
+			} else {
+				params.delete( 'preview_order' );
+			}
+			return params;
 		}
+
+		const params = updateParams( new URLSearchParams( window.location.search ) );
 		history.replaceState( null, '', '?' + params.toString() );
 
 		// Update document section links so they carry the param on navigation
 		$( '.wcpdf_document_settings_sections a, .doc-output-toggle-group .doc-output-toggle' ).each( function() {
-			const linkParams = new URLSearchParams( $( this ).attr( 'href' ).split( '?' )[1] );
-			if ( orderId ) {
-				linkParams.set( 'preview_order', orderId );
-			} else {
-				linkParams.delete( 'preview_order' );
-			}
-			$( this ).attr( 'href', '?' + linkParams.toString() );
+			const href       = $( this ).attr( 'href' );
+			const [ path ]   = href.split( '?' );
+			const linkParams = updateParams( new URLSearchParams( href.split( '?' )[1] ) );
+			$( this ).attr( 'href', path + '?' + linkParams.toString() );
 		} );
 	}
 
 	resetDocumentType();      // force document type reset
 
-	let urlOrderId = getPreviewOrderIdFromUrl();
+	let urlOrderId = parseInt( getPreviewOrderIdFromUrl(), 10 ) || '';
 	if ( urlOrderId ) {
 		$previewOrderIdInput.val( urlOrderId );
 		$( '.preview-document .order-search-label' ).text( '#' + urlOrderId );
 		$( '.preview-document p.last-order' ).hide();
 		$( '.preview-document p.order-search' ).show();
 	} else {
-		setPreviewOrderIdInUrl( '' );
 		resetOrderId();       // force order ID reset
 	}
 
@@ -554,7 +554,7 @@ jQuery( function( $ ) {
 
 	// Detect document type input changes and apply the same document title to the document selector
 	$previewDocumentTypeInput.on( 'change', function() {
-    let inputValue   = $( this ).val();
+		let inputValue = $( this ).val();
 		if ( inputValue.length ) {
 			let inputName   = $( this ).attr( 'name' );
 			let $ul         = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list[data-input-name='+inputName+']' );
@@ -742,7 +742,7 @@ jQuery( function( $ ) {
 		$div.children( 'a' ).remove();                                 // remove previous results
 		$div.hide();
 
-		$.ajax( {
+		previewSearchXhr = $.ajax( {
 			type: 'POST',
 			url:  wpo_wcpdf_admin.ajaxurl,
 			data: data,
