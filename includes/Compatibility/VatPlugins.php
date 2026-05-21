@@ -101,6 +101,16 @@ class VatPlugins {
 						'block_form_selector'   => '.wc-block-components-address-form__eu-vat-guard-vat_number input',
 					),
 				),
+				
+				'woocommerce_eu_vat_number' => array(
+					'detector'  => static function () {
+						return defined( 'WC_EU_VAT_FILE' ) || class_exists( 'WC_EU_VAT_Number_Init' );
+					},
+					'selectors' => array(
+						'classic_form_selector' => '#woocommerce_eu_vat_number_shipping_field input',
+						'block_form_selector'   => '.wc-block-components-checkout-step input#billing_vat_number',
+					),
+				),
 			)
 		);
 
