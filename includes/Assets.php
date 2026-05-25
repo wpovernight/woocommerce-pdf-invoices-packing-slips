@@ -45,7 +45,7 @@ class Assets {
 
 		global $wp_version;
 
-		if ( WPO_WCPDF()->is_order_page() ) {
+		if ( \wpo_ips_is_order_page() ) {
 
 			// STYLES
 			if ( ! wp_style_is( 'thickbox', 'enqueue' ) ) {

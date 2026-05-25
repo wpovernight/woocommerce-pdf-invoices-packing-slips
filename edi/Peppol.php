@@ -29,7 +29,7 @@ class Peppol {
 	 * Constructor
 	 */
 	public function __construct() {
-		if ( ! WPO_WCPDF()->is_frontend_page_request() ) {
+		if ( ! \wpo_ips_is_frontend_page_request() ) {
 			return;
 		}
 		

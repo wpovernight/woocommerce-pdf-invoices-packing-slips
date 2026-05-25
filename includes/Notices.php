@@ -174,8 +174,8 @@ class Notices {
 			return;
 		}
 
-		$is_settings_page = $this->plugin->is_settings_page();
-		$is_plugins_page  = $this->plugin->is_plugins_page();
+		$is_settings_page = \wpo_ips_is_settings_page();
+		$is_plugins_page  = \wpo_ips_is_plugins_page();
 
 		$notices = array(
 			array( array( $this, 'nginx_detected_notice' ), $is_settings_page ),

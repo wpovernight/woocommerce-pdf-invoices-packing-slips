@@ -97,25 +97,25 @@ class Main {
 		$order = apply_filters( 'wpo_wcpdf_email_order_object', $order, $email_id, $email );
 
 		// Skip User emails
-		if ( get_class( $order ) == 'WP_User' ) {
+		if ( 'WP_User' === get_class( $order ) ) {
 			return $attachments;
 		}
 
 		$order_id = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : false;
 
-		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) && $order_id == false ) {
+		if ( ! ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) && false === $order_id ) {
 			return $attachments;
 		}
 
 		// WooCommerce Booking compatibility
-		if ( get_post_type( $order_id ) == 'wc_booking' && isset( $order->order ) && ! empty( $order->order ) ) {
+		if ( 'wc_booking' === get_post_type( $order_id ) && isset( $order->order ) && ! empty( $order->order ) ) {
 			// $order is actually a WC_Booking object!
 			$order    = $order->order;
 			$order_id = $order->get_id();
 		}
 
 		// do not process low stock notifications, user emails etc!
-		if ( in_array( $email_id, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ) ) ) {
+		if ( in_array( $email_id, array( 'no_stock', 'low_stock', 'backorder', 'customer_new_account', 'customer_reset_password' ), true ) ) {
 			return $attachments;
 		}
 
@@ -132,7 +132,7 @@ class Main {
 
 		// reload translations because WC may have switched to site locale (by setting the plugin_locale filter to site locale in wc_switch_to_site_locale())
 		if ( apply_filters( 'wpo_wcpdf_allow_reload_attachment_translations', isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['reload_attachment_translations'] ) ) ) {
-			WPO_WCPDF()->translations();
+			WPO_WCPDF()->translations( true );
 			do_action( 'wpo_wcpdf_reload_attachment_translations' );
 		}
 

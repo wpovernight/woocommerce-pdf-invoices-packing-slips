@@ -156,26 +156,41 @@ class WPO_WCPDF {
 	 * @return object|null
 	 */
 	public function get_instance( string $property ): ?object {
-		$map = array(
-			'third_party_plugins' => ThirdPartyPlugins::class,
-			'vat_plugins'         => VatPlugins::class,
-			'order_util'          => OrderUtil::class,
-			'file_system'         => FileSystem::class,
-			'settings'            => Settings::class,
-			'documents'           => Documents::class,
-			'main'                => Main::class,
-			'endpoint'            => Endpoint::class,
-			'assets'              => Assets::class,
-			'admin'               => Admin::class,
-			'frontend'            => Frontend::class,
-			'install'             => Install::class,
-			'font_synchronizer'   => FontSynchronizer::class,
-			'peppol'              => Peppol::class,
-			'notices'             => Notices::class,
-			'setup_wizard'        => SetupWizard::class,
+		$map = apply_filters(
+			'wpo_ips_instance_map',
+			array(
+				'third_party_plugins' => ThirdPartyPlugins::class,
+				'vat_plugins'         => VatPlugins::class,
+				'order_util'          => OrderUtil::class,
+				'file_system'         => FileSystem::class,
+				'settings'            => Settings::class,
+				'documents'           => Documents::class,
+				'main'                => Main::class,
+				'endpoint'            => Endpoint::class,
+				'assets'              => Assets::class,
+				'admin'               => Admin::class,
+				'frontend'            => Frontend::class,
+				'install'             => Install::class,
+				'font_synchronizer'   => FontSynchronizer::class,
+				'peppol'              => Peppol::class,
+				'notices'             => Notices::class,
+				'setup_wizard'        => SetupWizard::class,
+			),
+			$this
 		);
 
 		if ( ! isset( $map[ $property ] ) ) {
+			if ( function_exists( 'wcpdf_log_error' ) ) {
+				wcpdf_log_error(
+					sprintf(
+						'%s: Unknown plugin instance property requested: %s.',
+						__METHOD__,
+						$property
+					),
+					'critical'
+				);
+			}
+
 			return null;
 		}
 
@@ -210,20 +225,25 @@ class WPO_WCPDF {
 	/**
 	 * Load the translation / textdomain files
 	 * 
+	 * @param bool $$force_reload
 	 * @return void
 	 */
-	public function translations(): void {
+	public function translations( bool $force_reload = false ): void {
 		static $loaded = false;
-
-		if ( $loaded ) {
-			return;
-		}
 
 		$textdomain = 'woocommerce-pdf-invoices-packing-slips';
 
-		if ( is_textdomain_loaded( $textdomain ) ) {
-			$loaded = true;
+		if ( $loaded && ! $force_reload ) {
 			return;
+		}
+
+		if ( is_textdomain_loaded( $textdomain ) ) {
+			if ( ! $force_reload ) {
+				$loaded = true;
+				return;
+			}
+
+			unload_textdomain( $textdomain );
 		}
 
 		$locale = $this->determine_locale();
@@ -406,94 +426,6 @@ class WPO_WCPDF {
 	 */
 	public function plugin_path(): string {
 		return untrailingslashit( plugin_dir_path( __FILE__ ) );
-	}
-	
-	/**
-	 * Check if the current admin page is the plugin settings page.
-	 *
-	 * @return bool
-	 */
-	public function is_settings_page(): bool {
-		if ( isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
-			return true;
-		}
-
-		global $pagenow;
-
-		if ( 'options.php' === $pagenow ) {
-			$option_page = isset( $_POST['option_page'] )
-				? sanitize_text_field( wp_unslash( $_POST['option_page'] ) )
-				: '';
-
-			return (
-				0 === strpos( $option_page, 'wpo_wcpdf_' ) ||
-				0 === strpos( $option_page, 'wpo_ips_' )
-			);
-		}
-
-		return false;
-	}
-
-	/**
-	 * Check if the current admin page is the plugins page.
-	 *
-	 * @return bool
-	 */
-	public function is_plugins_page(): bool {
-		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-
-		if ( ! empty( $screen ) && isset( $screen->id ) ) {
-			return 'plugins' === $screen->id;
-		}
-
-		return isset( $GLOBALS['pagenow'] ) && 'plugins.php' === $GLOBALS['pagenow'];
-	}
-	
-	/**
-	 * Check if this is a shop_order page (edit or list)
-	 * 
-	 * @return bool
-	 */
-	public function is_order_page(): bool {
-		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-		
-		if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ) ) ) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Check if this is the My Account page
-	 * 
-	 * @return bool
-	 */
-	public function is_account_page(): bool {
-		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
-			return true;
-		}
-		
-		if ( ! function_exists( 'wc_get_page_id' ) ) {
-			return false;
-		}
-		
-		$page_id = wc_get_page_id( 'myaccount' );
-
-		return ( $page_id && is_page( $page_id ) ) || wc_post_content_has_shortcode( 'woocommerce_my_account' ) || apply_filters( 'woocommerce_is_account_page', false );
-	}
-	
-	/**
-	 * Check if this is a frontend page request (not admin, ajax, cron, rest or wp-cli)
-	 * 
-	 * @return bool
-	 */
-	public function is_frontend_page_request(): bool {
-		return ! is_admin()
-			&& ! wp_doing_ajax()
-			&& ! wp_doing_cron()
-			&& ! ( defined( 'REST_REQUEST' ) && REST_REQUEST )
-			&& ! ( defined( 'WP_CLI' ) && WP_CLI );
 	}
 	
 	/**

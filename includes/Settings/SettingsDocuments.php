@@ -28,7 +28,7 @@ class SettingsDocuments {
 	 */
 	public function __construct() {
 		// WP
-		if ( \WPO_WCPDF()->is_settings_page() ) {
+		if ( \wpo_ips_is_settings_page() ) {
 			add_action( 'admin_init', array( $this, 'init_settings' ) );
 		}
 		

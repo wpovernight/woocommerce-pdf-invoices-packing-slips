@@ -125,8 +125,8 @@ class Frontend {
 	 * @return void
 	 */
 	public function open_my_account_link_on_new_tab(): void {
-		$is_account        = function_exists( 'is_account_page' )        && is_account_page();
-		$is_order_received = function_exists( 'is_order_received_page' ) && is_order_received_page();
+		$is_account        = \wpo_ips_is_account_page();
+		$is_order_received = \wpo_ips_is_order_received_page();
 
 		if ( $is_account || $is_order_received ) {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
@@ -254,7 +254,7 @@ class Frontend {
 		if ( empty( $values['order_id'] ) ) {
 			if ( is_checkout() && is_wc_endpoint_url( 'order-received' ) && isset( $wp->query_vars['order-received'] ) ) {
 				$order = wc_get_order( $wp->query_vars['order-received'] );
-			} elseif ( is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
+			} elseif ( \wpo_ips_is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
 				$order = wc_get_order( $wp->query_vars['view-order'] );
 			}
 		} else {
