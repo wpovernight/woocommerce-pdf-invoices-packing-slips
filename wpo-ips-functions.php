@@ -1051,10 +1051,10 @@ function wpo_wcpdf_get_simple_template_default_table_headers( \WPO\IPS\Documents
 /**
  * Get the WP_Filesystem instance
  *
- * @return \WP_Filesystem|false
+ * @return mixed
  * @throws RuntimeException
  */
-function wpo_wcpdf_get_wp_filesystem(): \WP_Filesystem|false {
+function wpo_wcpdf_get_wp_filesystem(): mixed {
 	wcpdf_deprecated_function( 'wpo_wcpdf_get_wp_filesystem', '4.2.0', '\WPO\IPS\Compatibility\FileSystem::instance()->wp_filesystem' );
 
 	if ( class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) {
