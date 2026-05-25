@@ -882,11 +882,11 @@ class SettingsGeneral {
 	/**
 	 * Get a general setting key value, optionally using a locale-specific sub-key.
 	 *
-	 * @param string $key     The key of the setting to retrieve.
-	 * @param string $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
-	 * @return string The value of the setting.
+	 * @param string $key          The key of the setting to retrieve.
+	 * @param string|null $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
+	 * @return string              The value of the setting.
 	 */
-	public function get_setting( string $key, string $locale = '' ): string {
+	public function get_setting( string $key, ?string $locale = '' ): string {
 		if ( empty( $key ) ) {
 			return '';
 		}

@@ -259,6 +259,10 @@ class Assets {
 						'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
 						'error'   => __( 'Error loading', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
+					'xml_document_types'        => array_values( array_map(
+						fn( $document ) => $document->get_type(),
+						WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' )
+					) ),
 				)
 			);
 
