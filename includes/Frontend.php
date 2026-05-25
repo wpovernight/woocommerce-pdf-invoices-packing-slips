@@ -101,7 +101,7 @@ class Frontend {
 				? $invoice->get_title()
 				: $document_title;
 
-			$endpoint_instance = WPO_WCPDF()->endpoint;
+			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
 			$actions[ $document_type ] = array(
 				'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
@@ -132,14 +132,16 @@ class Frontend {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 
 			if ( isset( $general_settings['download_display'] ) && 'display' === $general_settings['download_display'] ) {
-				$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-				$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+				$suffix               = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+				$file_path            = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+				$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-				if ( WPO_WCPDF()->file_system->exists( $file_path ) ) {
-					$script = WPO_WCPDF()->file_system->get_contents( $file_path );
+				if ( $file_system_instance->exists( $file_path ) ) {
+					$script            = $file_system_instance->get_contents( $file_path );
+					$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
-					if ( $script && WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
-						$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
+					if ( $script && $endpoint_instance->pretty_links_enabled() ) {
+						$script = str_replace( 'generate_wpo_wcpdf', $endpoint_instance->get_identifier(), $script );
 					}
 
 					wp_add_inline_script( 'jquery', $script );
@@ -153,7 +155,6 @@ class Frontend {
 	 *
 	 * @param array $data
 	 * @param \WC_Abstract_Order $order
-	 *
 	 * @return array
 	 */
 	public function add_invoice_number_to_wc_legacy_order_api( array $data, \WC_Abstract_Order $order ): array {
@@ -168,7 +169,6 @@ class Frontend {
 	 * @param \WP_REST_Response $response
 	 * @param \WC_Data $order
 	 * @param \WP_REST_Request $request
-	 *
 	 * @return \WP_REST_Response
 	 */
 	public function add_invoice_number_to_wc_order_api( \WP_REST_Response $response, \WC_Data $order, \WP_REST_Request $request ): \WP_REST_Response {
@@ -182,11 +182,10 @@ class Frontend {
 	/**
 	 * Retrieve formatted invoice number for a given order
 	 *
-	 * @param \WC_Abstract_Order|\WC_Order $order
-	 *
+	 * @param \WC_Abstract_Order $order
 	 * @return string
 	 */
-	private function get_invoice_number( $order ): string {
+	private function get_invoice_number( \WC_Abstract_Order $order ): string {
 		$this->disable_storing_document_settings();
 		$invoice        = wcpdf_get_document( 'invoice', $order );
 		$invoice_number = '';
@@ -228,7 +227,7 @@ class Frontend {
 		), $atts );
 
 		$is_document_type_valid = false;
-		$documents              = WPO_WCPDF()->documents->get_documents();
+		$documents              = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() === $values['document_type'] ) {
 				$is_document_type_valid = true;
@@ -272,7 +271,7 @@ class Frontend {
 			return '';
 		}
 
-		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
+		$pdf_url = WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
 
 		if ( 'wcpdf_document_link' === $shortcode_tag ) {
 			return esc_url( $pdf_url );
@@ -384,7 +383,7 @@ class Frontend {
 	 * @param string $key Field key.
 	 * @param mixed $value Field value.
 	 * @param string $group Group name.
-	 * @param object $wc_object WC object (e.g. order).
+	 * @param \WC_Customer|\WC_Order $wc_object
 	 * @return void
 	 */
 	public function checkout_field_save_checkout_block_field( string $key, $value, string $group, object $wc_object ): void {
@@ -645,7 +644,7 @@ class Frontend {
 	 * @param \WP_User  $user
 	 * @return \WP_Error
 	 */
-	public function account_details_validate_checkout_field( \WP_Error $errors, $user ): \WP_Error {
+	public function account_details_validate_checkout_field( \WP_Error $errors, \WP_User $user ): \WP_Error {
 		if ( ! $this->checkout_field_is_my_account_enabled() ) {
 			return $errors;
 		}
@@ -726,7 +725,7 @@ class Frontend {
 		}
 
 		// Prevent conflicts with VAT plugins.
-		if ( \WPO_WCPDF()->vat_plugins->has_active() ) {
+		if ( \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active() ) {
 			return false;
 		}
 

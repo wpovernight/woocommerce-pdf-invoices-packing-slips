@@ -1,18 +1,16 @@
 <?php
 namespace WPO\IPS\Compatibility;
 
-defined( 'ABSPATH' ) || exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\VatPlugins' ) ) :
 
 class VatPlugins {
 
-	protected static $_instance = null;
-
-	/**
-	 * Cached detection result (per request).
-	 *
-	 * @var array|null
-	 */
-	protected $detected = null;
+	protected ?array $detected        = null;
+	protected static ?self $_instance = null;
 
 	/**
 	 * Singleton instance access.
@@ -180,3 +178,5 @@ class VatPlugins {
 	}
 	
 }
+
+endif;

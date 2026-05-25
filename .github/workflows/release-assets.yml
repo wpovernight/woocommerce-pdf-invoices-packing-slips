@@ -20,7 +20,7 @@ jobs:
           # set environment variables
           echo "plugin_slug=$PLUGIN_SLUG" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_ENV
-          echo "zip_file_name=$PLUGIN_SLUG.$VERSION.zip" >> $GITHUB_ENV
+          echo "zip_file_name=$ZIP_FILE_NAME" >> $GITHUB_ENV
 
       - name: Checkout Git repository
         uses: actions/checkout@v4

@@ -9,19 +9,28 @@ if ( ! class_exists( '\\WPO\\IPS\\Endpoint' ) ) :
 
 class Endpoint {
 
-	public $action_suffix = '_wpo_wcpdf';
-	public $events        = array( 'generate', 'printed' );
-	public $actions;
+	public string $action_suffix      = '_wpo_wcpdf';
+	public array $events              = array( 'generate', 'printed' );
+	public array $actions;
 
-	protected static $_instance = null;
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Singleton instance accessor.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 */
 	public function __construct() {
 		if ( $this->pretty_links_enabled() ) {
 			add_action( 'init', array( $this, 'add_endpoint' ) );
@@ -32,7 +41,12 @@ class Endpoint {
 		$this->actions = $this->get_actions();
 	}
 
-	public function get_actions() {
+	/**
+	 * Get the list of actions with suffixes.
+	 *
+	 * @return array
+	 */
+	public function get_actions(): array {
 		$actions = [];
 		foreach ( $this->events as $event ) {
 			$actions[ $event ] = $event . $this->action_suffix;
@@ -53,19 +67,35 @@ class Endpoint {
 		return ! empty( $debug_settings['pretty_document_links'] ) && ! empty( get_option( 'permalink_structure' ) );
 	}
 
-	public function get_identifier() {
+	/**
+	 * Get the identifier for the pretty document links.
+	 *
+	 * @return string
+	 */
+	public function get_identifier(): string {
 		return apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' );
 	}
 
-	public function add_endpoint() {
+	/**
+	 * Add the rewrite rule for the pretty document links.
+	 *
+	 * @return void
+	 */
+	public function add_endpoint(): void {
 		add_rewrite_rule(
 			'^' . $this->get_identifier() . '/([^/]*)/([^/]*)/([^/]*)/([^/]*)?',
 			'index.php?action=' . $this->actions['generate'] . '&document_type=$matches[1]&order_ids=$matches[2]&access_key=$matches[3]&output=$matches[4]',
 			'top'
 		);
 	}
-
-	public function add_query_vars( $vars ) {
+	
+	/**
+	 * Add the query vars for the document endpoint.
+	 *
+	 * @param array $vars
+	 * @return array
+	 */
+	public function add_query_vars( array $vars ): array {
 		$vars[] = 'action';
 		$vars[] = 'document_type';
 		$vars[] = 'order_ids';
@@ -74,7 +104,12 @@ class Endpoint {
 		return $vars;
 	}
 
-	public function handle_document_requests() {
+	/**
+	 * Handle incoming requests to the document endpoint.
+	 *
+	 * @return void
+	 */
+	public function handle_document_requests(): void {
 		global $wp;
 
 		if ( ! empty( $wp->query_vars['action'] ) && $this->actions['generate'] == $wp->query_vars['action'] ) {
@@ -90,7 +125,16 @@ class Endpoint {
 		}
 	}
 
-	public function get_document_link( $order, $document_type, $additional_vars = array(), bool $bypass_login_access = false ) {
+	/**
+	 * Get document link for a given order and document type.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @param string $document_type
+	 * @param array $additional_vars
+	 * @param bool $bypass_login_access  Whether to bypass login access check (for example when generating links in the admin)
+	 * @return string
+	 */
+	public function get_document_link( \WC_Abstract_Order $order, string $document_type, array $additional_vars = array(), bool $bypass_login_access = false ): string {
 		if ( empty( $order ) || empty( $document_type ) ) {
 			return '';
 		}
@@ -159,13 +203,13 @@ class Endpoint {
 	/**
 	 * Get mark/unmark document printed link
 	 *
-	 * @param string $event          Can be 'mark' or 'unmark'
-	 * @param object $order
+	 * @param string $event  Can be 'mark' or 'unmark'
+	 * @param \WC_Abstract_Order $order
 	 * @param string $document_type
 	 * @param string $trigger
-	 * @return void
+	 * @return string
 	 */
-	public function get_document_printed_link( $event, $order, $document_type, $trigger = 'manually' ) {
+	public function get_document_printed_link( string $event, \WC_Abstract_Order $order, string $document_type, string $trigger = 'manually' ): string {
 		if ( empty( $event ) || ! in_array( $event, [ 'mark', 'unmark' ] ) ) {
 			return '';
 		}
@@ -191,7 +235,7 @@ class Endpoint {
 	 *
 	 * @return string
 	 */
-	public function get_document_link_access_type() {
+	public function get_document_link_access_type(): string {
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$access_type    = isset( $debug_settings['document_link_access_type'] ) ? $debug_settings['document_link_access_type'] : 'logged_in';
 
@@ -207,7 +251,7 @@ class Endpoint {
 	 *
 	 * @return string
 	 */
-	public function get_document_denied_frontend_redirect_url() {
+	public function get_document_denied_frontend_redirect_url(): string {
 		$redirect_url   = '';
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 

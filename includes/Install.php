@@ -9,15 +9,24 @@ if ( ! class_exists( '\\WPO\\IPS\\Install' ) ) :
 
 class Install {
 
-	protected static $_instance = null;
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get singleton instance
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 *
+	 */
 	public function __construct() {
 		// run lifecycle methods
 		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
@@ -25,16 +34,12 @@ class Install {
 		}
 	}
 
-	/** Lifecycle methods *******************************************************
-	 * Because register_activation_hook only runs when the plugin is manually
-	 * activated by the user, we're checking the current version against the
-	 * version stored in the database
-	****************************************************************************/
-
 	/**
 	 * Handles version checking
+	 * 
+	 * @return void
 	 */
-	public function do_install() {
+	public function do_install(): void {
 		// only install when woocommerce is active
 		if ( ! WPO_WCPDF()->is_woocommerce_activated() ) {
 			return;
@@ -45,7 +50,6 @@ class Install {
 
 		// installed version lower than plugin version?
 		if ( version_compare( $installed_version, WPO_WCPDF_VERSION, '<' ) ) {
-
 			if ( ! $installed_version ) {
 				try {
 					$this->install();
@@ -62,25 +66,29 @@ class Install {
 
 			// new version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
+			
+			// deactivate legacy addons
+			WPO_WCPDF()->deactivate_legacy_addons();
+			
 		} elseif ( $installed_version && version_compare( $installed_version, WPO_WCPDF_VERSION, '>' ) ) {
 			try {
 				$this->downgrade( $installed_version );
 			} catch ( \Throwable $th ) {
 				wcpdf_log_error( sprintf( "Plugin downgrade procedure failed (downgrading from version %s to %s): %s", $installed_version, WPO_WCPDF_VERSION, $th->getMessage() ), 'critical', $th );
 			}
+			
 			// downgrade version number
 			update_option( $version_setting, WPO_WCPDF_VERSION );
 		}
-
-		// deactivate legacy addons
-		add_action( 'admin_init', array( WPO_WCPDF(), 'deactivate_legacy_addons') );
 	}
 
 
 	/**
 	 * Plugin install method. Perform any installation tasks here
+	 * 
+	 * @return void
 	 */
-	protected function install() {
+	protected function install(): void {
 		// only install when php version or higher
 		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
@@ -92,12 +100,17 @@ class Install {
 			return;
 		}
 
+		// instances
+		$main_instance		  = WPO_WCPDF()->get_instance( 'main' );
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+		$settings_instance    = WPO_WCPDF()->get_instance( 'settings' );
+		
 		// Get tmp folders
-		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
+		$tmp_base = $main_instance->get_tmp_base();
 
 		// check if tmp folder exists => if not, initialize
-		if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_base ) || ! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ) {
-			WPO_WCPDF()->main->init_tmp();
+		if ( ! $file_system_instance->is_dir( $tmp_base ) || ! $file_system_instance->is_writable( $tmp_base ) ) {
+			$main_instance->init_tmp();
 		}
 
 		// Unsupported currency symbols
@@ -150,49 +163,23 @@ class Install {
 		// set default settings
 		$settings_defaults = array(
 			'wpo_wcpdf_settings_general' => array(
-				'download_display'			=> 'display',
-				'template_path'				=> WPO_WCPDF()->plugin_path() . '/templates/Simple',
-				'currency_font'				=> ( in_array( get_woocommerce_currency(), $unsupported_symbols ) ) ? 1 : '',
-				'paper_size'				=> 'a4',
-				// 'header_logo'				=> '',
-				// 'shop_name'					=> array(),
-				// 'shop_address'				=> array(),
-				// 'footer'					=> array(),
-				// 'extra_1'					=> array(),
-				// 'extra_2'					=> array(),
-				// 'extra_3'					=> array(),
+				'download_display' => 'display',
+				'template_path'    => WPO_WCPDF()->plugin_path() . '/templates/Simple',
+				'currency_font'    => ( in_array( get_woocommerce_currency(), $unsupported_symbols, true ) ) ? 1 : '',
+				'paper_size'       => 'a4',
 			),
 			'wpo_wcpdf_documents_settings_invoice' => array(
-				'enabled'					=> 1,
-				// 'attach_to_email_ids'		=> array(),
-				// 'display_shipping_address'	=> '',
-				// 'display_email'				=> '',
-				// 'display_phone'				=> '',
-				// 'display_date'				=> '',
-				// 'display_number'			=> '',
-				// 'number_format'				=> array(),
-				// 'reset_number_yearly'		=> '',
-				// 'my_account_buttons'		=> '',
-				// 'invoice_number_column'		=> '',
-				// 'invoice_date_column'		=> '',
-				// 'disable_free'				=> '',
+				'enabled' => 1,
 			),
 			'wpo_wcpdf_documents_settings_packing-slip' => array(
-				'enabled'					=> 1,
-				// 'display_billing_address'	=> '',
-				// 'display_email'				=> '',
-				// 'display_phone'				=> '',
+				'enabled' => 1,
 			),
 			'wpo_wcpdf_settings_debug' => array(
-				// 'legacy_mode'				=> '',
-				// 'enable_debug'				=> '',
-				// 'html_output'				=> '',
-				// 'html_output'				=> '',
-				'enable_cleanup'				=> 1,
-				'cleanup_days'					=> 7,
+				'enable_cleanup' => 1,
+				'cleanup_days'   => 7,
 			),
 		);
-		foreach ($settings_defaults as $option => $defaults) {
+		foreach ( $settings_defaults as $option => $defaults ) {
 			add_option( $option, $defaults );
 		}
 
@@ -200,8 +187,8 @@ class Install {
 		set_transient( 'wpo_wcpdf_new_install', 'yes', DAY_IN_SECONDS * 2 );
 
 		// schedule the yearly reset number action
-		if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
-			WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
+		if ( ! empty( $settings_instance ) && is_callable( array( $settings_instance, 'schedule_yearly_reset_numbers' ) ) ) {
+			$settings_instance->schedule_yearly_reset_numbers();
 		}
 	}
 
@@ -209,27 +196,33 @@ class Install {
 	 * Plugin upgrade method.  Perform any required upgrades here
 	 *
 	 * @param string $installed_version the currently installed ('old') version
+	 * @return void
 	 */
-	protected function upgrade( $installed_version ) {
+	protected function upgrade( string $installed_version ): void {
 		// Only upgrade when php version or higher
 		if ( ! WPO_WCPDF()->is_dependency_version_supported( 'php' ) ) {
 			return;
 		}
+		
+		$main_instance        = WPO_WCPDF()->get_instance( 'main' );
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+		$settings_instance	  = WPO_WCPDF()->get_instance( 'settings' );
+		$documents_instance	  = WPO_WCPDF()->get_instance( 'documents' );
 
 		// Sync fonts on every upgrade!
-		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
+		$tmp_base = $main_instance->get_tmp_base();
 
 		// Get fonts folder path
-		$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
+		$font_path = $main_instance->get_tmp_path( 'fonts' );
 
 		// Check if tmp folder exists => if not, initialize
 		if (
-			! WPO_WCPDF()->file_system->is_dir( $tmp_base ) ||
-			! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ||
-			! WPO_WCPDF()->file_system->is_dir( $font_path ) ||
-			! WPO_WCPDF()->file_system->is_writable( $font_path )
+			! $file_system_instance->is_dir( $tmp_base ) ||
+			! $file_system_instance->is_writable( $tmp_base ) ||
+			! $file_system_instance->is_dir( $font_path ) ||
+			! $file_system_instance->is_writable( $font_path )
 		) {
-			WPO_WCPDF()->main->init_tmp();
+			$main_instance->init_tmp();
 		}
 
 		// To ensure fonts will be copied to the upload directory
@@ -374,8 +367,8 @@ class Install {
 		// 2.10.0-dev: migrate template path to template ID
 		// 2.11.5: improvements to the migration procedure
 		if ( version_compare( $installed_version, '2.11.5', '<' ) ) {
-			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'maybe_migrate_template_paths' ) ) ) {
-				WPO_WCPDF()->settings->maybe_migrate_template_paths();
+			if ( ! empty( $settings_instance ) && is_callable( array( $settings_instance, 'maybe_migrate_template_paths' ) ) ) {
+				$settings_instance->maybe_migrate_template_paths();
 			}
 		}
 
@@ -388,10 +381,12 @@ class Install {
 		// 2.12.2-dev-1: change 'date' database table default value to '1000-01-01 00:00:00'
 		if ( version_compare( $installed_version, '2.12.2-dev-1', '<' ) ) {
 			global $wpdb;
-			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+			
+			$documents = $documents_instance->get_documents( 'all' );
+			
 			foreach ( $documents as $document ) {
 				$store_name        = "{$document->slug}_number";
-				$method            = WPO_WCPDF()->settings->get_sequential_number_store_method();
+				$method            = $settings_instance->get_sequential_number_store_method();
 				$table_name        = apply_filters( 'wpo_wcpdf_number_store_table_name', wpo_wcpdf_sanitize_identifier( "{$wpdb->prefix}wcpdf_{$store_name}" ), $store_name, $method );
 				$table_name_exists = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 					$wpdb->prepare( "SHOW TABLES LIKE %s", $table_name )
@@ -444,8 +439,8 @@ class Install {
 
 		// 3.3.0-dev-1: schedule the yearly reset number action
 		if ( version_compare( $installed_version, '3.3.0-dev-1', '<' ) ) {
-			if ( ! empty( WPO_WCPDF()->settings ) && is_callable( array( WPO_WCPDF()->settings, 'schedule_yearly_reset_numbers' ) ) ) {
-				WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
+			if ( ! empty( $settings_instance ) && is_callable( array( $settings_instance, 'schedule_yearly_reset_numbers' ) ) ) {
+				$settings_instance->schedule_yearly_reset_numbers();
 			}
 		}
 
@@ -542,8 +537,8 @@ class Install {
 			}
 
 			// set transient to flush rewrite rules if pretty links are enabled
-			if ( WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
-				set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
+			if ( WPO_WCPDF()->get_instance( 'endpoint' )->pretty_links_enabled() ) {
+				flush_rewrite_rules();
 			}
 		}
 
@@ -757,45 +752,47 @@ class Install {
 		}
 
 		// Maybe reinstall fonts
-		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
+		$main_instance->maybe_reinstall_fonts( true );
 	}
 
 	/**
 	 * Plugin downgrade method.  Perform any required downgrades here
 	 *
-	 *
 	 * @param string $installed_version the currently installed ('old') version (actually higher since this is a downgrade)
+	 * @return void
 	 */
-	protected function downgrade( $installed_version ) {
+	protected function downgrade( string $installed_version ): void {
+		$main_instance        = WPO_WCPDF()->get_instance( 'main' );
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+		
 		// Make sure fonts match with version: copy from plugin folder
-		$tmp_base = WPO_WCPDF()->main->get_tmp_base();
+		$tmp_base = $main_instance->get_tmp_base();
 
 		// Make sure we have the fonts directory
-		$font_path = WPO_WCPDF()->main->get_tmp_path( 'fonts' );
+		$font_path = $main_instance->get_tmp_path( 'fonts' );
 
 		// Don't continue if we don't have an upload dir
 		if ( false === $tmp_base ) {
-			return $tmp_base;
+			return;
 		}
 
 		// Check if tmp folder exists => if not, initialize
 		if (
-			! WPO_WCPDF()->file_system->is_dir( $tmp_base ) ||
-			! WPO_WCPDF()->file_system->is_writable( $tmp_base ) ||
-			! WPO_WCPDF()->file_system->is_dir( $font_path ) ||
-			! WPO_WCPDF()->file_system->is_writable( $font_path )
+			! $file_system_instance->is_dir( $tmp_base ) ||
+			! $file_system_instance->is_writable( $tmp_base ) ||
+			! $file_system_instance->is_dir( $font_path ) ||
+			! $file_system_instance->is_writable( $font_path )
 		) {
-			WPO_WCPDF()->main->init_tmp();
+			$main_instance->init_tmp();
 		}
 
 		// To ensure fonts will be copied to the upload directory
 		delete_transient( 'wpo_wcpdf_subfolder_fonts_has_files' );
 
 		// Maybe reinstall fonts
-		WPO_WCPDF()->main->maybe_reinstall_fonts();
+		$main_instance->maybe_reinstall_fonts();
 	}
 
 }
 
 endif; // class_exists
-

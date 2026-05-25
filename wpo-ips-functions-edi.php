@@ -326,7 +326,7 @@ function wpo_ips_edi_get_maker(): ?WPO\IPS\Makers\EDIMaker {
  * @param string|null $key
  * @return array|string|null
  */
-function wpo_ips_edi_get_settings( ?string $key = null ) {
+function wpo_ips_edi_get_settings( ?string $key = null ): array|string|null {
 	$settings = get_option( 'wpo_ips_edi_settings', array() );
 	return $key ? ( $settings[ $key ] ?? null ) : $settings;
 }
@@ -369,7 +369,7 @@ function wpo_ips_edi_peppol_is_available(): bool {
  *
  * @return string|false
  */
-function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
+function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ): string|false {
 	$edi_maker = wpo_ips_edi_get_maker();
 
 	if ( ! $edi_maker ) {
@@ -377,7 +377,7 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	}
 
 	if ( $attachment ) {
-		$tmp_path = WPO_WCPDF()->main->get_tmp_path( 'attachments' );
+		$tmp_path = WPO_WCPDF()->get_instance( 'main' )->get_tmp_path( 'attachments' );
 
 		if ( ! $tmp_path ) {
 			return wcpdf_error_handling( 'Temporary path not available. Cannot write EDI file.' );
@@ -433,7 +433,7 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
  * @param int|false $size
  * @return void
  */
-function wpo_ips_edi_file_headers( string $filename, $size ): void {
+function wpo_ips_edi_file_headers( string $filename, int|false $size ): void {
 	$charset = apply_filters( 'wpo_ips_edi_file_header_content_type_charset', 'UTF-8' );
 
 	header( 'Content-Description: File Transfer' );
@@ -464,7 +464,7 @@ function wpo_ips_edi_get_current_syntax(): ?string {
  * @param bool $full_details Optional. If true, returns full format details.
  * @return string|array|null
  */
-function wpo_ips_edi_get_current_format( bool $full_details = false ) {
+function wpo_ips_edi_get_current_format( bool $full_details = false ): string|array|null {
 	$syntax = wpo_ips_edi_get_settings( 'syntax' );
 	$format = null;
 
@@ -909,11 +909,11 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
  * @return array
  */
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
-	$general_settings = WPO_WCPDF()->settings->general;
-	$language         = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
+	$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
+	$language                  = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 	
-	$supplier_country = $general_settings->get_setting( 'shop_address_country', $language );
-	$supplier_vat     = $general_settings->get_setting( 'vat_number', $language );
+	$supplier_country = $general_settings_instance->get_setting( 'shop_address_country', $language );
+	$supplier_vat     = $general_settings_instance->get_setting( 'vat_number', $language );
 
 	if ( ! empty( $supplier_vat ) ) {
 		$supplier_vat = wpo_ips_edi_format_vat_number(
@@ -922,7 +922,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 		);
 	}
 	
-	$data             = array();
+	$data = array();
 
 	if ( empty( $language ) ) {
 		$language = 'default';
@@ -931,32 +931,32 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$data[ $language ] = array(
 		'name' => array(
 			'label'    => __( 'Name', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_name', $language ),
+			'value'    => $general_settings_instance->get_setting( 'shop_name', $language ),
 			'required' => true,
 		),
 		'address' => array(
 			'label'    => __( 'Street address', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_address_line_1', $language ),
+			'value'    => $general_settings_instance->get_setting( 'shop_address_line_1', $language ),
 			'required' => true,
 		),
 		'postcode' => array(
 			'label'    => __( 'Postcode', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_address_postcode', $language ),
+			'value'    => $general_settings_instance->get_setting( 'shop_address_postcode', $language ),
 			'required' => true,
 		),
 		'city' => array(
 			'label'    => __( 'City', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_address_city', $language ),
+			'value'    => $general_settings_instance->get_setting( 'shop_address_city', $language ),
 			'required' => true,
 		),
 		'state' => array(
 			'label'    => __( 'State', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_address_state', $language ),
+			'value'    => $general_settings_instance->get_setting( 'shop_address_state', $language ),
 			'required' => false,
 		),
 		'country' => array(
 			'label'    => __( 'Country Code', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_address_country', $language ),
+			'value'    => $general_settings_instance->get_setting( 'shop_address_country', $language ),
 			'required' => true,
 		),
 		'vat_number' => array(
@@ -966,12 +966,12 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 		),
 		'coc_number' => array(
 			'label'    => __( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'coc_number', $language ),
+			'value'    => $general_settings_instance->get_setting( 'coc_number', $language ),
 			'required' => false,
 		),
 		'email' => array(
 			'label'    => __( 'Email', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'shop_email_address', $language ),
+			'value'    => $general_settings_instance->get_setting( 'shop_email_address', $language ),
 			'required' => true,
 		),
 	);
@@ -993,7 +993,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 		'wpo_ips_edi_supplier_identifier_data',
 		$data,
 		$language,
-		$general_settings
+		$general_settings_instance
 	);
 }
 

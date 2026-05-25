@@ -200,40 +200,54 @@ table.wcpdf_documents_settings_list td.title {
 
 .wcpdf_document_settings_sections {
 	position: relative;
+	width: 100%;
+	max-width: none;
+	box-sizing: border-box;
 }
 
 .wcpdf_document_settings_sections > span {
+	display: inline-block;
+	margin-bottom: 8px;
 	font-size: 14px;
 	font-weight: 600;
-	margin-bottom: 0.6em;
-	display: inline-block;
+	color: #3c434a;
 }
 
 .wcpdf_document_settings_sections > h2 {
-	cursor: pointer;
-	padding: 1em 0.8em;
+	margin: 0;
+	padding: 14px 16px;
+	width: 100%;
+	box-sizing: border-box;
 	border: 1px solid #c3c4c7;
-	background: #ffffff;
-	border-radius: 0.5em;
-	margin: 0 0 0.5em;
+	border-radius: 8px;
+	background: #fff;
+	font-size: 15px;
+	font-weight: 600;
+	line-height: 1.4;
+	color: #1d2327;
+	cursor: pointer;
+	position: relative;
+	z-index: 101;
 }
 
 .wcpdf_document_settings_sections ul {
-	background: white;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	display: block;
-	height: auto;
 	display: none;
-	box-sizing: border-box;
 	position: absolute;
-	border-left: 1px solid #c3c4c7;
-	border-right: 1px solid #c3c4c7;
-	z-index: 1000;
-	box-shadow: 0 35px 35px -8px rgba(0, 0, 0, 0.1);
-	-webkit-box-shadow: 0 35px 35px -8px rgba(0, 0, 0, 0.1);
+	top: 100%;
+	left: 0;
+	right: 0;
+	width: 100%;
+	box-sizing: border-box;
+	z-index: 100;
+	margin: -1px 0 0;
+	padding: 0;
+	list-style: none;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-top: none;
+	border-radius: 0 0 8px 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+	overflow: hidden auto;
 }
 
 .wcpdf_document_settings_sections ul.active {
@@ -241,45 +255,36 @@ table.wcpdf_documents_settings_list td.title {
 }
 
 .wcpdf_document_settings_sections ul li {
-	box-sizing: border-box;
+	margin: 0;
 	padding: 0;
-	margin-bottom: 0;
-	border-bottom: 1px solid #eaeaea;
-	font-size: 1.1em;
+	border-bottom: 1px solid #f0f0f1;
 }
 
 .wcpdf_document_settings_sections ul li:last-child {
-	border-color: #c3c4c7;
-}
-
-.wcpdf_document_settings_sections ul li:hover {
-	cursor: pointer;
-	background: #51266b;
-	color: white;
-}
-
-.wcpdf_document_settings_sections ul li:hover a {
-	color: white;
+	border-bottom: none;
 }
 
 .wcpdf_document_settings_sections ul li a {
-	color: black;
-	text-decoration: none;
-	padding: 1.2em 1.6em;
 	display: block;
+	padding: 10px 16px;
+	color: #1e1e1e;
+	text-decoration: none;
+	line-height: 1.4;
+}
+
+.wcpdf_document_settings_sections ul li a:hover,
+.wcpdf_document_settings_sections ul li a:focus {
+	background-color: #f0f0f1;
+	color: #1d2327;
+	outline: none;
 }
 
 .wcpdf_document_settings_sections .arrow-down {
-	font-size: 0.7em;
-	color: #999;
+	font-size: 12px;
+	color: #646970;
 	margin-left: 8px;
 	font-weight: normal;
 	float: right;
-}
-
-.wcpdf_document_settings_sections p:hover,
-.wcpdf_document_settings_sections p:hover > .arrow-down {
-	color: #222;
 }
 
 .wcpdf_advanced_numbers_choose_table {

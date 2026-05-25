@@ -86,7 +86,7 @@ function resolve(string $basePath, string $newPath): string
     $path = implode('/', $newPathParts);
 
     // If the source url ended with a /, we want to preserve that.
-    $newParts['path'] = 0 === strpos($path, '/') ? $path : '/'.$path;
+    $newParts['path'] = str_starts_with($path, '/') ? $path : '/'.$path;
     // From PHP 8, no "?" query at all causes 'query' to be null.
     // An empty query "http://example.com/foo?" causes 'query' to be the empty string
     if (null !== $delta['query'] && '' !== $delta['query']) {
@@ -143,11 +143,11 @@ function normalize(string $uri): string
     if (null !== $parts['scheme']) {
         $parts['scheme'] = strtolower($parts['scheme']);
         $defaultPorts = [
-            'http' => '80',
-            'https' => '443',
+            'http' => 80,
+            'https' => 443,
         ];
 
-        if (null !== $parts['port'] && isset($defaultPorts[$parts['scheme']]) && $defaultPorts[$parts['scheme']] == $parts['port']) {
+        if (null !== $parts['port'] && isset($defaultPorts[$parts['scheme']]) && $defaultPorts[$parts['scheme']] === $parts['port']) {
             // Removing default ports.
             unset($parts['port']);
         }
@@ -196,9 +196,7 @@ function parse(string $uri): array
     // uriencode them first.
     $uri = preg_replace_callback(
         '/[^[:ascii:]]/u',
-        function ($matches) {
-            return rawurlencode($matches[0]);
-        },
+        fn ($matches) => rawurlencode($matches[0]),
         $uri
     );
 
@@ -339,9 +337,7 @@ function _parse_fallback(string $uri): array
     // uriencode them first.
     $uri = preg_replace_callback(
         '/[^[:ascii:]]/u',
-        function ($matches) {
-            return rawurlencode($matches[0]);
-        },
+        fn ($matches) => rawurlencode($matches[0]),
         $uri
     );
 
@@ -370,15 +366,15 @@ function _parse_fallback(string $uri): array
     }
 
     // Taking off a fragment part
-    if (false !== strpos($uri, '#')) {
-        list($uri, $result['fragment']) = explode('#', $uri, 2);
+    if (str_contains($uri, '#')) {
+        [$uri, $result['fragment']] = explode('#', $uri, 2);
     }
     // Taking off the query part
-    if (false !== strpos($uri, '?')) {
-        list($uri, $result['query']) = explode('?', $uri, 2);
+    if (str_contains($uri, '?')) {
+        [$uri, $result['query']] = explode('?', $uri, 2);
     }
 
-    if ('///' === substr($uri, 0, 3)) {
+    if (str_starts_with($uri, '///')) {
         // The triple slash uris are a bit unusual, but we have special handling
         // for them.
         $path = substr($uri, 2);
@@ -387,7 +383,7 @@ function _parse_fallback(string $uri): array
         }
         $result['path'] = $path;
         $result['host'] = '';
-    } elseif ('//' === substr($uri, 0, 2)) {
+    } elseif (str_starts_with($uri, '//')) {
         // Uris that have an authority part.
         $regex = '%^
             //
