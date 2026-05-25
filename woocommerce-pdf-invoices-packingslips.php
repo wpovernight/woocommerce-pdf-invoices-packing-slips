@@ -61,6 +61,7 @@ class WPO_WCPDF {
 	public ?FontSynchronizer $font_synchronizer    = null;
 	public ?Peppol $peppol                         = null;
 	public ?Notices $notices                       = null;
+	public ?SetupWizard $setup_wizard              = null;
 
 	protected ?bool $dependencies_ready            = null;
 	protected ?bool $woocommerce_activated         = null;
