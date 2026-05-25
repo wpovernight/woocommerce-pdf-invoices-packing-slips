@@ -508,9 +508,17 @@ abstract class AbstractHandler implements HandlerInterface {
 		$gross_total = (float) $this->format_decimal( $total_inc_tax + $rounding_diff, 2 );
 
 		// Default rule:
-		// - If there's NO due date AND no explicit prepaid set, treat as fully prepaid (paid on issue).
-		// - Otherwise, use the provided prepaid (or 0) and compute payable normally.
-		if ( $prepaid_amount <= 0.0 && ! $has_due_days ) {
+		// - If there's NO due date, no explicit prepaid set, and the order is paid, treat as fully prepaid.
+		// - Otherwise, use the provided prepaid amount and compute payable normally.
+		$is_paid = method_exists( $order, 'is_paid' ) ? $order->is_paid() : false;
+		$is_paid = (bool) apply_filters(
+			'wpo_ips_edi_order_is_paid',
+			$is_paid,
+			$order,
+			$this
+		);
+		
+		if ( $prepaid_amount <= 0.0 && ! $has_due_days && $is_paid ) {
 			// Fully prepaid by default.
 			$prepaid_amount = $gross_total;
 			$payable_amount = 0.0;
@@ -519,6 +527,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$payable_amount = $gross_total - $prepaid_amount;
 		}
 
+		// Compact totals for return.
 		$totals = compact(
 			'total_exc_tax',
 			'total_inc_tax',
