@@ -81,15 +81,15 @@ class Main {
 	/**
 	 * Attach document to WooCommerce email
 	 * 
-	 * @param array              $attachments
-	 * @param string             $email_id
-	 * @param \WC_Abstract_Order $order
-	 * @param \WC_Email|null     $email
+	 * @param array           $attachments
+	 * @param string          $email_id
+	 * @param mixed           $order
+	 * @param \WC_Email|null  $email
 	 * @return array
 	 */
-	public function attach_document_to_email( array $attachments, string $email_id, \WC_Abstract_Order $order, ?\WC_Email $email = null ): array {
+	public function attach_document_to_email( array $attachments, string $email_id, mixed $order, ?\WC_Email $email = null ): array {
 		// check if all variables properly set
-		if ( ! is_object( $order ) || ! isset( $email_id ) ) {
+		if ( ! $order instanceof \WC_Abstract_Order || ! isset( $email_id ) ) {
 			return $attachments;
 		}
 
