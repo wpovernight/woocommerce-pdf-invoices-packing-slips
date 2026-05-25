@@ -403,7 +403,7 @@ class Main {
 
 		// debug enabled by URL
 		if ( isset( $request['debug'] ) && ! ( is_user_logged_in() || isset( $request['my-account'] ) ) ) {
-			$this->maybe_enable_debug( true );
+			$this->maybe_enable_debug();
 		}
 
 		$document_type = sanitize_text_field( $request['document_type'] );
@@ -1875,22 +1875,36 @@ class Main {
 	}
 
 	/**
-	 * Enable error logging for administrators.
-	 * 
-	 * @param bool $force
+	 * Maybe enable error display for users who can manage the plugin settings.
+	 *
+	 * @param bool $bypass_setting Whether to enable debug even when the debug setting is disabled.
 	 * @return void
 	 */
-	public function maybe_enable_debug( bool $force = false ): void {
+	public function maybe_enable_debug( bool $bypass_setting = false ): void {
 		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
-		$debug_settings    = get_option( 'wpo_wcpdf_settings_debug', array() );
-		
-		if ( ( isset( $debug_settings['enable_debug'] ) && $debug_settings['enable_debug'] && $settings_instance->user_can_manage_settings() ) || $force ) {
-			error_reporting( E_ALL );       // phpcs:ignore WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting
-			ini_set( 'display_errors', 1 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
+
+		if ( ! $settings_instance->user_can_manage_settings() ) {
+			return;
 		}
+
+		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+
+		if ( ! $bypass_setting && empty( $debug_settings['enable_debug'] ) ) {
+			return;
+		}
+
+		error_reporting( E_ALL );       // phpcs:ignore WordPress.PHP.DevelopmentFunctions.prevent_path_disclosure_error_reporting
+		ini_set( 'display_errors', 1 ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
 	}
 
-	public function wc_webhook_topic_hooks( $topic_hooks, $wc_webhook ) {
+	/**
+	 * Add custom document saved webhook topic hooks.
+	 *
+	 * @param array $topic_hooks
+	 * @param \WC_Webhook $wc_webhook
+	 * @return array
+	 */
+	public function wc_webhook_topic_hooks( array $topic_hooks, \WC_Webhook $wc_webhook ): array {
 		$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 		foreach ( $documents as $document ) {
 			$topic_hooks["order.{$document->type}-saved"] = array(
