@@ -181,9 +181,17 @@ class Main {
 
 						if ( $attachment ) {
 							$attachments[] = $attachment;
-							$this->log_email_attachment_to_order_notes( $document, $email_id, true );
+							if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+								$note = sprintf(
+									/* translators: 1. document title, 2. email ID */
+									__( 'PDF %1$s successfully attached to email (%2$s).', 'woocommerce-pdf-invoices-packing-slips' ),
+									$document->get_title(),
+									$email_id
+								);
+								$this->log_to_order_notes( $note, $document );
+							}
 						} else {
-							$this->log_email_attachment_to_order_notes( $document, $email_id, false );
+							wcpdf_log_error( sprintf( 'PDF %1$s could not be attached to email (%2$s).', $document->get_title(), $email_id ), 'critical' );
 							continue;
 						}
 
@@ -1487,39 +1495,6 @@ class Main {
 			$note    = sprintf( $message, $document->get_title() );
 			$this->log_to_order_notes( $note, $document );
 		}
-	}
-
-	/**
-	 * Log email attachment success or failure to order notes.
-	 *
-	 * @param object $document The document object.
-	 * @param string $email_id The WooCommerce email ID.
-	 * @param bool   $success  Whether the attachment succeeded.
-	 *
-	 * @return void
-	 */
-	public function log_email_attachment_to_order_notes( object $document, string $email_id, bool $success ): void {
-		if ( empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
-			return;
-		}
-
-		if ( $success ) {
-			$note = sprintf(
-				/* translators: 1. document title, 2. email ID */
-				__( 'PDF %1$s successfully attached to email (%2$s).', 'woocommerce-pdf-invoices-packing-slips' ),
-				$document->get_title(),
-				$email_id
-			);
-		} else {
-			$note = sprintf(
-				/* translators: 1. document title, 2. email ID */
-				__( 'PDF %1$s could not be attached to email (%2$s).', 'woocommerce-pdf-invoices-packing-slips' ),
-				$document->get_title(),
-				$email_id
-			);
-		}
-
-		$this->log_to_order_notes( $note, $document );
 	}
 
 	/**
