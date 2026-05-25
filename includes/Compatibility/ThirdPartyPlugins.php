@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS\Compatibility;
 
+use WPO\IPS\Documents\OrderDocument;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -113,47 +115,6 @@ class ThirdPartyPlugins {
 
 		return $meta;
 	}
-	
-	/**
-	 * Add CSS classes to item rows for compatibility with product bundles, chained products and composite products
-	 * 
-	 * @param string             $classes
-	 * @param string             $document_type
-	 * @param \WC_Abstract_Order $order
-	 * @param int                $item_id
-	 * @return string
-	 */
-	public function add_item_row_classes( string $classes, string $document_type, \WC_Abstract_Order $order, int $item_id = 0 ): string {
-		if ( empty( $item_id ) ) {
-			$item_id = $this->get_item_id_from_classes( $classes );
-		}
-
-		if ( empty( $item_id ) ) {
-			return $classes;
-		}
-
-		if ( $this->has_wc_bundles ) {
-			$classes = $this->maybe_add_wc_bundles_classes( $classes, $order, $item_id );
-		}
-
-		if ( $this->has_wpc_bundles ) {
-			$classes = $this->maybe_add_wpc_bundles_classes( $classes, $order, $item_id );
-		}
-
-		if ( $this->has_yith_bundles ) {
-			$classes = $this->maybe_add_yith_bundles_classes( $classes, $order, $item_id );
-		}
-
-		if ( $this->has_chained_products ) {
-			$classes = $this->maybe_add_chained_product_class( $classes, $order, $item_id );
-		}
-
-		if ( $this->has_composite_products ) {
-			$classes = $this->maybe_add_composite_product_class( $classes, $order, $item_id );
-		}
-
-		return $classes;
-	}
 
 	/**
 	 * WooCommerce Order Status & Actions Manager emails compatibility
@@ -179,10 +140,10 @@ class ThirdPartyPlugins {
 	 * Applies decimal & Thousand separator settings
 	 * 
 	 * @param string $document_type
-	 * @param \WPO\IPS\Documents\Document $document
+	 * @param OrderDocument $document
 	 * @return void
 	 */
-	public function aelia_currency_formatting( string $document_type, \WPO\IPS\Documents\Document $document ): void {
+	public function aelia_currency_formatting( string $document_type, OrderDocument $document ): void {
 		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
 	}
 
@@ -206,10 +167,10 @@ class ThirdPartyPlugins {
 	 * Avoid double images from German Market
 	 * 
 	 * @param string $document_type
-	 * @param \WPO\IPS\Documents\Document $document
+	 * @param OrderDocument $document
 	 * @return void
 	 */
-	public function remove_wgm_thumbnails( string $document_type, \WPO\IPS\Documents\Document $document ): void {
+	public function remove_wgm_thumbnails( string $document_type, OrderDocument $document ): void {
 		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 	}
 
@@ -217,10 +178,10 @@ class ThirdPartyPlugins {
 	 * Restore above filter after document generation
 	 * 
 	 * @param string $document_type
-	 * @param \WPO\IPS\Documents\Document $document
+	 * @param OrderDocument $document
 	 * @return void
 	 */
-	public function restore_wgm_thumbnails( string $document_type, \WPO\IPS\Documents\Document $document ): void {
+	public function restore_wgm_thumbnails( string $document_type, OrderDocument $document ): void {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
@@ -350,23 +311,68 @@ class ThirdPartyPlugins {
 	
 	/**
 	 * Register hooks to add CSS classes to item rows for compatibility with product bundles, chained products and composite products
-	 * 
+	 *
 	 * @return void
 	 */
 	private function register_item_row_class_hooks(): void {
+		$has_wc_bundles         = class_exists( 'WC_Bundles' );
+		$has_wpc_bundles        = class_exists( 'WPCleverWoosb' );
+		$has_yith_bundles       = class_exists( 'YITH_WCPB' ) || class_exists( 'YITH_WCPB_Frontend' );
+		$has_chained_products   = class_exists( 'SA_WC_Chained_Products' ) || class_exists( 'WC_Chained_Products' );
+		$has_composite_products = function_exists( 'wc_cp_is_composited_order_item' ) && function_exists( 'wc_cp_is_composite_container_order_item' );
+
 		if (
-			! class_exists( 'WC_Bundles' )             &&
-			! class_exists( 'WPCleverWoosb' )          &&
-			! class_exists( 'YITH_WCPB' )              &&
-			! class_exists( 'YITH_WCPB_Frontend' )     &&
-			! class_exists( 'SA_WC_Chained_Products' ) &&
-			! class_exists( 'WC_Chained_Products' )    &&
-			! ( function_exists( 'wc_cp_is_composited_order_item' ) && function_exists( 'wc_cp_is_composite_container_order_item' ) )
+			! $has_wc_bundles &&
+			! $has_wpc_bundles &&
+			! $has_yith_bundles &&
+			! $has_chained_products &&
+			! $has_composite_products
 		) {
 			return;
 		}
 
-		add_filter( 'wpo_wcpdf_item_row_class', array( $this, 'add_item_row_classes' ), 10, 4 );
+		add_filter(
+			'wpo_wcpdf_item_row_class',
+			function( string $classes, string $document_type, \WC_Abstract_Order $order, int $item_id = 0 ) use (
+				$has_wc_bundles,
+				$has_wpc_bundles,
+				$has_yith_bundles,
+				$has_chained_products,
+				$has_composite_products
+			): string {
+				if ( empty( $item_id ) ) {
+					$item_id = $this->get_item_id_from_classes( $classes );
+				}
+
+				if ( empty( $item_id ) ) {
+					return $classes;
+				}
+
+				if ( $has_wc_bundles ) {
+					$classes = $this->maybe_add_wc_bundles_classes( $classes, $order, $item_id );
+				}
+
+				if ( $has_wpc_bundles ) {
+					$classes = $this->maybe_add_wpc_bundles_classes( $classes, $order, $item_id );
+				}
+
+				if ( $has_yith_bundles ) {
+					$classes = $this->maybe_add_yith_bundles_classes( $classes, $order, $item_id );
+				}
+
+				if ( $has_chained_products ) {
+					$classes = $this->maybe_add_chained_product_class( $classes, $order, $item_id );
+				}
+
+				if ( $has_composite_products ) {
+					$classes = $this->maybe_add_composite_product_class( $classes, $order, $item_id );
+				}
+
+				return $classes;
+			},
+			10,
+			4
+		);
 	}
 	
 	/**
@@ -437,11 +443,6 @@ class ThirdPartyPlugins {
 	 * @return string
 	 */
 	private function maybe_add_wc_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
-		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
-		if ( empty( $item_id ) ) {
-			return $classes;
-		}
-		
 		$bundled_by    = wc_get_order_item_meta( $item_id, '_bundled_by', true );
 		$bundled_items = wc_get_order_item_meta( $item_id, '_bundled_items', true );
 
@@ -472,11 +473,6 @@ class ThirdPartyPlugins {
 	 * @return string
 	 */
 	private function maybe_add_wpc_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
-		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
-		if ( empty( $item_id ) ) {
-			return $classes;
-		}
-
 		// Add row classes
 		$refunded_item_id = wc_get_order_item_meta( $item_id, '_refunded_item_id', true );
 		$class_item_id    = ! empty( $refunded_item_id ) ? $refunded_item_id : $item_id;
@@ -501,24 +497,6 @@ class ThirdPartyPlugins {
 	 * @return string
 	 */
 	private function maybe_add_yith_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
-		if ( empty( $order ) ) {
-			return $classes;
-		}
-
-		if ( ! $order instanceof \WC_Abstract_Order ) {
-			return $classes;
-		}
-
-		if ( empty( $item_id ) && ! empty( $classes ) ) {
-			$item_id = $this->get_item_id_from_classes( $classes );
-		}
-
-		if ( ! empty( $item_id ) && is_numeric( $item_id ) ) {
-			$item_id = absint( $item_id );
-		} else {
-			return $classes;
-		}
-
 		$product    = null;
 		$bundled_by = null;
 
@@ -552,11 +530,6 @@ class ThirdPartyPlugins {
 	 * @return string
 	 */
 	private function maybe_add_chained_product_class( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
-		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
-		if ( empty( $item_id ) ) {
-			return $classes;
-		}
-		
 		$chained_product_of = wc_get_order_item_meta( $item_id, '_chained_product_of', true );
 
 		if ( $chained_product_of ) {
@@ -575,11 +548,6 @@ class ThirdPartyPlugins {
 	 * @return string
 	 */
 	private function maybe_add_composite_product_class( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
-		$item_id = ! empty( $item_id ) ? $item_id : $this->get_item_id_from_classes( $classes );
-		if ( empty( $item_id ) ) {
-			return $classes;
-		}
-
 		// get order item object
 		$order_items = $order->get_items();
 		foreach ( $order_items as $order_item_id => $order_item ) {
