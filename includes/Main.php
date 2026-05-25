@@ -283,7 +283,7 @@ class Main {
 	 * @param string        $tmp_path
 	 * @return string|false
 	 */
-	public function get_document_xml_attachment( OrderDocument $document, string $tmp_path ) {
+	public function get_document_xml_attachment( OrderDocument $document, string $tmp_path ): string|false {
 		return wpo_ips_edi_write_file( $document, true );
 	}
 
@@ -755,7 +755,7 @@ class Main {
 	 *
 	 * @return string|false
 	 */
-	public function get_wp_upload_base() {
+	public function get_wp_upload_base(): string|false {
 		if ( null !== $this->wp_upload_base_cache ) {
 			return '' === $this->wp_upload_base_cache ? false : $this->wp_upload_base_cache;
 		}

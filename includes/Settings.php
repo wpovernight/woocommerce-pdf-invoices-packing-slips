@@ -18,14 +18,14 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings' ) ) :
 
 class Settings {
 
-	public ?SettingsCallbacks $callbacks = null;
-	public ?SettingsGeneral $general     = null;
-	public ?SettingsDocuments $documents = null;
-	public ?SettingsDebug $debug         = null;
-	public ?SettingsUpgrade $upgrade     = null;
-	public ?SettingsEDI $edi             = null;
+	public ?SettingsCallbacks $callbacks     = null;
+	public ?SettingsGeneral $general         = null;
+	public ?SettingsDocuments $documents     = null;
+	public ?SettingsDebug $debug             = null;
+	public ?SettingsUpgrade $upgrade         = null;
+	public ?SettingsEDI $edi                 = null;
 	
-	public $options_page_hook;
+	public string|false $options_page_hook   = false;
 	public array $general_settings;
 	public array $debug_settings;
 	public array $edi_settings;
@@ -34,8 +34,8 @@ class Settings {
 	private array $installed_templates_cache = array();
 	private array $template_list_cache       = array();
 
-	protected bool $settings_loaded   = false;
-	protected static ?self $_instance = null;
+	protected bool $settings_loaded          = false;
+	protected static ?self $_instance        = null;
 
 	/**
 	 * Singleton instance accessor.
@@ -611,7 +611,7 @@ class Settings {
 	 * @param string $output_format
 	 * @return array|false
 	 */
-	public function get_document_settings( string $document_type, string $output_format = 'pdf' ) {
+	public function get_document_settings( string $document_type, string $output_format = 'pdf' ): array|false {
 		if ( ! empty( $document_type ) ) {
 			$option_name = ( 'pdf' === $output_format || 'xml' === $output_format ) // In 5.0.0 and later, E‑Documents settings are isolated from document settings, so PDF is the default.
 				? "wpo_wcpdf_documents_settings_{$document_type}"
