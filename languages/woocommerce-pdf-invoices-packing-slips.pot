@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.12.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 5.12.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-18T12:51:16+00:00\n"
+"POT-Creation-Date: 2026-05-25T07:49:14+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2143,7 +2143,7 @@ msgid "Mutually defined"
 msgstr ""
 
 #. Translators: %s is the coupon code applied to the discount.
-#: edi/Syntaxes/Ubl/Handlers/LineHandler.php:273
+#: edi/Syntaxes/Ubl/Handlers/LineHandler.php:266
 #, php-format
 msgid "Discount %s"
 msgstr ""
@@ -2210,7 +2210,7 @@ msgstr ""
 
 #: includes/Admin.php:361
 #: includes/Admin.php:1972
-#: includes/Assets.php:374
+#: includes/Assets.php:378
 #: includes/Documents/Invoice.php:364
 #: includes/Main.php:1352
 #: views/setup-wizard/display-options.php:83
@@ -2575,7 +2575,7 @@ msgstr ""
 #: includes/Admin.php:2117
 #: includes/Admin.php:2143
 #: includes/Admin.php:2185
-#: includes/Assets.php:345
+#: includes/Assets.php:349
 #: includes/Settings/SettingsEDI.php:764
 msgid "Missing"
 msgstr ""
@@ -2583,7 +2583,7 @@ msgstr ""
 #: includes/Admin.php:2118
 #: includes/Admin.php:2144
 #: includes/Admin.php:2186
-#: includes/Assets.php:346
+#: includes/Assets.php:350
 #: includes/Settings/SettingsEDI.php:765
 msgid "Optional"
 msgstr ""
@@ -2697,19 +2697,19 @@ msgstr ""
 msgid "Error loading"
 msgstr ""
 
-#: includes/Assets.php:306
+#: includes/Assets.php:310
 msgid "Download"
 msgstr ""
 
-#: includes/Assets.php:307
+#: includes/Assets.php:311
 msgid "Are you sure you want to reset this settings? This cannot be undone."
 msgstr ""
 
-#: includes/Assets.php:308
+#: includes/Assets.php:312
 msgid "Please select a document type"
 msgstr ""
 
-#: includes/Assets.php:309
+#: includes/Assets.php:313
 #: includes/Settings/SettingsDebug.php:383
 #: includes/Settings/SettingsDebug.php:661
 #: includes/Settings/SettingsDebug.php:1780
@@ -2717,17 +2717,17 @@ msgstr ""
 msgid "You are not allowed to perform this action."
 msgstr ""
 
-#: includes/Assets.php:310
+#: includes/Assets.php:314
 msgid "The report may contain sensitive data such as license keys and log contents. Are you sure you want to include this information?"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag
-#: includes/Assets.php:315
+#: includes/Assets.php:319
 #, php-format
 msgid "<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools."
 msgstr ""
 
-#: includes/Assets.php:341
+#: includes/Assets.php:345
 #: includes/Settings/SettingsEDI.php:969
 #: includes/Settings/SettingsEDI.php:979
 #: includes/Settings/SettingsEDI.php:989
@@ -2737,35 +2737,35 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-#: includes/Assets.php:342
+#: includes/Assets.php:346
 msgid "New"
 msgstr ""
 
-#: includes/Assets.php:343
+#: includes/Assets.php:347
 msgid "unsaved"
 msgstr ""
 
-#: includes/Assets.php:347
+#: includes/Assets.php:351
 msgid "VAT number should start with a country prefix (e.g. NL123456789B01)."
 msgstr ""
 
-#: includes/Assets.php:348
+#: includes/Assets.php:352
 msgid "Error loading identifiers"
 msgstr ""
 
-#: includes/Assets.php:349
+#: includes/Assets.php:353
 msgid "Loading..."
 msgstr ""
 
-#: includes/Assets.php:350
+#: includes/Assets.php:354
 msgid "Order ID must be a valid number"
 msgstr ""
 
-#: includes/Assets.php:351
+#: includes/Assets.php:355
 msgid "Please enter an Order ID."
 msgstr ""
 
-#: includes/Assets.php:352
+#: includes/Assets.php:356
 msgid "No customer identifiers found."
 msgstr ""
 
