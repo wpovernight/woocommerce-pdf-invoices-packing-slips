@@ -716,7 +716,7 @@ class Invoice extends OrderDocumentMethods {
 	 * @return mixed
 	 */
 	public function init_number() {
-		wcpdf_deprecated_function( 'init_number', '3.8.0', 'initiate_number' );
+		\wcpdf_deprecated_function( 'init_number', '3.8.0', 'initiate_number' );
 		return $this->initiate_number();
 	}
 

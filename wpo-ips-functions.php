@@ -121,30 +121,6 @@ function wcpdf_get_bulk_document( string $document_type, array $order_ids ): \WP
 }
 
 /**
- * Deprecated functions to get the document object for an order, kept for backward compatibility.
- *
- * @param mixed $order
- * @param bool $init
- * @return object|false
- */
-function wcpdf_get_invoice( mixed $order, bool $init = false ): object|false {
-	wcpdf_deprecated_function( __FUNCTION__, '4.6.3', 'wcpdf_get_document( \'invoice\', $order, $init )' );
-	return wcpdf_get_document( 'invoice', $order, $init );
-}
-
-/**
- * Deprecated functions to get the document object for an order, kept for backward compatibility.
- *
- * @param mixed $order
- * @param bool $init
- * @return object|false
- */
-function wcpdf_get_packing_slip( mixed $order, bool $init = false ): object|false {
-	wcpdf_deprecated_function( __FUNCTION__, '4.6.3', 'wcpdf_get_document( \'packing-slip\', $order, $init )' );
-	return wcpdf_get_document( 'packing-slip', $order, $init );
-}
-
-/**
  * Get the available bulk actions for documents, which can be used in the admin order list or other places where bulk actions are needed.
  *
  * @return array
@@ -1046,24 +1022,6 @@ function wpo_wcpdf_get_simple_template_default_table_headers( \WPO\IPS\Documents
 	}
 
 	return apply_filters( 'wpo_wcpdf_simple_template_default_table_headers', $headers, $document );
-}
-
-/**
- * Get the WP_Filesystem instance
- *
- * @return mixed
- * @throws RuntimeException
- */
-function wpo_wcpdf_get_wp_filesystem(): mixed {
-	wcpdf_deprecated_function( 'wpo_wcpdf_get_wp_filesystem', '4.2.0', '\WPO\IPS\Compatibility\FileSystem::instance()->wp_filesystem' );
-
-	if ( class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) {
-		$filesystem = \WPO\IPS\Compatibility\FileSystem::instance();
-		$filesystem->initialize_wp_filesystem();
-		return $filesystem->wp_filesystem ?? false;
-	}
-
-	return false;
 }
 
 /**
