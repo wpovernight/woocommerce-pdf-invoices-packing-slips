@@ -158,7 +158,7 @@ class WPO_WCPDF {
 	 */
 	public function get_instance( string $property ): ?object {
 		$map = apply_filters(
-			'wpo_ips_instance_map',
+			'wpo_ips_plugin_instance_map',
 			array(
 				'third_party_plugins' => ThirdPartyPlugins::class,
 				'vat_plugins'         => VatPlugins::class,

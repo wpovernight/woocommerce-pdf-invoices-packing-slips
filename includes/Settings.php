@@ -92,13 +92,17 @@ class Settings {
 	 * @return object|null
 	 */
 	public function get_instance( string $setting ): ?object {
-		$map = array(
-			'callbacks' => SettingsCallbacks::class,
-			'general'   => SettingsGeneral::class,
-			'documents' => SettingsDocuments::class,
-			'debug'     => SettingsDebug::class,
-			'upgrade'   => SettingsUpgrade::class,
-			'edi'       => SettingsEDI::class,
+		$map = apply_filters(
+			'wpo_ips_settings_instance_map',
+			array(
+				'callbacks' => SettingsCallbacks::class,
+				'general'   => SettingsGeneral::class,
+				'documents' => SettingsDocuments::class,
+				'debug'     => SettingsDebug::class,
+				'upgrade'   => SettingsUpgrade::class,
+				'edi'       => SettingsEDI::class,
+			),
+			$this
 		);
 
 		if ( ! isset( $map[ $setting ] ) ) {
