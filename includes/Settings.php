@@ -69,6 +69,7 @@ class Settings {
 		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
 		add_action( 'update_option_wpo_wcpdf_settings_general', array( $this, 'general_settings_updated' ), 10, 3 );
 		add_action( 'update_option_wpo_wcpdf_settings_debug', array( $this, 'debug_settings_updated' ), 10, 3 );
+		add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
 		
 		// IPS
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 2 );
@@ -889,17 +890,36 @@ class Settings {
 	}
 
 	/**
-	 * Callback for when debug settings are updated, to check if we need to flush rewrite rules for pretty document links.
+	 * Callback for when debug settings are updated, to mark rewrite rules for flushing.
 	 *
-	 * @param array $old_settings
-	 * @param array $settings
+	 * @param array  $old_settings
+	 * @param array  $settings
 	 * @param string $option
 	 * @return void
 	 */
 	public function debug_settings_updated( array $old_settings, array $settings, string $option ): void {
-		if ( empty( $old_settings['pretty_document_links'] ) && ! empty ( $settings['pretty_document_links'] ) ) {
-			flush_rewrite_rules();
+		$old_pretty_links = ! empty( $old_settings['pretty_document_links'] );
+		$new_pretty_links = ! empty( $settings['pretty_document_links'] );
+
+		if ( $old_pretty_links === $new_pretty_links ) {
+			return;
 		}
+
+		set_transient( 'wpo_wcpdf_flush_rewrite_rules', true, MINUTE_IN_SECONDS );
+	}
+
+	/**
+	 * Flush rewrite rules when requested by transient, then remove the transient.
+	 *
+	 * @return void
+	 */
+	public function maybe_delete_flush_rewrite_rules_transient(): void {
+		if ( ! get_transient( 'wpo_wcpdf_flush_rewrite_rules' ) ) {
+			return;
+		}
+
+		flush_rewrite_rules();
+		delete_transient( 'wpo_wcpdf_flush_rewrite_rules' );
 	}
 
 	/**
