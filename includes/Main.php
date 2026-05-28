@@ -534,6 +534,15 @@ class Main {
 			if ( $document ) {
 				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself with $document->order_ids)
 
+				if ( count( $order_ids ) > 1 && isset( $request['bulk'] ) && property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids ) ) {
+					foreach ( $document->order_ids as $bulk_order_id ) {
+						$individual_document = wcpdf_get_document( $document_type, $bulk_order_id );
+						if ( $individual_document && is_callable( array( $individual_document, 'exists' ) ) && $individual_document->exists() ) {
+							$this->mark_document_printed( $individual_document, 'bulk' );
+						}
+					}
+				}
+
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document, $request );
 
 				switch ( $output_format ) {
