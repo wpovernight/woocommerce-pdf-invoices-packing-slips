@@ -1215,18 +1215,8 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 	), $order );
 
 	// Maybe add General Checkout Field key
-	if ( empty( WPO_WCPDF()->frontend ) ) {
-		$frontend = \WPO\IPS\Frontend::instance();
-	} else {
-		$frontend = WPO_WCPDF()->frontend;
-	}
-
-	if ( ! empty( $frontend ) && is_callable( array( $frontend, 'checkout_field_is_vat_number' ) ) ) {
-		$checkout_field_is_vat_number = $frontend->checkout_field_is_vat_number();
-
-		if ( $checkout_field_is_vat_number ) {
-			array_unshift( $vat_meta_keys, '_wpo_ips_checkout_field' );
-		}
+	if ( WPO_WCPDF()->checkout_field->is_vat_number() ) {
+		array_unshift( $vat_meta_keys, \WPO\IPS\CheckoutField::ORDER_META_KEY );
 	}
 
 	$vat_number = null;
@@ -2270,14 +2260,14 @@ function wpo_ips_register_additional_checkout_field( array $options ): void {
 	if ( ! defined( 'WC_VERSION' ) || version_compare( WC_VERSION, '8.9.0', '<' ) ) {
 		return;
 	}
-	
+
 	if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
 		$file                 = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
 		$file_system_instance = WPO_WCPDF()->file_system ?? null;
 		$file_system_instance = $file_system_instance
 			? $file_system_instance
 			: \WPO\IPS\Compatibility\FileSystem::instance();
-		
+
 		if ( $file_system_instance->is_readable( $file ) ) {
 			include_once $file;
 		}
