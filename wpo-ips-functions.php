@@ -2354,24 +2354,28 @@ function wpo_ips_get_invoice_count(): int {
  * @return bool
  */
 function wpo_ips_is_settings_page(): bool {
-	if ( isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
+	if ( ! is_admin() ) {
+		return false;
+	}
+
+	if ( isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
 		return true;
 	}
 
 	global $pagenow;
 
-	if ( 'options.php' === $pagenow ) {
-		$option_page = isset( $_POST['option_page'] )
-			? sanitize_text_field( wp_unslash( $_POST['option_page'] ) )
-			: '';
-
-		return (
-			0 === strpos( $option_page, 'wpo_wcpdf_' ) ||
-			0 === strpos( $option_page, 'wpo_ips_' )
-		);
+	if ( 'options.php' !== $pagenow ) {
+		return false;
 	}
 
-	return false;
+	$option_page = isset( $_POST['option_page'] )
+		? sanitize_key( wp_unslash( $_POST['option_page'] ) )
+		: '';
+
+	return (
+		0 === strpos( $option_page, 'wpo_wcpdf_' ) ||
+		0 === strpos( $option_page, 'wpo_ips_' )
+	);
 }
 
 /**
@@ -2380,24 +2384,61 @@ function wpo_ips_is_settings_page(): bool {
  * @return bool
  */
 function wpo_ips_is_plugins_page(): bool {
+	if ( ! is_admin() ) {
+		return false;
+	}
+
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-	if ( ! empty( $screen ) && isset( $screen->id ) ) {
+	if ( $screen && isset( $screen->id ) ) {
 		return 'plugins' === $screen->id;
 	}
 
-	return isset( $GLOBALS['pagenow'] ) && 'plugins.php' === $GLOBALS['pagenow'];
+	global $pagenow;
+
+	return 'plugins.php' === $pagenow;
 }
 
 /**
- * Check if this is a shop_order page (edit or list)
+ * Check if this is a shop order admin page.
+ *
+ * Supports legacy orders and HPOS, and works even before get_current_screen()
+ * is available by falling back to request values.
  *
  * @return bool
  */
 function wpo_ips_is_order_page(): bool {
+	if ( ! is_admin() ) {
+		return false;
+	}
+
 	$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
-	if ( ! is_null( $screen ) && in_array( $screen->id, array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ), true ) ) {
+	if ( $screen && isset( $screen->id ) ) {
+		return in_array(
+			$screen->id,
+			array( 'shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders' ),
+			true
+		);
+	}
+
+	global $pagenow;
+
+	$page      = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+	$post_type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+
+	// HPOS orders list/edit page.
+	if ( 'admin.php' === $pagenow && 'wc-orders' === $page ) {
+		return true;
+	}
+
+	// Legacy orders list page.
+	if ( 'edit.php' === $pagenow && 'shop_order' === $post_type ) {
+		return true;
+	}
+
+	// Legacy single order edit page.
+	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) && 'shop_order' === $post_type ) {
 		return true;
 	}
 
@@ -2405,22 +2446,34 @@ function wpo_ips_is_order_page(): bool {
 }
 
 /**
- * Check if this is the My Account page
+ * Check if this is the My Account page.
  *
  * @return bool
  */
 function wpo_ips_is_account_page(): bool {
-	if ( function_exists( 'is_account_page' ) && is_account_page() ) {
-		return true;
-	}
-
-	if ( ! function_exists( 'wc_get_page_id' ) ) {
+	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
 		return false;
 	}
 
-	$page_id = wc_get_page_id( 'myaccount' );
+	if ( did_action( 'wp' ) ) {
+		if ( function_exists( 'is_account_page' ) && is_account_page() ) {
+			return true;
+		}
 
-	return ( $page_id && is_page( $page_id ) ) || wc_post_content_has_shortcode( 'woocommerce_my_account' ) || apply_filters( 'woocommerce_is_account_page', false );
+		$page_id = wc_get_page_id( 'myaccount' );
+
+		if ( $page_id > 0 && is_page( $page_id ) ) {
+			return true;
+		}
+
+		if ( function_exists( 'wc_post_content_has_shortcode' ) && wc_post_content_has_shortcode( 'woocommerce_my_account' ) ) {
+			return true;
+		}
+
+		return (bool) apply_filters( 'woocommerce_is_account_page', false );
+	}
+
+	return wpo_ips_matches_wc_page_request( 'myaccount' );
 }
 
 /**
@@ -2429,19 +2482,33 @@ function wpo_ips_is_account_page(): bool {
  * @return bool
  */
 function wpo_ips_is_order_received_page(): bool {
-	if ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) {
-		return true;
-	}
-
-	if ( ! function_exists( 'wc_get_page_id' ) || ! function_exists( 'is_wc_endpoint_url' ) ) {
+	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
 		return false;
 	}
 
-	$page_id           = wc_get_page_id( 'checkout' );
-	$is_checkout_page  = $page_id && is_page( $page_id );
-	$has_checkout_code = function_exists( 'wc_post_content_has_shortcode' ) && wc_post_content_has_shortcode( 'woocommerce_checkout' );
+	if ( did_action( 'wp' ) ) {
+		if ( function_exists( 'is_order_received_page' ) && is_order_received_page() ) {
+			return true;
+		}
 
-	return is_wc_endpoint_url( 'order-received' ) && ( $is_checkout_page || $has_checkout_code );
+		if ( function_exists( 'is_wc_endpoint_url' ) && is_wc_endpoint_url( 'order-received' ) ) {
+			$page_id           = wc_get_page_id( 'checkout' );
+			$is_checkout_page  = $page_id > 0 && is_page( $page_id );
+			$has_checkout_code = function_exists( 'wc_post_content_has_shortcode' ) && wc_post_content_has_shortcode( 'woocommerce_checkout' );
+
+			return $is_checkout_page || $has_checkout_code;
+		}
+
+		return false;
+	}
+
+	$endpoint = 'order-received';
+
+	if ( function_exists( 'WC' ) && WC() && isset( WC()->query ) && is_object( WC()->query ) ) {
+		$endpoint = WC()->query->query_vars['order-received'] ?? $endpoint;
+	}
+
+	return wpo_ips_matches_wc_page_request( 'checkout', $endpoint );
 }
 
 /**
@@ -2455,4 +2522,53 @@ function wpo_ips_is_frontend_page_request(): bool {
 		&& ! wp_doing_cron()
 		&& ! ( defined( 'REST_REQUEST' ) && REST_REQUEST )
 		&& ! ( defined( 'WP_CLI' ) && WP_CLI );
+}
+
+/**
+ * Check whether the current request matches a WooCommerce page, optionally with an endpoint.
+ *
+ * @param string $page_name WooCommerce page key, e.g. 'myaccount' or 'checkout'.
+ * @param string $endpoint  Optional endpoint slug, e.g. 'order-received'.
+ * @return bool
+ */
+function wpo_ips_matches_wc_page_request( string $page_name, string $endpoint = '' ): bool {
+	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
+		return false;
+	}
+
+	$page_id = wc_get_page_id( $page_name );
+
+	if ( $page_id <= 0 ) {
+		return false;
+	}
+
+	$endpoint = trim( $endpoint, '/' );
+
+	// Plain permalinks fallback.
+	if ( isset( $_GET['page_id'] ) && absint( wp_unslash( $_GET['page_id'] ) ) === $page_id ) {
+		if ( '' === $endpoint || isset( $_GET[ $endpoint ] ) ) {
+			return true;
+		}
+	}
+
+	$permalink = get_permalink( $page_id );
+
+	if ( empty( $permalink ) || empty( $_SERVER['REQUEST_URI'] ) ) {
+		return false;
+	}
+
+	$page_path    = untrailingslashit( (string) wp_parse_url( $permalink, PHP_URL_PATH ) );
+	$request_path = untrailingslashit( (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) );
+
+	if ( empty( $page_path ) || empty( $request_path ) ) {
+		return false;
+	}
+
+	if ( '' === $endpoint ) {
+		return $request_path === $page_path || 0 === strpos( $request_path . '/', $page_path . '/' );
+	}
+
+	$endpoint_path = $page_path . '/' . $endpoint;
+
+	return $request_path === $endpoint_path || 0 === strpos( $request_path . '/', $endpoint_path . '/' );
 }
