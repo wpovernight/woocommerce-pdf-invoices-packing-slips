@@ -916,7 +916,7 @@ class Main {
 
 	/**
 	 * Install/create plugin tmp folders
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function init_tmp(): bool {
@@ -928,6 +928,7 @@ class Main {
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
 		if ( false === $tmp_base ) {
+			wcpdf_log_error( 'Unable to determine temp folder base path.', 'critical' );
 			return false;
 		}
 
@@ -939,6 +940,13 @@ class Main {
 			$tmp_path = $this->get_tmp_path( $subfolder );
 
 			if ( false === $tmp_path ) {
+				wcpdf_log_error(
+					sprintf(
+						'Unable to determine temp folder path for subfolder %s.',
+						$subfolder
+					),
+					'critical'
+				);
 				return false;
 			}
 
