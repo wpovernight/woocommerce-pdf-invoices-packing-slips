@@ -333,7 +333,17 @@ class SettingsDebug {
 	/**
 	 * AJAX handler for processing settings debug tools.
 	 *
+	 * Dispatches to one of the internal debug tool handlers.
+	 *
 	 * @return void
+	 * @see self::export_settings()
+	 * @see self::import_settings()
+	 * @see self::reset_settings()
+	 * @see self::generate_random_string()
+	 * @see self::install_fonts()
+	 * @see self::reschedule_yearly_reset()
+	 * @see self::clear_tmp()
+	 * @see self::clear_released_semaphore_locks()
 	 */
 	public function ajax_process_settings_debug_tools(): void {
 		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
