@@ -181,7 +181,25 @@ class Main {
 
 						if ( $attachment ) {
 							$attachments[] = $attachment;
+							if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+								$email_title = $email_id;
+
+								if ( is_object( $email ) && is_callable( array( $email, 'get_title' ) ) ) {
+									$email_title = $email->get_title();
+								}
+
+								$note = sprintf(
+									/* translators: 1. output format, 2. document title, 3. email title */
+									__( '%1$s %2$s successfully attached to the %3$s email.', 'woocommerce-pdf-invoices-packing-slips' ),
+									strtoupper( $output_format ),
+									$document->get_title(),
+									$email_title
+								);
+
+								$this->log_to_order_notes( $note, $document );
+							}
 						} else {
+							wcpdf_log_error( sprintf( 'PDF %1$s could not be attached to email (%2$s).', $document->get_title(), $email_id ), 'critical' );
 							continue;
 						}
 
