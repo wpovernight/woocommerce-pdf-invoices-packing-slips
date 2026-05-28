@@ -184,12 +184,17 @@ ul.wpo-ips-edi-actions > li {
 	height: 32px;
 	padding: 0;
 	margin-left: 3px;
-	line-height: 1;
+	line-height: 1.2;
 }
 
 #wpo_ips-edi-box .inside > .edi-order-actions .xml .dashicons {
 	font-size: 18px;
-	line-height: 1;
+	line-height: 1.2;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .xml.resend .dashicons,
+#wpo_ips-edi-box .inside > .edi-order-actions .xml.send .dashicons {
+	color: white !important;
 }
 
 #wpo_ips-edi-box .inside > .edi-order-actions .xml.disabled {
