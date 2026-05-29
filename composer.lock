@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d03cf063739f1093a8c3d5163ba724bb",
+    "content-hash": "a5f8f5fced66ee722e1e7487e315f075",
     "packages": [
         {
             "name": "dompdf/dompdf",
@@ -296,29 +296,29 @@
         },
         {
             "name": "sabre/uri",
-            "version": "3.1.0",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/uri.git",
-                "reference": "a926c749dddfb289b8a9b5218d16ac06affdc631"
+                "reference": "4fa0b2049e06a4fbe4aea4f0aa69e7b8410a13bc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/uri/zipball/a926c749dddfb289b8a9b5218d16ac06affdc631",
-                "reference": "a926c749dddfb289b8a9b5218d16ac06affdc631",
+                "url": "https://api.github.com/repos/sabre-io/uri/zipball/4fa0b2049e06a4fbe4aea4f0aa69e7b8410a13bc",
+                "reference": "4fa0b2049e06a4fbe4aea4f0aa69e7b8410a13bc",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.2"
+                "php": "^7.4 || ^8.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.95",
+                "friendsofphp/php-cs-fixer": "^3.94",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan": "^2.1",
                 "phpstan/phpstan-phpunit": "^2.0",
                 "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^10.5",
-                "rector/rector": "^2.4"
+                "phpunit/phpunit": "^9.6",
+                "rector/rector": "^2.3"
             },
             "type": "library",
             "autoload": {
@@ -353,20 +353,20 @@
                 "issues": "https://github.com/sabre-io/uri/issues",
                 "source": "https://github.com/fruux/sabre-uri"
             },
-            "time": "2026-04-26T04:19:03+00:00"
+            "time": "2026-04-01T08:19:11+00:00"
         },
         {
             "name": "sabre/xml",
-            "version": "4.1.0",
+            "version": "4.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/xml.git",
-                "reference": "bec83cbe2f4e1e1ca4254ed8d7caa7e32cc74b05"
+                "reference": "53db7bad0953949fb61037fbf9b13b421492395c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/xml/zipball/bec83cbe2f4e1e1ca4254ed8d7caa7e32cc74b05",
-                "reference": "bec83cbe2f4e1e1ca4254ed8d7caa7e32cc74b05",
+                "url": "https://api.github.com/repos/sabre-io/xml/zipball/53db7bad0953949fb61037fbf9b13b421492395c",
+                "reference": "53db7bad0953949fb61037fbf9b13b421492395c",
                 "shasum": ""
             },
             "require": {
@@ -374,17 +374,14 @@
                 "ext-xmlreader": "*",
                 "ext-xmlwriter": "*",
                 "lib-libxml": ">=2.6.20",
-                "php": "^8.2",
+                "php": "^7.4 || ^8.0",
                 "sabre/uri": ">=2.0,<4.0.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^3.95",
-                "phpstan/extension-installer": "^1.4",
+                "friendsofphp/php-cs-fixer": "^3.94",
                 "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-phpunit": "^2.0",
-                "phpstan/phpstan-strict-rules": "^2.0",
-                "phpunit/phpunit": "^10.5",
-                "rector/rector": "^2.4"
+                "phpunit/phpunit": "^9.6",
+                "rector/rector": "^2.3"
             },
             "type": "library",
             "autoload": {
@@ -426,7 +423,7 @@
                 "issues": "https://github.com/sabre-io/xml/issues",
                 "source": "https://github.com/fruux/sabre-xml"
             },
-            "time": "2026-04-27T10:56:01+00:00"
+            "time": "2026-04-02T11:40:41+00:00"
         },
         {
             "name": "symfony/polyfill-iconv",
@@ -514,16 +511,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.37.0",
+            "version": "v1.38.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315"
+                "reference": "14c5439eec4ccff081ac14eca2dc57feb2a66d92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/6a21eb99c6973357967f6ce3708cd55a6bec6315",
-                "reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/14c5439eec4ccff081ac14eca2dc57feb2a66d92",
+                "reference": "14c5439eec4ccff081ac14eca2dc57feb2a66d92",
                 "shasum": ""
             },
             "require": {
@@ -575,7 +572,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.37.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.1"
             },
             "funding": [
                 {
@@ -595,7 +592,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-10T17:25:58+00:00"
+            "time": "2026-05-26T12:51:13+00:00"
         }
     ],
     "packages-dev": [],
@@ -605,8 +602,11 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.1"
+        "php": "^8.1"
     },
     "platform-dev": {},
+    "platform-overrides": {
+        "php": "8.1"
+    },
     "plugin-api-version": "2.9.0"
 }

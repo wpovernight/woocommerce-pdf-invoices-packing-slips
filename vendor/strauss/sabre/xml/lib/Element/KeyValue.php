@@ -38,16 +38,20 @@ use WPO\IPS\Vendor\Sabre\Xml\Deserializer;
 class KeyValue implements Xml\Element
 {
     /**
+     * Value to serialize.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $value;
+
+    /**
      * Constructor.
      *
      * @param array<string, mixed> $value
      */
-    public function __construct(
-        /**
-         * Value to serialize.
-         */
-        protected array $value = [],
-    ) {
+    public function __construct(array $value = [])
+    {
+        $this->value = $value;
     }
 
     /**

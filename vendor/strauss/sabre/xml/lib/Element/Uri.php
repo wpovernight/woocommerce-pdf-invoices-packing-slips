@@ -27,14 +27,16 @@ use function WPO\IPS\Vendor\Sabre\Uri\resolve;
 class Uri implements Xml\Element
 {
     /**
+     * Uri element value.
+     */
+    protected string $value;
+
+    /**
      * Constructor.
      */
-    public function __construct(
-        /**
-         * Uri element value.
-         */
-        protected string $value,
-    ) {
+    public function __construct(string $value)
+    {
+        $this->value = $value;
     }
 
     /**

@@ -212,13 +212,11 @@ function valueObject(Reader $reader, string $className, string $namespace): obje
 
     $reader->read();
     do {
-        if (Reader::ELEMENT === $reader->nodeType && $reader->namespaceURI === $namespace) {
+        if (Reader::ELEMENT === $reader->nodeType && $reader->namespaceURI == $namespace) {
             if (property_exists($valueObject, $reader->localName)) {
                 if (is_array($defaultProperties[$reader->localName])) {
-                    // @phpstan-ignore property.dynamicName
                     $valueObject->{$reader->localName}[] = $reader->parseCurrentElement()['value'];
                 } else {
-                    // @phpstan-ignore property.dynamicName
                     $valueObject->{$reader->localName} = $reader->parseCurrentElement()['value'];
                 }
             } else {
@@ -317,12 +315,12 @@ function mixedContent(Reader $reader): array
     $content = [];
     $reader->read();
     while (true) {
-        if (Reader::ELEMENT === $reader->nodeType) {
+        if (Reader::ELEMENT == $reader->nodeType) {
             $content[] = $reader->parseCurrentElement();
-        } elseif ($reader->depth >= $previousDepth && in_array($reader->nodeType, [Reader::TEXT, Reader::CDATA, Reader::WHITESPACE], true)) {
+        } elseif ($reader->depth >= $previousDepth && in_array($reader->nodeType, [Reader::TEXT, Reader::CDATA, Reader::WHITESPACE])) {
             $content[] = $reader->value;
             $reader->read();
-        } elseif (Reader::END_ELEMENT === $reader->nodeType) {
+        } elseif (Reader::END_ELEMENT == $reader->nodeType) {
             // Ensuring we are moving the cursor after the end element.
             $reader->read();
             break;
@@ -355,7 +353,7 @@ function functionCaller(Reader $reader, callable $func, string $namespace)
     $funcArgs = [];
     if (is_array($func)) {
         $ref = new \ReflectionMethod($func[0], $func[1]);
-    } elseif (is_string($func) && str_contains($func, '::')) {
+    } elseif (is_string($func) && false !== strpos($func, '::')) {
         // We have a string that should refer to a method that exists, like "MyClass::someMethod"
         // ReflectionMethod knows how to handle that as-is
         $ref = new \ReflectionMethod($func);
@@ -373,7 +371,7 @@ function functionCaller(Reader $reader, callable $func, string $namespace)
 
     $reader->read();
     do {
-        if (Reader::ELEMENT === $reader->nodeType && $reader->namespaceURI === $namespace) {
+        if (Reader::ELEMENT === $reader->nodeType && $reader->namespaceURI == $namespace) {
             if (array_key_exists($reader->localName, $funcArgs)) {
                 $funcArgs[$reader->localName] = $reader->parseCurrentElement()['value'];
             } else {

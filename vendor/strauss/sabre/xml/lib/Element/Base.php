@@ -20,12 +20,18 @@ use WPO\IPS\Vendor\Sabre\Xml;
 class Base implements Xml\Element
 {
     /**
+     * @var mixed PHP value to serialize
+     */
+    protected $value;
+
+    /**
      * Constructor.
      *
      * @param mixed $value PHP value to serialize
      */
-    public function __construct(protected $value = null)
+    public function __construct($value = null)
     {
+        $this->value = $value;
     }
 
     /**

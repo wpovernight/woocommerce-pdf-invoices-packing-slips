@@ -22,14 +22,16 @@ use WPO\IPS\Vendor\Sabre\Xml;
 class Cdata implements Xml\XmlSerializable
 {
     /**
+     * CDATA element value.
+     */
+    protected string $value;
+
+    /**
      * Constructor.
      */
-    public function __construct(
-        /**
-         * CDATA element value.
-         */
-        protected string $value,
-    ) {
+    public function __construct(string $value)
+    {
+        $this->value = $value;
     }
 
     /**
@@ -50,6 +52,6 @@ class Cdata implements Xml\XmlSerializable
      */
     public function xmlSerialize(Xml\Writer $writer): void
     {
-        $writer->writeCdata($this->value);
+        $writer->writeCData($this->value);
     }
 }

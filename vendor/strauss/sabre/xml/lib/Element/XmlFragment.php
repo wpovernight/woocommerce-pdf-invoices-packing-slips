@@ -25,14 +25,16 @@ use WPO\IPS\Vendor\Sabre\Xml\Writer;
 class XmlFragment implements Element
 {
     /**
+     * The inner XML value.
+     */
+    protected string $xml;
+
+    /**
      * Constructor.
      */
-    public function __construct(
-        /**
-         * The inner XML value.
-         */
-        protected string $xml,
-    ) {
+    public function __construct(string $xml)
+    {
+        $this->xml = $xml;
     }
 
     /**
@@ -70,7 +72,7 @@ class XmlFragment implements Element
 <xml-fragment xmlns="http://sabre.io/ns">{$this->getXml()}</xml-fragment>
 XML;
 
-        $reader->XML($xml);
+        $reader->xml($xml);
 
         while ($reader->read()) {
             if ($reader->depth < 1) {
