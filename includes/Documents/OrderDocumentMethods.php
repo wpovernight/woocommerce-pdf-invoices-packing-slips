@@ -950,40 +950,30 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return array|bool array of rate_id => rate_percent, or false if not available
 	 */
 	public function get_tax_rates_from_order( ?\WC_Abstract_Order $order = null ): array|bool {
-		if (
-			! empty( $order )                                     &&
-			is_callable( array( $order, 'get_version' ) )         &&
-			version_compare( $order->get_version(), '3.7', '>=' ) &&
-			version_compare( WC_VERSION, '3.7', '>=' )
-		) {
-			$tax_rates = array();
-			$tax_items = $order->get_items( array('tax') );
+		$tax_rates = array();
+		$tax_items = $order->get_items( array( 'tax' ) );
 
-			if ( empty( $tax_items ) ) {
-				return $tax_rates;
-			}
-
-			foreach( $tax_items as $tax_item_key => $tax_item ) {
-				if ( is_callable( array( $order, 'get_created_via' ) ) && $order->get_created_via() === 'subscription' ) {
-					// subscription renewals didn't properly record the rate_percent property between WC3.7 and WCS3.0.1
-					// so we use a fallback if the rate_percent = 0 and the amount != 0
-					$rate_percent = $tax_item->get_rate_percent();
-					$tax_amount   = $tax_item->get_tax_total() + $tax_item->get_shipping_tax_total();
-					
-					if ( $tax_amount > 0 && $rate_percent > 0 ) {
-						$tax_rates[ $tax_item->get_rate_id() ] = $rate_percent;
-					} else {
-						continue; // not setting the rate will let the plugin fall back to the rate from the settings
-					}
-				} else {
-					$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
-				}
-
-			}
+		if ( empty( $tax_items ) ) {
 			return $tax_rates;
-		} else {
-			return false;
 		}
+
+		foreach ( $tax_items as $tax_item_key => $tax_item ) {
+			if ( is_callable( array( $order, 'get_created_via' ) ) && 'subscription' === $order->get_created_via() ) {
+				$rate_percent = $tax_item->get_rate_percent();
+				$tax_amount   = $tax_item->get_tax_total() + $tax_item->get_shipping_tax_total();
+
+				if ( $tax_amount > 0 && $rate_percent > 0 ) {
+					$tax_rates[ $tax_item->get_rate_id() ] = $rate_percent;
+				} else {
+					continue; // not setting the rate will let the plugin fall back to the rate from the settings
+				}
+			} else {
+				$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
+			}
+
+		}
+
+		return $tax_rates;
 	}
 
 	/**

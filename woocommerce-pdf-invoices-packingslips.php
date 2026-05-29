@@ -10,7 +10,7 @@
  * License:              GPLv2 or later
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
- * WC requires at least: 3.3
+ * WC requires at least: 4.0
  * WC tested up to:      10.7
  */
 
@@ -41,7 +41,7 @@ class WPO_WCPDF {
 
 	public string $version                         = '6.0.0-i1482.2';
 	public string $version_php                     = '8.1';
-	public string $version_woo                     = '3.3';
+	public string $version_woo                     = '4.0';
 	public string $version_wp                      = '4.4';
 	public ?string $plugin_basename                = null;
 	public array $legacy_addons                    = array();
