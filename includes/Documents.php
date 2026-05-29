@@ -29,8 +29,16 @@ class Documents {
 	 *
 	 */
 	public function __construct() {
-		if ( \wpo_ips_is_order_page() || \wpo_ips_is_settings_page() || \wpo_ips_is_account_page() ) {
-			add_action( 'init', array( $this, 'init' ), 15 ); // after regular 10 actions but before most 'follow-up' actions (usually 20+)
+		if (
+			\wpo_ips_is_order_page()                      ||
+			\wpo_ips_is_settings_page()                   ||
+			\wpo_ips_is_account_page()                    ||
+			wp_doing_cron()                               ||
+			( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
+			( defined( 'WP_CLI' ) && WP_CLI )             ||
+			! is_admin()
+		) {
+			add_action( 'init', array( $this, 'init' ), 15 );
 		}
 	}
 
