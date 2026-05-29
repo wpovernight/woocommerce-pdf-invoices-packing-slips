@@ -2438,8 +2438,18 @@ function wpo_ips_is_order_page(): bool {
 	}
 
 	// Legacy single order edit page.
-	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) && 'shop_order' === $post_type ) {
-		return true;
+	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) ) {
+		if ( 'shop_order' === $post_type ) {
+			return true;
+		}
+
+		// post_type is absent from the URL when accessing via post=<id>&action=edit,
+		// so fall back to resolving the post type from the post ID.
+		$post_id = isset( $_GET['post'] ) ? absint( wp_unslash( $_GET['post'] ) ) : 0;
+
+		if ( $post_id && 'shop_order' === get_post_type( $post_id ) ) {
+			return true;
+		}
 	}
 
 	return false;
