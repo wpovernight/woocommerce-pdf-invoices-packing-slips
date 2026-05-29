@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Parsing;
 
 /**
@@ -9,4 +7,6 @@ namespace WPO\IPS\Vendor\Sabberworm\CSS\Parsing;
  *
  * Extends `UnexpectedTokenException` in order to preserve backwards compatibility.
  */
-final class UnexpectedEOFException extends UnexpectedTokenException {}
+class UnexpectedEOFException extends UnexpectedTokenException
+{
+}

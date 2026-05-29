@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace WPO\IPS\Vendor\Sabberworm\CSS\Value;
 
 use WPO\IPS\Vendor\Sabberworm\CSS\OutputFormat;
@@ -9,9 +7,6 @@ use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\ParserState;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\SourceException;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedEOFException;
 use WPO\IPS\Vendor\Sabberworm\CSS\Parsing\UnexpectedTokenException;
-use WPO\IPS\Vendor\Sabberworm\CSS\ShortClassNameProvider;
-
-use function WPO\IPS\Vendor\Safe\preg_match;
 
 /**
  * This class is a wrapper for quoted strings to distinguish them from keywords.
@@ -20,106 +15,102 @@ use function WPO\IPS\Vendor\Safe\preg_match;
  */
 class CSSString extends PrimitiveValue
 {
-    use ShortClassNameProvider;
-
     /**
      * @var string
      */
-    private $string;
+    private $sString;
 
     /**
-     * @param int<1, max>|null $lineNumber
+     * @param string $sString
+     * @param int $iLineNo
      */
-    public function __construct(string $string, ?int $lineNumber = null)
+    public function __construct($sString, $iLineNo = 0)
     {
-        $this->string = $string;
-        parent::__construct($lineNumber);
+        $this->sString = $sString;
+        parent::__construct($iLineNo);
     }
 
     /**
+     * @return CSSString
+     *
      * @throws SourceException
      * @throws UnexpectedEOFException
      * @throws UnexpectedTokenException
      *
      * @internal since V8.8.0
      */
-    public static function parse(ParserState $parserState): CSSString
+    public static function parse(ParserState $oParserState)
     {
-        $begin = $parserState->peek();
-        $quote = null;
-        if ($begin === "'") {
-            $quote = "'";
-        } elseif ($begin === '"') {
-            $quote = '"';
+        $sBegin = $oParserState->peek();
+        $sQuote = null;
+        if ($sBegin === "'") {
+            $sQuote = "'";
+        } elseif ($sBegin === '"') {
+            $sQuote = '"';
         }
-        if ($quote !== null) {
-            $parserState->consume($quote);
+        if ($sQuote !== null) {
+            $oParserState->consume($sQuote);
         }
-        $result = '';
-        $content = null;
-        if ($quote === null) {
+        $sResult = "";
+        $sContent = null;
+        if ($sQuote === null) {
             // Unquoted strings end in whitespace or with braces, brackets, parentheses
-            while (preg_match('/[\\s{}()<>\\[\\]]/isu', $parserState->peek()) === 0) {
-                $result .= $parserState->parseCharacter(false);
+            while (!preg_match('/[\\s{}()<>\\[\\]]/isu', $oParserState->peek())) {
+                $sResult .= $oParserState->parseCharacter(false);
             }
         } else {
-            while (!$parserState->comes($quote)) {
-                $content = $parserState->parseCharacter(false);
-                if ($content === null) {
+            while (!$oParserState->comes($sQuote)) {
+                $sContent = $oParserState->parseCharacter(false);
+                if ($sContent === null) {
                     throw new SourceException(
-                        "Non-well-formed quoted string {$parserState->peek(3)}",
-                        $parserState->currentLine()
+                        "Non-well-formed quoted string {$oParserState->peek(3)}",
+                        $oParserState->currentLine()
                     );
                 }
-                $result .= $content;
+                $sResult .= $sContent;
             }
-            $parserState->consume($quote);
+            $oParserState->consume($sQuote);
         }
-        return new CSSString($result, $parserState->currentLine());
-    }
-
-    public function setString(string $string): void
-    {
-        $this->string = $string;
-    }
-
-    public function getString(): string
-    {
-        return $this->string;
+        return new CSSString($sResult, $oParserState->currentLine());
     }
 
     /**
-     * @return non-empty-string
-     */
-    public function render(OutputFormat $outputFormat): string
-    {
-        return $outputFormat->getStringQuotingType()
-            . $this->escape($this->string, $outputFormat)
-            . $outputFormat->getStringQuotingType();
-    }
-
-    /**
-     * @return array<string, bool|int|float|string|array<mixed>|null>
+     * @param string $sString
      *
-     * @internal
+     * @return void
      */
-    public function getArrayRepresentation(): array
+    public function setString($sString)
     {
-        return [
-            'class' => $this->getShortClassName(),
-            // We're using the term "contents" here to make the difference to the class more clear.
-            'contents' => $this->string,
-        ];
+        $this->sString = $sString;
     }
 
-    private function escape(string $string, OutputFormat $outputFormat): string
+    /**
+     * @return string
+     */
+    public function getString()
     {
-        $charactersToEscape = '\\';
-        $charactersToEscape .= ($outputFormat->getStringQuotingType() === '"' ? '"' : "'");
-        $withEscapedQuotes = \addcslashes($string, $charactersToEscape);
+        return $this->sString;
+    }
 
-        $withNewlineEncoded = \str_replace("\n", '\\A', $withEscapedQuotes);
+    /**
+     * @return string
+     *
+     * @deprecated in V8.8.0, will be removed in V9.0.0. Use `render` instead.
+     */
+    public function __toString()
+    {
+        return $this->render(new OutputFormat());
+    }
 
-        return $withNewlineEncoded;
+    /**
+     * @param OutputFormat|null $oOutputFormat
+     *
+     * @return string
+     */
+    public function render($oOutputFormat)
+    {
+        $sString = addslashes($this->sString);
+        $sString = str_replace("\n", '\A', $sString);
+        return $oOutputFormat->getStringQuotingType() . $sString . $oOutputFormat->getStringQuotingType();
     }
 }
