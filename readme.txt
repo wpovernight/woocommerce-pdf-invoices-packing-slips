@@ -54,7 +54,7 @@ In addition to a number of default settings (including a custom header/logo) and
 
 = Minimum Requirements =
 
-* WooCommerce 3.3 or later
+* WooCommerce 4.0 or later
 * WordPress 4.4 or later
 
 = Automatic installation =
