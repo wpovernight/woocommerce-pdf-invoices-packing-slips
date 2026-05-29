@@ -1,8 +1,6 @@
 <?php
 namespace WPO\IPS;
 
-use MailPoet\Settings\SettingsController as MailPoetSettingsController;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -518,8 +516,14 @@ class Notices {
 	 * @return void
 	 */
 	public function mailpoet_mta_detected_notice(): void {
-		if ( is_callable( array( MailPoetSettingsController::class, 'getInstance' ) ) ) {
-			$settings = MailPoetSettingsController::getInstance();
+		if ( ! class_exists( '\\MailPoet\\Settings\\SettingsController' ) ) {
+			return;
+		}
+
+		$mailpoet_settings = \MailPoet\Settings\SettingsController::class;
+
+		if ( is_callable( array( $mailpoet_settings, 'getInstance' ) ) ) {
+			$settings = $mailpoet_settings::getInstance();
 			
 			if ( empty( $settings ) || ! method_exists( $settings, 'get' ) ) {
 				return;
