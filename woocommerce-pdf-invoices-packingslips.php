@@ -11,7 +11,7 @@
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 4.0
- * WC tested up to:      10.7
+ * WC tested up to:      10.8
  */
 
 if ( ! defined( 'ABSPATH' ) ) {

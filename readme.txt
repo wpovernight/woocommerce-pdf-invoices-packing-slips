@@ -110,6 +110,14 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.13.0 (2026-06-01) =
+- New: Add email attachment success/failure logging to order notes
+- New: Add WC EU VAT Number plugin support
+- Fix: XML action button color in order meta box
+- Fix: Include account number in EDI payment means data
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.8
+
 = 5.12.1 (2026-05-18) =
 - Tweak: Normalize VAT numbers for EDI output
 - Fix: Preview document selection panel can't be closed

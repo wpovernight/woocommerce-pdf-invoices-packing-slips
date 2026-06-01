@@ -128,6 +128,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			'iban'           => '',
 			'bic'            => '',
 			'account_name'   => '',
+			'account_number' => '',
 			'transaction_id' => '',
 		);
 
@@ -156,9 +157,10 @@ abstract class AbstractHandler implements HandlerInterface {
 				$data = array_merge(
 					$data,
 					array(
-						'iban'         => isset( $account['iban'] )         ? (string) $account['iban']         : '',
-						'bic'          => isset( $account['bic'] )          ? (string) $account['bic']          : '',
-						'account_name' => isset( $account['account_name'] ) ? (string) $account['account_name'] : '',
+						'account_name'   => isset( $account['account_name'] )   ? (string) $account['account_name']   : '',
+						'account_number' => isset( $account['account_number'] ) ? (string) $account['account_number'] : '',
+						'iban'           => isset( $account['iban'] )           ? (string) $account['iban']           : '',
+						'bic'            => isset( $account['bic'] )            ? (string) $account['bic']            : '',
 					)
 				);
 			}
