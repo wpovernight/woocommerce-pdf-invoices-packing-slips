@@ -118,6 +118,13 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - Translations: Updated translation template (POT)
 - Tested: Compatibility confirmed with WooCommerce 10.8
 
+= 5.12.2 (2026-05-25) =
+- Fix: UBL payable amount for unpaid renewal orders
+- Fix: Order selection and XML behavior in document preview
+- Fix: Fatal error when locale value is missing
+- Fix: EDI price rounding for discounted multi-quantity lines
+- Translations: Updated translation template (POT)
+
 = 5.12.1 (2026-05-18) =
 - Tweak: Normalize VAT numbers for EDI output
 - Fix: Preview document selection panel can't be closed
