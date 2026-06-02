@@ -161,13 +161,21 @@ function wcpdf_get_bulk_actions(): array {
  * @return \WPO\IPS\Makers\PDFMaker
  */
 function wcpdf_get_pdf_maker( string $html, array $settings = array(), ?\WPO\IPS\Documents\OrderDocument $document = null ): \WPO\IPS\Makers\PDFMaker {
-	$class = '\\WPO\\IPS\\Makers\\PDFMaker';
+	$default_class = '\\WPO\\IPS\\Makers\\PDFMaker';
 
-	if ( ! class_exists( $class ) ) {
+	if ( ! class_exists( $default_class ) ) {
 		include_once( WPO_WCPDF()->plugin_path() . '/includes/Makers/PDFMaker.php' );
 	}
 
-	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $class );
+	$class = apply_filters( 'wpo_wcpdf_pdf_maker', $default_class );
+
+	if (
+		! is_string( $class )    ||
+		! class_exists( $class ) ||
+		! is_a( $class, $default_class, true )
+	) {
+		$class = $default_class;
+	}
 
 	return new $class( $html, $settings, $document );
 }
