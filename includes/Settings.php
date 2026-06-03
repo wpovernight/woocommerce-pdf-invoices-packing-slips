@@ -335,7 +335,7 @@ class Settings {
 							$order_number = $order->get_order_number();
 							$number_data  = array(
 								'number'           => absint( $order_number ),
-								'number_formatted' => "{$order_number}",
+								'formatted_number' => "{$order_number}",
 							);
 						}
 
