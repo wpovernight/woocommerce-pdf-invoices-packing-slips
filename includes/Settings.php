@@ -326,8 +326,31 @@ class Settings {
 
 					// Apply document number formatting.
 					if ( $document_number ) {
-						if ( ! empty( $document->settings['number_format'] ) && is_array( $document->settings['number_format'] ) ) {
-							$document_number->load_number_data( $document->settings['number_format'] );
+						$number_data = array();
+
+						if (
+							isset( $document->settings['display_number'] ) &&
+							'order_number' === $document->settings['display_number']
+						) {
+							$order_number = $order->get_order_number();
+							$number_data  = array(
+								'number'           => (int) preg_replace( '/\D/', '', $order_number ),
+								'formatted_number' => "{$order_number}",
+							);
+						}
+
+						if (
+							! empty( $document->settings['number_format'] ) &&
+							is_array( $document->settings['number_format'] )
+						) {
+							$number_data = array_merge(
+								$number_data,
+								$document->settings['number_format']
+							);
+						}
+
+						if ( ! empty( $number_data ) ) {
+							$document_number->load_number_data( $number_data );
 						}
 
 						$document_number->apply_formatting( $document, $order );
