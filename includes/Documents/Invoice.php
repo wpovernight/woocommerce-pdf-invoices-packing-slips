@@ -84,7 +84,11 @@ class Invoice extends OrderDocumentMethods {
 	 */
 	public function get_number_title() {
 		// override to allow for language switching!
-		$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
+		if ( ! empty( $this->settings['display_number'] ) && 'order_number' === $this->settings['display_number'] ) {
+			$title = __( 'Order Number:', 'woocommerce-pdf-invoices-packing-slips' );
+		} else {
+			$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
+		}
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' ); // deprecated
 		return apply_filters( 'wpo_wcpdf_document_number_title', $title, $this );
 	}
