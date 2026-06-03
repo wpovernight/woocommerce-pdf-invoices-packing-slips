@@ -303,26 +303,54 @@ class Settings {
 				$document = wcpdf_get_document( $document_type, $order );
 
 				if ( $document ) {
-					// Always use latest settings in preview, historical settings from the order should not affect preview.
-    				$document->settings = $document->get_settings( true );
-
 					if ( ! $document->exists() ) {
 						$document->set_date( current_time( 'timestamp', true ) );
+						$number_store_method = $this->get_sequential_number_store_method();
+						$number_store_name   = apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$document->slug}_number", $document );
+						$number_store        = new SequentialNumberStore( $number_store_name, $number_store_method );
+						$document->set_number( $number_store->get_next() );
+					}
+
+					// Update document date.
+					$document->initiate_date();
+
+					// Update document number only if it is not already set.
+					if ( empty( $document->get_number() ) ) {
 						$document_number = $document->get_document_number();
 						if ( ! empty( $document_number ) ) {
 							$document->set_number( $document_number );
 						}
 					}
 
-					// Update document date.
-					$document->initiate_date();
-
 					$document_number = $document->get_number( $document->get_type() );
 
 					// Apply document number formatting.
 					if ( $document_number ) {
-						if ( ! empty( $document->settings['number_format'] ) && is_array( $document->settings['number_format'] ) ) {
-							$document_number->load_number_data( $document->settings['number_format'] );
+						$number_data = array();
+
+						if (
+							isset( $document->settings['display_number'] ) &&
+							'order_number' === $document->settings['display_number']
+						) {
+							$order_number = $order->get_order_number();
+							$number_data  = array(
+								'number'           => absint( $order_number ),
+								'number_formatted' => "{$order_number}",
+							);
+						}
+
+						if (
+							! empty( $document->settings['number_format'] ) &&
+							is_array( $document->settings['number_format'] )
+						) {
+							$number_data = array_merge(
+								$number_data,
+								$document->settings['number_format']
+							);
+						}
+
+						if ( ! empty( $number_data ) ) {
+							$document_number->load_number_data( $number_data );
 						}
 
 						$document_number->apply_formatting( $document, $order );
