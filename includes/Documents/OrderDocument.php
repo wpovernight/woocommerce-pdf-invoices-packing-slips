@@ -732,10 +732,6 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_number_title() {
-		if ( ! empty( $this->settings['display_number'] ) && 'order_number' === $this->settings['display_number'] ) {
-			return $this->get_title_for( 'order_number' );
-		}
-
 		return $this->get_title_for( 'document_number' );
 	}
 
