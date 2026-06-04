@@ -435,12 +435,27 @@ class ThirdPartyPlugins {
 				return sanitize_text_field( trim( $number ) );
 			}, $invoice_numbers );
 
-			$order_query_args['meta_query']    = $order_query_args['meta_query'] ?? array();
-			$order_query_args['meta_query'][]  = [
-				'key'     => '_wcpdf_invoice_number',
-				'value'   => $invoice_numbers,
-				'compare' => 'IN',
-			];
+			$order_query_args['meta_query'] = $order_query_args['meta_query'] ?? array();
+			$partial_search_enabled         = WPO_WCPDF()->admin->invoice_number_partial_search_enabled();
+
+			if ( $partial_search_enabled ) {
+				$order_query_args['meta_query']['relation'] = 'OR';
+
+				foreach ( $invoice_numbers as $invoice_number ) {
+					$order_query_args['meta_query'][] = array(
+						'key'     => '_wcpdf_invoice_number',
+						'value'   => $invoice_number,
+						'compare' => 'LIKE',
+					);
+				}
+			} else {
+				$order_query_args['meta_query'][] = array(
+					'key'     => '_wcpdf_invoice_number',
+					'value'   => $invoice_numbers,
+					'compare' => 'IN',
+				);
+			}
+
 			$order_query_args['search_filter'] = 'all';
 			unset( $order_query_args['s'] );
 		}

@@ -449,6 +449,17 @@ class Admin {
 		return $is_enabled;
 	}
 
+	/**
+	 * Check if the invoice number partial search is enabled.
+	 *
+	 * @return boolean
+	 */
+	public function invoice_number_partial_search_enabled(): bool {
+		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+
+		return isset( $invoice_settings['invoice_number_partial_search'] );
+	}
+
 
 	/**
 	 * Makes invoice columns sortable

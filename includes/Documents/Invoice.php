@@ -510,6 +510,18 @@ class Invoice extends OrderDocumentMethods {
 				)
 			),
 			array(
+				'type'		    => 'setting',
+				'id'		    => 'invoice_number_partial_search',
+				'title'		    => __( 'Enable partial invoice number matching', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	    => 'checkbox',
+				'section'	    => $this->type,
+				'args'		    => array(
+					'option_name'	=> $option_name,
+					'id'			=> 'invoice_number_partial_search',
+					'description'	=> __( 'When enabled, searching for an invoice number will also match partial values (e.g. searching "123" will match "INV-123"). Requires invoice number search to be enabled.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
 				'type'			=> 'setting',
 				'id'			=> 'disable_free',
 				'title'			=> __( 'Disable for free orders', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -685,6 +697,7 @@ class Invoice extends OrderDocumentMethods {
 						'invoice_number_column',
 						'invoice_date_column',
 						'invoice_number_search',
+						'invoice_number_partial_search',
 					),
 				),
 				'advanced'         => array(

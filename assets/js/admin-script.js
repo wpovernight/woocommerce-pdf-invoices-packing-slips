@@ -116,6 +116,17 @@ jQuery( function( $ ) {
 		}
 	} ).trigger( 'change' );
 
+	$( '#wpo-wcpdf-preview-wrapper #invoice_number_search' ).on( 'change', function() {
+		const $invoice_number_search         = $( '#wpo-wcpdf-preview-wrapper #invoice_number_search' );
+		const $invoice_number_partial_search = $( '#wpo-wcpdf-preview-wrapper #invoice_number_partial_search' );
+
+		if ( $invoice_number_search.is( ':checked' ) ) {
+			$invoice_number_partial_search.prop( 'disabled', false );
+		} else {
+			$invoice_number_partial_search.prop( 'disabled', true );
+		}
+	} ).trigger( 'change' );
+
 	//----------> Preview <----------//
 	// objects
 	let $previewWrapper           = $( '#wpo-wcpdf-preview-wrapper' );
