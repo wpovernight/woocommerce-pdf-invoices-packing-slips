@@ -436,18 +436,21 @@ class ThirdPartyPlugins {
 			}, $invoice_numbers );
 
 			$order_query_args['meta_query'] = $order_query_args['meta_query'] ?? array();
-			$partial_search_enabled         = WPO_WCPDF()->admin->invoice_number_partial_search_enabled();
 
-			if ( $partial_search_enabled ) {
-				$order_query_args['meta_query']['relation'] = 'OR';
+			if ( WPO_WCPDF()->admin->invoice_number_search_enabled( true ) ) {
+				$partial_clauses = array(
+					'relation' => 'OR',
+				);
 
 				foreach ( $invoice_numbers as $invoice_number ) {
-					$order_query_args['meta_query'][] = array(
+					$partial_clauses[] = array(
 						'key'     => '_wcpdf_invoice_number',
 						'value'   => $invoice_number,
 						'compare' => 'LIKE',
 					);
 				}
+
+				$order_query_args['meta_query'][] = $partial_clauses;
 			} else {
 				$order_query_args['meta_query'][] = array(
 					'key'     => '_wcpdf_invoice_number',
