@@ -516,9 +516,14 @@ class Invoice extends OrderDocumentMethods {
 				'callback'	    => 'checkbox',
 				'section'	    => $this->type,
 				'args'		    => array(
-					'option_name'	=> $option_name,
-					'id'			=> 'invoice_number_partial_search',
-					'description'	=> __( 'When enabled, searching for an invoice number will also match partial values (e.g. searching "123" will match "INV-123"). Requires invoice number search to be enabled.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'option_name'	    => $option_name,
+					'id'			    => 'invoice_number_partial_search',
+					'description'	    => __( 'When enabled, searching for an invoice number will also match partial values (e.g. searching "123" will match "INV-123"). Requires invoice number search to be enabled.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes'	=> array(
+						'data-show_for_option_name'   => $option_name . '[invoice_number_search]',
+						'data-show_for_option_values' => wp_json_encode( array( '1' ) ),
+						'data-keep_current_value'     => true,
+					),
 				)
 			),
 			array(
