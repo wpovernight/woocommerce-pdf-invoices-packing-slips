@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 5.13.1-i1539.1
+Stable tag: 5.14.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,14 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.14.0 (2026-06-08) =
+- New: Add partial invoice number search setting
+- Fix: Empty order item prices when WooCommerce subtotal is filtered
+- Fix: Prevent fatal when REST invoice number lookup returns bulk document
+- Fix: Document number display setting not respected in preview
+- Fix: Bulk Document: “Mark as printed” not applied to all orders in bulk export
+- Translations: Updated translation template (POT)
 
 = 5.13.0 (2026-06-01) =
 - New: Add email attachment success/failure logging to order notes
