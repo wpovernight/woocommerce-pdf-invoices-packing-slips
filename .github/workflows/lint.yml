@@ -33,7 +33,7 @@ jobs:
           fail-fast: true
 
       - name: Run PHP Parallel Lint on PHP ${{ matrix.php-versions }}
-          shell: bash
-          run: |
-            set -o pipefail
-            parallel-lint . --exclude vendor --checkstyle --show-deprecated | cs2pr
+        shell: bash
+        run: |
+          set -o pipefail
+          parallel-lint . --exclude vendor --checkstyle --show-deprecated | cs2pr
