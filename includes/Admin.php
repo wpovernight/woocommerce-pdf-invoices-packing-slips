@@ -437,16 +437,16 @@ class Admin {
 
 	/**
 	 * Check if the invoice number search is enabled.
+	 * 
+	 * @param  bool $check_partial Check if the partial search is enabled.
+	 * 
+	 * @return bool
 	 */
-	public function invoice_number_search_enabled() {
-		$is_enabled       = false;
+	public function invoice_number_search_enabled( bool $check_partial = false ): bool {
 		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+		$setting_key      = $check_partial ? 'invoice_number_partial_search' : 'invoice_number_search';
 
-		if ( isset( $invoice_settings['invoice_number_search'] ) ) {
-			$is_enabled = true;
-		}
-
-		return $is_enabled;
+		return isset( $invoice_settings[ $setting_key ] );
 	}
 
 
