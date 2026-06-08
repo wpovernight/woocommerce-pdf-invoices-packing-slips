@@ -12,14 +12,18 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function wcpdf_filter_order_ids( array $order_ids, string $document_type ): array {
 	$order_ids = apply_filters( 'wpo_wcpdf_process_order_ids', $order_ids, $document_type );
-	// filter out trashed orders.
+
+	// Filter out trashed orders.
 	foreach ( $order_ids as $key => $order_id ) {
 		$order = wc_get_order( $order_id );
-		if ( ! empty( $order ) && is_callable( array( $order, 'get_status' ) ) && $order->get_status() == 'trash' ) {
+
+		if ( ! empty( $order ) && is_callable( array( $order, 'get_status' ) ) && 'trash' === $order->get_status() ) {
 			unset( $order_ids[ $key ] );
 		}
 	}
-	return $order_ids;
+
+	// Ensure duplicated order IDs do not incorrectly trigger a BulkDocument.
+	return array_values( array_unique( $order_ids ) );
 }
 
 /**

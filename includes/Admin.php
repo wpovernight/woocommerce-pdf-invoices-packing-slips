@@ -350,17 +350,15 @@ class Admin {
 	/**
 	 * Check if the invoice number search is enabled.
 	 * 
+	 * @param  bool $check_partial Check if the partial search is enabled.
+	 * 
 	 * @return bool
 	 */
-	public function invoice_number_search_enabled(): bool {
-		$is_enabled       = false;
-		$invoice_settings = $this->get_invoice_settings();
+	public function invoice_number_search_enabled( bool $check_partial = false ): bool {
+		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+		$setting_key      = $check_partial ? 'invoice_number_partial_search' : 'invoice_number_search';
 
-		if ( isset( $invoice_settings['invoice_number_search'] ) ) {
-			$is_enabled = true;
-		}
-
-		return $is_enabled;
+		return isset( $invoice_settings[ $setting_key ] );
 	}
 
 
@@ -2079,7 +2077,7 @@ class Admin {
 
 		$query->set( 'orderby', $this->is_invoice_number_numeric() ? 'meta_value_num' : 'meta_value' );
 	}
-	
+
 	/**
 	 * Adds "Invoice numbers" filter to the search filters available in the admin order search.
 	 *
@@ -2090,8 +2088,9 @@ class Admin {
 		if ( WPO_WCPDF()->get_instance( 'admin' )->invoice_number_search_enabled() ) {
 			$all = $options['all'];
 			unset( $options['all'] );
+
 			$options['invoice_numbers'] = __( 'Invoice numbers', 'woocommerce-pdf-invoices-packing-slips' );
-			$options['all'] = $all;
+			$options['all']             = $all;
 		}
 
 		return $options;
@@ -2110,12 +2109,30 @@ class Admin {
 				return sanitize_text_field( trim( $number ) );
 			}, $invoice_numbers );
 
-			$order_query_args['meta_query']    = $order_query_args['meta_query'] ?? array();
-			$order_query_args['meta_query'][]  = [
-				'key'     => '_wcpdf_invoice_number',
-				'value'   => $invoice_numbers,
-				'compare' => 'IN',
-			];
+			$order_query_args['meta_query'] = $order_query_args['meta_query'] ?? array();
+
+			if ( WPO_WCPDF()->get_instance( 'admin' )->invoice_number_search_enabled( true ) ) {
+				$partial_clauses = array(
+					'relation' => 'OR',
+				);
+
+				foreach ( $invoice_numbers as $invoice_number ) {
+					$partial_clauses[] = array(
+						'key'     => '_wcpdf_invoice_number',
+						'value'   => $invoice_number,
+						'compare' => 'LIKE',
+					);
+				}
+
+				$order_query_args['meta_query'][] = $partial_clauses;
+			} else {
+				$order_query_args['meta_query'][] = array(
+					'key'     => '_wcpdf_invoice_number',
+					'value'   => $invoice_numbers,
+					'compare' => 'IN',
+				);
+			}
+
 			$order_query_args['search_filter'] = 'all';
 			unset( $order_query_args['s'] );
 		}
