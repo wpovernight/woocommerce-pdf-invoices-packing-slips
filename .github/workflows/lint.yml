@@ -5,16 +5,20 @@ on:
   pull_request:
     paths:
       - '**.php'
+      - '.github/workflows/php-lint.yml'
   push:
     branches:
       - master
     paths:
       - '**.php'
+      - '.github/workflows/php-lint.yml'
 
 jobs:
   lint:
     runs-on: ${{ matrix.operating-system }}
+
     strategy:
+      fail-fast: false
       matrix:
         operating-system: ['ubuntu-latest']
         php-versions: ['8.1', '8.2', '8.3', '8.4', '8.5']
@@ -28,9 +32,15 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           coverage: none
-          tools: cs2pr, php-parallel-lint/php-parallel-lint
-        env:
-          fail-fast: true
+          tools: composer:v2
+
+      - name: Install lint tools
+        run: |
+          composer global require --no-interaction --prefer-dist \
+            php-parallel-lint/php-parallel-lint \
+            staabm/annotate-pull-request-from-checkstyle
+
+          echo "$(composer global config bin-dir --absolute)" >> "$GITHUB_PATH"
 
       - name: Run PHP Parallel Lint on PHP ${{ matrix.php-versions }}
         shell: bash
