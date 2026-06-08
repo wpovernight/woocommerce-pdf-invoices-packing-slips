@@ -627,7 +627,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 				$data['line_subtotal_tax'] = $this->format_price( $item['line_subtotal_tax'] );
 				$data['ex_price']          = $this->get_formatted_item_price( $item, 'total', 'excl' );
 				$data['price']             = $this->get_formatted_item_price( $item, 'total' );
-				$data['order_price']       = $this->order->get_formatted_line_subtotal( $item ); // formatted according to WC settings
+				$data['order_price']       = $this->get_formatted_order_item_price( $item );
 
 				// Calculate the single price with the same rules as the formatted line subtotal (!)
 				// = before discount
@@ -1251,6 +1251,31 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 
 		return $item_price;
+	}
+
+	/**
+	 * Gets the order item price formatted for display.
+	 *
+	 * Uses WooCommerce's formatted line subtotal when available, but falls back to
+	 * our own formatter if a third-party callback empties the WooCommerce value.
+	 *
+	 * @param mixed $item Order item.
+	 * @return string
+	 */
+	public function get_formatted_order_item_price( $item ): string {
+		$order_price = is_callable( array( $this->order, 'get_formatted_line_subtotal' ) )
+			? $this->order->get_formatted_line_subtotal( $item )
+			: '';
+
+		if ( '' !== trim( wp_strip_all_tags( (string) $order_price ) ) ) {
+			return (string) $order_price;
+		}
+
+		return $this->get_formatted_item_price(
+			$item,
+			'total',
+			get_option( 'woocommerce_tax_display_cart', 'excl' )
+		);
 	}
 
 	/**
