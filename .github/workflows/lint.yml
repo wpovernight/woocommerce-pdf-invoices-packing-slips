@@ -28,7 +28,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           coverage: none
-          tools: cs2pr, parallel-lint
+          tools: cs2pr, php-parallel-lint/php-parallel-lint
         env:
           fail-fast: true
 
