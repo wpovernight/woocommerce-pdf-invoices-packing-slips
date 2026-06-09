@@ -36,7 +36,7 @@ class Peppol {
 		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
-		add_action( 'woocommerce_new_order', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 20, 2 );
+		add_action( 'woocommerce_checkout_order_created', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 999, 1 );
 
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
@@ -721,11 +721,10 @@ class Peppol {
 	/**
 	 * Handle automatic Peppol Endpoint ID derivation on new order creation.
 	 *
-	 * @param int $order_id
 	 * @param \WC_Order $order
 	 * @return void
 	 */
-	public function peppol_handle_new_order_automatic_endpoint_id_derivation( int $order_id, $order ): void {
+	public function peppol_handle_new_order_automatic_endpoint_id_derivation( \WC_Order $order ): void {
 		if (
 			! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ||
 			wpo_ips_edi_peppol_enabled_for_location( 'checkout' )
@@ -733,14 +732,7 @@ class Peppol {
 			return;
 		}
 
-		if ( is_null( $order ) ) {
-			$order = wc_get_order( $order_id );
-		}
-
-		// check if we have an order object
-		if ( empty( $order ) ) {
-			return;
-		}
+		$order->read_meta_data( true );
 
 		$billing_country = $order->get_billing_country();
 		$vat_number      = wpo_wcpdf_get_order_customer_vat_number( $order );
