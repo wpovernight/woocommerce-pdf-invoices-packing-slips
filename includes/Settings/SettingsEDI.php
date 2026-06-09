@@ -370,11 +370,36 @@ class SettingsEDI {
 
 		if ( is_array( $mappings ) ) {
 			foreach ( $mappings as $code => $data ) {
-				if ( empty( $data['name'] ) || empty( $data['eas'] ) ) {
+				if (
+					! is_array( $data ) ||
+					empty( $data['name'] ) ||
+					empty( $data['mappings'] ) ||
+					! is_array( $data['mappings'] )
+				) {
 					continue;
 				}
 
-				$countries[ $code ] = sprintf( '%s [%s]', $data['name'], $data['eas'] );
+				$eas_codes = array();
+
+				foreach ( $data['mappings'] as $mapping ) {
+					if ( ! is_array( $mapping ) || empty( $mapping['eas'] ) ) {
+						continue;
+					}
+
+					$eas_codes[] = (string) $mapping['eas'];
+				}
+
+				$eas_codes = array_values( array_unique( array_filter( $eas_codes ) ) );
+
+				if ( empty( $eas_codes ) ) {
+					continue;
+				}
+
+				$countries[ $code ] = sprintf(
+					'%s [%s]',
+					$data['name'],
+					implode( ', ', $eas_codes )
+				);
 			}
 		}
 

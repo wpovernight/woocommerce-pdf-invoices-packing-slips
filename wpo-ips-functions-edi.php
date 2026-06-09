@@ -846,42 +846,74 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 		return array();
 	}
 
-	$cfg   = $mappings[ $billing_country ];
-	$value = $parts['id'];
+	$cfg     = $mappings[ $billing_country ];
+	$configs = ! empty( $cfg['mappings'] ) && is_array( $cfg['mappings'] )
+		? $cfg['mappings']
+		: array( $cfg );
 
-	if ( '' === $value ) {
-		return array();
-	}
+	foreach ( $configs as $config ) {
+		$value = $vat_number;
 
-	// Keep only what the country expects.
-	if ( ! empty( $cfg['keep_pattern'] ) && is_string( $cfg['keep_pattern'] ) ) {
-		if ( preg_match_all( $cfg['keep_pattern'], $value, $m ) ) {
-			$value = implode( '', $m[0] );
-		} else {
-			$value = '';
+		if ( '' === $value ) {
+			continue;
 		}
+
+		if ( ! empty( $config['strip_prefixes'] ) && is_array( $config['strip_prefixes'] ) ) {
+			foreach ( $config['strip_prefixes'] as $strip_prefix ) {
+				$strip_prefix = strtoupper( trim( (string) $strip_prefix ) );
+
+				if ( '' === $strip_prefix ) {
+					continue;
+				}
+
+				$value = (string) preg_replace(
+					'/^' . preg_quote( $strip_prefix, '/' ) . '/i',
+					'',
+					$value
+				);
+			}
+		}
+
+		// Keep only what the country/mapping expects.
+		if ( ! empty( $config['keep_pattern'] ) && is_string( $config['keep_pattern'] ) ) {
+			if ( preg_match_all( $config['keep_pattern'], $value, $matches ) ) {
+				$value = implode( '', $matches[0] );
+			} else {
+				$value = '';
+			}
+		}
+
+		$value = trim( $value );
+
+		if ( '' === $value ) {
+			continue;
+		}
+
+		if ( ! empty( $config['length'] ) ) {
+			$lengths = is_array( $config['length'] )
+				? $config['length']
+				: array( $config['length'] );
+
+			$lengths = array_values( array_filter( array_map( 'absint', $lengths ) ) );
+
+			if ( ! empty( $lengths ) && ! in_array( strlen( $value ), $lengths, true ) ) {
+				continue;
+			}
+		}
+
+		$eas = (string) ( $config['eas'] ?? '' );
+
+		if ( '' === $eas ) {
+			continue;
+		}
+
+		return array(
+			'eas'         => $eas,
+			'endpoint_id' => sprintf( '%s:%s', $eas, $value ),
+		);
 	}
 
-	$value = trim( $value );
-
-	if ( '' === $value ) {
-		return array();
-	}
-
-	if ( ! empty( $cfg['length'] ) && is_int( $cfg['length'] ) && strlen( $value ) !== $cfg['length'] ) {
-		return array();
-	}
-
-	$eas = (string) ( $cfg['eas'] ?? '' );
-
-	if ( '' === $eas ) {
-		return array();
-	}
-
-	return array(
-		'eas'         => $eas,
-		'endpoint_id' => sprintf( '%s:%s', $eas, $value ),
-	);
+	return array();
 }
 
 /**
@@ -891,12 +923,336 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
  */
 function wpo_ips_edi_get_peppol_vat_mappings(): array {
 	$mappings = array(
+		'AT' => array(
+			'name'     => 'Austria',
+			'mappings' => array(
+				array(
+					'eas'            => '9914',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
 		'BE' => array(
-			'name'           => 'Belgium',
-			'eas'            => '0208',
-			'strip_prefixes' => array( 'BE' ),
-			'keep_pattern'   => '/\d+/',
-			'length'         => 10,
+			'name'     => 'Belgium',
+			'mappings' => array(
+				array(
+					'eas'            => '0208',
+					'strip_prefixes' => array( 'BE' ),
+					'keep_pattern'   => '/\d+/',
+					'length'         => 10,
+				),
+				array(
+					'eas'            => '9925',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 12,
+				),
+			),
+		),
+		'BG' => array(
+			'name'     => 'Bulgaria',
+			'mappings' => array(
+				array(
+					'eas'            => '9926',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 11, 12 ),
+				),
+			),
+		),
+		'CY' => array(
+			'name'     => 'Cyprus',
+			'mappings' => array(
+				array(
+					'eas'            => '9928',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'CZ' => array(
+			'name'     => 'Czech Republic',
+			'mappings' => array(
+				array(
+					'eas'            => '9929',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 10, 11, 12 ),
+				),
+			),
+		),
+		'DE' => array(
+			'name'     => 'Germany',
+			'mappings' => array(
+				array(
+					'eas'            => '9930',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'DK' => array(
+			'name'     => 'Denmark',
+			'mappings' => array(
+				array(
+					'eas'            => '0184',
+					'strip_prefixes' => array( 'DK' ),
+					'keep_pattern'   => '/\d+/',
+					'length'         => 8,
+				),
+			),
+		),
+		'EE' => array(
+			'name'     => 'Estonia',
+			'mappings' => array(
+				array(
+					'eas'            => '9931',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'ES' => array(
+			'name'     => 'Spain',
+			'mappings' => array(
+				array(
+					'eas'            => '9920',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'FI' => array(
+			'name'     => 'Finland',
+			'mappings' => array(
+				array(
+					'eas'            => '0213',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'FR' => array(
+			'name'     => 'France',
+			'mappings' => array(
+				array(
+					'eas'            => '0002',
+					'strip_prefixes' => array( 'FR' ),
+					'keep_pattern'   => '/\d{9}$/',
+					'length'         => 9,
+				),
+				array(
+					'eas'            => '9957',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 13,
+				),
+			),
+		),
+		'GB' => array(
+			'name'     => 'United Kingdom',
+			'mappings' => array(
+				array(
+					'eas'            => '9932',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 11, 14 ),
+				),
+			),
+		),
+		'GR' => array(
+			'name'     => 'Greece',
+			'mappings' => array(
+				array(
+					'eas'            => '9933',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'HR' => array(
+			'name'     => 'Croatia',
+			'mappings' => array(
+				array(
+					'eas'            => '9934',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 13,
+				),
+			),
+		),
+		'HU' => array(
+			'name'     => 'Hungary',
+			'mappings' => array(
+				array(
+					'eas'            => '9910',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'IE' => array(
+			'name'     => 'Ireland',
+			'mappings' => array(
+				array(
+					'eas'            => '9935',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 10, 11 ),
+				),
+			),
+		),
+		'IT' => array(
+			'name'     => 'Italy',
+			'mappings' => array(
+				array(
+					'eas'            => '0211',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 13,
+				),
+			),
+		),
+		'LT' => array(
+			'name'     => 'Lithuania',
+			'mappings' => array(
+				array(
+					'eas'            => '9937',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 11, 14 ),
+				),
+			),
+		),
+		'LU' => array(
+			'name'     => 'Luxembourg',
+			'mappings' => array(
+				array(
+					'eas'            => '9938',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'LV' => array(
+			'name'     => 'Latvia',
+			'mappings' => array(
+				array(
+					'eas'            => '9939',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 13,
+				),
+			),
+		),
+		'MT' => array(
+			'name'     => 'Malta',
+			'mappings' => array(
+				array(
+					'eas'            => '9943',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'NL' => array(
+			'name'     => 'Netherlands',
+			'mappings' => array(
+				array(
+					'eas'            => '9944',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 14,
+				),
+			),
+		),
+		'NO' => array(
+			'name'     => 'Norway',
+			'mappings' => array(
+				array(
+					'eas'            => '0192',
+					'strip_prefixes' => array( 'NO' ),
+					'keep_pattern'   => '/\d+/',
+					'length'         => 9,
+				),
+			),
+		),
+		'PL' => array(
+			'name'     => 'Poland',
+			'mappings' => array(
+				array(
+					'eas'            => '9945',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 12,
+				),
+			),
+		),
+		'PT' => array(
+			'name'     => 'Portugal',
+			'mappings' => array(
+				array(
+					'eas'            => '9946',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'RO' => array(
+			'name'     => 'Romania',
+			'mappings' => array(
+				array(
+					'eas'            => '9947',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => range( 4, 12 ),
+				),
+			),
+		),
+		'SE' => array(
+			'name'     => 'Sweden',
+			'mappings' => array(
+				array(
+					'eas'            => '0007',
+					'strip_prefixes' => array( 'SE' ),
+					'keep_pattern'   => '/^\d{10}/',
+					'length'         => 10,
+				),
+			),
+		),
+		'SI' => array(
+			'name'     => 'Slovenia',
+			'mappings' => array(
+				array(
+					'eas'            => '9949',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'SK' => array(
+			'name'     => 'Slovakia',
+			'mappings' => array(
+				array(
+					'eas'            => '9950',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 12,
+				),
+			),
 		),
 	);
 
