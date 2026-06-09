@@ -124,6 +124,25 @@ class SettingsGeneral {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'template_color',
+				'title'    => __( 'Template color', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => 'template_color',
+					'type'              => 'color',
+					'default'           => apply_filters( 'wpo_ips_template_color_default', '#000000', WPO_WCPDF()->settings->general_settings['template_path'] ?? '' ),
+					'description'       => __( 'Sets the primary color used across supported templates.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[template_path]',
+						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_template_color_supported_templates', array() ) ),
+						'data-keep_current_value'     => 'true',
+					),
+				),
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'paper_size',
 				'title'    => __( 'Paper size', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
@@ -657,6 +676,7 @@ class SettingsGeneral {
 					'paper_size',
 					'template_path',
 					'template_ink_saving',
+					'template_color',
 					'test_mode',
 				),
 			),
