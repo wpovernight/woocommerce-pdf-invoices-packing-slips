@@ -694,7 +694,7 @@ class Peppol {
 						);
 					}
 
-					$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $value );
+					$result = $this->peppol_find_valid_endpoint_from_vat( $billing_country, $value );
 					if ( empty( $result['endpoint_id'] ) || empty( $result['eas'] ) ) {
 						return rest_ensure_response(
 							array(
@@ -742,15 +742,9 @@ class Peppol {
 			return;
 		}
 
-		$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $vat_number );
+		$result = $this->peppol_find_valid_endpoint_from_vat( $billing_country, $vat_number );
 
 		if ( empty( $result['endpoint_id'] ) ) {
-			return;
-		}
-
-		$validation = $this->peppol_validate_identifier_value( $result['endpoint_id'] );
-
-		if ( is_wp_error( $validation ) ) {
 			return;
 		}
 
@@ -1294,6 +1288,58 @@ class Peppol {
 				'participant' => $participant_id,
 			)
 		);
+	}
+
+	/**
+	 * Find the first valid Peppol endpoint from VAT mappings.
+	 *
+	 * @param string $billing_country Billing country.
+	 * @param string $vat_number      VAT number.
+	 * @return array
+	 */
+	private function peppol_find_valid_endpoint_from_vat( string $billing_country, string $vat_number ): array {
+		$candidates = wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( $billing_country, $vat_number );
+
+		foreach ( $candidates as $candidate ) {
+			if ( empty( $candidate['endpoint_id'] ) ) {
+				continue;
+			}
+
+			if ( $this->peppol_directory_participant_exists( (string) $candidate['endpoint_id'] ) ) {
+				return $candidate;
+			}
+		}
+
+		return array();
+	}
+
+	/**
+	 * Check whether a Peppol participant exists in the Directory.
+	 *
+	 * @param string $endpoint_id Endpoint ID.
+	 * @return bool
+	 */
+	private function peppol_directory_participant_exists( string $endpoint_id ): bool {
+		$data = $this->peppol_directory_request_by_participant( $endpoint_id );
+
+		if ( is_wp_error( $data ) ) {
+			return false;
+		}
+
+		$matches     = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
+		$endpoint_id = wc_strtolower( trim( $endpoint_id ) );
+
+		foreach ( $matches as $match ) {
+			$value = isset( $match['participantID']['value'] )
+				? wc_strtolower( trim( (string) $match['participantID']['value'] ) )
+				: '';
+
+			if ( $value === $endpoint_id ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

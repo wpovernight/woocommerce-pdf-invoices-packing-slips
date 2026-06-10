@@ -804,13 +804,13 @@ function wpo_ips_edi_get_order_customer_vat_number( \WC_Order $order ): ?string 
 }
 
 /**
- * Build PEPPOL endpoint ID from VAT number.
+ * Build PEPPOL endpoint ID candidates from VAT number.
  *
  * @param string $billing_country The billing country code (ISO 3166-1 alpha-2).
  * @param string $vat_number      The VAT number.
- * @return array Array with 'eas' and 'endpoint_id' keys, or empty array on failure.
+ * @return array
  */
-function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, string $vat_number ): array {
+function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_country, string $vat_number ): array {
 	$billing_country = strtoupper( trim( $billing_country ) );
 	$vat_number      = wpo_ips_edi_normalize_vat_number( $vat_number );
 
@@ -851,6 +851,8 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 		? $cfg['mappings']
 		: array( $cfg );
 
+	$candidates = array();
+
 	foreach ( $configs as $config ) {
 		$value = $vat_number;
 
@@ -874,7 +876,6 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 			}
 		}
 
-		// Keep only what the country/mapping expects.
 		if ( ! empty( $config['keep_pattern'] ) && is_string( $config['keep_pattern'] ) ) {
 			if ( preg_match_all( $config['keep_pattern'], $value, $matches ) ) {
 				$value = implode( '', $matches[0] );
@@ -907,13 +908,13 @@ function wpo_ips_edi_build_peppol_endpoint_from_vat( string $billing_country, st
 			continue;
 		}
 
-		return array(
+		$candidates[] = array(
 			'eas'         => $eas,
 			'endpoint_id' => sprintf( '%s:%s', $eas, $value ),
 		);
 	}
 
-	return array();
+	return $candidates;
 }
 
 /**
