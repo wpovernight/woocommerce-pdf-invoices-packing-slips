@@ -725,10 +725,11 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_handle_new_order_automatic_endpoint_id_derivation( \WC_Order $order ): void {
-		if (
-			! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ||
-			wpo_ips_edi_peppol_enabled_for_location( 'checkout' )
-		) {
+		if ( ! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ) {
+			return;
+		}
+
+		if ( wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
 
@@ -742,18 +743,30 @@ class Peppol {
 		}
 
 		$result = wpo_ips_edi_build_peppol_endpoint_from_vat( $billing_country, $vat_number );
+
 		if ( empty( $result['endpoint_id'] ) ) {
 			return;
 		}
 
 		$validation = $this->peppol_validate_identifier_value( $result['endpoint_id'] );
+
 		if ( is_wp_error( $validation ) ) {
 			return;
 		}
 
+		/*
+		 * Important:
+		 * Keep peppol_endpoint_id as "scheme:identifier".
+		 * wpo_ips_edi_maybe_save_order_peppol_data() will split it internally
+		 * and save _peppol_endpoint_id + _peppol_endpoint_eas.
+		 */
 		$data = array(
 			'peppol_endpoint_id' => $result['endpoint_id'],
 		);
+
+		if ( ! empty( $result['eas'] ) ) {
+			$data['peppol_endpoint_eas'] = $result['eas'];
+		}
 
 		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
 			? absint( $order->get_customer_id() )
@@ -1119,7 +1132,9 @@ class Peppol {
 		}
 
 		// First attempt: full query (can be scheme:value, value, or name).
-		$data = $this->peppol_directory_request( $primary_query );
+		$data = $has_colon
+			? $this->peppol_directory_request_by_participant( $primary_query )
+			: $this->peppol_directory_request_by_query( $primary_query );
 
 		if ( is_wp_error( $data ) ) {
 			return $data;
@@ -1129,7 +1144,7 @@ class Peppol {
 
 		// Fallback: if we had "scheme:value" and got no matches, try "value" only.
 		if ( $has_colon && empty( $matches ) && '' !== $fallback_query ) {
-			$data = $this->peppol_directory_request( $fallback_query );
+			$data = $this->peppol_directory_request_by_query( $fallback_query );
 
 			if ( is_wp_error( $data ) ) {
 				return $data;
@@ -1191,20 +1206,17 @@ class Peppol {
 	}
 
 	/**
-	 * Perform a Peppol Directory request using the generic "q" parameter.
+	 * Perform a Peppol Directory request.
 	 *
-	 * @param string $query
+	 * @param array $query_args Query arguments.
 	 * @return array|\WP_Error
 	 */
-	private function peppol_directory_request( string $query ) {
+	private function peppol_directory_request( array $query_args ) {
 		$base_url = 'https://directory.peppol.eu/search/1.0/json';
 
-		$query_args = array(
-			'q'        => $query,
-			'beautify' => 'true',
-		);
+		$query_args['beautify'] = 'true';
 
-		$url = add_query_arg( $query_args, $base_url );
+		$url = $base_url . '?' . http_build_query( $query_args, '', '&', PHP_QUERY_RFC3986 );
 
 		$response = wp_remote_get(
 			$url,
@@ -1248,6 +1260,40 @@ class Peppol {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Perform a Peppol Directory request using the generic query parameter.
+	 *
+	 * @param string $query Query.
+	 * @return array|\WP_Error
+	 */
+	private function peppol_directory_request_by_query( string $query ) {
+		return $this->peppol_directory_request(
+			array(
+				'q' => trim( $query ),
+			)
+		);
+	}
+
+	/**
+	 * Perform a Peppol Directory request using the exact participant parameter.
+	 *
+	 * @param string $participant_id Participant ID.
+	 * @return array|\WP_Error
+	 */
+	private function peppol_directory_request_by_participant( string $participant_id ) {
+		$participant_id = trim( $participant_id );
+
+		if ( false === strpos( $participant_id, '::' ) ) {
+			$participant_id = 'iso6523-actorid-upis::' . $participant_id;
+		}
+
+		return $this->peppol_directory_request(
+			array(
+				'participant' => $participant_id,
+			)
+		);
 	}
 
 	/**
