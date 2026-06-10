@@ -840,6 +840,17 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 		}
 	}
 
+	/*
+	 * Format after validation so local VAT numbers are expanded using the
+	 * billing country. Example: 123456789 + PT becomes PT123456789.
+	 */
+	$vat_number = wpo_ips_edi_format_vat_number( $vat_number, $billing_country );
+	$vat_number = wpo_ips_edi_normalize_vat_number( $vat_number );
+
+	if ( '' === $vat_number ) {
+		return array();
+	}
+
 	$mappings = wpo_ips_edi_get_peppol_vat_mappings();
 
 	if ( empty( $mappings[ $billing_country ] ) ) {

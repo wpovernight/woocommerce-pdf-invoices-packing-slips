@@ -744,7 +744,7 @@ class Peppol {
 
 		$result = $this->peppol_find_valid_endpoint_from_vat( $billing_country, $vat_number );
 
-		if ( empty( $result['endpoint_id'] ) ) {
+		if ( empty( $result['endpoint_id'] ) || empty( $result['eas'] ) ) {
 			return;
 		}
 

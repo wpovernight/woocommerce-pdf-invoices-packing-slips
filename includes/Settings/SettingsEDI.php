@@ -370,18 +370,17 @@ class SettingsEDI {
 
 		if ( is_array( $mappings ) ) {
 			foreach ( $mappings as $code => $data ) {
-				if (
-					! is_array( $data ) ||
-					empty( $data['name'] ) ||
-					empty( $data['mappings'] ) ||
-					! is_array( $data['mappings'] )
-				) {
+				if ( ! is_array( $data ) || empty( $data['name'] ) ) {
 					continue;
 				}
 
+				$country_mappings = ! empty( $data['mappings'] ) && is_array( $data['mappings'] )
+					? $data['mappings']
+					: array( $data );
+
 				$eas_codes = array();
 
-				foreach ( $data['mappings'] as $mapping ) {
+				foreach ( $country_mappings as $mapping ) {
 					if ( ! is_array( $mapping ) || empty( $mapping['eas'] ) ) {
 						continue;
 					}
