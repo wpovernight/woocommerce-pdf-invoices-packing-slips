@@ -110,6 +110,14 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.14.0 (2026-06-08) =
+- New: Add partial invoice number search setting
+- Fix: Empty order item prices when WooCommerce subtotal is filtered
+- Fix: Prevent fatal when REST invoice number lookup returns bulk document
+- Fix: Document number display setting not respected in preview
+- Fix: Bulk Document: “Mark as printed” not applied to all orders in bulk export
+- Translations: Updated translation template (POT)
+
 = 5.13.0 (2026-06-01) =
 - New: Add email attachment success/failure logging to order notes
 - New: Add WC EU VAT Number plugin support
