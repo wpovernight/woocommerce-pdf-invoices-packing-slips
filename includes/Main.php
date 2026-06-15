@@ -686,11 +686,11 @@ class Main {
 	/**
 	 * Return tmp path for different plugin processes.
 	 *
-	 * @param string $type
+	 * @param string $type Path type.
 	 * @return string|false
 	 */
-	public function get_tmp_path( string $type = '' ) {
-		$cache_key = (string) $type;
+	public function get_tmp_path( string $type = '' ): string|false {
+		$cache_key = $type;
 
 		if ( array_key_exists( $cache_key, $this->tmp_path_cache ) ) {
 			return $this->tmp_path_cache[ $cache_key ];
@@ -708,24 +708,13 @@ class Main {
 			return $this->tmp_path_cache[ $cache_key ];
 		}
 
-		switch ( $type ) {
-			case 'dompdf':
-				$tmp_path = $tmp_base . 'dompdf';
-				break;
-			case 'xml':
-				$tmp_path = $tmp_base . 'xml';
-				break;
-			case 'font_cache':
-			case 'fonts':
-				$tmp_path = $tmp_base . 'fonts';
-				break;
-			case 'attachments':
-				$tmp_path = $tmp_base . 'attachments/';
-				break;
-			default:
-				$tmp_path = $tmp_base . $type;
-				break;
-		}
+		$tmp_path = match ( $type ) {
+			'dompdf'              => $tmp_base . 'dompdf',
+			'xml'                 => $tmp_base . 'xml',
+			'font_cache', 'fonts' => $tmp_base . 'fonts',
+			'attachments'         => $tmp_base . 'attachments/',
+			default               => $tmp_base . $type,
+		};
 
 		$tmp_path = apply_filters( "wpo_wcpdf_tmp_path_{$type}", $tmp_path );
 
