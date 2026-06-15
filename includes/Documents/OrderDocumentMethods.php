@@ -945,11 +945,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 	/**
 	 * Get tax rates from the order's tax items
-	 * 
+	 *
 	 * @param \WC_Abstract_Order|null $order
 	 * @return array|bool array of rate_id => rate_percent, or false if not available
 	 */
-	public function get_tax_rates_from_order( ?\WC_Abstract_Order $order = null ): array|bool {
+	public function get_tax_rates_from_order( \WC_Abstract_Order $order ): array {
 		$tax_rates = array();
 		$tax_items = $order->get_items( array( 'tax' ) );
 
@@ -957,20 +957,8 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			return $tax_rates;
 		}
 
-		foreach ( $tax_items as $tax_item_key => $tax_item ) {
-			if ( is_callable( array( $order, 'get_created_via' ) ) && 'subscription' === $order->get_created_via() ) {
-				$rate_percent = $tax_item->get_rate_percent();
-				$tax_amount   = $tax_item->get_tax_total() + $tax_item->get_shipping_tax_total();
-
-				if ( $tax_amount > 0 && $rate_percent > 0 ) {
-					$tax_rates[ $tax_item->get_rate_id() ] = $rate_percent;
-				} else {
-					continue; // not setting the rate will let the plugin fall back to the rate from the settings
-				}
-			} else {
-				$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
-			}
-
+		foreach ( $tax_items as $tax_item ) {
+			$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
 		}
 
 		return $tax_rates;
