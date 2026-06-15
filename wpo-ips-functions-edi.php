@@ -377,9 +377,9 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	}
 
 	if ( $attachment ) {
-		$tmp_path = WPO_WCPDF()->get_instance( 'main' )->get_tmp_path( 'attachments' );
+		$tmp_path = WPO_WCPDF()->get_instance( 'main' )->ensure_tmp_path( 'attachments' );
 
-		if ( ! $tmp_path ) {
+		if ( false === $tmp_path ) {
 			return wcpdf_error_handling( 'Temporary path not available. Cannot write EDI file.' );
 		}
 

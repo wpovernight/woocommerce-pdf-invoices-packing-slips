@@ -722,6 +722,35 @@ class Main {
 
 		return $this->tmp_path_cache[ $cache_key ];
 	}
+
+	/**
+	 * Ensure a tmp path exists and is writable.
+	 *
+	 * @param string $type Path type.
+	 * @return string|false
+	 */
+	public function ensure_tmp_path( string $type = '' ): string|false {
+		$tmp_path = $this->get_tmp_path( $type );
+
+		if ( false === $tmp_path ) {
+			return false;
+		}
+
+		if ( $this->ensure_tmp_path_exists( trailingslashit( $tmp_path ) ) ) {
+			return $tmp_path;
+		}
+
+		// For the default plugin tmp folders, run the full initializer so security files are restored too.
+		if ( empty( $type ) || in_array( $type, $this->subfolders, true ) || 'font_cache' === $type ) {
+			$this->init_tmp();
+		}
+
+		if ( ! $this->ensure_tmp_path_exists( trailingslashit( $tmp_path ) ) ) {
+			return false;
+		}
+
+		return $tmp_path;
+	}
 	
 	/**
 	 * Return the base tmp folder path.
@@ -849,35 +878,52 @@ class Main {
 	}
 
 	/**
-	 * Maybe reinstall fonts
+	 * Maybe reinstall font files.
 	 *
-	 * @param bool $force  force fonts reinstall
+	 * @param bool $force Whether to force reinstalling the fonts.
 	 * @return void
 	 */
 	public function maybe_reinstall_fonts( bool $force = false ): void {
+		$fonts_path = $this->ensure_tmp_path( 'fonts' );
+
+		if ( false === $fonts_path ) {
+			return;
+		}
+
 		$has_font_files = $this->tmp_subfolder_has_files( 'fonts' );
 
-		if ( ! $has_font_files || $force ) {
-			$fonts_path = untrailingslashit( $this->get_tmp_path( 'fonts' ) );
-
-			// clear folder first
-			if ( function_exists( 'glob' ) && $files = glob( $fonts_path.'/*.*' ) ) {
-				$exclude_files = array( 'index.php', '.htaccess' );
-				foreach ( $files as $file ) {
-					if ( is_file( $file ) && ! in_array( basename( $file ), $exclude_files ) ) {
-						wp_delete_file( $file );
-					}
-				}
-			} else {
-				wcpdf_log_error( "Couldn't clear fonts tmp subfolder before copy fonts.", 'critical' );
-			}
-
-			// copy fonts
-			$this->copy_fonts( $fonts_path );
-
-			// save to cache
-			set_transient( 'wpo_wcpdf_subfolder_fonts_has_files', 'yes' , DAY_IN_SECONDS );
+		if ( $has_font_files && ! $force ) {
+			return;
 		}
+
+		$fonts_path           = untrailingslashit( $fonts_path );
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+		$files                = false;
+
+		if ( function_exists( 'glob' ) ) {
+			$files = glob( $fonts_path . '/*.*' );
+		}
+
+		if ( false !== $files ) {
+			$exclude_files = array( 'index.php', '.htaccess' );
+
+			foreach ( $files as $file ) {
+				if (
+					$file_system_instance->is_file( $file ) &&
+					! in_array( basename( $file ), $exclude_files, true )
+				) {
+					$file_system_instance->delete( $file );
+				}
+			}
+		} else {
+			wcpdf_log_error( "Couldn't clear fonts tmp subfolder before copy fonts.", 'critical' );
+		}
+
+		// Copy fonts.
+		$this->copy_fonts( $fonts_path );
+
+		// Save to cache.
+		set_transient( 'wpo_wcpdf_subfolder_fonts_has_files', 'yes', DAY_IN_SECONDS );
 	}
 
 	/**

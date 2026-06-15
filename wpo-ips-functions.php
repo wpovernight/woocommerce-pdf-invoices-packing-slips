@@ -248,13 +248,11 @@ function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument $document, st
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$main_instance        = WPO_WCPDF()->get_instance( 'main' );
-	$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
-	
-	$tmp_path             = $main_instance->get_tmp_path( 'attachments' );
+	$main_instance = WPO_WCPDF()->get_instance( 'main' );
+	$tmp_path      = $main_instance->ensure_tmp_path( 'attachments' );
 
-	if ( ! $file_system_instance->is_dir( $tmp_path ) || ! $file_system_instance->is_writable( $tmp_path ) ) {
-		$error_message = "Couldn't get the attachments temporary folder path: {$tmp_path}.";
+	if ( false === $tmp_path ) {
+		$error_message = "Couldn't get the attachments temporary folder path.";
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 

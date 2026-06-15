@@ -42,16 +42,24 @@ class EDIMaker {
 	}
 
 	/**
-	 * Get the file path for the EDI files
+	 * Get the file path for the EDI files.
 	 *
 	 * @return string
+	 * @throws \Exception If the temporary XML folder is not available.
 	 */
 	public function get_file_path(): string {
 		if ( ! empty( $this->tmp_base ) ) {
 			return $this->tmp_base;
 		}
 
-		$this->tmp_base = trailingslashit( WPO_WCPDF()->get_instance( 'main' )->get_tmp_path( 'xml' ) );
+		$tmp_path = WPO_WCPDF()->get_instance( 'main' )->ensure_tmp_path( 'xml' );
+
+		if ( false === $tmp_path ) {
+			throw new \Exception( 'Temporary XML folder not available.' );
+		}
+
+		$this->tmp_base = trailingslashit( $tmp_path );
+
 		return $this->tmp_base;
 	}
 	

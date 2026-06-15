@@ -47,13 +47,21 @@ class PDFMaker {
 		
 		$main_instance = WPO_WCPDF()->get_instance( 'main' );
 
+		$tmp_path   = $main_instance->ensure_tmp_path( 'dompdf' );
+		$fonts_path = $main_instance->ensure_tmp_path( 'fonts' );
+
+		if ( false === $tmp_path || false === $fonts_path ) {
+			wcpdf_log_error( 'PDF temporary folders are not available.', 'critical' );
+			return null;
+		}
+
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
-			'tempDir'                 => $main_instance->get_tmp_path( 'dompdf' ),
-			'fontDir'                 => $main_instance->get_tmp_path( 'fonts' ),
-			'fontCache'               => $main_instance->get_tmp_path( 'fonts' ),
+			'tempDir'                 => $tmp_path,
+			'fontDir'                 => $fonts_path,
+			'fontCache'               => $fonts_path,
 			'chroot'                  => $this->get_chroot_paths(),
-			'logOutputFile'           => $main_instance->get_tmp_path( 'dompdf' ) . "/log.htm",
+			'logOutputFile'           => $tmp_path . '/log.htm',
 			'defaultFont'             => 'dejavu sans',
 			'isRemoteEnabled'         => true,
 			'isHtml5ParserEnabled'    => true,

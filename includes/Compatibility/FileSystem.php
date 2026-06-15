@@ -232,6 +232,22 @@ class FileSystem {
 	}
 
 	/**
+	 * Check if path is a regular file.
+	 *
+	 * @param string $filename File path.
+	 * @return bool
+	 */
+	public function is_file( string $filename ): bool {
+		if ( empty( $filename ) ) {
+			return false;
+		}
+
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->is_file( $filename ) :
+			( $this->suppress_errors ? @is_file( $filename ) : is_file( $filename ) );
+	}
+
+	/**
 	 * Create a directory
 	 * 
 	 * @param string $path
