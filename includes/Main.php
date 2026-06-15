@@ -2117,12 +2117,18 @@ class Main {
 			array()
 		);
 
-		// Bail if no color set or template not supported.
-		if ( empty( $template_color ) || ! in_array( $current_template, $supported_templates, true ) ) {
+		// Bail if template not supported.
+		if ( ! in_array( $current_template, $supported_templates, true ) ) {
 			return $css;
 		}
 
-		// Let templates provide their own color CSS.
+		$default_color = apply_filters( 'wpo_ips_template_color_default', '', $current_template );
+
+		// Bail if no color set, or it matches the template's own default (not a user customization).
+		if ( empty( $template_color ) || $template_color === $default_color ) {
+			return $css;
+		}
+
 		$css = apply_filters(
 			'wpo_ips_template_color_css',
 			$css,

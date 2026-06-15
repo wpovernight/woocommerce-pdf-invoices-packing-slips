@@ -132,7 +132,7 @@ class SettingsGeneral {
 					'option_name'       => $option_name,
 					'id'                => 'template_color',
 					'type'              => 'color',
-					'default'           => apply_filters( 'wpo_ips_template_color_default', '#000000', WPO_WCPDF()->settings->general_settings['template_path'] ?? '' ),
+					'default'           => apply_filters( 'wpo_ips_template_color_default', '', WPO_WCPDF()->settings->general_settings['template_path'] ?? '' ),
 					'description'       => __( 'Sets the primary color used across supported templates.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'custom_attributes' => array(
 						'data-show_for_option_name'   => $option_name . '[template_path]',
