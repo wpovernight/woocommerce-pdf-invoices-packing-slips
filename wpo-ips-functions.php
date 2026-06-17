@@ -2532,7 +2532,9 @@ function wpo_ips_is_order_received_page(): bool {
 }
 
 /**
- * Check if this is a frontend page request (not admin, ajax, cron, rest or wp-cli)
+ * Check if this is a normal frontend page load.
+ *
+ * Excludes admin, AJAX, cron, REST API and WP-CLI requests.
  *
  * @return bool
  */
