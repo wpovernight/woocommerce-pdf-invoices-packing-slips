@@ -28,10 +28,9 @@ class Documents {
 
 	/**
 	 * Constructor.
-	 *
 	 */
 	public function __construct() {
-		if (
+		$should_init_documents = (
 			\wpo_ips_is_order_page()                      ||
 			\wpo_ips_is_settings_page()                   ||
 			\wpo_ips_is_account_page()                    ||
@@ -39,7 +38,9 @@ class Documents {
 			( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
 			( defined( 'WP_CLI' ) && WP_CLI )             ||
 			! is_admin()
-		) {
+		);
+
+		if ( apply_filters( 'wpo_ips_should_init_documents', $should_init_documents, $this ) ) {
 			add_action( 'init', array( $this, 'init' ), 15 );
 		}
 	}
