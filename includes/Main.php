@@ -171,7 +171,7 @@ class Main {
 
 						if ( $attachment ) {
 							$attachments[] = $attachment;
-							if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+							if ( ! empty( \WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
 								$email_title = $email_id;
 
 								if ( is_object( $email ) && is_callable( array( $email, 'get_title' ) ) ) {
@@ -561,7 +561,7 @@ class Main {
 					$this->mark_document_printed( $individual_document, $trigger );
 				}
 
-				$output_format = WPO_WCPDF()->settings->get_output_format( $document, $request );
+				$output_format = \WPO_WCPDF()->get_instance( 'settings' )->get_output_format( $document, $request );
 
 				switch ( $output_format ) {
 					case 'xml':

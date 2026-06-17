@@ -391,7 +391,7 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function set_new_unstable_version_available_option( array $unstable, string $owner, string $repo ): void {
-		$debug_settings = $this->settings->debug_settings;
+		$debug_settings = $this->get_instance( 'settings' )->debug_settings;
 		$enabled        = isset( $debug_settings['check_unstable_versions'] );
 		$new_tag        = sanitize_text_field( $unstable['tag'] );
 

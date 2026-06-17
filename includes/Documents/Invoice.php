@@ -248,11 +248,11 @@ class Invoice extends OrderDocumentMethods {
 					'id'			  => 'attach_to_email_ids',
 					'fields_callback' => array( $this, 'get_wc_emails' ),
 					/* translators: directory path */
-					'description'     => ! \WPO_WCPDF()->file_system->is_writable( \WPO_WCPDF()->main->get_tmp_path( 'attachments' ) )
+					'description'     => ! \WPO_WCPDF()->get_instance( 'file_system' )->is_writable( \WPO_WCPDF()->get_instance( 'main' )->get_tmp_path( 'attachments' ) )
 						? '<span class="wpo-warning">' . sprintf(
 							/* translators: 1. directory path */
 							__( 'It looks like the temp folder (%s) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email documents.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<code>' . \WPO_WCPDF()->main->get_tmp_path( 'attachments' ) . '</code>'
+							'<code>' . \WPO_WCPDF()->get_instance( 'main' )->get_tmp_path( 'attachments' ) . '</code>'
 						  ) . '</span>'
 						: '',
 				)

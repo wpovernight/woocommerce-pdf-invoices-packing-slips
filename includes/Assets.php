@@ -261,7 +261,7 @@ class Assets {
 					),
 					'xml_document_types'        => array_values( array_map(
 						fn( $document ) => $document->get_type(),
-						WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' )
+						\WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'xml' )
 					) ),
 				)
 			);
