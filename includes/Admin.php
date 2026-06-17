@@ -1407,75 +1407,85 @@ class Admin {
 
 	/**
 	 * Save the invoice number and date when the order is saved in the admin.
-	 * 
-	 * @param int $post_or_order_id The order ID or post ID.
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object The order object or order ID.
+	 *
+	 * @param int                         $post_or_order_id     The order ID or post ID.
+	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object The order object or post object.
 	 * @return void
 	 */
-	public function save_invoice_number_date( int $post_or_order_id, object $post_or_order_object ): void {
-		// Skip any auto-draft or draft request
+	public function save_invoice_number_date( int $post_or_order_id, \WC_Abstract_Order|\WP_Post $post_or_order_object ): void {
+		$original_post_status = isset( $_POST['original_post_status'] )
+			? sanitize_text_field( wp_unslash( $_POST['original_post_status'] ) )
+			: '';
+
+		$post_status = isset( $_POST['post_status'] )
+			? sanitize_text_field( wp_unslash( $_POST['post_status'] ) )
+			: '';
+
+		// Skip any auto-draft or draft request.
 		if (
-			( isset( $_POST['original_post_status'] ) && in_array( $_POST['original_post_status'], array( 'auto-draft', 'draft' ), true ) ) ||
-			( isset( $_POST['post_status'] ) && in_array( $_POST['post_status'], array( 'auto-draft', 'draft' ), true ) )
+			in_array( $original_post_status, array( 'auto-draft', 'draft' ), true ) ||
+			in_array( $post_status, array( 'auto-draft', 'draft' ), true )
 		) {
 			return;
 		}
 
-		if ( ! ( $order instanceof \WC_Order ) && ! empty( $order_id ) ) {
-			$order = wc_get_order( $order_id );
-		}
+		$order = $post_or_order_object instanceof \WC_Abstract_Order
+			? $post_or_order_object
+			: wc_get_order( $post_or_order_id );
 
-		if ( ! ( $order instanceof \WC_Order ) || 'auto-draft' === $order->get_status() ) {
+		if ( ! $order instanceof \WC_Order || 'auto-draft' === $order->get_status() ) {
 			return;
 		}
 
-		$order_type = $order->get_type();
-
-		if ( 'shop_order' === $order_type ) {
-			if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-				return;
-			}
-
-			// Check if user is allowed to change invoice data
-			if ( ! $this->user_can_manage_document( 'invoice' ) ) {
-				return;
-			}
-
-			$form_data = array();
-			$invoice   = wcpdf_get_document( 'invoice', $order );
-
-			if ( $invoice ) {
-				// IMPORTANT: $is_new must be set before calling initiate_number().
-				// The exists() method uses the number to determine existence, so
-				// if we call initiate_number() first, it may affect the result of exists().
-				$is_new        = ( false === $invoice->exists() );
-				$form_data     = stripslashes_deep( $_POST );
-				$document_data = $this->process_order_document_form_data( (array) $form_data, $invoice );
-
-				if ( empty( $document_data ) ) {
-					return;
-				}
-
-				$invoice->set_data( $document_data, $order );
-
-				// check if we have number, and if not generate one
-				if  ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'initiate_number' ) ) ) {
-					$invoice->initiate_number();
-				}
-
-				$invoice->save();
-				
-				$main_instance = WPO_WCPDF()->get_instance( 'main' );
-
-				if ( $is_new ) {
-					$main_instance->log_document_creation_to_order_notes( $invoice, 'document_data' );
-					$main_instance->mark_document_printed( $invoice, 'document_data' );
-				}
-			}
-
-			// allow other documents to hook here and save their form data
-			do_action( 'wpo_wcpdf_on_save_invoice_order_data', $form_data, $order, $this );
+		if ( 'shop_order' !== $order->get_type() ) {
+			return;
 		}
+
+		if ( empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['woocommerce_meta_nonce'] ) ), 'woocommerce_save_data' ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			return;
+		}
+
+		// Check if user is allowed to change invoice data.
+		if ( ! $this->user_can_manage_document( 'invoice' ) ) {
+			return;
+		}
+
+		$form_data = array();
+		$invoice   = wcpdf_get_document( 'invoice', $order );
+
+		if ( $invoice ) {
+			/*
+			 * IMPORTANT: $is_new must be set before calling initiate_number().
+			 * The exists() method uses the number to determine existence, so
+			 * if we call initiate_number() first, it may affect the result of exists().
+			 */
+			$is_new        = ( false === $invoice->exists() );
+			$form_data     = stripslashes_deep( $_POST );
+			$document_data = $this->process_order_document_form_data( (array) $form_data, $invoice );
+
+			if ( empty( $document_data ) ) {
+				return;
+			}
+
+			$invoice->set_data( $document_data, $order );
+
+			// Check if we have a date, and if not generate a number.
+			if ( $invoice->get_date() && ! $invoice->get_number() && is_callable( array( $invoice, 'initiate_number' ) ) ) {
+				$invoice->initiate_number();
+			}
+
+			$invoice->save();
+
+			$main_instance = WPO_WCPDF()->get_instance( 'main' );
+
+			if ( $is_new ) {
+				$main_instance->log_document_creation_to_order_notes( $invoice, 'document_data' );
+				$main_instance->mark_document_printed( $invoice, 'document_data' );
+			}
+		}
+
+		// Allow other documents to hook here and save their form data.
+		do_action( 'wpo_wcpdf_on_save_invoice_order_data', $form_data, $order, $this );
 	}
 
 	/**
