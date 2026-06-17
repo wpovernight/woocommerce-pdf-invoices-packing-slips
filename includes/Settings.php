@@ -270,6 +270,7 @@ class Settings {
 	 * AJAX callback to generate document preview.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function ajax_preview(): void {
 		check_ajax_referer( 'wpo_wcpdf_preview', 'security' );
@@ -459,6 +460,7 @@ class Settings {
 	 * AJAX callback to search for orders in document preview.
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function preview_order_search(): void {
 		check_ajax_referer( 'wpo_wcpdf_preview', 'security' );

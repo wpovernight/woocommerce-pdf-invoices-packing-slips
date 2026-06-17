@@ -227,7 +227,7 @@ class WPO_WCPDF {
 	/**
 	 * Load the translation / textdomain files
 	 * 
-	 * @param bool $$force_reload
+	 * @param bool $force_reload
 	 * @return void
 	 */
 	public function translations( bool $force_reload = false ): void {

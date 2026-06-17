@@ -218,8 +218,8 @@ class SettingsUpgrade {
 	public function extension_is_enabled( string $extension ): bool {
 		$is_enabled = false;
 
-		if ( ! empty( $extension ) || ! in_array( $extension, $this->extensions ) ) {
-			$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
+		if ( ! empty( $extension ) && ! in_array( $extension, $this->extensions, true ) ) {
+			$extension_main_function = "WPO_WCPDF_" . ucfirst( $extension );
 			if ( function_exists( $extension_main_function ) ) {
 				$is_enabled = true;
 			}
