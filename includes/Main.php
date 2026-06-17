@@ -736,7 +736,7 @@ class Main {
 			return false;
 		}
 
-		if ( $this->ensure_tmp_path_exists( trailingslashit( $tmp_path ) ) ) {
+		if ( $this->ensure_tmp_dir_is_writable( trailingslashit( $tmp_path ) ) ) {
 			return $tmp_path;
 		}
 
@@ -745,7 +745,7 @@ class Main {
 			$this->init_tmp();
 		}
 
-		if ( ! $this->ensure_tmp_path_exists( trailingslashit( $tmp_path ) ) ) {
+		if ( ! $this->ensure_tmp_dir_is_writable( trailingslashit( $tmp_path ) ) ) {
 			return false;
 		}
 
@@ -998,7 +998,7 @@ class Main {
 			return false;
 		}
 
-		if ( ! $this->ensure_tmp_path_exists( $tmp_base ) ) {
+		if ( ! $this->ensure_tmp_dir_is_writable( $tmp_base ) ) {
 			return false;
 		}
 
@@ -1018,7 +1018,7 @@ class Main {
 
 			$path = trailingslashit( $tmp_path );
 
-			if ( ! $this->ensure_tmp_path_exists( $path ) ) {
+			if ( ! $this->ensure_tmp_dir_is_writable( $path ) ) {
 				return false;
 			}
 
@@ -1053,7 +1053,7 @@ class Main {
 			return false;
 		}
 
-		if ( ! $this->ensure_tmp_path_exists( $new_path ) ) {
+		if ( ! $this->ensure_tmp_dir_is_writable( $new_path ) ) {
 			return false;
 		}
 
@@ -1097,14 +1097,14 @@ class Main {
 	public function tmp_folders_exist_and_writable(): bool {
 		$tmp_base = $this->get_tmp_base();
 
-		if ( false === $tmp_base || ! $this->ensure_tmp_path_exists( $tmp_base ) ) {
+		if ( false === $tmp_base || ! $this->ensure_tmp_dir_is_writable( $tmp_base ) ) {
 			return false;
 		}
 
 		foreach ( $this->subfolders as $type ) {
 			$tmp_path = $this->get_tmp_path( $type );
 
-			if ( false === $tmp_path || ! $this->ensure_tmp_path_exists( trailingslashit( $tmp_path ) ) ) {
+			if ( false === $tmp_path || ! $this->ensure_tmp_dir_is_writable( trailingslashit( $tmp_path ) ) ) {
 				return false;
 			}
 		}
@@ -2308,12 +2308,12 @@ class Main {
 	}
 	
 	/**
-	 * Ensure a temporary path exists and is writable.
+	 * Ensure a temporary directory exists and is writable.
 	 *
-	 * @param string $path
-	 * @return bool
+	 * @param string $path Temporary directory path.
+	 * @return bool True if the directory exists and is writable, false otherwise.
 	 */
-	private function ensure_tmp_path_exists( string $path ): bool {
+	private function ensure_tmp_dir_is_writable( string $path ): bool {
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
 		if ( empty( $path ) ) {
@@ -2321,9 +2321,9 @@ class Main {
 		}
 
 		if ( ! $file_system_instance->is_dir( $path ) ) {
-			$dir = $file_system_instance->mkdir( $path );
+			$created = $file_system_instance->mkdir( $path );
 
-			if ( ! $dir ) {
+			if ( ! $created ) {
 				$this->record_tmp_dir_error( $path, "Unable to create folder {$path}" );
 				return false;
 			}
