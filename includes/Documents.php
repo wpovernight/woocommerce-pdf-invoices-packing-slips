@@ -85,7 +85,7 @@ class Documents {
 				switch ( $output_format ) {
 					case 'pdf':
 					case 'xml':
-						if ( in_array( $output_format, $document_output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
+						if ( in_array( $output_format, $document_output_formats, true ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
 							$documents[ $class_name ] = $document;
 						}
 						break;

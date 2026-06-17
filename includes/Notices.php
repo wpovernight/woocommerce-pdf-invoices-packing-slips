@@ -613,7 +613,7 @@ class Notices {
 			$notice_shown_on = get_option( 'wpo_wcpdf_review_notice_shown', array() );
 			$today           = gmdate( 'Y-m-d' );
 			
-			if ( ! in_array( $today, $notice_shown_on ) ) {
+			if ( ! in_array( $today, $notice_shown_on, true ) ) {
 				$notice_shown_on[] = $today;
 				update_option( 'wpo_wcpdf_review_notice_shown', $notice_shown_on );
 			}

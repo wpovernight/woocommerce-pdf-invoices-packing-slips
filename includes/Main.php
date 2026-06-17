@@ -346,14 +346,14 @@ class Main {
 			foreach ( $_documents as $document_type => $attach_to_email_ids ) {
 				// legacy settings: convert abbreviated email_ids
 				foreach ( $attach_to_email_ids as $key => $attach_to_email_id ) {
-					if ( in_array( $attach_to_email_id, array( 'completed', 'processing' ) ) ) {
+					if ( in_array( $attach_to_email_id, array( 'completed', 'processing' ), true ) ) {
 						$attach_to_email_ids[ $key ] = "customer_{$attach_to_email_id}_order";
 					}
 				}
 
 				$extra_condition = apply_filters( 'wpo_wcpdf_custom_attachment_condition', true, $order, $email_id, $document_type, $output_format );
 
-				if ( in_array( $email_id, $attach_to_email_ids ) && $extra_condition ) {
+				if ( in_array( $email_id, $attach_to_email_ids, true ) && $extra_condition ) {
 					$document_types[ $output_format ][] = $document_type;
 				}
 			}
@@ -449,7 +449,7 @@ class Main {
 		// Process oldest first: reverse $order_ids array if required
 		$sort_order         = apply_filters( 'wpo_wcpdf_bulk_document_sort_order', 'ASC' );
 		$current_sort_order = ( count( $order_ids ) > 1 && end( $order_ids ) < reset( $order_ids ) ) ? 'DESC' : 'ASC';
-		if ( in_array( $sort_order, array( 'ASC', 'DESC' ) ) && $sort_order != $current_sort_order ) {
+		if ( in_array( $sort_order, array( 'ASC', 'DESC' ), true ) && $sort_order != $current_sort_order ) {
 			$order_ids = array_reverse( $order_ids );
 		}
 
@@ -1415,7 +1415,7 @@ class Main {
 						$basename  = wp_basename( $file_path );
 
 						// Exclude specific files before adding to list
-						if ( ! in_array( $basename, $excluded_files ) && $file_system_instance->exists( $file_path ) && ! $file_system_instance->is_dir( $file_path ) ) {
+						if ( ! in_array( $basename, $excluded_files, true ) && $file_system_instance->exists( $file_path ) && ! $file_system_instance->is_dir( $file_path ) ) {
 							$files[] = $file_path;
 						}
 					}
@@ -1792,7 +1792,7 @@ class Main {
 	public function mark_document_printed( OrderDocument $document, string $trigger ): void {
 		$triggers = isset( $document->latest_settings['mark_printed'] ) && is_array( $document->latest_settings['mark_printed'] ) ? $document->latest_settings['mark_printed'] : [];
 		if ( ! empty( $document ) && ! $this->is_document_printed( $document ) ) {
-			if ( ! empty( $document->order ) && ! empty( $trigger ) && in_array( $trigger, $triggers ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
+			if ( ! empty( $document->order ) && ! empty( $trigger ) && in_array( $trigger, $triggers, true ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
 				$order = $document->order;
 				if ( 'shop_order' === $order->get_type() ) {
 					$data = [
@@ -1916,7 +1916,7 @@ class Main {
 		$document_exists                = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 		$document_printed               = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
 		$triggers                       = isset( $document->latest_settings['mark_printed'] ) && is_array( $document->latest_settings['mark_printed'] ) ? $document->latest_settings['mark_printed'] : [];
-		$manually_print_enabled         = in_array( 'manually', $triggers ) ? true : false;
+		$manually_print_enabled         = in_array( 'manually', $triggers, true ) ? true : false;
 
 		if ( $document_exists && ! $document_printed && $manually_print_enabled ) {
 			$can_be_manually_marked_printed = true;

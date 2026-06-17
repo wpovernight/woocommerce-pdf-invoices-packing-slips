@@ -238,7 +238,7 @@ function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument $document, st
 		$output_format = $default_output_format;
 	}
 
-	if ( ! in_array( $output_format, $document->output_formats ) ) {
+	if ( ! in_array( $output_format, $document->output_formats, true ) ) {
 		$error_message = "Invalid output format: {$output_format}. Expected one of: " . implode( ', ', $document->output_formats );
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
@@ -306,7 +306,7 @@ function wcpdf_deprecated_function( string $function, string $version, ?string $
 	$filter               = current_filter();
 	$global_wcpdf_filters = array( 'wp_ajax_generate_wpo_wcpdf' );
 
-	if ( ! empty( $filter ) && ! empty( $replacement ) && ! in_array( $filter, $global_wcpdf_filters ) && false !== strpos( $filter, 'wpo_wcpdf' ) && false !== strpos( $replacement, '$this' ) ) {
+	if ( ! empty( $filter ) && ! empty( $replacement ) && ! in_array( $filter, $global_wcpdf_filters, true ) && false !== strpos( $filter, 'wpo_wcpdf' ) && false !== strpos( $replacement, '$this' ) ) {
 		$replacement =  str_replace( '$this', '$document', $replacement );
 		$replacement = "{$replacement} - check that the \$document parameter is included in your action or filter ($filter)!";
 	}
@@ -664,7 +664,7 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		if ( array_key_exists( $node->nodeName, $filtered_tags ) ) {
 			// if the node is allowed, check each attribute.
 			foreach ( $node->attributes as $attr ) {
-				if ( ! in_array( $attr->nodeName, $filtered_tags[ $node->nodeName ] ) ) {
+				if ( ! in_array( $attr->nodeName, $filtered_tags[ $node->nodeName ], true ) ) {
 					$node->removeAttribute( $attr->nodeName );
 				}
 			}

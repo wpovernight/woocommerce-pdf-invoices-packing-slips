@@ -319,7 +319,7 @@ class SettingsDebug {
 		$documents            = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 		foreach ( $documents as $document ) {
-			if ( in_array( $document->get_type(), array( 'proforma', 'credit-note' ) ) && $document->is_enabled() && is_callable( array( $document, 'get_number_sequence' ) ) ) {
+			if ( in_array( $document->get_type(), array( 'proforma', 'credit-note' ), true ) && $document->is_enabled() && is_callable( array( $document, 'get_number_sequence' ) ) ) {
 				$number_sequence = $document->get_number_sequence( '', $document );
 				if ( 'invoice_number' === $number_sequence ) {
 					$additional_doc_types[] = $document->get_type();
@@ -477,7 +477,7 @@ class SettingsDebug {
 		$new_settings    = stripslashes_deep( $file_data['settings'] );
 		$settings_option = '';
 
-		if ( ! in_array( $type, array_keys( $setting_types ) ) ) {
+		if ( ! in_array( $type, array_keys( $setting_types ), true ) ) {
 			$message = __( 'The JSON file settings type is not supported on this store!', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_log_error( $message );
 			wp_send_json_error( compact( 'message' ) );
@@ -668,7 +668,7 @@ class SettingsDebug {
 			'date_paid',
 		);
 
-		if ( in_array( $date_type, $wc_date_types ) ) {
+		if ( in_array( $date_type, $wc_date_types ), true ) {
 			$date_arg      = $date_type;
 		} elseif ( 'document_date' === $date_type ) {
 			$document_slug = ! empty( $document_type ) ? str_replace( '-', '_', $document_type ) : '';
@@ -1333,7 +1333,7 @@ class SettingsDebug {
 			'WP Filesystem Method' => array(
 				'required' => __( 'Required to save documents to the server', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'    => $filesystem_method,
-				'result'   => in_array( $filesystem_method, array( 'direct', 'php' ) ),
+				'result'   => in_array( $filesystem_method, array( 'direct', 'php' ), true ),
 				'fallback' => __( 'Check your server configuration', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'allow_url_fopen' => array (
@@ -1776,7 +1776,7 @@ class SettingsDebug {
 		$valid_table_name = null;
 		if (
 			isset( $request_data['table_name'] )
-			&& in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) )
+			&& in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ), true )
 		) {
 			$valid_table_name = sanitize_text_field( $request_data['table_name'] );
 		}

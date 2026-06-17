@@ -648,7 +648,7 @@ class Invoice extends OrderDocumentMethods {
 		if ( apply_filters( 'woocommerce_invoice_number_by_plugin', false ) ) {
 			$remove_settings = array( 'next_invoice_number', 'number_format', 'reset_number_yearly' );
 			foreach ( $settings_fields as $key => $settings_field ) {
-				if ( in_array( $settings_field['id'], $remove_settings ) ) {
+				if ( in_array( $settings_field['id'], $remove_settings ), true ) {
 					unset( $settings_fields[$key] );
 				} elseif ( $settings_field['id'] == 'display_number' ) {
 					// alternate description for invoice number

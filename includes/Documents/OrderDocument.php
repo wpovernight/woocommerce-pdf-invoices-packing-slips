@@ -351,7 +351,7 @@ abstract class OrderDocument {
 	 * @return mixed
 	 */
 	public function get_setting( string $key, mixed $default = '', string $output_format = 'pdf' ): mixed {
-		if ( in_array( $output_format, $this->output_formats ) ) {
+		if ( in_array( $output_format, $this->output_formats ), true ) {
 			$settings        = $this->get_settings( false, $output_format );
 			$latest_settings = $this->get_settings( true, $output_format );
 		} else {
@@ -361,7 +361,7 @@ abstract class OrderDocument {
 
 		$non_historical_settings = $this->get_non_historical_settings();
 
-		if ( in_array( $key, $non_historical_settings ) && isset( $latest_settings ) ) {
+		if ( in_array( $key, $non_historical_settings, true ) && isset( $latest_settings ) ) {
 			$setting = isset( $latest_settings[ $key ] ) ? $latest_settings[ $key ] : $default;
 		} else {
 			$setting = isset( $settings[ $key ] ) ? $settings[ $key ] : $default;
@@ -610,7 +610,7 @@ abstract class OrderDocument {
 				return $status;
 			}, $this->settings['disable_for_statuses'] );
 
-			if ( in_array( $status, $disabled_statuses ) ) {
+			if ( in_array( $status, $disabled_statuses ), true ) {
 				$allowed = false;
 			}
 		}
@@ -1529,7 +1529,7 @@ abstract class OrderDocument {
 		}
 
 		// legacy filters
-		if ( in_array( $settings_key, array( 'shop_name', 'footer', 'extra_1', 'extra_2', 'extra_3' ) ) ) {
+		if ( in_array( $settings_key, array( 'shop_name', 'footer', 'extra_1', 'extra_2', 'extra_3' ), true ) ) {
 			$text = apply_filters_deprecated(
 				"wpo_wcpdf_{$settings_key}",
 				array( $text, $this ),
@@ -2214,7 +2214,7 @@ abstract class OrderDocument {
 		// prevents WPML language mixups
 		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		if ( empty( $request['page'] ) || ! in_array( $request['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ) ) ) {
+		if ( empty( $request['page'] ) || ! in_array( $request['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ), true ) ) {
 			return array();
 		}
 
@@ -2238,20 +2238,21 @@ abstract class OrderDocument {
 		);
 
 		$emails = array();
-		foreach ($wc_emails as $class => $email) {
-			if ( !is_object( $email ) ) {
+		foreach ( $wc_emails as $class => $email ) {
+			if ( ! is_object( $email ) ) {
 				continue;
 			}
-			if ( !in_array( $email->id, $non_order_emails ) ) {
-				switch ($email->id) {
+
+			if ( ! in_array( $email->id, $non_order_emails ), true ) {
+				switch ( $email->id ) {
 					case 'new_order':
-						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf('%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					case 'customer_invoice':
-						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf('%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					default:
-						$emails[$email->id] = $email->title;
+						$emails[ $email->id ] = $email->title;
 						break;
 				}
 			}

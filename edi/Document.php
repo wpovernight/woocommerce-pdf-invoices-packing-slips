@@ -62,7 +62,7 @@ class Document {
 			return null;
 		}
 
-		if ( ! in_array( $document_type, array_keys( $format['documents'] ) ) ) {
+		if ( ! in_array( $document_type, array_keys( $format['documents'] ), true ) ) {
 			wpo_ips_edi_log(
 				sprintf(
 					'Document type "%s" is not supported for format "%s".',

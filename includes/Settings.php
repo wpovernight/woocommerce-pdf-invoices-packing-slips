@@ -320,7 +320,7 @@ class Settings {
 				if ( empty( $order ) ) {
 					wp_send_json_error( array( 'error' => esc_html__( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 				}
-				if ( ! in_array( $order->get_type(), array( 'shop_order', 'shop_order_refund' ) ) ) {
+				if ( ! in_array( $order->get_type(), array( 'shop_order', 'shop_order_refund' ), true ) ) {
 					wp_send_json_error( array( 'error' => esc_html__( 'Object found is not an order!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 				}
 
@@ -407,7 +407,7 @@ class Settings {
 					}
 
 					// preview
-					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) ) : 'pdf';
+					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats, true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) ) : 'pdf';
 					switch ( $output_format ) {
 						default:
 						case 'pdf':
@@ -664,7 +664,7 @@ class Settings {
 
 		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
 			$output_format = 'html';
-		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats ) ) {
+		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats, true ) ) {
 			$output_format = esc_attr( $request['output'] );
 		}
 
@@ -751,7 +751,7 @@ class Settings {
 
 		$installed_templates = $this->get_installed_templates();
 
-		if ( in_array( $selected_template, $installed_templates ) ) {
+		if ( in_array( $selected_template, $installed_templates, true ) ) {
 			return array_search( $selected_template, $installed_templates );
 		} else {
 			// unknown template or full template path (filter override)
@@ -987,7 +987,7 @@ class Settings {
 		$installed_templates = $this->get_installed_templates( true );
 		$selected_template = wp_normalize_path( $this->general_settings['template_path'] );
 		$template_match = '';
-		if ( ! in_array( $selected_template, $installed_templates ) && substr_count( $selected_template, '/' ) > 1 ) {
+		if ( ! in_array( $selected_template, $installed_templates, true ) && substr_count( $selected_template, '/' ) > 1 ) {
 			// search for path match
 			foreach ( $installed_templates as $path => $template_id ) {
 				$path = wp_normalize_path( $path );

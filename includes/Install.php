@@ -322,7 +322,7 @@ class Install {
 					if ( ! empty( $old_settings[ $old_option ][ $old_key ] ) ) {
 						// turn translatable fields into array
 						$translatable_fields = array( 'shop_name','shop_address','footer','extra_1','extra_2','extra_3' );
-						if ( in_array( $new_key, $translatable_fields ) ) {
+						if ( in_array( $new_key, $translatable_fields, true ) ) {
 							${$new_option}[ $new_key ] = array( 'default' => $old_settings[ $old_option ][ $old_key ] );
 						} else {
 							${$new_option}[ $new_key ] = $old_settings[ $old_option ][ $old_key ];
@@ -332,7 +332,7 @@ class Install {
 
 				// auto enable invoice & packing slip
 				$enabled = array( 'wpo_wcpdf_documents_settings_invoice', 'wpo_wcpdf_documents_settings_packing-slip' );
-				if ( in_array( $new_option, $enabled ) ) {
+				if ( in_array( $new_option, $enabled, true ) ) {
 					${$new_option}['enabled'] = 1;
 				}
 
@@ -548,7 +548,7 @@ class Install {
 
 			if ( ! empty( $ubl_tax_settings ) ) {
 				array_walk_recursive( $ubl_tax_settings, function ( &$value, $key ) {
-					if ( in_array( $key, array( 'scheme', 'category' ) ) && ! empty( $value ) ) {
+					if ( in_array( $key, array( 'scheme', 'category' ), true ) && ! empty( $value ) ) {
 						$value = strtoupper( $value );
 					}
 				} );

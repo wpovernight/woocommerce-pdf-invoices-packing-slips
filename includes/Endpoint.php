@@ -210,7 +210,7 @@ class Endpoint {
 	 * @return string
 	 */
 	public function get_document_printed_link( string $event, \WC_Abstract_Order $order, string $document_type, string $trigger = 'manually' ): string {
-		if ( empty( $event ) || ! in_array( $event, [ 'mark', 'unmark' ] ) ) {
+		if ( empty( $event ) || ! in_array( $event, array( 'mark', 'unmark' ), true ) ) {
 			return '';
 		}
 

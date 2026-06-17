@@ -273,7 +273,7 @@ class Admin {
 			return;
 		}
 		
-		if ( ! in_array( $column, array( 'invoice_number_column', 'invoice_date_column' ) ) ) {
+		if ( ! in_array( $column, array( 'invoice_number_column', 'invoice_date_column' ), true ) ) {
 			return;
 		}
 
@@ -1107,7 +1107,7 @@ class Admin {
 		$settings_instance = \WPO_WCPDF()->get_instance( 'settings' );
 
 		$document_data_editing_enabled = $settings_instance->user_can_manage_settings() &&
-			( ! empty( $settings_instance->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
+			( ! empty( $settings_instance->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ), true ) );
 		?>
 		<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
@@ -1601,7 +1601,7 @@ class Admin {
 
 		$request = stripslashes_deep( $_POST );
 
-		if ( ! isset( $request['action'] ) ||  ! in_array( $request['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ) ) ) {
+		if ( ! isset( $request['action'] ) ||  ! in_array( $request['action'], array( 'wpo_wcpdf_regenerate_document', 'wpo_wcpdf_save_document', 'wpo_wcpdf_delete_document' ), true ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Bad action!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
@@ -1878,7 +1878,7 @@ class Admin {
 		$key_prefix                    = "_wcpdf_{$document->slug}_";
 		$settings_instance             = \WPO_WCPDF()->get_instance( 'settings' );
 		$document_data_editing_enabled = $settings_instance->user_can_manage_settings() &&
-			( ! empty( $settings_instance->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ) ) );
+			( ! empty( $settings_instance->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ), true ) );
 
 		if ( $document_data_editing_enabled ) {
 			// Number
