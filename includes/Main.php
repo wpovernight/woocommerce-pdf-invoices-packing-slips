@@ -758,7 +758,7 @@ class Main {
 	 * @param bool $append_random_string Whether to append the random string to the temp folder name.
 	 * @return string|false
 	 */
-	public function get_tmp_base( bool $append_random_string = true ) {
+	public function get_tmp_base( bool $append_random_string = true ): string|false {
 		// wp_upload_dir() is used to set the base temp folder, under which a
 		// 'wpo_wcpdf' folder and several subfolders are created
 		//
@@ -948,7 +948,7 @@ class Main {
 	 * @param bool $reinstall_fonts
 	 * @return string|false
 	 */
-	public function regenerate_random_string( bool $reinstall_fonts = true ) {
+	public function regenerate_random_string( bool $reinstall_fonts = true ): string|false {
 		if ( ! empty( $this->get_random_string() ) ) {
 			$old_path = $this->get_tmp_base();
 		} else {
@@ -971,7 +971,7 @@ class Main {
 	 * 
 	 * @return string|false
 	 */
-	public function get_random_string () {
+	public function get_random_string (): string|false {
 		$code = get_option( 'wpo_wcpdf_random_string', '' );
 		if ( ! empty( $code ) ) {
 			return esc_attr( $code );
