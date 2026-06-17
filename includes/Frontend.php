@@ -396,7 +396,7 @@ class Frontend {
 	 * @param \WC_Customer|\WC_Order $wc_object
 	 * @return void
 	 */
-	public function checkout_field_save_checkout_block_field( string $key, $value, string $group, object $wc_object ): void {
+	public function checkout_field_save_checkout_block_field( string $key, mixed $value, string $group, object $wc_object ): void {
 		if ( ! $this->checkout_field_is_enabled() ) {
 			return;
 		}
