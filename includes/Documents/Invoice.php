@@ -41,7 +41,7 @@ class Invoice extends OrderDocumentMethods {
 	 * @return bool
 	 */
 	public function use_historical_settings(): bool {
-		return apply_filters(
+		return (bool) apply_filters(
 			'wpo_wcpdf_document_use_historical_settings',
 			wpo_wcpdf_is_document_using_historical_settings( $this->get_type() ),
 			$this
@@ -54,7 +54,7 @@ class Invoice extends OrderDocumentMethods {
 	 * @return bool
 	 */
 	public function storing_settings_enabled(): bool {
-		return apply_filters(
+		return (bool) apply_filters(
 			'wpo_wcpdf_document_store_settings',
 			true,
 			$this
@@ -70,7 +70,12 @@ class Invoice extends OrderDocumentMethods {
 		// override/not using $this->title to allow for language switching!
 		$title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_title' ); // deprecated
-		return apply_filters( 'wpo_wcpdf_document_title', $title, $this );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_document_title',
+			$title,
+			$this
+		);
 	}
 
 	/**
@@ -82,7 +87,12 @@ class Invoice extends OrderDocumentMethods {
 		// override to allow for language switching!
 		$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' ); // deprecated
-		return apply_filters( 'wpo_wcpdf_document_number_title', $title, $this );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_document_number_title',
+			$title,
+			$this
+		);
 	}
 
 	/**
@@ -94,7 +104,12 @@ class Invoice extends OrderDocumentMethods {
 		// override to allow for language switching!
 		$title = __( 'Invoice Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' ); // deprecated
-		return apply_filters( 'wpo_wcpdf_document_date_title', $title, $this );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_document_date_title',
+			$title,
+			$this
+		);
 	}
 
 	/**
@@ -104,7 +119,11 @@ class Invoice extends OrderDocumentMethods {
 	 */
 	public function get_shipping_address_title(): string {
 		// override to allow for language switching!
-		return apply_filters( 'wpo_wcpdf_document_shipping_address_title', __( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_document_shipping_address_title',
+			__( 'Ship To:', 'woocommerce-pdf-invoices-packing-slips' ),
+			$this
+		);
 	}
 
 	/**
@@ -662,7 +681,12 @@ class Invoice extends OrderDocumentMethods {
 			}
 		}
 
-		return apply_filters( "wpo_wcpdf_{$this->type}_pdf_settings_fields", $settings_fields, $option_name, $this );
+		return (array) apply_filters(
+			"wpo_wcpdf_{$this->type}_pdf_settings_fields",
+			$settings_fields,
+			$option_name,
+			$this
+		);
 	}
 
 	/**
@@ -726,7 +750,12 @@ class Invoice extends OrderDocumentMethods {
 			),
 		);
 
-		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ] ?? array(), $output_format, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_document_settings_categories',
+			$settings_categories[ $output_format ] ?? array(),
+			$output_format,
+			$this
+		);
 	}
 	
 	/**

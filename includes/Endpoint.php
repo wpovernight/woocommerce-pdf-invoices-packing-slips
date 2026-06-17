@@ -73,7 +73,10 @@ class Endpoint {
 	 * @return string
 	 */
 	public function get_identifier(): string {
-		return apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' );
+		return (string) apply_filters(
+			'wpo_wcpdf_pretty_document_link_identifier',
+			'wcpdf'
+		);
 	}
 
 	/**
@@ -189,7 +192,7 @@ class Endpoint {
 			$document_link = add_query_arg( $additional_vars, $document_link );
 		}
 
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_wcpdf_document_link',
 			esc_url( $document_link ),
 			$order,
@@ -239,7 +242,7 @@ class Endpoint {
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$access_type    = isset( $debug_settings['document_link_access_type'] ) ? $debug_settings['document_link_access_type'] : 'logged_in';
 
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_wcpdf_document_link_access_type',
 			$access_type,
 			$this
@@ -274,7 +277,7 @@ class Endpoint {
 			}
 		}
 
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_wcpdf_document_denied_frontend_redirect_url',
 			wp_sanitize_redirect( $redirect_url ),
 			$debug_settings,

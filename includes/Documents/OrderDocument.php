@@ -330,7 +330,11 @@ abstract class OrderDocument {
 	 * @return bool
 	 */
 	public function use_historical_settings(): bool {
-		return apply_filters( 'wpo_wcpdf_document_use_historical_settings', false, $this );
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_use_historical_settings',
+			false,
+			$this
+		);
 	}
 
 	/**
@@ -339,7 +343,11 @@ abstract class OrderDocument {
 	 * @return bool
 	 */
 	public function storing_settings_enabled(): bool {
-		return apply_filters( 'wpo_wcpdf_document_store_settings', false, $this );
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_store_settings',
+			false,
+			$this
+		);
 	}
 
 	/**
@@ -401,7 +409,12 @@ abstract class OrderDocument {
 		$output_format = ( 'xml' === $output_format ) ? 'pdf' : $output_format; // currently not using separated settings for EDI
 		$is_enabled    = $this->get_setting( 'enabled', false, $output_format );
 
-		return apply_filters( 'wpo_wcpdf_document_is_enabled', $is_enabled, $this->type, $output_format );
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_is_enabled',
+			$is_enabled,
+			$this->type,
+			$output_format
+		);
 	}
 
 	/**
@@ -614,7 +627,11 @@ abstract class OrderDocument {
 				$allowed = false;
 			}
 		}
-		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_is_allowed',
+			$allowed,
+			$this
+		);
 	}
 
 	/**
@@ -650,7 +667,13 @@ abstract class OrderDocument {
 			}
 		}
 
-		return apply_filters( 'wpo_ips_document_is_allowed_in_my_account', $allowed, $default, $output_format, $this );
+		return (bool) apply_filters(
+			'wpo_ips_document_is_allowed_in_my_account',
+			$allowed,
+			$default,
+			$output_format,
+			$this
+		);
 	}
 
 	/**
@@ -737,7 +760,15 @@ abstract class OrderDocument {
 			$number = $number->get_formatted();
 		}
 
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number", $number, $document_type, $order, $context, $formatted, $this );
+		return apply_filters(
+			"wpo_wcpdf_{$this->slug}_number",
+			$number,
+			$document_type,
+			$order,
+			$context,
+			$formatted,
+			$this
+		);
 	}
 
 	/**
@@ -766,7 +797,15 @@ abstract class OrderDocument {
 			$date = $date->date_i18n( wcpdf_date_format( $this, 'document_date' ) );
 		}
 
-		return apply_filters( "wpo_wcpdf_{$this->slug}_date", $date, $document_type, $order, $context, $formatted, $this );
+		return apply_filters(
+			"wpo_wcpdf_{$this->slug}_date",
+			$date,
+			$document_type,
+			$order,
+			$context,
+			$formatted,
+			$this
+		);
 	}
 
 	/**
@@ -1156,7 +1195,11 @@ abstract class OrderDocument {
 
 		$title = apply_filters( 'wpo_wcpdf_title_for', $title, $slug, $this ); // used by Pro to translate strings
 
-		return apply_filters( "wpo_wcpdf_{$slug}_title", $title, $this );
+		return (string) apply_filters(
+			"wpo_wcpdf_{$slug}_title",
+			$title,
+			$this
+		);
 	}
 
 	/**
@@ -1373,7 +1416,12 @@ abstract class OrderDocument {
 		} else {
 			$number_settings = $this->get_setting( 'number_format', array() );
 		}
-		return apply_filters( 'wpo_wcpdf_document_number_settings', $number_settings, $this );
+
+		return (array) apply_filters(
+			'wpo_wcpdf_document_number_settings',
+			$number_settings,
+			$this
+		);
 	}
 
 	/**
@@ -1442,7 +1490,15 @@ abstract class OrderDocument {
 			? str_replace( ' ', '', $this->settings['header_logo_height'] )
 			: null;
 		
-		return apply_filters( 'wpo_wcpdf_header_logo_height', $logo_height, $this );
+		$logo_height = apply_filters(
+			'wpo_wcpdf_header_logo_height',
+			$logo_height,
+			$this
+		);
+
+		return is_string( $logo_height )
+			? $logo_height
+			: null;
 	}
 
 	/**
@@ -1545,7 +1601,11 @@ abstract class OrderDocument {
 			);
 		}
 
-		return apply_filters( "wpo_wcpdf_{$settings_key}_settings_text", $text, $this );
+		return (string) apply_filters(
+			"wpo_wcpdf_{$settings_key}_settings_text",
+			$text,
+			$this
+		);
 	}
 
 	/**
@@ -1770,7 +1830,7 @@ abstract class OrderDocument {
 			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
 		);
 
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_wcpdf_get_shop_address',
 			wpo_wcpdf_format_address( $address ),
 			$address,
@@ -1944,7 +2004,15 @@ abstract class OrderDocument {
 
 		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
 
-		return apply_filters( 'wpo_wcpdf_get_pdf', $pdf, $this );
+		$pdf = apply_filters(
+			'wpo_wcpdf_get_pdf',
+			$pdf,
+			$this
+		);
+
+		return is_string( $pdf )
+			? $pdf
+			: null;
 	}
 	
 	/**
@@ -2008,7 +2076,11 @@ abstract class OrderDocument {
 		// remove temporary filters
 		\wpo_ips_remove_filters( $html_filters );
 
-		return apply_filters( 'wpo_wcpdf_get_html', $html, $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_get_html',
+			$html,
+			$this
+		);
 	}
 
 	/**
@@ -2225,7 +2297,10 @@ abstract class OrderDocument {
 			global $woocommerce;
 
 			if ( empty( $woocommerce ) ) { // bail if WooCommerce not active
-				return apply_filters( 'wpo_wcpdf_wc_emails', array() );
+				return (array) apply_filters(
+					'wpo_wcpdf_wc_emails',
+					array()
+				);
 			}
 
 			$mailer = $woocommerce->mailer();
@@ -2258,7 +2333,10 @@ abstract class OrderDocument {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_wc_emails', $emails );
+		return (array) apply_filters(
+			'wpo_wcpdf_wc_emails',
+			$emails
+		);
 	}
 
 	/**
@@ -2348,7 +2426,14 @@ abstract class OrderDocument {
 			}
 		}
 
-		return apply_filters( "wpo_wcpdf_{$this->slug}_number_store_name", $number_store_name, $store_base_name, $date, $method, $this );
+		return (string) apply_filters(
+			"wpo_wcpdf_{$this->slug}_number_store_name",
+			$number_store_name,
+			$store_base_name,
+			$date,
+			$method,
+			$this
+		);
 	}
 
 	/**
@@ -2360,7 +2445,13 @@ abstract class OrderDocument {
 	 */
 	public function get_number_store_table_default_name( string $store_base_name, string $method ): string {
 		global $wpdb;
-		return apply_filters( "wpo_wcpdf_number_store_table_name", "{$wpdb->prefix}wcpdf_{$store_base_name}", $store_base_name, $method );
+
+		return (string) apply_filters(
+			"wpo_wcpdf_number_store_table_name",
+			"{$wpdb->prefix}wcpdf_{$store_base_name}",
+			$store_base_name,
+			$method
+		);
 	}
 
 	/**
@@ -2604,7 +2695,11 @@ abstract class OrderDocument {
 			'wpo_wcpdf_document_due_date'
 		);
 
-		return apply_filters( 'wpo_wcpdf_document_due_date', $due_date ?? 0, $this );
+		return (int) apply_filters(
+			'wpo_wcpdf_document_due_date',
+			$due_date ?? 0,
+			$this
+		);
 	}
 
 	/**
@@ -2622,18 +2717,22 @@ abstract class OrderDocument {
 	 * @return array
 	 */
 	private function get_non_historical_settings(): array {
-		return apply_filters( 'wpo_wcpdf_non_historical_settings', array(
-			'enabled',
-			'attach_to_email_ids',
-			'disable_for_statuses',
-			'number_format', // this is stored in the number data already!
-			'my_account_buttons',
-			'my_account_restrict',
-			'invoice_number_column',
-			'invoice_date_column',
-			'paper_size',
-			'font_subsetting',
-		), $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_non_historical_settings',
+			array(
+				'enabled',
+				'attach_to_email_ids',
+				'disable_for_statuses',
+				'number_format', // this is stored in the number data already!
+				'my_account_buttons',
+				'my_account_restrict',
+				'invoice_number_column',
+				'invoice_date_column',
+				'paper_size',
+				'font_subsetting',
+			),
+			$this
+		);
 	}
 	
 	/**

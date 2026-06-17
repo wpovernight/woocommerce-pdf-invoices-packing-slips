@@ -1082,7 +1082,11 @@ class Admin {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_current_values_for_document', $data, $document );
+		return (array) apply_filters(
+			'wpo_wcpdf_current_values_for_document',
+			$data,
+			$document
+		);
 	}
 
 	/**
@@ -1594,7 +1598,11 @@ class Admin {
 	 * @return bool True if the user can manage the document, false otherwise.
 	 */
 	public function user_can_manage_document( string $document_type ): bool {
-		return apply_filters( 'wpo_wcpdf_current_user_is_allowed', ( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ), $document_type );
+		return (bool) apply_filters(
+			'wpo_wcpdf_current_user_is_allowed',
+			( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ),
+			$document_type
+		);
 	}
 
 	/**
@@ -1971,7 +1979,12 @@ class Admin {
 			$data['notes'] = wp_kses( $form_data["{$key_prefix}notes"], $allowed_html );
 		}
 
-		return apply_filters( 'wpo_wcpdf_order_document_form_data', $data, $form_data, $document );
+		return (array) apply_filters(
+			'wpo_wcpdf_order_document_form_data',
+			$data,
+			$form_data,
+			$document
+		);
 	}
 
 	/**
@@ -2348,7 +2361,10 @@ class Admin {
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
 							( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
 
-		return apply_filters( 'wpo_wcpdf_invoice_number_is_numeric', $is_numeric );
+		return (bool) apply_filters(
+			'wpo_wcpdf_invoice_number_is_numeric',
+			$is_numeric
+		);
 	}
 
 	/**

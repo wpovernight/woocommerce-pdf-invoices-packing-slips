@@ -105,7 +105,13 @@ class Documents {
 			$documents = $this->documents;
 		}
 
-		return apply_filters( 'wpo_wcpdf_get_documents', $documents, $filter, $output_format, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_get_documents',
+			$documents,
+			$filter,
+			$output_format,
+			$this
+		);
 	}
 
 	/**

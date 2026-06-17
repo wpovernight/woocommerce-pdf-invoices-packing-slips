@@ -90,8 +90,13 @@ class DocumentNumber {
 	 * @return string
 	 */
 	public function get_formatted(): string {
-		$formatted_number = isset( $this->formatted_number ) ? $this->formatted_number : '';
-		return apply_filters( 'wpo_wcpdf_formatted_document_number', $formatted_number, $this, $this->document_type, $this->order_id );
+		return (string) apply_filters(
+			'wpo_wcpdf_formatted_document_number',
+			isset( $this->formatted_number ) ? $this->formatted_number : '',
+			$this,
+			$this->document_type,
+			$this->order_id
+		);
 	}
 
 	/**

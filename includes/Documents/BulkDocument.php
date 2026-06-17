@@ -152,8 +152,14 @@ class BulkDocument {
 	public function merge_documents( array $html_content ): string {
 		// insert page breaks merge
 		$page_break = "\n<div style=\"page-break-before: always;\"></div>\n";
-		$html = implode( $page_break, $html_content );
-		return apply_filters( 'wpo_wcpdf_merged_bulk_document_content', $html, $html_content, $this );
+		$html       = implode( $page_break, $html_content );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_merged_bulk_document_content',
+			$html,
+			$html_content,
+			$this
+		);
 	}
 
 	/**

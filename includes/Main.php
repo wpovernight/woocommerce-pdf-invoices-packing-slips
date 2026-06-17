@@ -359,7 +359,12 @@ class Main {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_document_types_for_email', $document_types, $email_id, $order );
+		return (array) apply_filters(
+			'wpo_wcpdf_document_types_for_email',
+			$document_types,
+			$email_id,
+			$order
+		);
 	}
 
 	/**
@@ -1779,7 +1784,11 @@ class Main {
 				break;
 		}
 
-		return apply_filters( 'wpo_wcpdf_document_triggers', $triggers, $trigger_type );
+		return (array) apply_filters(
+			'wpo_wcpdf_document_triggers',
+			$triggers,
+			$trigger_type
+		);
 	}
 
 	/**
@@ -1922,7 +1931,11 @@ class Main {
 			$can_be_manually_marked_printed = true;
 		}
 
-		return apply_filters( 'wpo_wcpdf_document_can_be_manually_marked_printed', $can_be_manually_marked_printed, $document );
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_can_be_manually_marked_printed',
+			$can_be_manually_marked_printed,
+			$document
+		);
 	}
 
 	/**
@@ -1945,7 +1958,11 @@ class Main {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_document_printed_data', $data, $document );
+		return (array) apply_filters(
+			'wpo_wcpdf_document_printed_data',
+			$data,
+			$document
+		);
 	}
 
 	/**

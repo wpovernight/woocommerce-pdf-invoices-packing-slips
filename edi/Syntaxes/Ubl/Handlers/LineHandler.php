@@ -362,7 +362,16 @@ class LineHandler extends AbstractUblHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_coupon_line', $line, $coupon_item, $this );
+		$line = apply_filters(
+			'wpo_ips_edi_ubl_coupon_line',
+			$line,
+			$coupon_item,
+			$this
+		);
+
+		return is_array( $line )
+			? $line
+			: null;
 	}
 
 }

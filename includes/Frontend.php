@@ -82,7 +82,11 @@ class Frontend {
 		$invoice        = wcpdf_get_document( $document_type, $order );
 
 		if ( ! $invoice ) {
-			return apply_filters( 'wpo_wcpdf_myaccount_actions', $actions, $order );
+			return (array) apply_filters(
+				'wpo_wcpdf_myaccount_actions',
+				$actions,
+				$order
+			);
 		}
 
 		$invoice_allowed = $invoice->is_allowed_in_my_account( 'available' );
@@ -116,7 +120,11 @@ class Frontend {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_myaccount_actions', $actions, $order );
+		return (array) apply_filters(
+			'wpo_wcpdf_myaccount_actions',
+			$actions,
+			$order
+		);
 	}
 
 	/**
@@ -789,7 +797,7 @@ class Frontend {
 	 * @param string $raw_value
 	 * @return true|\WP_Error
 	 */
-	private function checkout_field_validate_vat_number_value( string $raw_value ) {
+	private function checkout_field_validate_vat_number_value( string $raw_value ): bool|\WP_Error {
 		$vat = strtoupper( preg_replace( '/\s+/', '', trim( $raw_value ) ) );
 
 		// Optional field: empty is always OK.
@@ -818,7 +826,15 @@ class Frontend {
 			 * @param \WP_Error $error
 			 * @param string   $vat
 			 */
-			return apply_filters( 'wpo_ips_checkout_field_vat_prefix_error', $error, $vat );
+			$filtered_error = apply_filters(
+				'wpo_ips_checkout_field_vat_prefix_error',
+				$error,
+				$vat
+			);
+
+			return $filtered_error instanceof \WP_Error
+				? $filtered_error
+				: $error;
 		}
 
 		/**
@@ -829,7 +845,16 @@ class Frontend {
 		 * @param string         $vat
 		 * @param string         $raw_value
 		 */
-		return apply_filters( 'wpo_ips_checkout_field_vat_validate', true, $vat, $raw_value );
+		$result = apply_filters(
+			'wpo_ips_checkout_field_vat_validate',
+			true,
+			$vat,
+			$raw_value
+		);
+
+		return $result instanceof \WP_Error
+			? $result
+			: true;
 	}
 
 }

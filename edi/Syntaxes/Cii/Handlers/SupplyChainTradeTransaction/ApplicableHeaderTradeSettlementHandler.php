@@ -60,7 +60,15 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			'value' => wpo_ips_edi_sanitize_string( $reference ),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_payment_reference', $payment_reference, $this );
+		$payment_reference = apply_filters(
+			'wpo_ips_edi_cii_payment_reference',
+			$payment_reference,
+			$this
+		);
+
+		return is_array( $payment_reference )
+			? $payment_reference
+			: null;
 	}
 
 	/**
@@ -132,7 +140,15 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			);
 		}
 
-		return apply_filters( 'wpo_ips_edi_cii_payment_means', $payment_means, $this );
+		$payment_means = apply_filters(
+			'wpo_ips_edi_cii_payment_means',
+			$payment_means,
+			$this
+		);
+
+		return is_array( $payment_means )
+			? $payment_means
+			: null;
 	}
 
 	/**
@@ -211,7 +227,15 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			return null;
 		}
 
-		return apply_filters( 'wpo_ips_edi_cii_trade_tax', $trade_tax, $this );
+		$trade_tax = apply_filters(
+			'wpo_ips_edi_cii_trade_tax',
+			$trade_tax,
+			$this
+		);
+
+		return is_array( $trade_tax )
+			? $trade_tax
+			: null;
 	}
 
 	/**
@@ -255,7 +279,15 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_payment_terms', $payment_terms, $this );
+		$payment_terms = apply_filters(
+			'wpo_ips_edi_cii_payment_terms',
+			$payment_terms,
+			$this
+		);
+
+		return is_array( $payment_terms )
+			? $payment_terms
+			: null;
 	}
 
 	/**
@@ -317,7 +349,15 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			'value' => $this->format_decimal( $totals['payable_amount'] ),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_monetary_summation', $monetary_summation, $this );
+		$monetary_summation = apply_filters(
+			'wpo_ips_edi_cii_monetary_summation',
+			$monetary_summation,
+			$this
+		);
+
+		return is_array( $monetary_summation )
+			? $monetary_summation
+			: null;
 	}
 
 }

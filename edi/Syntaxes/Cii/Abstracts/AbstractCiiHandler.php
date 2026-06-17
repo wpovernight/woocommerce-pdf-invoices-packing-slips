@@ -16,7 +16,11 @@ abstract class AbstractCiiHandler extends AbstractHandler {
 	 * @return string The default date format code.
 	 */
 	public function get_date_format_code(): string {
-		return apply_filters( 'wpo_ips_edi_cii_document_date_format_code', '102', $this );
+		return (string) apply_filters(
+			'wpo_ips_edi_cii_document_date_format_code',
+			'102',
+			$this
+		);
 	}
 
 	/**

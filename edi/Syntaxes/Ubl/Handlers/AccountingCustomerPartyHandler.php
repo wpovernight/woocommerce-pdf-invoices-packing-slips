@@ -47,7 +47,11 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			) ),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party', $customer_party, $this );
+		return (array) apply_filters(
+			'wpo_ips_edi_ubl_customer_party',
+			$customer_party,
+			$this
+		);
 	}
 	
 	/**
@@ -75,7 +79,15 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party_name', $party_name, $this );
+		$party_name = apply_filters(
+			'wpo_ips_edi_ubl_customer_party_name',
+			$party_name,
+			$this
+		);
+
+		return is_array( $party_name )
+			? $party_name
+			: null;
 	}
 	
 	/**
@@ -124,7 +136,15 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party_postal_address', $postal_address, $this );
+		$postal_address = apply_filters(
+			'wpo_ips_edi_ubl_customer_party_postal_address',
+			$postal_address,
+			$this
+		);
+
+		return is_array( $postal_address )
+			? $postal_address
+			: null;
 	}
 	
 	/**
@@ -171,7 +191,15 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			'value' => $values,
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party_tax_scheme', $party_tax_scheme, $this );
+		$party_tax_scheme = apply_filters(
+			'wpo_ips_edi_ubl_customer_party_tax_scheme',
+			$party_tax_scheme,
+			$this
+		);
+
+		return is_array( $party_tax_scheme )
+			? $party_tax_scheme
+			: null;
 	}
 	
 	/**
@@ -225,7 +253,15 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			'value' => $values,
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party_legal_entity', $party_legal_entity, $this );
+		$party_legal_entity = apply_filters(
+			'wpo_ips_edi_ubl_customer_party_legal_entity',
+			$party_legal_entity,
+			$this
+		);
+
+		return is_array( $party_legal_entity )
+			? $party_legal_entity
+			: null;
 	}
 	
 	/**
@@ -279,7 +315,15 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			'value' => $values,
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party_contact', $party_contact, $this );
+		$party_contact = apply_filters(
+			'wpo_ips_edi_ubl_customer_party_contact',
+			$party_contact,
+			$this
+		);
+
+		return is_array( $party_contact )
+			? $party_contact
+			: null;
 	}
 	
 }

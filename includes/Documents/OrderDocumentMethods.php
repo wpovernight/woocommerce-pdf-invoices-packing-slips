@@ -87,7 +87,12 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		}
 
 		//if we got here, it means the addresses are equal -> doesn't ship to different address!
-		return apply_filters( 'wpo_wcpdf_ships_to_different_address', false, $order, $this );
+		return (bool) apply_filters(
+			'wpo_wcpdf_ships_to_different_address',
+			false,
+			$order,
+			$this
+		);
 	}
 
 	/**
@@ -161,7 +166,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$billing_email = $parent_order->get_billing_email();
 		}
 
-		return apply_filters( 'wpo_wcpdf_billing_email', sanitize_email( $billing_email ), $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_billing_email',
+			sanitize_email( $billing_email ),
+			$this
+		);
 	}
 	
 	/**
@@ -195,9 +204,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return string
 	 */
 	public function get_billing_phone(): string {
-		$phone = $this->get_phone( 'billing' );
-
-		return apply_filters( "wpo_wcpdf_billing_phone", $phone, $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_billing_phone',
+			$this->get_phone( 'billing' ),
+			$this
+		);
 	}
 
 	/**
@@ -209,11 +220,15 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	public function get_shipping_phone( bool $fallback_to_billing = false ): string {
 		$phone = $this->get_phone( 'shipping' );
 
-		if( $fallback_to_billing && empty( $phone ) ) {
+		if ( $fallback_to_billing && empty( $phone ) ) {
 			$phone = $this->get_billing_phone();
 		}
 
-		return apply_filters( "wpo_wcpdf_shipping_phone", $phone, $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_shipping_phone',
+			$phone,
+			$this
+		);
 	}
 
 	/**
@@ -331,7 +346,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_billing_custom_field', $custom_field, $this );
+		return apply_filters(
+			'wpo_wcpdf_billing_custom_field',
+			$custom_field,
+			$this
+		);
 	}
 	
 	/**
@@ -578,7 +597,10 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return string
 	 */
 	public function get_current_date(): string {
-		return apply_filters( 'wpo_wcpdf_date', date_i18n( wcpdf_date_format( $this, 'current_date' ) ) );
+		return (string) apply_filters(
+			'wpo_wcpdf_date',
+			date_i18n( wcpdf_date_format( $this, 'current_date' ) )
+		);
 	}
 	
 	/**
@@ -632,7 +654,15 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 		$payment_date = empty( $payment_date ) ? null : apply_filters( 'wpo_wcpdf_date', date_i18n( wcpdf_date_format( $this, 'order_date_paid' ), $payment_date->getTimestamp() ) );
 
-		return apply_filters( 'wpo_wcpdf_payment_date', $payment_date, $this );
+		$payment_date = apply_filters(
+			'wpo_wcpdf_payment_date',
+			$payment_date,
+			$this
+		);
+
+		return is_string( $payment_date )
+			? $payment_date
+			: null;
 	}
 	
 	/**
@@ -650,8 +680,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return string
 	 */
 	public function get_shipping_method(): string {
-		$shipping_method = wpo_wcpdf_dynamic_translate( $this->order->get_shipping_method(), 'woocommerce' );
-		return apply_filters( 'wpo_wcpdf_shipping_method', $shipping_method, $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_shipping_method',
+			wpo_wcpdf_dynamic_translate( $this->order->get_shipping_method(), 'woocommerce' ),
+			$this
+		);
 	}
 	
 	/**
@@ -680,7 +713,12 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		// Trim the hash to have a clean number but still
 		// support any filters that were applied before.
 		$order_number = ltrim($order_number, '#');
-		return apply_filters( 'wpo_wcpdf_order_number', $order_number, $this );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_order_number',
+			$order_number,
+			$this
+		);
 	}
 	
 	/**
@@ -700,14 +738,20 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	public function get_order_date(): string {
 		if ( $this->is_refund( $this->order ) ) {
 			$parent_order = $this->get_refund_parent( $this->order );
-			$order_date = $parent_order->get_date_created();
+			$order_date   = $parent_order->get_date_created();
 		} else {
-			$order_date = $this->order->get_date_created();
+			$order_date   = $this->order->get_date_created();
 		}
 
-		$date = $order_date->date_i18n( wcpdf_date_format( $this, 'order_date' ) );
+		$date       = $order_date->date_i18n( wcpdf_date_format( $this, 'order_date' ) );
 		$mysql_date = $order_date->date( "Y-m-d H:i:s" );
-		return apply_filters( 'wpo_wcpdf_order_date', $date, $mysql_date, $this );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_order_date',
+			$date,
+			$mysql_date,
+			$this
+		);
 	}
 	
 	/**
@@ -821,7 +865,12 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_order_items_data', $data_list, $this->order, $this->get_type() );
+		return (array) apply_filters(
+			'wpo_wcpdf_order_items_data',
+			$data_list,
+			$this->order,
+			$this->get_type()
+		);
 	}
 
 	/**
@@ -1168,7 +1217,12 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 		}
 
-		return apply_filters( 'wpo_wcpdf_woocommerce_totals', $totals, $this->order, $this->get_type() );
+		return (array) apply_filters(
+			'wpo_wcpdf_woocommerce_totals',
+			$totals,
+			$this->order,
+			$this->get_type()
+		);
 	}
 
 	/**
@@ -1189,7 +1243,13 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			'value' => $subtotal,
 		);
 
-		return apply_filters( 'wpo_wcpdf_order_subtotal', $subtotal, $tax, $discount, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_order_subtotal',
+			$subtotal,
+			$tax,
+			$discount,
+			$this
+		);
 	}
 	
 	/**
@@ -1225,7 +1285,13 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			'value' => $formatted_shipping_cost,
 			'tax'   => $this->format_price( $shipping_tax ),
 		);
-		return apply_filters( 'wpo_wcpdf_order_shipping', $shipping, $tax, $this );
+
+		return (array) apply_filters(
+			'wpo_wcpdf_order_shipping',
+			$shipping,
+			$tax,
+			$this
+		);
 	}
 	
 	/**
@@ -1270,7 +1336,17 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			);
 		}
 
-		return apply_filters( 'wpo_wcpdf_order_discount', $discount, $type, $tax, $this );
+		$discount = apply_filters(
+			'wpo_wcpdf_order_discount',
+			$discount,
+			$type,
+			$tax,
+			$this
+		);
+
+		return is_array( $discount )
+			? $discount
+			: null;
 	}
 	
 	/**
@@ -1342,7 +1418,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 		}
 		
-		return apply_filters( 'wpo_wcpdf_order_taxes', $taxes, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_order_taxes',
+			$taxes,
+			$this
+		);
 	}
 
 	/**
@@ -1367,7 +1447,12 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			'value' => $total,
 		);
 
-		return apply_filters( 'wpo_wcpdf_order_grand_total', $grand_total, $tax, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_order_grand_total',
+			$grand_total,
+			$tax,
+			$this
+		);
 	}
 	
 	/**
@@ -1402,7 +1487,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$shipping_notes = wp_strip_all_tags( $shipping_notes );
 		}
 
-		return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes, $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_shipping_notes',
+			$shipping_notes,
+			$this
+		);
 	}
 
 	/**
@@ -1485,9 +1574,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return string
 	 */
 	public function get_document_notes(): string {
-		$document_notes = $this->get_notes( $this->get_type() );
-
-		return apply_filters( 'wpo_wcpdf_document_notes', $document_notes ?? '', $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_document_notes',
+			$this->get_notes( $this->get_type() ) ?? '',
+			$this
+		);
 	}
 
 	/**
@@ -1575,7 +1666,11 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return string
 	 */
 	public function get_refund_reason_title(): string {
-		return apply_filters( 'wpo_wcpdf_refund_reason_title', __( 'Reason for refund:', 'woocommerce-pdf-invoices-packing-slips' ), $this );
+		return (string) apply_filters(
+			'wpo_wcpdf_refund_reason_title',
+			__( 'Reason for refund:', 'woocommerce-pdf-invoices-packing-slips' ),
+			$this
+		);
 	}
 
 	/**

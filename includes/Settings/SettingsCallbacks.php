@@ -1154,7 +1154,11 @@ class SettingsCallbacks {
 		}
 
 		// Return the array processing any additional functions filtered by this action.
-		return apply_filters( 'wpo_wcpdf_validate_input', $output, $input );
+		return (array) apply_filters(
+			'wpo_wcpdf_validate_input',
+			$output,
+			$input
+		);
 	}
 
 	/**

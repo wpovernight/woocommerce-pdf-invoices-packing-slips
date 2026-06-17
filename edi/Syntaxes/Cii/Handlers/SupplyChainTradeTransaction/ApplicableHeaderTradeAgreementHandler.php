@@ -119,7 +119,15 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_seller_trade_party', $seller_trade_party, $this );
+		$seller_trade_party = apply_filters(
+			'wpo_ips_edi_cii_seller_trade_party',
+			$seller_trade_party,
+			$this
+		);
+
+		return is_array( $seller_trade_party )
+			? $seller_trade_party
+			: null;
 	}
 	
 	/**
@@ -227,7 +235,15 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			);
 		}
 
-		return apply_filters( 'wpo_ips_edi_cii_buyer_trade_party', $buyer_trade_party, $this );
+		$buyer_trade_party = apply_filters(
+			'wpo_ips_edi_cii_buyer_trade_party',
+			$buyer_trade_party,
+			$this
+		);
+
+		return is_array( $buyer_trade_party )
+			? $buyer_trade_party
+			: null;
 	}
 	
 	/**
@@ -253,7 +269,15 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_contract_referenced_document', $contract_document, $this );
+		$contract_document = apply_filters(
+			'wpo_ips_edi_cii_contract_referenced_document',
+			$contract_document,
+			$this
+		);
+
+		return is_array( $contract_document )
+			? $contract_document
+			: null;
 	}
 
 }

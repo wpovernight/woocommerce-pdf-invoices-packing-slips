@@ -83,7 +83,12 @@ abstract class AbstractHandler implements HandlerInterface {
 			? absint( $this->document->order_document->get_setting( 'due_date_days' ) )
 			: 0;
 
-		return apply_filters( 'wpo_ips_edi_due_date_days', $due_date_days, $this->document->order_document, $this );
+		return (int) apply_filters(
+			'wpo_ips_edi_due_date_days',
+			$due_date_days,
+			$this->document->order_document,
+			$this
+		);
 	}
 
 	/**
@@ -176,7 +181,13 @@ abstract class AbstractHandler implements HandlerInterface {
 				break;
 		}
 
-		return apply_filters( 'wpo_ips_edi_payment_means_data', $data, $method_id, $order, $this );
+		return (array) apply_filters(
+			'wpo_ips_edi_payment_means_data',
+			$data,
+			$method_id,
+			$order,
+			$this
+		);
 	}
 
 	/**
@@ -385,7 +396,11 @@ abstract class AbstractHandler implements HandlerInterface {
 		$groups = $this->ensure_one_zero_tax_group( $groups );
 		$groups = array_values( $groups );
 
-		return apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
+		return (array) apply_filters(
+			'wpo_ips_edi_order_tax_data',
+			$groups,
+			$this
+		);
 	}
 
 	/**
@@ -540,7 +555,12 @@ abstract class AbstractHandler implements HandlerInterface {
 			'lines_net'
 		);
 
-		return apply_filters( 'wpo_ips_edi_order_payment_totals', $totals, $order, $this );
+		return (array) apply_filters(
+			'wpo_ips_edi_order_payment_totals',
+			$totals,
+			$order,
+			$this
+		);
 	}
 
 	/**

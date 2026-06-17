@@ -42,6 +42,20 @@ function wcpdf_filter_order_ids( array $order_ids, string $document_type ): arra
  */
 function wcpdf_get_document( string $document_type, mixed $order, bool $init = false ): object|false {
 	$documents_instance = WPO_WCPDF()->get_instance( 'documents' );
+
+	$filtered_document = static function( object|false $document, string $document_type, mixed $order, bool $init ): object|false {
+		$document = apply_filters(
+			'wcpdf_get_document',
+			$document,
+			$document_type,
+			$order,
+			$init
+		);
+
+		return is_object( $document )
+			? $document
+			: false;
+	};
 	
 	if ( ! empty( $order ) ) {
 		if ( ! is_object( $order ) && ! is_array( $order ) && is_numeric( $order ) ) {
@@ -58,17 +72,18 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 			if ( empty( $order_id_diff ) && count( $order_ids ) == count( $filtered_order_ids ) ) {
 				// nothing changed, load document with Order object.
 				do_action( 'wpo_wcpdf_process_template_order', $document_type, $order->get_id() );
+
 				$document = $documents_instance->get_document( $document_type, $order );
 
 				if ( ! $document || ! is_callable( array( $document, 'is_allowed' ) ) || ! $document->is_allowed() ) {
-					return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
+					return $filtered_document( false, $document_type, $order, $init );
 				}
 
 				if ( $init && ! $document->exists() ) {
 					$document->init();
 					$document->save();
 				}
-				return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
+				return $filtered_document( $document, $document_type, $order, $init );
 			} else {
 				// order ids array changed, continue processing that array.
 				$order_ids = $filtered_order_ids;
@@ -76,12 +91,12 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 		} elseif ( is_array( $order ) ) {
 			$order_ids = wcpdf_filter_order_ids( $order, $document_type );
 		} else {
-			return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
+			return $filtered_document( false, $document_type, $order, $init );
 		}
 
 		if ( empty( $order_ids ) ) {
 			// No orders to export for this document type.
-			return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
+			return $filtered_document( false, $document_type, $order, $init );
 		}
 
 		// if we only have one order, it's simple.
@@ -94,7 +109,7 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 			$document = $documents_instance->get_document( $document_type, $order );
 
 			if ( ! $document || ! $document->is_allowed() ) {
-				return apply_filters( 'wcpdf_get_document', false, $document_type, $order, $init );
+				return $filtered_document( false, $document_type, $order, $init );
 			}
 
 			if ( $init && ! $document->exists() ) {
@@ -110,7 +125,7 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 		$document = $documents_instance->get_document( $document_type, $order );
 	}
 
-	return apply_filters( 'wcpdf_get_document', $document, $document_type, $order, $init );
+	return $filtered_document( $document, $document_type, $order, $init );
 }
 
 /**
@@ -152,7 +167,10 @@ function wcpdf_get_bulk_actions(): array {
 		}
 	}
 
-	return apply_filters( 'wpo_wcpdf_bulk_actions', $actions );
+	return (array) apply_filters(
+		'wpo_wcpdf_bulk_actions',
+		$actions
+	);
 }
 
 /**
@@ -269,9 +287,16 @@ function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument $document, st
 		return wcpdf_error_handling( $error_message, $error_handling, true, 'critical' );
 	}
 
-	$file_path = $main_instance->$function( $document, $tmp_path );
+	$file_path = apply_filters(
+		'wpo_wcpdf_get_document_file',
+		$main_instance->$function( $document, $tmp_path ),
+		$document,
+		$output_format
+	);
 
-	return apply_filters( 'wpo_wcpdf_get_document_file', $file_path, $document, $output_format );
+	return is_string( $file_path )
+		? $file_path
+		: false;
 }
 
 /**
@@ -428,7 +453,12 @@ function wcpdf_error_handling( string $message, string $handling_type = 'excepti
  * @return string
  */
 function wcpdf_date_format( ?\WPO\IPS\Documents\OrderDocument $document = null, ?string $date_type = null ): string {
-	return apply_filters( 'wpo_wcpdf_date_format', wc_date_format(), $document, $date_type );
+	return (string) apply_filters(
+		'wpo_wcpdf_date_format',
+		wc_date_format(),
+		$document,
+		$date_type
+	);
 }
 
 /**
@@ -772,7 +802,10 @@ function wpo_wcpdf_get_multilingual_languages(): array {
 		}
 	}
 
-	return apply_filters( 'wpo_wcpdf_multilingual_languages', $languages );
+	return (array) apply_filters(
+		'wpo_wcpdf_multilingual_languages',
+		$languages
+	);
 }
 
 /**
@@ -1031,7 +1064,11 @@ function wpo_wcpdf_get_simple_template_default_table_headers( \WPO\IPS\Documents
 		unset( $headers['price'] );
 	}
 
-	return apply_filters( 'wpo_wcpdf_simple_template_default_table_headers', $headers, $document );
+	return (array) apply_filters(
+		'wpo_wcpdf_simple_template_default_table_headers',
+		$headers,
+		$document
+	);
 }
 
 /**
@@ -1177,7 +1214,11 @@ function wpo_wcpdf_order_is_vat_exempt( \WC_Abstract_Order $order ): bool {
 		}
 	}
 
-	return apply_filters( 'wpo_wcpdf_is_vat_exempt_order', $is_vat_exempt, $order );
+	return (bool) apply_filters(
+		'wpo_wcpdf_is_vat_exempt_order',
+		$is_vat_exempt,
+		$order
+	);
 }
 
 /**
@@ -1229,7 +1270,16 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		}
 	}
 
-	return apply_filters( 'wpo_wcpdf_order_customer_vat_number', $vat_number, $order, $meta_key ?? null );
+	$vat_number = apply_filters(
+		'wpo_wcpdf_order_customer_vat_number',
+		$vat_number,
+		$order,
+		$meta_key ?? null
+	);
+
+	return is_string( $vat_number )
+		? $vat_number
+		: null;
 }
 
 /**
@@ -1592,7 +1642,12 @@ function wpo_wcpdf_is_document_using_historical_settings( string $document_type 
 		$is_using = false;
 	}
 
-	return apply_filters( 'wpo_wcpdf_is_document_using_historical_settings', $is_using, $document_settings, $document_type );
+	return (bool) apply_filters(
+		'wpo_wcpdf_is_document_using_historical_settings',
+		$is_using,
+		$document_settings,
+		$document_type
+	);
 }
 
 

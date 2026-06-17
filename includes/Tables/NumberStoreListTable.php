@@ -129,7 +129,11 @@ class NumberStoreListTable extends \WP_List_Table {
 				break;
 		}
 
-		return apply_filters( 'wpo_wcpdf_number_tools_column_content_' . $column_name, $value, $item );
+		return apply_filters(
+			'wpo_wcpdf_number_tools_column_content_' . $column_name,
+			$value,
+			$item
+		);
 	}
 
 	/**
@@ -151,7 +155,10 @@ class NumberStoreListTable extends \WP_List_Table {
 			unset( $columns['calculated_number'] );
 		}
 
-		return apply_filters( 'wpo_wcpdf_number_tools_columns', $columns );
+		return apply_filters(
+			'wpo_wcpdf_number_tools_columns',
+			$columns
+		);
 	}
 
 	/**

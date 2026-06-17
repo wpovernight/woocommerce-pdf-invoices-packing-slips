@@ -455,7 +455,11 @@ class WPO_WCPDF {
 			$locale = is_admin() && function_exists( 'get_user_locale' ) ? get_user_locale() : get_locale();
 		}
 
-		return apply_filters( 'plugin_locale', $locale, 'woocommerce-pdf-invoices-packing-slips' );
+		return (string) apply_filters(
+			'plugin_locale',
+			$locale,
+			'woocommerce-pdf-invoices-packing-slips'
+		);
 	}
 	
 	/**

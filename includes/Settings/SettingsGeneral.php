@@ -760,7 +760,11 @@ class SettingsGeneral {
 			);
 		}
 
-		return apply_filters( 'wpo_wcpdf_general_settings_categories', $settings_categories, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_general_settings_categories',
+			$settings_categories,
+			$this
+		);
 	}
 
 	/**
@@ -811,7 +815,10 @@ class SettingsGeneral {
 			$installed_templates[ $simple_template_path ] = 'Simple';
 		}
 
-		return apply_filters( 'wpo_wcpdf_templates', $installed_templates );
+		return (array) apply_filters(
+			'wpo_wcpdf_templates',
+			$installed_templates
+		);
 	}
 	
 	/**
@@ -910,7 +917,7 @@ class SettingsGeneral {
 			}
 		}
 
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_wcpdf_get_general_setting',
 			wptexturize( trim( $setting_text ) ),
 			$key,

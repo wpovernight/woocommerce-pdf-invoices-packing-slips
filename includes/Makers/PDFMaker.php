@@ -102,7 +102,10 @@ class PDFMaker {
 			$chroot[] = $tmp_base;
 		}
 
-		return apply_filters( 'wpo_wcpdf_dompdf_chroot', $chroot );
+		return (array) apply_filters(
+			'wpo_wcpdf_dompdf_chroot',
+			$chroot
+		);
 	}
 	
 	/**

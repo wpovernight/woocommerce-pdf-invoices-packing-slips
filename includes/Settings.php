@@ -668,7 +668,11 @@ class Settings {
 			$output_format = esc_attr( $request['output'] );
 		}
 
-		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document );
+		return (string) apply_filters(
+			'wpo_wcpdf_output_format',
+			$output_format,
+			$document
+		);
 	}
 
 	/**

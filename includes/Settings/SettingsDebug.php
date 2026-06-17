@@ -824,7 +824,10 @@ class SettingsDebug {
 			$setting_types[ $document->get_type() ] = $title;
 		}
 
-		return apply_filters( 'wpo_wcpdf_setting_types', $setting_types );
+		return (array) apply_filters(
+			'wpo_wcpdf_setting_types',
+			$setting_types
+		);
 	}
 
 	/**
@@ -1383,7 +1386,10 @@ class SettingsDebug {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_server_configs', $server_configs );
+		return (array) apply_filters(
+			'wpo_wcpdf_server_configs',
+			$server_configs
+		);
 	}
 
 	/**
@@ -1458,7 +1464,10 @@ class SettingsDebug {
 		}
 		unset( $data ); // break the reference
 
-		return apply_filters( 'wpo_wcpdf_premium_plugins_data', $plugins );
+		return (array) apply_filters(
+			'wpo_wcpdf_premium_plugins_data',
+			$plugins
+		);
 	}
 
 	/**
@@ -1502,7 +1511,11 @@ class SettingsDebug {
 			),
 		);
 
-		return apply_filters( 'wpo_wcpdf_plugin_directories', $permissions, $status );
+		return (array) apply_filters(
+			'wpo_wcpdf_plugin_directories',
+			$permissions,
+			$status
+		);
 	}
 
 	/**
@@ -1573,12 +1586,15 @@ class SettingsDebug {
 	 * @return array
 	 */
 	private function get_settings_sections(): array {
-		return apply_filters( 'wpo_wcpdf_settings_debug_sections', array(
-			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
-			'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
-			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
-			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
-		) );
+		return (array) apply_filters(
+			'wpo_wcpdf_settings_debug_sections',
+			array(
+				'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
+				'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
+				'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
 	}
 
 	/**
@@ -1645,7 +1661,10 @@ class SettingsDebug {
 			),
 		);
 
-		return apply_filters( 'wpo_wcpdf_settings_debug_categories', $categories );
+		return (array) apply_filters(
+			'wpo_wcpdf_settings_debug_categories',
+			$categories
+		);
 	}
 
 	/**
@@ -2218,7 +2237,10 @@ class SettingsDebug {
 
 		$plugins_data = \wpo_ips_get_plugins_data( $free_extensions );
 
-		return apply_filters( 'wpo_ips_free_extensions_data', $plugins_data );
+		return (array) apply_filters(
+			'wpo_ips_free_extensions_data',
+			$plugins_data
+		);
 	}
 
 	/**
@@ -2246,7 +2268,10 @@ class SettingsDebug {
 
 		$plugins_data = \wpo_ips_get_plugins_data( $multilingual_plugins );
 
-		return apply_filters( 'wpo_ips_multilingual_plugins_data', $plugins_data );
+		return (array) apply_filters(
+			'wpo_ips_multilingual_plugins_data',
+			$plugins_data
+		);
 	}
 
 	/**

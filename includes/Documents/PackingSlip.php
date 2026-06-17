@@ -39,7 +39,12 @@ class PackingSlip extends OrderDocumentMethods {
 		// override/not using $this->title to allow for language switching!
 		$title = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_title' ); // deprecated
-		return apply_filters( 'wpo_wcpdf_document_title', $title, $this );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_document_title',
+			$title,
+			$this
+		);
 	}
 
 	/**
@@ -51,7 +56,12 @@ class PackingSlip extends OrderDocumentMethods {
 		// override to allow for language switching!
 		$title = __( 'Packing Slip Number:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' ); // deprecated
-		return apply_filters( 'wpo_wcpdf_document_number_title', $title, $this );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_document_number_title',
+			$title,
+			$this
+		);
 	}
 
 	/**
@@ -63,7 +73,12 @@ class PackingSlip extends OrderDocumentMethods {
 		// override to allow for language switching!
 		$title = __( 'Packing Slip Date:', 'woocommerce-pdf-invoices-packing-slips' );
 		$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' ); // deprecated
-		return apply_filters( 'wpo_wcpdf_document_date_title', $title, $this );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_document_date_title',
+			$title,
+			$this
+		);
 	}
 
 	/**
@@ -256,7 +271,12 @@ class PackingSlip extends OrderDocumentMethods {
 			),
 		);
 
-		return apply_filters( 'wpo_wcpdf_document_settings_categories', $settings_categories[ $output_format ], $output_format, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_document_settings_categories',
+			$settings_categories[ $output_format ],
+			$output_format,
+			$this
+		);
 	}
 
 }

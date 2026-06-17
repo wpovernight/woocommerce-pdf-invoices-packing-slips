@@ -29,7 +29,7 @@ function wpo_ips_edi_sanitize_string( string $string ): string {
  * @return bool
  */
 function wpo_ips_edi_is_zero_tax_category( string $category ): bool {
-	return apply_filters(
+	return (bool) apply_filters(
 		'wpo_ips_edi_is_zero_tax_category',
 		in_array(
 			strtoupper( trim( $category ) ),
@@ -347,7 +347,10 @@ function wpo_ips_edi_get_tax_settings(): array {
  */
 function wpo_ips_edi_is_available(): bool {
 	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
-	return apply_filters( 'wpo_ips_edi_is_available', WPO_WCPDF()->is_dependency_version_supported( 'php' ) && ! empty( wpo_ips_edi_get_settings( 'enabled' ) ) );
+	return (bool) apply_filters(
+		'wpo_ips_edi_is_available',
+		( WPO_WCPDF()->is_dependency_version_supported( 'php' ) && ! empty( wpo_ips_edi_get_settings( 'enabled' ) ) )
+	);
 }
 
 /**
@@ -357,7 +360,11 @@ function wpo_ips_edi_is_available(): bool {
  */
 function wpo_ips_edi_peppol_is_available(): bool {
 	$format = wpo_ips_edi_get_current_format();
-	return apply_filters( 'wpo_ips_edi_peppol_is_available', wpo_ips_edi_is_available() && ! empty( $format ) && false !== strpos( $format, 'peppol' ) );
+
+	return (bool) apply_filters(
+		'wpo_ips_edi_peppol_is_available',
+		( wpo_ips_edi_is_available() && ! empty( $format ) && false !== strpos( $format, 'peppol' ) )
+	);
 }
 
 /**
@@ -454,8 +461,14 @@ function wpo_ips_edi_file_headers( string $filename, int|false $size ): void {
  * @return string|null
  */
 function wpo_ips_edi_get_current_syntax(): ?string {
-	$syntax = wpo_ips_edi_get_settings( 'syntax' );
-	return apply_filters( 'wpo_ips_edi_current_syntax', $syntax ?: null );
+	$syntax = apply_filters(
+		'wpo_ips_edi_current_syntax',
+		wpo_ips_edi_get_settings( 'syntax' ) ?: null
+	);
+
+	return is_string( $syntax )
+		? $syntax
+		: null;
 }
 
 /**
@@ -476,7 +489,16 @@ function wpo_ips_edi_get_current_format( bool $full_details = false ): string|ar
 		}
 	}
 
-	return apply_filters( 'wpo_ips_edi_current_format', $format ?: null, $syntax, $full_details );
+	$format = apply_filters(
+		'wpo_ips_edi_current_format',
+		$format ?: null,
+		$syntax,
+		$full_details
+	);
+
+	return is_string( $format ) || is_array( $format )
+		? $format
+		: null;
 }
 
 /**
@@ -494,7 +516,10 @@ function wpo_ips_edi_send_attachments(): bool {
  * @return bool
  */
 function wpo_ips_edi_embed_encrypted_pdf(): bool {
-	return apply_filters( 'wpo_ips_edi_embed_encrypted_pdf', ! empty( wpo_ips_edi_get_settings( 'embed_encrypted_pdf' ) ) );
+	return (bool) apply_filters(
+		'wpo_ips_edi_embed_encrypted_pdf',
+		! empty( wpo_ips_edi_get_settings( 'embed_encrypted_pdf' ) )
+	);
 }
 
 /**
@@ -503,7 +528,10 @@ function wpo_ips_edi_embed_encrypted_pdf(): bool {
  * @return bool
  */
 function wpo_ips_edi_include_item_meta(): bool {
-	return apply_filters( 'wpo_ips_edi_include_item_meta', ! empty( wpo_ips_edi_get_settings( 'include_item_meta' ) ) );
+	return (bool) apply_filters(
+		'wpo_ips_edi_include_item_meta',
+		! empty( wpo_ips_edi_get_settings( 'include_item_meta' ) )
+	);
 }
 
 /**
@@ -527,7 +555,10 @@ function wpo_ips_edi_syntaxes(): array {
 		$syntaxes[ $slug ] = $data['name'];
 	}
 
-	return apply_filters( 'wpo_ips_edi_syntaxes', $syntaxes );
+	return (array) apply_filters(
+		'wpo_ips_edi_syntaxes',
+		$syntaxes
+	);
 }
 
 /**
@@ -771,7 +802,7 @@ function wpo_ips_edi_format_vat_number( string $vat_number, string $billing_coun
 
 	$formatted = '' !== $country ? $country . $parts['id'] : $parts['id'];
 
-	return apply_filters(
+	return (string) apply_filters(
 		'wpo_ips_edi_format_vat_number',
 		$formatted,
 		$vat_number,
@@ -796,11 +827,15 @@ function wpo_ips_edi_get_order_customer_vat_number( \WC_Order $order ): ?string 
 		);
 	}
 
-	return apply_filters(
+	$vat_number = apply_filters(
 		'wpo_ips_edi_order_customer_vat_number',
 		! empty( $vat_number ) ? $vat_number : null,
 		$order
 	);
+
+	return is_string( $vat_number )
+		? $vat_number
+		: null;
 }
 
 /**
@@ -1268,7 +1303,10 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
 		),
 	);
 
-	return apply_filters( 'wpo_ips_edi_peppol_vat_mappings', $mappings );
+	return (array) apply_filters(
+		'wpo_ips_edi_peppol_vat_mappings',
+		$mappings
+	);
 }
 
 /**
@@ -1357,7 +1395,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 		);
 	}
 
-	return apply_filters(
+	return (array) apply_filters(
 		'wpo_ips_edi_supplier_identifier_data',
 		$data,
 		$language,
@@ -1437,7 +1475,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		);
 	}
 
-	return apply_filters(
+	return (array) apply_filters(
 		'wpo_ips_edi_order_customer_identifier_data',
 		$data,
 		$order
