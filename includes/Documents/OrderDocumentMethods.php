@@ -944,12 +944,16 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	}
 
 	/**
-	 * Get tax rates from the order's tax items
+	 * Get tax rates from the order's tax items.
 	 *
-	 * @param \WC_Abstract_Order|null $order
-	 * @return array|bool array of rate_id => rate_percent, or false if not available
+	 * @param \WC_Abstract_Order|null $order Order object.
+	 * @return array Array of rate_id => rate_percent.
 	 */
-	public function get_tax_rates_from_order( \WC_Abstract_Order $order ): array {
+	public function get_tax_rates_from_order( ?\WC_Abstract_Order $order = null ): array {
+		if ( null === $order ) {
+			return array();
+		}
+
 		$tax_rates = array();
 		$tax_items = $order->get_items( array( 'tax' ) );
 
