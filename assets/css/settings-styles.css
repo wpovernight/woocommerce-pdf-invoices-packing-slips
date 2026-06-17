@@ -215,11 +215,11 @@ table.wcpdf_documents_settings_list td.title {
 
 .wcpdf_document_settings_sections > h2 {
 	margin: 0;
-	padding: 14px 16px;
+	padding: 0.9333em 1.0667em;
 	width: 100%;
 	box-sizing: border-box;
 	border: 1px solid #c3c4c7;
-	border-radius: 8px;
+	border-radius: 0.5333em;
 	background: #fff;
 	font-size: 15px;
 	font-weight: 600;
