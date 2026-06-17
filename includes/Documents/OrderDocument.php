@@ -351,7 +351,7 @@ abstract class OrderDocument {
 	 * @return mixed
 	 */
 	public function get_setting( string $key, mixed $default = '', string $output_format = 'pdf' ): mixed {
-		if ( in_array( $output_format, $this->output_formats ), true ) {
+		if ( in_array( $output_format, $this->output_formats, true ) ) {
 			$settings        = $this->get_settings( false, $output_format );
 			$latest_settings = $this->get_settings( true, $output_format );
 		} else {
