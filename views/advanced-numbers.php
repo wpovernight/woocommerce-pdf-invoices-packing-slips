@@ -17,7 +17,7 @@
 			}
 		?>
 	</ul>
-	<?php if ( ! empty( $document_type ) && 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types ), true ) : ?>
+	<?php if ( ! empty( $document_type ) && 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) : ?>
 		<div class="notice notice-warning inline">
 			<p><?php esc_html_e( 'This document is currently using the main invoice number sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
 		</div>

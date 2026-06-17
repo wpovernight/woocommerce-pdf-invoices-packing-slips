@@ -668,7 +668,7 @@ class SettingsDebug {
 			'date_paid',
 		);
 
-		if ( in_array( $date_type, $wc_date_types ), true ) {
+		if ( in_array( $date_type, $wc_date_types, true ) ) {
 			$date_arg      = $date_type;
 		} elseif ( 'document_date' === $date_type ) {
 			$document_slug = ! empty( $document_type ) ? str_replace( '-', '_', $document_type ) : '';

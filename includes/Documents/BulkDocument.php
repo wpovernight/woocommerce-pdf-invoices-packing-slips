@@ -58,7 +58,7 @@ class BulkDocument {
 	 * @return bool
 	 */
 	public function is_enabled( string $output_format = 'pdf' ): bool {
-		if ( in_array( $output_format, $this->output_formats ), true ) {
+		if ( in_array( $output_format, $this->output_formats, true ) ) {
 			return true;
 		}
 		return false;

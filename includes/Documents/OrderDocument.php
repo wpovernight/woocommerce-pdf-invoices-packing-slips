@@ -610,7 +610,7 @@ abstract class OrderDocument {
 				return $status;
 			}, $this->settings['disable_for_statuses'] );
 
-			if ( in_array( $status, $disabled_statuses ), true ) {
+			if ( in_array( $status, $disabled_statuses, true ) ) {
 				$allowed = false;
 			}
 		}
@@ -2243,7 +2243,7 @@ abstract class OrderDocument {
 				continue;
 			}
 
-			if ( ! in_array( $email->id, $non_order_emails ), true ) {
+			if ( ! in_array( $email->id, $non_order_emails, true ) ) {
 				switch ( $email->id ) {
 					case 'new_order':
 						$emails[ $email->id ] = sprintf('%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );

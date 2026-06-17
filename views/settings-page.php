@@ -76,7 +76,7 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 
 		<div class="sidebar">
 			<?php do_action( 'wpo_wcpdf_after_sidebar', $active_tab, $active_section, $nonce ); ?>
-			<?php if ( ! in_array( $active_section, $excluded_sections ), true ) : ?>
+			<?php if ( ! in_array( $active_section, $excluded_sections, true ) ) : ?>
 				<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 			<?php endif; ?>
 				<?php
@@ -92,7 +92,7 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 					}
 					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section, $nonce );
 				?>
-			<?php if ( ! in_array( $active_section, $excluded_sections ), true ) : ?>
+			<?php if ( ! in_array( $active_section, $excluded_sections, true ) ) : ?>
 				</form>
 			<?php endif; ?>
 			<?php do_action( 'wpo_wcpdf_after_settings_form', $active_tab, $active_section, $nonce ); ?>
