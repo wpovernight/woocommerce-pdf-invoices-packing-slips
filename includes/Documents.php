@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS;
 
+use WPO\IPS\Documents\OrderDocument;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -109,10 +111,10 @@ class Documents {
 	 * Return an instance of the document class for a given document type and order.
 	 *
 	 * @param string $document_type
-	 * @param int|object|\WC_Order $order
+	 * @param int|object|null $order
 	 * @return OrderDocument|false
 	 */
-	public function get_document( string $document_type, $order ) {
+	public function get_document( string $document_type, int|object|null $order ): OrderDocument|false {
 		foreach ( $this->get_documents( 'all' ) as $class_name => $document ) {
 			if ( $document->get_type() == $document_type && class_exists( $class_name ) ) {
 				return new $class_name( $order );
