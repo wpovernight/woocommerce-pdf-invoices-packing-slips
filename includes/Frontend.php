@@ -157,22 +157,31 @@ class Frontend {
 	 * Retrieve formatted invoice number for a given order
 	 *
 	 * @param \WC_Abstract_Order|\WC_Order $order
-	 *
 	 * @return string
 	 */
 	private function get_invoice_number( $order ): string {
-		$this->disable_storing_document_settings();
-		$invoice        = wcpdf_get_document( 'invoice', $order );
 		$invoice_number = '';
 
-		if ( $invoice ) {
-			$number = $invoice->get_number();
-			if ( ! empty( $number ) ) {
-				$invoice_number = $number->get_formatted();
-			}
-		}
+		$this->disable_storing_document_settings();
 
-		$this->restore_storing_document_settings();
+		try {
+			$invoice = wcpdf_get_document( 'invoice', $order );
+
+			if ( ! $invoice || ! is_callable( array( $invoice, 'get_number' ) ) ) {
+				return '';
+			}
+
+			$number = $invoice->get_number();
+
+			if ( ! empty( $number ) ) {
+				$invoice_number = is_callable( array( $number, 'get_formatted' ) )
+					? $number->get_formatted()
+					: (string) $number;
+			}
+
+		} finally {
+			$this->restore_storing_document_settings();
+		}
 
 		return $invoice_number;
 	}

@@ -59,15 +59,8 @@ class LineHandler extends AbstractUblHandler {
 			// Price parts
 			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon_lines );
 
-			$price_decimal_places = 2;
+			$price_decimal_places = $this->get_line_price_decimal_places( $parts );
 			$qty                  = (float) $parts['qty'];
-
-			// When WooCommerce rounds tax at subtotal level, derive the XML unit
-			// prices from the line totals to keep PriceAmount consistent with the
-			// final line extension amount.
-			if ( 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' ) && $qty > 0 ) {
-				$price_decimal_places = 4;
-			}
 
 			$xml_gross_unit_f = $qty > 0
 				? (float) $this->format_decimal( (float) $parts['gross_total'] / $qty, $price_decimal_places )

@@ -128,6 +128,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			'iban'           => '',
 			'bic'            => '',
 			'account_name'   => '',
+			'account_number' => '',
 			'transaction_id' => '',
 		);
 
@@ -156,9 +157,10 @@ abstract class AbstractHandler implements HandlerInterface {
 				$data = array_merge(
 					$data,
 					array(
-						'iban'         => isset( $account['iban'] )         ? (string) $account['iban']         : '',
-						'bic'          => isset( $account['bic'] )          ? (string) $account['bic']          : '',
-						'account_name' => isset( $account['account_name'] ) ? (string) $account['account_name'] : '',
+						'account_name'   => isset( $account['account_name'] )   ? (string) $account['account_name']   : '',
+						'account_number' => isset( $account['account_number'] ) ? (string) $account['account_number'] : '',
+						'iban'           => isset( $account['iban'] )           ? (string) $account['iban']           : '',
+						'bic'            => isset( $account['bic'] )            ? (string) $account['bic']            : '',
 					)
 				);
 			}
@@ -508,9 +510,17 @@ abstract class AbstractHandler implements HandlerInterface {
 		$gross_total = (float) $this->format_decimal( $total_inc_tax + $rounding_diff, 2 );
 
 		// Default rule:
-		// - If there's NO due date AND no explicit prepaid set, treat as fully prepaid (paid on issue).
-		// - Otherwise, use the provided prepaid (or 0) and compute payable normally.
-		if ( $prepaid_amount <= 0.0 && ! $has_due_days ) {
+		// - If there's NO due date, no explicit prepaid set, and the order is paid, treat as fully prepaid.
+		// - Otherwise, use the provided prepaid amount and compute payable normally.
+		$is_paid = method_exists( $order, 'is_paid' ) ? $order->is_paid() : false;
+		$is_paid = (bool) apply_filters(
+			'wpo_ips_edi_order_is_paid',
+			$is_paid,
+			$order,
+			$this
+		);
+		
+		if ( $prepaid_amount <= 0.0 && ! $has_due_days && $is_paid ) {
 			// Fully prepaid by default.
 			$prepaid_amount = $gross_total;
 			$payable_amount = 0.0;
@@ -519,6 +529,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$payable_amount = $gross_total - $prepaid_amount;
 		}
 
+		// Compact totals for return.
 		$totals = compact(
 			'total_exc_tax',
 			'total_inc_tax',
@@ -570,6 +581,60 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		return (float) $this->format_decimal( $lines_net, 2 );
+	}
+	
+	/**
+	 * Get the number of decimal places needed for XML unit prices.
+	 *
+	 * Some WooCommerce line totals cannot be reproduced by multiplying a
+	 * 2-decimal unit price by the quantity. This can happen when discounts are
+	 * distributed across multiple units, for example 187.98 / 4 = 46.995.
+	 *
+	 * Line totals should remain rounded to 2 decimals, but unit prices may need
+	 * higher precision so that PriceAmount, BaseAmount, AllowanceCharge and
+	 * LineExtensionAmount remain consistent.
+	 *
+	 * @param array $parts {
+	 *     Price parts for the order item.
+	 *
+	 *     @type float|int|string $qty         Item quantity.
+	 *     @type float|int|string $net_total   Item net line total.
+	 *     @type float|int|string $gross_total Item gross line total.
+	 * }
+	 * @return int
+	 */
+	protected function get_line_price_decimal_places( array $parts ): int {
+		$decimal_places = 2;
+		$qty            = isset( $parts['qty'] ) ? abs( (float) $parts['qty'] ) : 0.0;
+
+		if ( $qty <= 0 ) {
+			return $decimal_places;
+		}
+
+		if ( 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' ) ) {
+			return 4;
+		}
+
+		$net_total   = isset( $parts['net_total'] ) ? (float) $parts['net_total'] : 0.0;
+		$gross_total = isset( $parts['gross_total'] ) ? (float) $parts['gross_total'] : 0.0;
+
+		$net_unit_2dp   = (float) $this->format_decimal( $net_total / $qty, 2 );
+		$gross_unit_2dp = (float) $this->format_decimal( $gross_total / $qty, 2 );
+
+		$net_total_from_unit_2dp   = $this->format_decimal( $net_unit_2dp * $qty, 2 );
+		$gross_total_from_unit_2dp = $this->format_decimal( $gross_unit_2dp * $qty, 2 );
+
+		$net_total_2dp   = $this->format_decimal( $net_total, 2 );
+		$gross_total_2dp = $this->format_decimal( $gross_total, 2 );
+
+		if (
+			$net_total_from_unit_2dp !== $net_total_2dp ||
+			$gross_total_from_unit_2dp !== $gross_total_2dp
+		) {
+			$decimal_places = 4;
+		}
+
+		return $decimal_places;
 	}
 
 	/**

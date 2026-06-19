@@ -181,7 +181,25 @@ class Main {
 
 						if ( $attachment ) {
 							$attachments[] = $attachment;
+							if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
+								$email_title = $email_id;
+
+								if ( is_object( $email ) && is_callable( array( $email, 'get_title' ) ) ) {
+									$email_title = $email->get_title();
+								}
+
+								$note = sprintf(
+									/* translators: 1. output format, 2. document title, 3. email title */
+									__( '%1$s %2$s successfully attached to the %3$s email.', 'woocommerce-pdf-invoices-packing-slips' ),
+									strtoupper( $output_format ),
+									$document->get_title(),
+									$email_title
+								);
+
+								$this->log_to_order_notes( $note, $document );
+							}
 						} else {
+							wcpdf_log_error( sprintf( 'PDF %1$s could not be attached to email (%2$s).', $document->get_title(), $email_id ), 'critical' );
 							continue;
 						}
 
@@ -489,25 +507,19 @@ class Main {
 
 		// if we got here, we're safe to go!
 		try {
-			// log document creation to order notes
 			if ( count( $order_ids ) > 1 && isset( $request['bulk'] ) ) {
-				add_action( 'wpo_wcpdf_init_document', function( $document ) use ( $request ) {
-					$this->log_document_creation_to_order_notes( $document, 'bulk' );
-					$this->log_document_creation_trigger_to_order_meta( $document, 'bulk', false, $request );
-					$this->mark_document_printed( $document, 'bulk' );
-				} );
+				$trigger = 'bulk';
 			} elseif ( isset( $request['my-account'] ) ) {
-				add_action( 'wpo_wcpdf_init_document', function( $document ) use ( $request ) {
-					$this->log_document_creation_to_order_notes( $document, 'my_account' );
-					$this->log_document_creation_trigger_to_order_meta( $document, 'my_account', false, $request );
-					$this->mark_document_printed( $document, 'my_account' );
-				} );
+				$trigger = 'my_account';
 			} else {
-				add_action( 'wpo_wcpdf_init_document', function( $document ) use ( $request ) {
-					$this->log_document_creation_to_order_notes( $document, 'single' );
-					$this->log_document_creation_trigger_to_order_meta( $document, 'single', false, $request );
-					$this->mark_document_printed( $document, 'single' );
-				} );
+				$trigger = 'single';
+			}
+
+			// Snapshot pre-existing documents so we only log creation for documents actually created in this flow.
+			$pre_existing = array();
+			foreach ( $order_ids as $check_order_id ) {
+				$check_doc = wcpdf_get_document( $document_type, $check_order_id );
+				$pre_existing[ $check_order_id ] = $check_doc && is_callable( array( $check_doc, 'exists' ) ) && $check_doc->exists();
 			}
 
 			// get document
@@ -515,6 +527,25 @@ class Main {
 
 			if ( $document ) {
 				do_action( 'wpo_wcpdf_document_created_manually', $document, $order_ids ); // note that $order_ids is filtered and may not be the same as the order IDs used for the document (which can be fetched from the document object itself with $document->order_ids)
+
+				// Iterate explicitly so pre-existing documents are also processed; wpo_wcpdf_init_document only fires for newly created docs.
+				$document_order_ids = property_exists( $document, 'order_ids' ) && ! empty( $document->order_ids )
+					? $document->order_ids
+					: ( ! empty( $document->order ) ? array( $document->order->get_id() ) : array() );
+
+				foreach ( $document_order_ids as $individual_order_id ) {
+					$individual_document = wcpdf_get_document( $document_type, $individual_order_id, true );
+					if ( ! $individual_document || ! is_callable( array( $individual_document, 'exists' ) ) || ! $individual_document->exists() ) {
+						continue;
+					}
+
+					if ( empty( $pre_existing[ $individual_order_id ] ) ) {
+						$this->log_document_creation_to_order_notes( $individual_document, $trigger );
+					}
+
+					$this->log_document_creation_trigger_to_order_meta( $individual_document, $trigger, false, $request );
+					$this->mark_document_printed( $individual_document, $trigger );
+				}
 
 				$output_format = WPO_WCPDF()->settings->get_output_format( $document, $request );
 
