@@ -307,6 +307,10 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_set_checkout_block_fields_value(): void {
+		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
+			return;
+		}
+
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
