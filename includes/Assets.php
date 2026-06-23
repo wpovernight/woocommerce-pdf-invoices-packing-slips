@@ -59,25 +59,6 @@ class Assets {
 				WPO_WCPDF_VERSION
 			);
 
-			if ( version_compare( $wp_version, '5.3', '<' ) ) {
-				// WC2.1 - WC3.2 (MP6) is used: bigger buttons
-				// also applied to WC3.3+ but without affect due to .column-order_actions class being deprecated in 3.3+
-				wp_enqueue_style(
-					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38' . $suffix . '.css',
-					array(),
-					WPO_WCPDF_VERSION
-				);
-			} elseif ( version_compare( $wp_version, '5.3', '>=' ) ) {
-				// WP5.3 or newer is used: realign img inside buttons
-				wp_enqueue_style(
-					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39' . $suffix . '.css',
-					array(),
-					WPO_WCPDF_VERSION
-				);
-			}
-
 			// SCRIPTS
 			wp_enqueue_script(
 				'wpo-wcpdf',

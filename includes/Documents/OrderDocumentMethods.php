@@ -978,17 +978,18 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	}
 
 	/**
-	 * Returns the percentage rate (float) for a given tax rate ID.
-	 * 
-	 * @param  int                     $rate_id  woocommerce tax rate id
-	 * @param  \WC_Abstract_Order|null $order    optional order
-	 * @return float|bool              $rate     percentage rate
+	 * Returns the percentage rate for a given tax rate ID.
+	 *
+	 * @param int                     $rate_id WooCommerce tax rate ID.
+	 * @param \WC_Abstract_Order|null $order   Optional order.
+	 * @return float|bool Percentage rate, or false if not found.
 	 */
 	public function get_tax_rate_by_id( int $rate_id, ?\WC_Abstract_Order $order = null ): float|bool {
 		global $wpdb;
 
-		// WC 3.7+ stores rate in tax items!
+		// Prefer the rate stored on the order, as this reflects the rate used when the order was created.
 		$order_rates = $this->get_tax_rates_from_order( $order );
+
 		if ( isset( $order_rates[ $rate_id ] ) ) {
 			return (float) $order_rates[ $rate_id ];
 		}
@@ -1000,11 +1001,9 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			)
 		);
 
-		if ( is_null( $rate ) ) {
-			return false;
-		} else {
-			return (float) $rate;
-		}
+		return null === $rate
+			? false
+			: (float) $rate;
 	}
 
 	/**
