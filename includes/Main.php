@@ -89,7 +89,7 @@ class Main {
 	 */
 	public function attach_document_to_email( array $attachments, string $email_id, mixed $order, ?\WC_Email $email = null ): array {
 		// check if all variables properly set
-		if ( ! $order instanceof \WC_Abstract_Order || ! isset( $email_id ) ) {
+		if ( ! is_object( $order ) || ! isset( $email_id ) ) {
 			return $attachments;
 		}
 
