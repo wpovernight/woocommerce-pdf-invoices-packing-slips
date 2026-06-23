@@ -84,10 +84,10 @@ class Main {
 	 * @param array           $attachments
 	 * @param string          $email_id
 	 * @param mixed           $order
-	 * @param \WC_Email|null  $email
+	 * @param mixed|\WC_Email $email
 	 * @return array
 	 */
-	public function attach_document_to_email( array $attachments, string $email_id, mixed $order, ?\WC_Email $email = null ): array {
+	public function attach_document_to_email( array $attachments, string $email_id, mixed $order, $email = null ): array {
 		// check if all variables properly set
 		if ( ! is_object( $order ) || ! isset( $email_id ) ) {
 			return $attachments;
