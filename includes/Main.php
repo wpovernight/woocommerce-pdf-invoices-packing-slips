@@ -948,26 +948,42 @@ class Main {
 	}
 	
 	/**
-	 * Regenerate random string and copy contents to new tmp folder
+	 * Regenerate random string and copy contents to new tmp folder.
 	 *
-	 * @param bool $reinstall_fonts
+	 * @param bool $reinstall_fonts Whether to reinstall fonts.
 	 * @return string|false
 	 */
 	public function regenerate_random_string( bool $reinstall_fonts = true ): string|false {
-		if ( ! empty( $this->get_random_string() ) ) {
-			$old_path = $this->get_tmp_base();
-		} else {
-			$old_path = $this->get_tmp_base( false );
+		$old_path = ! empty( $this->get_random_string() )
+			? $this->get_tmp_base()
+			: $this->get_tmp_base( false );
+
+		if ( false === $old_path ) {
+			wcpdf_log_error( 'Unable to determine the current temp folder base path before regenerating the random string.', 'critical' );
+			return false;
 		}
 
 		$this->generate_random_string();
+
 		$new_path = $this->get_tmp_base();
-		$this->copy_directory( $old_path, $new_path );
-		
-		if ( $reinstall_fonts ) {
-			$this->maybe_reinstall_fonts( $reinstall_fonts );
+
+		if ( false === $new_path ) {
+			wcpdf_log_error( 'Unable to determine the new temp folder base path after regenerating the random string.', 'critical' );
+			return false;
 		}
-		
+
+		if ( untrailingslashit( $old_path ) !== untrailingslashit( $new_path ) ) {
+			if ( ! $this->copy_directory( $old_path, $new_path ) ) {
+				return false;
+			}
+		} elseif ( ! $this->ensure_tmp_dir_is_writable( $new_path ) ) {
+			return false;
+		}
+
+		if ( $reinstall_fonts ) {
+			$this->maybe_reinstall_fonts( true );
+		}
+
 		return $new_path;
 	}
 
