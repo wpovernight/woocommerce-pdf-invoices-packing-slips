@@ -312,7 +312,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function disable_storing_document_settings(): void {
-		add_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
+		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'prevent_storing_document_settings' ), 9999 );
 	}
 
 	/**
@@ -322,7 +322,16 @@ class Frontend {
 	 * @return void
 	 */
 	public function restore_storing_document_settings(): void {
-		remove_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
+		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'prevent_storing_document_settings' ), 9999 );
+	}
+
+	/**
+	 * Prevent document settings from being stored during temporary document checks.
+	 *
+	 * @return bool
+	 */
+	public function prevent_storing_document_settings(): bool {
+		return false;
 	}
 
 	/**

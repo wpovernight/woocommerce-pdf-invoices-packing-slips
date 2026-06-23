@@ -1514,7 +1514,7 @@ class Admin {
 			return;
 		}
 
-		add_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
+		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'prevent_storing_document_settings' ), 9999 );
 		$this->storing_document_settings_disabled = true;
 	}
 
@@ -1529,8 +1529,17 @@ class Admin {
 			return;
 		}
 
-		remove_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
+		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'prevent_storing_document_settings' ), 9999 );
 		$this->storing_document_settings_disabled = false;
+	}
+
+	/**
+	 * Prevent document settings from being stored during temporary document checks.
+	 *
+	 * @return bool
+	 */
+	public function prevent_storing_document_settings(): bool {
+		return false;
 	}
 
 	/**
