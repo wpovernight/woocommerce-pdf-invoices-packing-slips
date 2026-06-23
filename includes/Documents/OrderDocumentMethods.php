@@ -316,36 +316,48 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	}
 
 	/**
-	 * Get a custom field value
-	 * 
-	 * @param string $field_name
+	 * Get a custom field value.
+	 *
+	 * @param string $field_name Field name.
 	 * @return mixed
 	 */
 	public function get_custom_field( string $field_name ): mixed {
+		$custom_field = null;
+
 		if ( ! $this->is_order_prop( $field_name ) ) {
 			$custom_field = $this->order->get_meta( $field_name );
 		}
-		// if not found, try prefixed with underscore (not when ACF is active!)
-		if ( empty( $custom_field ) && substr( $field_name, 0, 1 ) !== '_' && !$this->is_order_prop( "_{$field_name}" ) && !class_exists('ACF') ) {
+
+		// If not found, try prefixed with underscore (not when ACF is active).
+		if (
+			empty( $custom_field )
+			&& '_' !== substr( $field_name, 0, 1 )
+			&& ! $this->is_order_prop( "_{$field_name}" )
+			&& ! class_exists( 'ACF' )
+		) {
 			$custom_field = $this->order->get_meta( "_{$field_name}" );
 		}
 
-		// WC3.0 fallback to properties
+		// Fallback to order properties.
 		$property = ! empty( $field_name ) ? str_replace( '-', '_', sanitize_title( ltrim( $field_name, '_' ) ) ) : '';
+
 		if ( empty( $custom_field ) && is_callable( array( $this->order, "get_{$property}" ) ) ) {
 			$custom_field = $this->order->{"get_{$property}"}( 'view' );
 		}
 
-		// fallback to parent for refunds
+		// Fallback to parent for refunds.
 		if ( empty( $custom_field ) && $this->is_refund( $this->order ) ) {
 			$parent_order = $this->get_refund_parent( $this->order );
-			if ( !$this->is_order_prop( $field_name ) ) {
-				$custom_field = $parent_order->get_meta( $field_name );
-			}
 
-			// WC3.0 fallback to properties
-			if ( empty( $custom_field ) && is_callable( array( $parent_order, "get_{$property}" ) ) ) {
-				$custom_field = $parent_order->{"get_{$property}"}( 'view' );
+			if ( $parent_order instanceof \WC_Abstract_Order ) {
+				if ( ! $this->is_order_prop( $field_name ) ) {
+					$custom_field = $parent_order->get_meta( $field_name );
+				}
+
+				// Fallback to parent order properties.
+				if ( empty( $custom_field ) && is_callable( array( $parent_order, "get_{$property}" ) ) ) {
+					$custom_field = $parent_order->{"get_{$property}"}( 'view' );
+				}
 			}
 		}
 
@@ -480,42 +492,42 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	}
 
 	/**
-	 * Get a product attribute
-	 * 
-	 * @param string $attribute_name
-	 * @param \WC_Product $product
+	 * Get a product attribute.
+	 *
+	 * @param string      $attribute_name Attribute name.
+	 * @param \WC_Product $product        Product object.
 	 * @return string|false
 	 */
 	public function get_product_attribute( string $attribute_name, \WC_Product $product ): string|false {
-		// first, check the text attributes
+		$attribute     = false;
 		$attributes    = $product->get_attributes();
-		$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
-		
+		$attribute_key = wc_attribute_taxonomy_name( $attribute_name );
+
 		if ( array_key_exists( sanitize_title( $attribute_name ), $attributes ) ) {
-			$attribute = $product->get_attribute ( $attribute_name );
+			$attribute = $product->get_attribute( $attribute_name );
 		} elseif ( array_key_exists( sanitize_title( $attribute_key ), $attributes ) ) {
-			$attribute = $product->get_attribute ( $attribute_key );
+			$attribute = $product->get_attribute( $attribute_key );
 		}
 
 		if ( empty( $attribute ) ) {
-			// not a text attribute, try attribute taxonomy
-			$attribute_key = @wc_attribute_taxonomy_name( $attribute_name );
-			$product_id    = $product->get_id();
-			$product_terms = @wc_get_product_terms( $product_id, $attribute_key, array( 'fields' => 'names' ) );
-			
-			// check if not empty, then display
-			if ( ! empty( $product_terms ) ) {
+			// Not a text attribute, try attribute taxonomy.
+			$product_terms = wc_get_product_terms( $product->get_id(), $attribute_key, array( 'fields' => 'names' ) );
+
+			if ( ! empty( $product_terms ) && ! is_wp_error( $product_terms ) ) {
 				$attribute = array_shift( $product_terms );
 			}
 		}
 
-		// WC3.0+ fallback parent product for variations
+		// Fallback to parent product for variations.
 		if ( empty( $attribute ) && $product->is_type( 'variation' ) ) {
-			$product   = wc_get_product( $product->get_parent_id() );
-			$attribute = $this->get_product_attribute( $attribute_name, $product );
+			$parent_product = wc_get_product( $product->get_parent_id() );
+
+			if ( $parent_product instanceof \WC_Product ) {
+				$attribute = $this->get_product_attribute( $attribute_name, $parent_product );
+			}
 		}
 
-		return isset( $attribute ) ? $attribute : false;
+		return ! empty( $attribute ) ? $attribute : false;
 	}
 	
 	/**

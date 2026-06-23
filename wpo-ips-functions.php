@@ -350,7 +350,7 @@ function wcpdf_deprecated_function( string $function, string $version, ?string $
 
 /**
  * Logs errors thrown by this plugin.
- * Uses the WooCommerce logger when available (WC 3.0+), otherwise falls back to PHP error_log().
+ * Uses the WooCommerce logger when available, otherwise falls back to PHP error_log().
  *
  * @param string           $message Error message to log.
  * @param string           $level   Log level: debug, info, notice, warning, error, critical, alert, emergency.
