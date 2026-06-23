@@ -262,25 +262,33 @@ class Admin {
 	}
 
 	/**
-	 * Display Invoice Number/Date in Shop Order column (if available)
-	 * 
-	 * @param  string $column              column slug
-	 * @param  \WC_Abstract_Order|\WP_Post $post_or_order_object
+	 * Display Invoice Number/Date in Shop Order column (if available).
+	 *
+	 * @param string                          $column               Column slug.
+	 * @param \WC_Abstract_Order|\WP_Post|int $post_or_order_object Post object, order object, or order/post ID.
 	 * @return void
 	 */
-	public function invoice_columns_data( string $column, object $post_or_order_object ): void {
+	public function invoice_columns_data( string $column, $post_or_order_object ): void {
 		if ( ! $this->invoice_columns_enabled() ) {
 			return;
 		}
-		
+
 		if ( ! in_array( $column, array( 'invoice_number_column', 'invoice_date_column' ), true ) ) {
 			return;
 		}
 
-		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
+		if ( $post_or_order_object instanceof \WC_Abstract_Order ) {
+			$order = $post_or_order_object;
+		} elseif ( $post_or_order_object instanceof \WP_Post ) {
+			$order = wc_get_order( $post_or_order_object->ID );
+		} elseif ( is_numeric( $post_or_order_object ) ) {
+			$order = wc_get_order( absint( $post_or_order_object ) );
+		} else {
+			$order = false;
+		}
 
-		if ( ! is_object( $order ) && is_numeric( $order ) ) {
-			$order = wc_get_order( absint( $order ) );
+		if ( ! $order instanceof \WC_Abstract_Order ) {
+			return;
 		}
 
 		switch ( $column ) {
@@ -289,6 +297,7 @@ class Admin {
 				echo esc_html( $invoice_number );
 				do_action( 'wcpdf_invoice_number_column_end', $order );
 				break;
+
 			case 'invoice_date_column':
 				$invoice_timestamp = (int) $order->get_meta( '_wcpdf_invoice_date', true );
 
@@ -319,6 +328,7 @@ class Admin {
 
 				do_action( 'wcpdf_invoice_date_column_end', $order );
 				break;
+
 			default:
 				return;
 		}
