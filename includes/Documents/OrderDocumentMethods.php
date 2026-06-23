@@ -32,21 +32,24 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	/**
 	 * Get the parent order for a refund order.
 	 *
-	 * @param \WC_Abstract_Order $order
+	 * @param \WC_Abstract_Order $order Order object.
 	 * @return \WC_Abstract_Order|null
 	 */
 	public function get_refund_parent( \WC_Abstract_Order $order ): ?\WC_Abstract_Order {
-		// only try if this is actually a refund
+		// Only try if this is actually a refund.
 		if ( ! $this->is_refund( $order ) ) {
 			return $order;
 		}
 
 		$parent_order_id = $this->get_refund_parent_id( $order );
+
 		if ( ! $parent_order_id ) {
 			return null;
 		}
-		
-		return wc_get_order( $parent_order_id );
+
+		$parent_order = wc_get_order( $parent_order_id );
+
+		return $parent_order instanceof \WC_Abstract_Order ? $parent_order : null;
 	}
 
 	/**
