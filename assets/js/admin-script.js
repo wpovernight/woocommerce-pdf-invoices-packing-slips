@@ -1251,4 +1251,16 @@ jQuery( function( $ ) {
 
 	//----------> /Sync Address <----------//
 
+	document.querySelector( '[name="wpo_wcpdf_settings_general[template_path]"]' )
+		?.addEventListener( 'change', function() {
+			const selectedTemplate = this.value;
+			const $colorInput      = $( '#template_color' );
+			const defaults         = $colorInput.data( 'template_color_defaults' ) || {};
+			const savedValue       = $colorInput.data( 'saved_value' ) || '';
+			const defaultColor     = defaults[ selectedTemplate ] || '';
+
+			if ( ! savedValue && defaultColor ) {
+				$colorInput.val( defaultColor );
+			}
+		}, true ); // true = capture phase, fires before jQuery handlers
 } );

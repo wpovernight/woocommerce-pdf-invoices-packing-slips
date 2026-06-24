@@ -2122,7 +2122,8 @@ class Main {
 			return $css;
 		}
 
-		$default_color = apply_filters( 'wpo_ips_template_color_default', '', $current_template );
+		$defaults_map  = apply_filters( 'wpo_ips_template_color_defaults_map', array() );
+		$default_color = $defaults_map[ $current_template ] ?? '';
 
 		// Bail if no color set, or it matches the template's own default (not a user customization).
 		if ( empty( $template_color ) || $template_color === $default_color ) {
