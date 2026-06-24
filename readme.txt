@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 7.0
 Requires PHP: 8.1
-Stable tag: 6.0.0-i1482.3
+Stable tag: 6.0.0-i1482.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
