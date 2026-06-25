@@ -1506,8 +1506,9 @@ class Admin {
 
 				if ( $is_new ) {
 					WPO_WCPDF()->main->log_document_creation_to_order_notes( $invoice, 'document_data' );
-					WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
 				}
+
+				WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
 			}
 
 			// allow other documents to hook here and save their form data
@@ -1687,6 +1688,7 @@ class Admin {
 				if ( 'regenerate' === $action_type && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
 					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true, $request );
+					WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
@@ -1718,9 +1720,10 @@ class Admin {
 					if ( $is_new ) {
 						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
 						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', false, $request );
-						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
-					$response      = array(
+
+					WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
