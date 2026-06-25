@@ -168,7 +168,6 @@ class Main {
 						add_action( 'wpo_wcpdf_init_document', function( $document ) {
 							$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
 							$this->log_document_creation_trigger_to_order_meta( $document, 'email_attachment' );
-							$this->mark_document_printed( $document, 'email_attachment' );
 						} );
 
 						// prepare document
@@ -184,6 +183,8 @@ class Main {
 
 						if ( $attachment ) {
 							$attachments[] = $attachment;
+							$this->mark_document_printed( $document, 'email_attachment' );
+
 							if ( ! empty( WPO_WCPDF()->settings->debug_settings['log_to_order_notes'] ) ) {
 								$email_title = $email_id;
 
@@ -510,7 +511,7 @@ class Main {
 
 		// if we got here, we're safe to go!
 		try {
-			if ( count( $order_ids ) > 1 && isset( $request['bulk'] ) ) {
+			if ( isset( $request['bulk'] ) ) {
 				$trigger = 'bulk';
 			} elseif ( isset( $request['my-account'] ) ) {
 				$trigger = 'my_account';
