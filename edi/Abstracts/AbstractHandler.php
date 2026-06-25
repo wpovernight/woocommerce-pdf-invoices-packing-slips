@@ -351,6 +351,11 @@ abstract class AbstractHandler implements HandlerInterface {
 				}
 			}
 
+			if ( $this->is_credit_note_document() && $this->should_normalize_credit_note_signs() ) {
+				$line_sign = (float) $net_total < 0 ? -1 : 1;
+				$item_tax  = abs( $item_tax ) * $line_sign;
+			}
+
 			if ( ! isset( $groups[ $key ] ) ) {
 				$groups[ $key ] = array(
 					'total_ex'   => 0.0,
@@ -486,7 +491,13 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		// Reconcile to WooCommerce order total.
-		$order_total   = (float) $order->get_total();
+		$order_total = (float) $order->get_total();
+
+		if ( $this->is_credit_note_document() && $this->should_normalize_credit_note_signs() ) {
+			$document_sign = $total_inc_tax < 0 || ( 0.0 === $total_inc_tax && $lines_net_rounded < 0 ) ? -1 : 1;
+			$order_total   = abs( $order_total ) * $document_sign;
+		}
+
 		$rounding_diff = wc_round_tax_total( $order_total - $total_inc_tax );
 
 		// Config / inputs.
@@ -849,26 +860,34 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * Compute line totals, unit prices and unit discount for an item.
 	 *
 	 * @param \WC_Order_Item $item
-	 * @param bool $lock_net_to_subtotal
+	 * @param bool           $lock_net_to_subtotal
 	 * @return array
 	 */
 	protected function compute_item_price_parts( $item, bool $lock_net_to_subtotal = false ): array {
 		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
 			$gross_total = (float) $item->get_subtotal();                                                  // ex-VAT, before discounts
 			$net_total   = (float) ( $lock_net_to_subtotal ? $item->get_subtotal() : $item->get_total() ); // ex-VAT, after discounts
-			$qty         = max( 1, (int) $item->get_quantity() );
+			$qty         = max( 1, absint( $item->get_quantity() ) );
 		} else {
 			$gross_total = (float) $item->get_total();
 			$net_total   = (float) $item->get_total();
 			$qty         = 1;
 		}
 
-		$gross_unit = $qty > 0 ? $gross_total / $qty : 0.0;
-		$net_unit   = $qty > 0 ? $net_total   / $qty : (float) $item->get_total();
+		$line_sign = $net_total < 0 ? -1 : 1;
+
+		if ( $this->is_credit_note_document() && $this->should_normalize_credit_note_signs() ) {
+			$line_sign   = $this->get_credit_note_line_sign( $item, $net_total );
+			$gross_total = abs( $gross_total ) * $line_sign;
+			$net_total   = abs( $net_total ) * $line_sign;
+		}
+
+		$gross_unit = $qty > 0 ? abs( $gross_total ) / $qty : 0.0;
+		$net_unit   = $qty > 0 ? abs( $net_total ) / $qty : abs( (float) $item->get_total() );
 
 		$unit_discount = max( 0.0, $gross_unit - $net_unit );
 
-		return compact( 'gross_total', 'net_total', 'qty', 'gross_unit', 'net_unit', 'unit_discount' );
+		return compact( 'gross_total', 'net_total', 'qty', 'gross_unit', 'net_unit', 'unit_discount', 'line_sign' );
 	}
 
 	/**
@@ -1110,6 +1129,95 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		return $fallback;
+	}
+
+	/**
+	 * Check whether the current EDI document is a credit note.
+	 *
+	 * @return bool
+	 */
+	protected function is_credit_note_document(): bool {
+		$document_type = is_callable( array( $this->document->order_document, 'get_type' ) )
+			? (string) $this->document->order_document->get_type()
+			: '';
+
+		$root_element = is_callable( array( $this->document, 'get_root_element' ) )
+			? (string) $this->document->get_root_element()
+			: '';
+
+		$quantity_role = is_callable( array( $this->document, 'get_quantity_role' ) )
+			? (string) $this->document->get_quantity_role()
+			: '';
+
+		return (
+			'credit-note' === $document_type ||
+			'CreditNote' === $root_element ||
+			'Credited' === $quantity_role
+		);
+	}
+
+	/**
+	 * Whether credit note signs should be normalized from WooCommerce refund signs
+	 * to Peppol CreditNote signs.
+	 *
+	 * @return bool
+	 */
+	protected function should_normalize_credit_note_signs(): bool {
+		return (bool) apply_filters(
+			'wpo_ips_edi_normalize_credit_note_signs',
+			true,
+			$this
+		);
+	}
+
+	/**
+	 * Get the sign that should be used for a credit note line.
+	 *
+	 * For normal WooCommerce refunds, refund item totals are negative, but Peppol
+	 * CreditNote lines should mirror the original invoice line sign.
+	 *
+	 * @param \WC_Order_Item $item
+	 * @param float          $fallback_amount
+	 * @return int
+	 */
+	protected function get_credit_note_line_sign( \WC_Order_Item $item, float $fallback_amount = 0.0 ): int {
+		$sign = 1;
+
+		if ( ! $this->is_credit_note_document() || ! $this->should_normalize_credit_note_signs() ) {
+			return $fallback_amount < 0 ? -1 : 1;
+		}
+
+		$refunded_item_id = is_callable( array( $item, 'get_meta' ) )
+			? absint( $item->get_meta( '_refunded_item_id', true ) )
+			: 0;
+
+		if ( $refunded_item_id > 0 ) {
+			$parent_order = wpo_ips_edi_get_parent_order( $this->document->order );
+
+			if ( $parent_order && is_callable( array( $parent_order, 'get_item' ) ) ) {
+				$original_item = $parent_order->get_item( $refunded_item_id );
+
+				if ( $original_item instanceof \WC_Order_Item ) {
+					$original_total = is_callable( array( $original_item, 'get_total' ) )
+						? (float) $original_item->get_total()
+						: 0.0;
+
+					if ( 0.0 !== $original_total ) {
+						$sign = $original_total < 0 ? -1 : 1;
+					} elseif ( is_callable( array( $original_item, 'get_quantity' ) ) ) {
+						$sign = (float) $original_item->get_quantity() < 0 ? -1 : 1;
+					}
+				}
+			}
+		}
+
+		return (int) apply_filters(
+			'wpo_ips_edi_credit_note_line_sign',
+			$sign,
+			$item,
+			$this->document->order,
+			$this
+		);
 	}
 
 }
