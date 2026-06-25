@@ -508,7 +508,7 @@ class Main {
 
 		// if we got here, we're safe to go!
 		try {
-			if ( count( $order_ids ) > 1 && isset( $request['bulk'] ) ) {
+			if ( isset( $request['bulk'] ) ) {
 				$trigger = 'bulk';
 			} elseif ( isset( $request['my-account'] ) ) {
 				$trigger = 'my_account';
