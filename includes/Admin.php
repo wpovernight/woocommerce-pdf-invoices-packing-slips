@@ -1508,9 +1508,7 @@ class Admin {
 					WPO_WCPDF()->main->log_document_creation_to_order_notes( $invoice, 'document_data' );
 				}
 
-				if ( isset( $document_data['number'] ) || isset( $document_data['date'] ) ) {
-					WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
-				}
+				WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
 			}
 
 			// allow other documents to hook here and save their form data
