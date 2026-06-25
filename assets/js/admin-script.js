@@ -369,7 +369,7 @@ jQuery( function( $ ) {
 
 	// Check for settings change
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea', settingsChanged );
-	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
+	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select, #wpo-wcpdf-settings input[type="color"]', function( event ) {
 		if ( 'shop_address_country' === event.target.id || ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
 			settingsChanged( event );
 		}
@@ -1251,4 +1251,16 @@ jQuery( function( $ ) {
 
 	//----------> /Sync Address <----------//
 
+	document.querySelector( '[name="wpo_wcpdf_settings_general[template_path]"]' )
+		?.addEventListener( 'change', function() {
+			const selectedTemplate = this.value;
+			const $colorInput      = $( '#template_color' );
+			const defaults         = $colorInput.data( 'template_color_defaults' ) || {};
+			const savedValue       = $colorInput.data( 'saved_value' ) || '';
+			const defaultColor     = defaults[ selectedTemplate ] || '';
+
+			if ( ! savedValue && defaultColor ) {
+				$colorInput.val( defaultColor );
+			}
+		}, true ); // true = capture phase, fires before jQuery handlers
 } );

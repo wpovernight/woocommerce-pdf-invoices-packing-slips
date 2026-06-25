@@ -76,6 +76,9 @@ class Main {
 		// set ink saving mode
 		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_ink_saving_styles' ), 10, 2 );
 
+		// apply template color
+		add_filter( 'wpo_wcpdf_template_styles', array( $this, 'apply_template_color_styles' ), 10, 2 );
+
 		// show notice of missing required directories
 		add_action( 'admin_notices', array( $this, 'no_dir_notice' ), 1 );
 
@@ -2093,6 +2096,48 @@ class Main {
 		if ( ! empty( trim( $ink_saving_css ) ) ) {
 			$css .= "\n\n" . $ink_saving_css . "\n";
 		}
+
+		return $css;
+	}
+
+	/**
+	 * Apply template color styles to supported templates when a color is set.
+	 *
+	 * @param string        $css
+	 * @param OrderDocument $document
+	 * @return string
+	 */
+	public function apply_template_color_styles( string $css, OrderDocument $document ): string {
+		$settings = WPO_WCPDF()->settings->general_settings ?? array();
+
+		$template_color   = $settings['template_color'] ?? '';
+		$current_template = $settings['template_path'] ?? '';
+
+		$supported_templates = apply_filters(
+			'wpo_ips_template_color_supported_templates',
+			array()
+		);
+
+		// Bail if template not supported.
+		if ( ! in_array( $current_template, $supported_templates, true ) ) {
+			return $css;
+		}
+
+		$defaults_map  = apply_filters( 'wpo_ips_template_color_defaults_map', array() );
+		$default_color = $defaults_map[ $current_template ] ?? '';
+
+		// Bail if no color set, or it matches the template's own default (not a user customization).
+		if ( empty( $template_color ) || $template_color === $default_color ) {
+			return $css;
+		}
+
+		$css = apply_filters(
+			'wpo_ips_template_color_css',
+			$css,
+			$document,
+			$current_template,
+			$template_color
+		);
 
 		return $css;
 	}
