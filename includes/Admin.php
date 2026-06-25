@@ -1494,8 +1494,9 @@ class Admin {
 
 			if ( $is_new ) {
 				$main_instance->log_document_creation_to_order_notes( $invoice, 'document_data' );
-				$main_instance->mark_document_printed( $invoice, 'document_data' );
 			}
+
+			$main_instance->mark_document_printed( $invoice, 'document_data' );
 		}
 
 		// Allow other documents to hook here and save their form data.
@@ -1708,8 +1709,10 @@ class Admin {
 				// on regenerate
 				if ( 'regenerate' === $action_type && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
+
 					$main_instance->log_document_creation_trigger_to_order_meta( $document, 'document_data', true, $request );
-					
+					$main_instance->mark_document_printed( $document, 'document_data' );
+
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
@@ -1741,9 +1744,11 @@ class Admin {
 					if ( $is_new ) {
 						$main_instance->log_document_creation_to_order_notes( $document, 'document_data' );
 						$main_instance->log_document_creation_trigger_to_order_meta( $document, 'document_data', false, $request );
-						$main_instance->mark_document_printed( $document, 'document_data' );
 					}
-					$response      = array(
+
+					$main_instance->mark_document_printed( $document, 'document_data' );
+
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 

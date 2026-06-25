@@ -64,6 +64,7 @@ class Main {
 		add_filter( 'wpo_wcpdf_html_filters', array( $this, 'html_currency_filters' ) );
 		add_filter( 'wpo_wcpdf_document_is_allowed', array( $this, 'disable_anonymized' ), 11, 2 );
 		add_filter( 'wpo_wcpdf_template_custom_styles', array( $this, 'apply_ink_saving_styles' ), 10, 2 );
+		add_filter( 'wpo_wcpdf_template_styles', array( $this, 'apply_template_color_styles' ), 10, 2 );
 		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'set_header_logo_height' ), 9, 2 );
 		add_action( 'wpo_wcpdf_after_dompdf_render', array( $this, 'page_number_replacements' ), 9, 2 );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
@@ -155,7 +156,6 @@ class Main {
 						add_action( 'wpo_wcpdf_init_document', function( $document ) {
 							$this->log_document_creation_to_order_notes( $document, 'email_attachment' );
 							$this->log_document_creation_trigger_to_order_meta( $document, 'email_attachment' );
-							$this->mark_document_printed( $document, 'email_attachment' );
 						} );
 
 						// prepare document
@@ -171,6 +171,9 @@ class Main {
 
 						if ( $attachment ) {
 							$attachments[] = $attachment;
+
+							$this->mark_document_printed( $document, 'email_attachment' );
+
 							if ( ! empty( \WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
 								$email_title = $email_id;
 
@@ -525,7 +528,7 @@ class Main {
 
 		// if we got here, we're safe to go!
 		try {
-			if ( count( $order_ids ) > 1 && isset( $request['bulk'] ) ) {
+			if ( isset( $request['bulk'] ) ) {
 				$trigger = 'bulk';
 			} elseif ( isset( $request['my-account'] ) ) {
 				$trigger = 'my_account';
@@ -2399,6 +2402,48 @@ class Main {
 	private function clear_tmp_path_caches(): void {
 		$this->tmp_base_cache = array();
 		$this->tmp_path_cache = array();
+	}
+
+	/**
+	 * Apply template color styles to supported templates when a color is set.
+	 *
+	 * @param string        $css
+	 * @param OrderDocument $document
+	 * @return string
+	 */
+	public function apply_template_color_styles( string $css, OrderDocument $document ): string {
+		$settings = WPO_WCPDF()->settings->general_settings ?? array();
+
+		$template_color   = $settings['template_color'] ?? '';
+		$current_template = $settings['template_path'] ?? '';
+
+		$supported_templates = apply_filters(
+			'wpo_ips_template_color_supported_templates',
+			array()
+		);
+
+		// Bail if template not supported.
+		if ( ! in_array( $current_template, $supported_templates, true ) ) {
+			return $css;
+		}
+
+		$defaults_map  = apply_filters( 'wpo_ips_template_color_defaults_map', array() );
+		$default_color = $defaults_map[ $current_template ] ?? '';
+
+		// Bail if no color set, or it matches the template's own default (not a user customization).
+		if ( empty( $template_color ) || $template_color === $default_color ) {
+			return $css;
+		}
+
+		$css = apply_filters(
+			'wpo_ips_template_color_css',
+			$css,
+			$document,
+			$current_template,
+			$template_color
+		);
+
+		return $css;
 	}
 
 }
