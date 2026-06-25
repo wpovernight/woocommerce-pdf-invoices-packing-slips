@@ -2412,7 +2412,7 @@ class Main {
 	 * @return string
 	 */
 	public function apply_template_color_styles( string $css, OrderDocument $document ): string {
-		$settings = WPO_WCPDF()->settings->general_settings ?? array();
+		$settings = WPO_WCPDF()->get_instance( 'settings' )->general_settings ?? array();
 
 		$template_color   = $settings['template_color'] ?? '';
 		$current_template = $settings['template_path'] ?? '';

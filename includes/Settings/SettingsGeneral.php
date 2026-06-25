@@ -157,7 +157,7 @@ class SettingsGeneral {
 					'option_name'       => $option_name,
 					'id'                => 'template_color',
 					'type'              => 'color',
-					'default'           => apply_filters( 'wpo_ips_template_color_defaults_map', array() )[ WPO_WCPDF()->settings->general_settings['template_path'] ?? '' ] ?? '',
+					'default'           => apply_filters( 'wpo_ips_template_color_defaults_map', array() )[ WPO_WCPDF()->get_instance( 'settings' )->general_settings['template_path'] ?? '' ] ?? '',
 					'default_if_empty'  => true,
 					'description'       => __( 'Sets the primary color used across supported templates.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'custom_attributes' => array(
@@ -166,7 +166,7 @@ class SettingsGeneral {
 						'data-keep_current_value'      => 'true',
 						'data-template_color_defaults' => wp_json_encode( apply_filters( 'wpo_ips_template_color_defaults_map', array() ) ),
 						// Browsers render empty color inputs as #000000, so we store the actual saved value separately for JS to read.
-						'data-saved_value'             => WPO_WCPDF()->settings->general_settings['template_color'] ?? '',
+						'data-saved_value'             => WPO_WCPDF()->get_instance( 'settings' )->general_settings['template_color'] ?? '',
 					),
 				),
 			),
