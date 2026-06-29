@@ -244,8 +244,13 @@ class Frontend {
 			'document_type' => 'invoice',
 		), $atts );
 
+		$values['order_id']      = absint( $values['order_id'] );
+		$values['document_type'] = sanitize_key( $values['document_type'] );
+		$has_explicit_order_id   = ! empty( $values['order_id'] );
+
 		$is_document_type_valid = false;
 		$documents              = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
+
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() === $values['document_type'] ) {
 				$is_document_type_valid = true;
@@ -269,7 +274,9 @@ class Frontend {
 		}
 
 		// Get $order
-		if ( empty( $values['order_id'] ) ) {
+		$order = null;
+
+		if ( ! $has_explicit_order_id ) {
 			if ( is_checkout() && is_wc_endpoint_url( 'order-received' ) && isset( $wp->query_vars['order-received'] ) ) {
 				$order = wc_get_order( $wp->query_vars['order-received'] );
 			} elseif ( \wpo_ips_is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
@@ -280,6 +287,10 @@ class Frontend {
 		}
 
 		if ( empty( $order ) || ! is_object( $order ) ) {
+			return '';
+		}
+
+		if ( $has_explicit_order_id && ! $this->current_user_can_access_shortcode_order( $order, $values['document_type'] ) ) {
 			return '';
 		}
 
@@ -864,6 +875,21 @@ class Frontend {
 		return $result instanceof \WP_Error
 			? $result
 			: true;
+	}
+
+	/**
+	 * Check whether the current user can use a shortcode with an explicit order ID.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @param string             $document_type
+	 * @return bool
+	 */
+	protected function current_user_can_access_shortcode_order( \WC_Abstract_Order $order, string $document_type ): bool {
+		if ( WPO_WCPDF()->admin->user_can_manage_document( $document_type ) ) {
+			return true;
+		}
+
+		return is_user_logged_in() && current_user_can( 'view_order', $order->get_id() );
 	}
 
 }
