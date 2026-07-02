@@ -1230,7 +1230,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Reconcile VAT breakdown taxable amounts with the invoice line net total.
+	 * Reconcile VAT breakdown taxable amounts with the line net total.
 	 *
 	 * Peppol validates TaxSubtotal/TaxableAmount against the sum of the
 	 * emitted InvoiceLine/LineExtensionAmount values per VAT category.
