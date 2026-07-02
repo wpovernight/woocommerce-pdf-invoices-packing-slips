@@ -390,7 +390,16 @@ abstract class AbstractHandler implements HandlerInterface {
 		$groups = $this->ensure_one_zero_tax_group( $groups );
 		$groups = array_values( $groups );
 
-		return apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
+		$groups = apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
+
+		if (
+			is_array( $groups ) &&
+			apply_filters( 'wpo_ips_edi_reconcile_tax_groups_to_lines', true, $this->document->order, $this )
+		) {
+			$groups = $this->reconcile_tax_groups_to_line_totals( $groups, $this->document->order );
+		}
+
+		return array_values( $groups );
 	}
 
 	/**
@@ -1218,6 +1227,102 @@ abstract class AbstractHandler implements HandlerInterface {
 			$this->document->order,
 			$this
 		);
+	}
+
+	/**
+	 * Reconcile VAT breakdown taxable amounts with the invoice line net total.
+	 *
+	 * Peppol validates TaxSubtotal/TaxableAmount against the sum of the
+	 * emitted InvoiceLine/LineExtensionAmount values per VAT category.
+	 *
+	 * @param array              $groups Grouped tax data.
+	 * @param \WC_Abstract_Order $order  WooCommerce order.
+	 * @return array
+	 */
+	protected function reconcile_tax_groups_to_line_totals( array $groups, \WC_Abstract_Order $order ): array {
+		if ( empty( $groups ) ) {
+			return $groups;
+		}
+
+		$lines_net = (float) $this->format_decimal( $this->get_lines_net_total( $order ), 2 );
+
+		$groups_total = 0.0;
+
+		foreach ( $groups as $group ) {
+			$groups_total += (float) $this->format_decimal( $group['total_ex'] ?? 0, 2 );
+		}
+
+		$groups_total = (float) $this->format_decimal( $groups_total, 2 );
+		$diff         = (float) $this->format_decimal( $lines_net - $groups_total, 2 );
+
+		if ( abs( $diff ) < 0.01 ) {
+			return $groups;
+		}
+
+		$target_key = $this->get_tax_group_reconciliation_key( $groups );
+
+		if ( null === $target_key ) {
+			return $groups;
+		}
+
+		$groups[ $target_key ]['total_ex'] = (float) $this->format_decimal(
+			(float) ( $groups[ $target_key ]['total_ex'] ?? 0 ) + $diff,
+			2
+		);
+
+		wpo_ips_edi_log(
+			sprintf(
+				'Reconciled tax group taxable amount for order #%d: lines_net=%s, groups_total=%s, diff=%s',
+				$order->get_id(),
+				$this->format_decimal( $lines_net ),
+				$this->format_decimal( $groups_total ),
+				$this->format_decimal( $diff )
+			),
+			'warning'
+		);
+
+		return $groups;
+	}
+
+	/**
+	 * Pick the safest tax group to receive a minor taxable amount reconciliation.
+	 *
+	 * Prefer the configured zero-tax group, otherwise use the group with the
+	 * largest taxable amount.
+	 *
+	 * @param array $groups Grouped tax data.
+	 * @return int|string|null
+	 */
+	protected function get_tax_group_reconciliation_key( array $groups ) {
+		$zero_meta = $this->get_preferred_zero_tax_meta( $this->document->order );
+
+		foreach ( $groups as $key => $group ) {
+			$percentage = (float) ( $group['percentage'] ?? 0 );
+			$category   = strtoupper( (string) ( $group['category'] ?? '' ) );
+			$scheme     = strtoupper( (string) ( $group['scheme'] ?? 'VAT' ) );
+
+			if (
+				0.0 === $percentage &&
+				$category === strtoupper( $zero_meta['category'] ) &&
+				$scheme === strtoupper( $zero_meta['scheme'] )
+			) {
+				return $key;
+			}
+		}
+
+		$target_key = null;
+		$max_amount = null;
+
+		foreach ( $groups as $key => $group ) {
+			$amount = abs( (float) ( $group['total_ex'] ?? 0 ) );
+
+			if ( null === $max_amount || $amount > $max_amount ) {
+				$max_amount = $amount;
+				$target_key = $key;
+			}
+		}
+
+		return $target_key;
 	}
 
 }
