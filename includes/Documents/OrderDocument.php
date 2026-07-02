@@ -1849,11 +1849,11 @@ abstract class OrderDocument {
 	*/
 
 	/**
-	 * get all emails registered in WooCommerce
-	 * @param  boolean $remove_defaults switch to remove default woocommerce emails
-	 * @return array   $emails       list of all email ids/slugs and names
+	 * Get all emails registered in WooCommerce
+	 * 
+	 * @return array
 	 */
-	public function get_wc_emails() {
+	public function get_wc_emails(): array {
 		// only run this in the context of the settings page or setup wizard
 		// prevents WPML language mixups
 		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -1863,7 +1863,7 @@ abstract class OrderDocument {
 		}
 
 		// get emails from WooCommerce
-		if (function_exists('WC')) {
+		if ( function_exists( 'WC' ) ) {
 			$mailer = WC()->mailer();
 		} else {
 			global $woocommerce;
@@ -1874,6 +1874,7 @@ abstract class OrderDocument {
 
 			$mailer = $woocommerce->mailer();
 		}
+
 		$wc_emails = $mailer->get_emails();
 
 		$non_order_emails = array(
@@ -1882,24 +1883,26 @@ abstract class OrderDocument {
 		);
 
 		$emails = array();
-		foreach ($wc_emails as $class => $email) {
-			if ( !is_object( $email ) ) {
+
+		foreach ( $wc_emails as $class => $email ) {
+			if ( ! is_object( $email ) ) {
 				continue;
 			}
-			if ( !in_array( $email->id, $non_order_emails ) ) {
-				switch ($email->id) {
+
+			if ( ! in_array( $email->id, $non_order_emails ) ) {
+				switch ( $email->id ) {
 					case 'new_order':
-						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					case 'customer_invoice':
-						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					case 'cancelled_order':
 					case 'failed_order':
-						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					default:
-						$emails[$email->id] = $email->title;
+						$emails[ $email->id ] = $email->title;
 						break;
 				}
 			}
