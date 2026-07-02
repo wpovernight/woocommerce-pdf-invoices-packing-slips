@@ -1881,9 +1881,6 @@ abstract class OrderDocument {
 			'customer_new_account'
 		);
 
-		// first pass: count how many times each title occurs, so we only
-		// disambiguate labels that actually collide (e.g. "Cancelled order"
-		// admin email vs "Cancelled order" customer email)
 		$title_counts = array();
 		foreach ( $wc_emails as $email ) {
 			if ( ! is_object( $email ) ) {
