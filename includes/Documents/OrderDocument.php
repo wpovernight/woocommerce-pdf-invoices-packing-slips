@@ -1881,18 +1881,6 @@ abstract class OrderDocument {
 			'customer_new_account'
 		);
 
-		$title_counts = array();
-		foreach ( $wc_emails as $email ) {
-			if ( ! is_object( $email ) ) {
-				continue;
-			}
-			if ( in_array( $email->id, $non_order_emails ) ) {
-				continue;
-			}
-			$title = $email->title;
-			$title_counts[ $title ] = isset( $title_counts[ $title ] ) ? $title_counts[ $title ] + 1 : 1;
-		}
-
 		$emails = array();
 		foreach ($wc_emails as $class => $email) {
 			if ( !is_object( $email ) ) {
@@ -1906,13 +1894,12 @@ abstract class OrderDocument {
 					case 'customer_invoice':
 						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
+					case 'cancelled_order':
+					case 'failed_order':
+						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						break;
 					default:
-						if ( $title_counts[ $email->title ] > 1 ) {
-							$suffix = $email->is_customer_email() ? __( 'Customer email', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' );
-							$emails[ $email->id ] = sprintf('%s (%s)', $email->title, $suffix );
-						} else {
-							$emails[ $email->id ] = $email->title;
-						}
+						$emails[$email->id] = $email->title;
 						break;
 				}
 			}
