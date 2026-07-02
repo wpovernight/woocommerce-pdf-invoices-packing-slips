@@ -1881,6 +1881,21 @@ abstract class OrderDocument {
 			'customer_new_account'
 		);
 
+		// first pass: count how many times each title occurs, so we only
+		// disambiguate labels that actually collide (e.g. "Cancelled order"
+		// admin email vs "Cancelled order" customer email)
+		$title_counts = array();
+		foreach ( $wc_emails as $email ) {
+			if ( ! is_object( $email ) ) {
+				continue;
+			}
+			if ( in_array( $email->id, $non_order_emails ) ) {
+				continue;
+			}
+			$title = $email->title;
+			$title_counts[ $title ] = isset( $title_counts[ $title ] ) ? $title_counts[ $title ] + 1 : 1;
+		}
+
 		$emails = array();
 		foreach ($wc_emails as $class => $email) {
 			if ( !is_object( $email ) ) {
@@ -1895,7 +1910,12 @@ abstract class OrderDocument {
 						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					default:
-						$emails[$email->id] = $email->title;
+						if ( $title_counts[ $email->title ] > 1 ) {
+							$suffix = $email->is_customer_email() ? __( 'Customer email', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' );
+							$emails[ $email->id ] = sprintf('%s (%s)', $email->title, $suffix );
+						} else {
+							$emails[ $email->id ] = $email->title;
+						}
 						break;
 				}
 			}
