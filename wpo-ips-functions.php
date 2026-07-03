@@ -2423,7 +2423,7 @@ function wpo_ips_is_settings_page(): bool {
 		return false;
 	}
 
-	if ( isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
+	if ( isset( $_GET['page'] ) && 'wpo_wcpdf_options_page' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return true;
 	}
 
@@ -2433,9 +2433,7 @@ function wpo_ips_is_settings_page(): bool {
 		return false;
 	}
 
-	$option_page = isset( $_POST['option_page'] )
-		? sanitize_key( wp_unslash( $_POST['option_page'] ) )
-		: '';
+	$option_page = isset( $_POST['option_page'] ) ? sanitize_key( wp_unslash( $_POST['option_page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 	return (
 		0 === strpos( $option_page, 'wpo_wcpdf_' ) ||
@@ -2489,8 +2487,8 @@ function wpo_ips_is_order_page(): bool {
 
 	global $pagenow;
 
-	$page      = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
-	$post_type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+	$page      = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$post_type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 	// HPOS orders list/edit page.
 	if ( 'admin.php' === $pagenow && 'wc-orders' === $page ) {
@@ -2510,7 +2508,7 @@ function wpo_ips_is_order_page(): bool {
 
 		// post_type is absent from the URL when accessing via post=<id>&action=edit,
 		// so fall back to resolving the post type from the post ID.
-		$post_id = isset( $_GET['post'] ) ? absint( wp_unslash( $_GET['post'] ) ) : 0;
+		$post_id = isset( $_GET['post'] ) ? absint( wp_unslash( $_GET['post'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		if ( $post_id && 'shop_order' === get_post_type( $post_id ) ) {
 			return true;
@@ -2622,7 +2620,7 @@ function wpo_ips_matches_wc_page_request( string $page_name, string $endpoint = 
 	$endpoint = trim( $endpoint, '/' );
 
 	// Plain permalinks fallback.
-	if ( isset( $_GET['page_id'] ) && absint( wp_unslash( $_GET['page_id'] ) ) === $page_id ) {
+	if ( isset( $_GET['page_id'] ) && absint( wp_unslash( $_GET['page_id'] ) ) === $page_id ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( '' === $endpoint || isset( $_GET[ $endpoint ] ) ) {
 			return true;
 		}
@@ -2635,7 +2633,7 @@ function wpo_ips_matches_wc_page_request( string $page_name, string $endpoint = 
 	}
 
 	$page_path    = untrailingslashit( (string) wp_parse_url( $permalink, PHP_URL_PATH ) );
-	$request_path = untrailingslashit( (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) );
+	$request_path = untrailingslashit( (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 	if ( empty( $page_path ) || empty( $request_path ) ) {
 		return false;
