@@ -43,7 +43,7 @@ class WPO_WCPDF {
 	public string $version                         = '6.0.0-i1482.4';
 	public string $version_php                     = '8.1';
 	public string $version_woo                     = '4.0';
-	public string $version_wp                      = '4.4';
+	public string $version_wp                      = '5.3';
 	public ?string $plugin_basename                = null;
 	public array $legacy_addons                    = array();
 	
