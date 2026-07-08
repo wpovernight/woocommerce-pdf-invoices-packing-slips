@@ -1272,6 +1272,29 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
 }
 
 /**
+ * Format a company registration number for EDI output.
+ *
+ * This intentionally avoids digits-only normalization because some countries use
+ * alphanumeric company registration numbers. By default, it trims the value and
+ * removes whitespace only.
+ *
+ * @param string $registration_number Registration number to format.
+ * @param string $country             Country code in ISO 3166-1 alpha-2 format.
+ * @return string
+ */
+function wpo_ips_edi_format_registration_number( string $registration_number, string $country = '' ): string {
+	$registration_number = trim( wp_strip_all_tags( $registration_number ) );
+	$registration_number = preg_replace( '/\s+/', '', $registration_number ) ?? '';
+	$country             = strtoupper( trim( $country ) );
+
+	return (string) apply_filters(
+		'wpo_ips_edi_format_registration_number',
+		$registration_number,
+		$country
+	);
+}
+
+/**
  * Get supplier identifiers data for EDI.
  *
  * @return array

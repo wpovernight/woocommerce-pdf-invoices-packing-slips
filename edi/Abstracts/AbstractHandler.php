@@ -46,12 +46,18 @@ abstract class AbstractHandler implements HandlerInterface {
 			$language = 'default';
 		}
 
-		$value = $general_settings->get_setting( $key, $language ) ?: '';
+		$value   = $general_settings->get_setting( $key, $language ) ?: '';
+		$country = $general_settings->get_setting( 'shop_address_country', $language ) ?: '';
 
 		if ( 'vat_number' === $key && '' !== $value ) {
-			$country = $general_settings->get_setting( 'shop_address_country', $language ) ?: '';
-
 			$value = wpo_ips_edi_format_vat_number(
+				(string) $value,
+				(string) $country
+			);
+		}
+
+		if ( 'coc_number' === $key && '' !== $value ) {
+			$value = wpo_ips_edi_format_registration_number(
 				(string) $value,
 				(string) $country
 			);
