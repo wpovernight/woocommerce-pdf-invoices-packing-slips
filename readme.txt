@@ -110,6 +110,13 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.15.1 (2026-07-08) =
+- Fix: Empty UBL `IssueDate` when document date meta is missing
+- Fix: EDI total reconciliation with emitted line amounts
+- Fix: Make cancelled/failed order email labels distinct between admin and customer
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.9
+
 = 5.15.0 (2026-06-29) =
 - New: Add global template color setting
 - New: Add BIC support to UBL payment means
