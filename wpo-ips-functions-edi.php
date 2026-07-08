@@ -1283,14 +1283,16 @@ function wpo_ips_edi_get_peppol_vat_mappings(): array {
  * @return string
  */
 function wpo_ips_edi_format_registration_number( string $registration_number, string $country = '' ): string {
-	$registration_number = trim( wp_strip_all_tags( $registration_number ) );
-	$registration_number = preg_replace( '/\s+/', '', $registration_number ) ?? '';
-	$country             = strtoupper( trim( $country ) );
+	$raw_registration_number = $registration_number;
+	$registration_number     = trim( wp_strip_all_tags( $registration_number ) );
+	$registration_number     = preg_replace( '/\s+/', '', $registration_number ) ?? '';
+	$country                 = strtoupper( trim( $country ) );
 
 	return (string) apply_filters(
 		'wpo_ips_edi_format_registration_number',
 		$registration_number,
-		$country
+		$country,
+		$raw_registration_number
 	);
 }
 
