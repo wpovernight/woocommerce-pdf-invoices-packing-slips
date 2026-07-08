@@ -2305,6 +2305,7 @@ abstract class OrderDocument {
 
 			$mailer = $woocommerce->mailer();
 		}
+
 		$wc_emails = $mailer->get_emails();
 
 		$non_order_emails = array(
@@ -2313,18 +2314,23 @@ abstract class OrderDocument {
 		);
 
 		$emails = array();
+
 		foreach ( $wc_emails as $class => $email ) {
 			if ( ! is_object( $email ) ) {
 				continue;
 			}
 
-			if ( ! in_array( $email->id, $non_order_emails, true ) ) {
+			if ( ! in_array( $email->id, $non_order_emails ) ) {
 				switch ( $email->id ) {
 					case 'new_order':
-						$emails[ $email->id ] = sprintf('%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					case 'customer_invoice':
-						$emails[ $email->id ] = sprintf('%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						break;
+					case 'cancelled_order':
+					case 'failed_order':
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					default:
 						$emails[ $email->id ] = $email->title;
