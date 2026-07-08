@@ -2103,11 +2103,11 @@ class Main {
 	/**
 	 * Apply template color styles to supported templates when a color is set.
 	 *
-	 * @param string        $css
-	 * @param OrderDocument $document
+	 * @param string  $css
+	 * @param object  $document
 	 * @return string
 	 */
-	public function apply_template_color_styles( string $css, OrderDocument $document ): string {
+	public function apply_template_color_styles( string $css, $document ): string {
 		$settings = WPO_WCPDF()->settings->general_settings ?? array();
 
 		$template_color   = $settings['template_color'] ?? '';
