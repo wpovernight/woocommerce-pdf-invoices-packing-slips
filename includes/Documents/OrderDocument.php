@@ -2045,6 +2045,8 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_html( array $args = array() ): string {
+		\WPO_WCPDF()->get_instance( 'main' )->load_template_functions();
+
 		// temporarily apply filters that need to be removed again after the html is generated
 		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
 		\wpo_ips_add_filters( $html_filters );

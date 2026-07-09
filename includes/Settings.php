@@ -53,37 +53,46 @@ class Settings {
 	 * Constructor.
 	 */
 	public function __construct() {
+		$this->load_settings();
+
+		// Admin hooks only
+		if ( is_admin() || wp_doing_ajax() ) {
+			$this->load_settings_components();
+
+			// WP
+			add_action( 'admin_menu', array( $this, 'menu' ), 999 );
+			add_filter( 'plugin_action_links_' . WPO_WCPDF()->plugin_basename, array( $this, 'add_settings_link' ) );
+			add_filter( 'plugin_row_meta', array( $this, 'add_support_links' ), 10, 2 );
+			add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
+			add_action( 'update_option_wpo_wcpdf_settings_general', array( $this, 'general_settings_updated' ), 10, 3 );
+			add_action( 'update_option_wpo_wcpdf_settings_debug', array( $this, 'debug_settings_updated' ), 10, 3 );
+			add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
+
+			// IPS
+			add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 2 );
+			add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
+			add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_categories' ), 999 );
+			add_filter( 'wpo_wcpdf_settings_fields_debug', array( $this, 'update_debug_settings_categories' ), 999, 4 );
+
+			// AJAX
+			add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
+			add_action( 'wp_ajax_wpo_wcpdf_get_media_upload_setting_html', array( $this, 'get_media_upload_setting_html' ) );
+			add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
+			add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
+			add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
+		}
+
+		// Runtime hook
+		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
+	}
+
+	private function load_settings_components(): void {
 		$this->get_instance( 'callbacks' );
 		$this->get_instance( 'general' );
 		$this->get_instance( 'documents' );
 		$this->get_instance( 'debug' );
 		$this->get_instance( 'upgrade' );
 		$this->get_instance( 'edi' );
-		
-		$this->load_settings();
-		
-		// WP
-		add_action( 'admin_menu', array( $this, 'menu' ), 999 );
-		add_filter( 'plugin_action_links_'.WPO_WCPDF()->plugin_basename, array( $this, 'add_settings_link' ) );
-		add_filter( 'plugin_row_meta', array( $this, 'add_support_links' ), 10, 2 );
-		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
-		add_action( 'update_option_wpo_wcpdf_settings_general', array( $this, 'general_settings_updated' ), 10, 3 );
-		add_action( 'update_option_wpo_wcpdf_settings_debug', array( $this, 'debug_settings_updated' ), 10, 3 );
-		add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
-		
-		// IPS
-		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 2 );
-		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
-		add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_categories' ), 999 );
-		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
-		add_filter( 'wpo_wcpdf_settings_fields_debug', array( $this, 'update_debug_settings_categories' ), 999, 4 );
-		
-		// AJAX
-		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_get_media_upload_setting_html', array( $this, 'get_media_upload_setting_html' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
-		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 	}
 	
 	/**

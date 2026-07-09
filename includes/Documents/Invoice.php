@@ -650,14 +650,7 @@ class Invoice extends OrderDocumentMethods {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'include_email_link_placement',
-					'options'     => apply_filters( 'wpo_wcpdf_document_link_guest_emails_template_hooks_options', array(
-						'order_details'            => __( 'Order details', 'woocommerce-pdf-invoices-packing-slips' ),
-						'order_meta'               => __( 'Order meta', 'woocommerce-pdf-invoices-packing-slips' ),
-						'before_order_table'       => __( 'Before order table', 'woocommerce-pdf-invoices-packing-slips' ),
-						'after_order_table'        => __( 'After order table', 'woocommerce-pdf-invoices-packing-slips' ),
-						'customer_address_section' => __( 'Customer address section', 'woocommerce-pdf-invoices-packing-slips' ),
-						'customer_details'         => __( 'Customer details', 'woocommerce-pdf-invoices-packing-slips' ),
-					), $this ),
+					'options'     => wpo_ips_get_document_link_email_placements( $this ),
 					'description' => __( 'Select the placement of the document link in the guest customer emails.', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 			);

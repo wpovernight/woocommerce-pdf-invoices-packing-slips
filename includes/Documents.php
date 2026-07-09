@@ -30,17 +30,7 @@ class Documents {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$should_init_documents = (
-			\wpo_ips_is_order_page()                      ||
-			\wpo_ips_is_settings_page()                   ||
-			\wpo_ips_is_account_page()                    ||
-			wp_doing_cron()                               ||
-			( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
-			( defined( 'WP_CLI' ) && WP_CLI )             ||
-			! is_admin()
-		);
-
-		if ( apply_filters( 'wpo_ips_should_init_documents', $should_init_documents, $this ) ) {
+		if ( apply_filters( 'wpo_ips_should_init_documents', wpo_ips_is_document_context_request(), $this ) ) {
 			add_action( 'init', array( $this, 'init' ), 15 );
 		}
 	}
@@ -51,6 +41,10 @@ class Documents {
 	 * @return void
 	 */
 	public function init(): void {
+		if ( ! empty( $this->documents ) ) {
+			return;
+		}
+
 		// Load Invoice & Packing Slip
 		$this->documents['\WPO\IPS\Documents\Invoice']     = new \WPO\IPS\Documents\Invoice();
 		$this->documents['\WPO\IPS\Documents\PackingSlip'] = new \WPO\IPS\Documents\PackingSlip();

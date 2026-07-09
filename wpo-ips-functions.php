@@ -2647,3 +2647,152 @@ function wpo_ips_matches_wc_page_request( string $page_name, string $endpoint = 
 
 	return $request_path === $endpoint_path || 0 === strpos( $request_path . '/', $endpoint_path . '/' );
 }
+
+/**
+ * Gets the current request action.
+ *
+ * @return string
+ */
+function wpo_ips_current_request_action(): string {
+	$action = $_REQUEST['action'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+	if ( ! is_scalar( $action ) ) {
+		return '';
+	}
+
+	return sanitize_key( wp_unslash( (string) $action ) );
+}
+
+/**
+ * Checks whether the current AJAX request belongs to this plugin.
+ *
+ * @return bool
+ */
+function wpo_ips_is_ajax_request(): bool {
+	if ( ! wp_doing_ajax() ) {
+		return false;
+	}
+
+	return in_array(
+		wpo_ips_current_request_action(),
+		array(
+			'generate_wpo_wcpdf',
+			'printed_wpo_wcpdf',
+			'wpo_ips_get_refund_order_ids',
+			'wpo_wcpdf_delete_document',
+			'wpo_wcpdf_regenerate_document',
+			'wpo_wcpdf_save_document',
+			'wpo_wcpdf_preview',
+			'wpo_wcpdf_preview_order_search',
+			'wpo_wcpdf_preview_formatted_number',
+			'wpo_wcpdf_set_next_number',
+			'wpo_wcpdf_get_media_upload_setting_html',
+			'wpo_wcpdf_sync_address',
+			'wpo_ips_edi_save_order_customer_peppol_identifiers',
+		),
+		true
+	);
+}
+
+/**
+ * Checks whether the current request is a pretty document link request.
+ *
+ * @return bool
+ */
+function wpo_ips_is_pretty_document_link_request(): bool {
+	if ( ! wpo_ips_is_frontend_page_request() || empty( $_SERVER['REQUEST_URI'] ) ) {
+		return false;
+	}
+
+	$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+
+	if ( empty( $debug_settings['pretty_document_links'] ) || empty( get_option( 'permalink_structure' ) ) ) {
+		return false;
+	}
+
+	$identifier = trim(
+		(string) apply_filters( 'wpo_wcpdf_pretty_document_link_identifier', 'wcpdf' ),
+		'/'
+	);
+
+	if ( '' === $identifier ) {
+		return false;
+	}
+
+	$request_path = trim(
+		(string) wp_parse_url( wp_unslash( (string) $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ), // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		'/'
+	);
+
+	return $request_path === $identifier || 0 === strpos( $request_path . '/', $identifier . '/' );
+}
+
+/**
+ * Checks whether the current request is a document download request.
+ *
+ * @return bool
+ */
+function wpo_ips_is_document_download_request(): bool {
+	return 'generate_wpo_wcpdf' === wpo_ips_current_request_action() || wpo_ips_is_pretty_document_link_request();
+}
+
+/**
+ * Checks whether the current request is for the WooCommerce checkout page.
+ *
+ * @return bool
+ */
+function wpo_ips_is_checkout_request(): bool {
+	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
+		return false;
+	}
+
+	if ( did_action( 'wp' ) && function_exists( 'is_checkout' ) && is_checkout() ) {
+		return true;
+	}
+
+	return wpo_ips_matches_wc_page_request( 'checkout' );
+}
+
+/**
+ * Checks whether the current request may require document-related functionality.
+ *
+ * @return bool
+ */
+function wpo_ips_is_document_context_request(): bool {
+	return (
+		wpo_ips_is_order_page()                       ||
+		wpo_ips_is_settings_page()                    ||
+		wpo_ips_is_account_page()                     ||
+		wpo_ips_is_order_received_page()              ||
+		wpo_ips_is_document_download_request()        ||
+		wpo_ips_is_ajax_request()                     ||
+		wp_doing_cron()                               ||
+		( defined( 'REST_REQUEST' ) && REST_REQUEST ) ||
+		( defined( 'WP_CLI' ) && WP_CLI )
+	);
+}
+
+/**
+ * Gets the available WooCommerce email placement options for guest document links.
+ *
+ * @param \WPO\IPS\Documents\OrderDocument|null $document Optional document object
+ * @return array<string, string>
+ */
+function wpo_ips_get_document_link_email_placements( ?\WPO\IPS\Documents\OrderDocument $document = null ): array {
+	$placements = array(
+		'order_details'            => __( 'Order details', 'woocommerce-pdf-invoices-packing-slips' ),
+		'order_meta'               => __( 'Order meta', 'woocommerce-pdf-invoices-packing-slips' ),
+		'before_order_table'       => __( 'Before order table', 'woocommerce-pdf-invoices-packing-slips' ),
+		'after_order_table'        => __( 'After order table', 'woocommerce-pdf-invoices-packing-slips' ),
+		'customer_address_section' => __( 'Customer address section', 'woocommerce-pdf-invoices-packing-slips' ),
+		'customer_details'         => __( 'Customer details', 'woocommerce-pdf-invoices-packing-slips' ),
+	);
+
+	$placements = apply_filters(
+		'wpo_wcpdf_document_link_guest_emails_template_hooks_options',
+		$placements,
+		$document
+	);
+
+	return is_array( $placements ) ? $placements : array();
+}

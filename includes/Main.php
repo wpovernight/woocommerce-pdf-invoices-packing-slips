@@ -13,12 +13,13 @@ if ( ! class_exists( '\\WPO\\IPS\\Main' ) ) :
 
 class Main {
 
-	protected ?string $wp_upload_base_cache = null;
-	protected array $tmp_base_cache         = array();
-	protected array $tmp_path_cache         = array();
-	protected array $subfolders             = array( 'attachments', 'fonts', 'dompdf', 'xml' );
+	protected ?string $wp_upload_base_cache         = null;
+	protected array $tmp_base_cache                 = array();
+	protected array $tmp_path_cache                 = array();
+	protected array $subfolders                     = array( 'attachments', 'fonts', 'dompdf', 'xml' );
+	protected array $loaded_template_function_files = array();
 
-	protected static ?self $_instance       = null;
+	protected static ?self $_instance               = null;
 
 	/**
 	 * Singleton instance accessor.
@@ -38,12 +39,11 @@ class Main {
 	public function __construct() {
 		// enable debug mode if set in settings
 		$this->maybe_enable_debug();
-		
-		// include template specific custom functions
-		$this->load_template_functions();
+
+		// register document link email hooks
+		$this->register_document_link_email_hooks();
 		
 		// WP
-		add_action( 'init', array( $this, 'handle_document_link_in_emails' ), 20 );
 		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );
 		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
 		
@@ -664,7 +664,7 @@ class Main {
 	 * 
 	 * @return void
 	 */
-	private function load_template_functions(): void {
+	public function load_template_functions(): void {
 		$template_path     = '';
 		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
 
@@ -677,18 +677,27 @@ class Main {
 
 			// only allow template ids that exist in our installed templates list
 			$installed_templates = array_keys( $settings_instance->get_installed_templates_list() );
+
 			if ( in_array( $selected_id, $installed_templates, true ) ) {
 				$template_path = $selected_id;
 			}
 		}
 
 		$file = trailingslashit( $settings_instance->get_template_path( $template_path ) ) . 'template-functions.php';
+
+		if ( isset( $this->loaded_template_function_files[ $file ] ) ) {
+			return;
+		}
+
 		if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $file ) ) {
 			$loaded = @include_once( $file );
-			if ( $loaded === false ) {
+
+			if ( false === $loaded ) {
 				wcpdf_log_error( sprintf( 'Failed to load template functions: %s', $file ), 'critical' );
 			}
 		}
+
+		$this->loaded_template_function_files[ $file ] = true;
 	}
 	
 	/**
@@ -2341,6 +2350,30 @@ class Main {
 		}
 
 		return $css;
+	}
+
+	/**
+	 * Registers the WooCommerce email hooks used to output document links.
+	 *
+	 * @return void
+	 */
+	private function register_document_link_email_hooks(): void {
+		$email_hooks = array_map(
+			static fn( string $placement ): string => "woocommerce_email_{$placement}",
+			array_keys( wpo_ips_get_document_link_email_placements() )
+		);
+
+		$email_hooks = array_unique(
+			apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks )
+		);
+
+		foreach ( $email_hooks as $email_hook ) {
+			if ( 'woocommerce_email_customer_address_section' === $email_hook ) {
+				add_action( $email_hook, array( $this, 'add_document_link_to_address_section' ), 10, 4 );
+			} else {
+				add_action( $email_hook, array( $this, 'add_document_link_to_email' ), 10, 4 );
+			}
+		}
 	}
 	
 	/**

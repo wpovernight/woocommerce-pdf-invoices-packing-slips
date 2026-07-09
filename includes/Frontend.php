@@ -27,21 +27,25 @@ class Frontend {
 	 * Constructor
 	 */
 	public function __construct() {
-		// PDF download link on My Account page
-		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 ); // needs to be triggered later because of Jetpack query string: https://github.com/Automattic/jetpack/blob/1a062c5388083c7f15b9a3e82e61fde838e83047/projects/plugins/jetpack/modules/woocommerce-analytics/classes/class-jetpack-woocommerce-analytics-my-account.php#L235
-		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
-
-		// REST API
-		add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 ); // support for legacy WC REST API
-		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
-
 		// Shortcodes
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
 
+		// REST
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
+			add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
+		}
+
+		// Account
+		if ( wpo_ips_is_account_page() ) {
+			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 );
+			add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
+		}
+
 		// Optional Checkout field (General Settings).
-		if ( $this->checkout_field_is_enabled() ) {
+		if ( wpo_ips_is_checkout_request() && $this->checkout_field_is_enabled() ) {
 			// Blocks/store-api hooks
 			$this->checkout_field_display_checkout_block_field();
 			$this->checkout_field_set_checkout_block_field_value();

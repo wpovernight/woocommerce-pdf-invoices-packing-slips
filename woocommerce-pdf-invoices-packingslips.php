@@ -131,23 +131,61 @@ class WPO_WCPDF {
 		// plugin functions
 		include_once $this->plugin_path() . '/wpo-ips-functions.php';
 		include_once $this->plugin_path() . '/wpo-ips-functions-edi.php';
-		
-		// plugin classes
-		$this->get_instance( 'third_party_plugins' );
-		$this->get_instance( 'vat_plugins' );
-		$this->get_instance( 'order_util' );
-		$this->get_instance( 'file_system' );
+
+		$is_admin_like       = is_admin() || wp_doing_ajax();
+		$is_document_context = wpo_ips_is_document_context_request();
+		$is_checkout_context = wpo_ips_is_checkout_request();
+
+		// Lightweight/common services
 		$this->get_instance( 'settings' );
 		$this->get_instance( 'documents' );
+		$this->get_instance( 'order_util' );
+		$this->get_instance( 'vat_plugins' );
 		$this->get_instance( 'main' );
-		$this->get_instance( 'endpoint' );
-		$this->get_instance( 'assets' );
-		$this->get_instance( 'admin' );
-		$this->get_instance( 'frontend' );
-		$this->get_instance( 'install' );
-		$this->get_instance( 'font_synchronizer' );
-		$this->get_instance( 'peppol' );
-		$this->get_instance( 'notices' );
+
+		// Endpoint only matters for document links/downloads/admin generation
+		if ( $is_document_context || wpo_ips_is_pretty_document_link_request() ) {
+			$this->get_instance( 'endpoint' );
+		}
+
+		// Document-related runtime
+		if ( $is_document_context ) {
+			$this->get_instance( 'file_system' );
+			$this->get_instance( 'third_party_plugins' );
+			$this->get_instance( 'font_synchronizer' );
+		}
+
+		// Admin/UI/runtime AJAX
+		if ( $is_admin_like ) {
+			$this->get_instance( 'admin' );
+			$this->get_instance( 'assets' );
+			$this->get_instance( 'install' );
+			$this->get_instance( 'notices' );
+		}
+
+		// Frontend only where useful
+		if (
+			wpo_ips_is_account_page()        ||
+			wpo_ips_is_order_received_page() ||
+			$is_checkout_context             ||
+			( defined( 'REST_REQUEST' ) && REST_REQUEST )
+		) {
+			$this->get_instance( 'frontend' );
+		}
+
+		// Peppol only when enabled and relevant
+		if (
+			function_exists( 'wpo_ips_edi_peppol_is_available' ) &&
+			wpo_ips_edi_peppol_is_available() &&
+			(
+				$is_checkout_context       ||
+				wpo_ips_is_account_page()  ||
+				$is_admin_like             ||
+				( defined( 'REST_REQUEST' ) && REST_REQUEST )
+			)
+		) {
+			$this->get_instance( 'peppol' );
+		}
 	}
 	
 	/**
