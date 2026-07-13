@@ -110,6 +110,13 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.15.2 (2026-07-13) =
+- Fix: UBL Supplier `PartyLegalEntity` to omit empty values
+- Fix: Deprecated emoji styles callback in setup wizard
+- Fix: Add CII supplier registration number support
+- Fix: Relax the type hint to prevent a fatal error in `Main::apply_template_color_styles()`
+- Translations: Updated translation template (POT)
+
 = 5.15.1 (2026-07-08) =
 - Fix: Empty UBL `IssueDate` when document date meta is missing
 - Fix: EDI total reconciliation with emitted line amounts

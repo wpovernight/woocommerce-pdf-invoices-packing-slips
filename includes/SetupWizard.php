@@ -225,6 +225,7 @@ class SetupWizard {
 			<?php wp_print_scripts( 'wpo-wcpdf-setup' ); ?>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
 			<?php wp_print_scripts( wp_script_is( 'wc-select2', 'registered' ) ? 'wc-select2' : 'select2' ); ?>
+			<?php remove_action( 'admin_print_styles', 'print_emoji_styles' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
 		</head>

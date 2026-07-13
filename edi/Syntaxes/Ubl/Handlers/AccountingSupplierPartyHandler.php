@@ -208,27 +208,34 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$supplier    = $this->get_supplier_data();
-		$company     = (string) ( $supplier['company'] ?? '' );
-		$coc_number  = (string) ( $supplier['coc_number'] ?? '' );
+		$supplier   = $this->get_supplier_data();
+		$company    = (string) ( $supplier['company'] ?? '' );
+		$coc_number = (string) ( $supplier['coc_number'] ?? '' );
 
 		if ( empty( $company ) && empty( $coc_number ) ) {
 			wpo_ips_edi_log( 'UBL PartyLegalEntity: Both company name and CoC number are missing for supplier.', 'error' );
 			return null;
 		}
 
+		$values = array();
+
+		if ( ! empty( $company ) ) {
+			$values[] = array(
+				'name'  => 'cbc:RegistrationName',
+				'value' => wpo_ips_edi_sanitize_string( $company ),
+			);
+		}
+
+		if ( ! empty( $coc_number ) ) {
+			$values[] = array(
+				'name'  => 'cbc:CompanyID',
+				'value' => wpo_ips_edi_sanitize_string( $coc_number ),
+			);
+		}
+
 		$party_legal_entity = array(
 			'name'  => 'cac:PartyLegalEntity',
-			'value' => array(
-				array(
-					'name'  => 'cbc:RegistrationName',
-					'value' => wpo_ips_edi_sanitize_string( $company ),
-				),
-				array(
-					'name'  => 'cbc:CompanyID',
-					'value' => $coc_number,
-				),
-			),
+			'value' => $values,
 		);
 
 		$party_legal_entity = apply_filters(

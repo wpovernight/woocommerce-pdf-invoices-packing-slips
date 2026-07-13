@@ -40,6 +40,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$seller = apply_filters( 'wpo_ips_edi_cii_seller_data', array(
 			'name'         => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_name' ) ),
 			'vat_number'   => $this->get_supplier_identifiers_data( 'vat_number' ),
+			'coc_number'   => $this->get_supplier_identifiers_data( 'coc_number' ),
 			'postcode'     => $this->get_supplier_identifiers_data( 'shop_address_postcode' ),
 			'address_line' => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_line_1' ) ),
 			'city'         => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_city' ) ),
@@ -48,6 +49,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 
 		$name       = wpo_ips_edi_sanitize_string( (string) ( $seller['name'] ?? '' ) );
 		$vat_number = (string) ( $seller['vat_number'] ?? '' );
+		$coc_number = (string) ( $seller['coc_number'] ?? '' );
 
 		if ( empty( $name ) ) {
 			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Seller name is empty. Please check your shop settings.', 'error' );
@@ -66,52 +68,54 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 
 		$seller_trade_party = array(
 			'name'  => 'ram:SellerTradeParty',
-			'value' => array(
+			'value' => array_filter(
 				array(
-					'name'  => 'ram:Name',
-					'value' => $name,
-				),
+					array(
+						'name'  => 'ram:Name',
+						'value' => $name,
+					),
 
-				array(
-					'name'  => 'ram:SpecifiedLegalOrganization',
-					'value' => array(
-						array(
-							'name'  => 'ram:ID',
-							'value' => $vat_number,
+					! empty( $coc_number ) ? array(
+						'name'  => 'ram:SpecifiedLegalOrganization',
+						'value' => array(
+							array(
+								'name'  => 'ram:ID',
+								'value' => $coc_number,
+							),
+						),
+					) : null,
+
+					array(
+						'name'  => 'ram:PostalTradeAddress',
+						'value' => array(
+							array(
+								'name'  => 'ram:PostcodeCode',
+								'value' => $postcode,
+							),
+							array(
+								'name'  => 'ram:LineOne',
+								'value' => $address_line_1,
+							),
+							array(
+								'name'  => 'ram:CityName',
+								'value' => $address_city,
+							),
+							array(
+								'name'  => 'ram:CountryID',
+								'value' => $country_code,
+							),
 						),
 					),
-				),
 
-				array(
-					'name'  => 'ram:PostalTradeAddress',
-					'value' => array(
-						array(
-							'name'  => 'ram:PostcodeCode',
-							'value' => $postcode,
-						),
-						array(
-							'name'  => 'ram:LineOne',
-							'value' => $address_line_1,
-						),
-						array(
-							'name'  => 'ram:CityName',
-							'value' => $address_city,
-						),
-						array(
-							'name'  => 'ram:CountryID',
-							'value' => $country_code,
-						),
-					),
-				),
-
-				array(
-					'name'  => 'ram:SpecifiedTaxRegistration',
-					'value' => array(
-						array(
-							'name'       => 'ram:ID',
-							'value'      => $vat_number,
-							'attributes' => array(
-								'schemeID' => 'VA',
+					array(
+						'name'  => 'ram:SpecifiedTaxRegistration',
+						'value' => array(
+							array(
+								'name'       => 'ram:ID',
+								'value'      => $vat_number,
+								'attributes' => array(
+									'schemeID' => 'VA',
+								),
 							),
 						),
 					),
