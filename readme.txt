@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 5.15.2-i1570.1
+Stable tag: 5.15.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,13 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.15.2 (2026-07-13) =
+- Fix: UBL Supplier `PartyLegalEntity` to omit empty values
+- Fix: Deprecated emoji styles callback in setup wizard
+- Fix: Add CII supplier registration number support
+- Fix: Relax the type hint to prevent a fatal error in `Main::apply_template_color_styles()`
+- Translations: Updated translation template (POT)
 
 = 5.15.1 (2026-07-08) =
 - Fix: Empty UBL `IssueDate` when document date meta is missing
