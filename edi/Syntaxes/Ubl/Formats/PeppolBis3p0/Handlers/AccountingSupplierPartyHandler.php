@@ -56,30 +56,6 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	}
 
 	/**
-	 * Returns the party legal entity for the supplier.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_legal_entity(): ?array {
-		$company = $this->get_supplier_identifiers_data( 'shop_name' );
-
-		if ( empty( $company ) ) {
-			wpo_ips_edi_log( 'UBL/Peppol PartyLegalEntity: Company name is missing for supplier.', 'error' );
-			return null;
-		}
-
-		$party_legal_entity = array(
-			'name'  => 'cac:PartyLegalEntity',
-			'value' => array(
-				'name'  => 'cbc:RegistrationName',
-				'value' => wpo_ips_edi_sanitize_string( $company ),
-			),
-		);
-
-		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_legal_entity', $party_legal_entity, $this );
-	}
-
-	/**
 	 * Gets the Peppol Endpoint ID and scheme for the supplier from plugin settings.
 	 *
 	 * @return array|null Array with 'id' and 'scheme' keys, or null if invalid/missing.
