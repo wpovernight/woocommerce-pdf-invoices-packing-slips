@@ -179,10 +179,10 @@ function wcpdf_get_bulk_actions(): array {
  *
  * @param string $html
  * @param array  $settings
- * @param null|\WPO\IPS\Documents\OrderDocument $document
+ * @param object|null $document
  * @return \WPO\IPS\Makers\PDFMaker
  */
-function wcpdf_get_pdf_maker( string $html, array $settings = array(), ?\WPO\IPS\Documents\OrderDocument $document = null ): \WPO\IPS\Makers\PDFMaker {
+function wcpdf_get_pdf_maker( string $html, array $settings = array(), ?object $document = null ): \WPO\IPS\Makers\PDFMaker {
 	$default_class = '\\WPO\\IPS\\Makers\\PDFMaker';
 
 	if ( ! class_exists( $default_class ) ) {
