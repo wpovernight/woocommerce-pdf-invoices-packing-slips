@@ -664,11 +664,11 @@ class Settings {
 	/**
 	 * Get output format for document generation.
 	 *
-	 * @param OrderDocument|null $document
+	 * @param object|null $document
 	 * @param array|null $request
 	 * @return string
 	 */
-	public function get_output_format( ?OrderDocument $document = null, ?array $request = null ): string {
+	public function get_output_format( ?object $document = null, ?array $request = null ): string {
 		$output_format = 'pdf'; // default
 
 		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
