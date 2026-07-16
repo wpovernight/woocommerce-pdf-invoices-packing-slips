@@ -92,14 +92,14 @@ class WPO_WCPDF {
 
 		$this->plugin_basename = plugin_basename( __FILE__ );
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
-			'ubl-woocommerce-pdf-invoices.php'     => 'UBL Invoices for WooCommerce',
-			'woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
-			'woocommerce-pdf-ips-ubl-extender.php' => 'PDF Invoices & Packing Slips for WooCommerce - UBL Extender',
-			'wpo-ips-factur-x.php'                 => 'PDF Invoices & Packing Slips for WooCommerce - Factur-X',
-			'wpo-ips-cius-ro.php'                  => 'PDF Invoices & Packing Slips for WooCommerce - CIUS-RO',
-			'wpo-ips-xrechnung.php'                => 'PDF Invoices & Packing Slips for WooCommerce - XRechnung',
-			'wpo-ips-fatturapa.php'                => 'PDF Invoices & Packing Slips for WooCommerce - FatturaPA',
-			'wcpdf-quotation'                      => 'PDF Invoices & Packing Slips for WooCommerce - Quotation Document',
+			'ubl-woocommerce-pdf-invoices/ubl-woocommerce-pdf-invoices.php'         => 'UBL Invoices for WooCommerce',
+			'woocommerce-pdf-ips-number-tools/woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
+			'woocommerce-pdf-ips-ubl-extender/woocommerce-pdf-ips-ubl-extender.php' => 'PDF Invoices & Packing Slips for WooCommerce - UBL Extender',
+			'wpo-ips-factur-x/wpo-ips-factur-x.php'                                 => 'PDF Invoices & Packing Slips for WooCommerce - Factur-X',
+			'wpo-ips-cius-ro/wpo-ips-cius-ro.php'                                   => 'PDF Invoices & Packing Slips for WooCommerce - CIUS-RO',
+			'wpo-ips-xrechnung/wpo-ips-xrechnung.php'                               => 'PDF Invoices & Packing Slips for WooCommerce - XRechnung',
+			'wpo-ips-fatturapa/wpo-ips-fatturapa.php'                               => 'PDF Invoices & Packing Slips for WooCommerce - FatturaPA',
+			'wcpdf-quotation/wcpdf-quotation.php'                                   => 'PDF Invoices & Packing Slips for WooCommerce - Quotation Document',
 		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
@@ -112,8 +112,18 @@ class WPO_WCPDF {
 		add_action( 'wpo_wcpdf_new_github_prerelease_available', array( $this, 'set_new_unstable_version_available_option' ), 10, 3 );
 		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
-		// deactivate legacy extensions if activated
-		register_activation_hook( __FILE__, array( $this, 'deactivate_legacy_addons' ) );
+		// Deactivate legacy extensions when the plugin is activated.
+		register_activation_hook(
+			__FILE__,
+			array( $this, 'deactivate_legacy_addons' )
+		);
+
+		// Also handle existing installations after an update.
+		add_action(
+			'plugins_loaded',
+			array( $this, 'deactivate_legacy_addons' ),
+			PHP_INT_MIN
+		);
 	}
 	
 	/**
@@ -307,8 +317,6 @@ class WPO_WCPDF {
 			return;
 		}
 
-		add_action( 'admin_init', array( $this, 'deactivate_legacy_addons') );
-
 		// all systems ready - GO!
 		$this->includes();
 	}
@@ -397,14 +405,22 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function deactivate_legacy_addons(): void {
-		foreach ( $this->legacy_addons as $filename => $name ) {
-			$legacy_addon = $this->plugin_is_activated( $filename );
+		if ( ! function_exists( 'deactivate_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
 
-			if ( ! empty( $legacy_addon ) ) {
-				deactivate_plugins( $legacy_addon );
-				$transient_name = $this->get_legacy_addon_transient_name( $filename );
-				set_transient( $transient_name, 'yes', DAY_IN_SECONDS );
+		foreach ( $this->legacy_addons as $plugin_basename => $name ) {
+			if ( ! $this->plugin_is_activated( $plugin_basename ) ) {
+				continue;
 			}
+
+			deactivate_plugins( $plugin_basename );
+
+			set_transient(
+				$this->get_legacy_addon_transient_name( $plugin_basename ),
+				'yes',
+				DAY_IN_SECONDS
+			);
 		}
 	}
 	
@@ -566,23 +582,15 @@ class WPO_WCPDF {
 	}
 	
 	/**
-	 * Check if a plugin with the given filename is activated.
+	 * Check whether a plugin is active.
 	 *
-	 * @param string $filename The filename to check for (e.g., 'wcpdf-legacy-addon.php').
-	 * @return string The full plugin path if activated, or an empty string if not.
+	 * @param string $plugin_basename Plugin basename.
+	 * @return string
 	 */
-	private function plugin_is_activated( string $filename ): string {
-		$active_plugins = $this->get_active_plugins();
-		$active_plugin  = '';
-
-		foreach ( $active_plugins as $plugin ) {
-			if ( ! empty( $plugin ) && false !== strpos( $plugin, $filename ) ) {
-				$active_plugin = $plugin;
-				break;
-			}
-		}
-
-		return $active_plugin;
+	private function plugin_is_activated( string $plugin_basename ): string {
+		return in_array( $plugin_basename, $this->get_active_plugins(), true )
+			? $plugin_basename
+			: '';
 	}
 
 } // class WPO_WCPDF
@@ -592,7 +600,6 @@ endif; // class_exists
 /**
  * Returns the main instance of PDF Invoices & Packing Slips for WooCommerce to prevent the need to use globals.
  *
- * @since  1.6
  * @return WPO_WCPDF
  */
 function WPO_WCPDF(): WPO_WCPDF {

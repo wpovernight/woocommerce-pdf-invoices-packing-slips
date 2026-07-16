@@ -495,11 +495,17 @@ class Notices {
 				<div class="notice notice-warning">
 					<p>
 						<?php
-							echo wp_kses_post( sprintf(
-								/* translators: legacy addon name */
-								__( 'While updating the PDF Invoices & Packing Slips for WooCommerce plugin we\'ve noticed our legacy %s add-on was active on your site. This functionality is now incorporated into the core plugin. We\'ve deactivated the add-on for you, and you are free to uninstall it.', 'woocommerce-pdf-invoices-packing-slips' ),
-								'<strong>' . esc_attr( $name ) . '</strong>'
-							) );
+							echo wp_kses_post(
+								sprintf(
+									/* translators: 1: legacy add-on name, 2: support contact URL */
+									__(
+										'The legacy %1$s add-on was active on your site and has been deactivated to prevent potential compatibility issues. If you need help finding a replacement or alternative solution, please <a href="%2$s" target="_blank" rel="noopener noreferrer">contact our support team</a>.',
+										'woocommerce-pdf-invoices-packing-slips'
+									),
+									'<strong>' . esc_html( $name ) . '</strong>',
+									esc_url( 'https://wpovernight.com/contact/' )
+								)
+							);
 						?>
 					</p>
 					<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( $query_arg => true ) ), 'wcpdf_legacy_addon_notice' ) ); ?>"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
