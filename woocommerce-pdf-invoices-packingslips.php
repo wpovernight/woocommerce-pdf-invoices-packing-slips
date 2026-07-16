@@ -99,6 +99,7 @@ class WPO_WCPDF {
 			'wpo-ips-cius-ro.php'                  => 'PDF Invoices & Packing Slips for WooCommerce - CIUS-RO',
 			'wpo-ips-xrechnung.php'                => 'PDF Invoices & Packing Slips for WooCommerce - XRechnung',
 			'wpo-ips-fatturapa.php'                => 'PDF Invoices & Packing Slips for WooCommerce - FatturaPA',
+			'wcpdf-quotation'                      => 'PDF Invoices & Packing Slips for WooCommerce - Quotation Document',
 		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
