@@ -498,10 +498,7 @@ class Notices {
 							echo wp_kses_post(
 								sprintf(
 									/* translators: 1: legacy add-on name, 2: support contact URL */
-									__(
-										'The legacy %1$s add-on was active on your site and has been deactivated to prevent potential compatibility issues. If you need help finding a replacement or alternative solution, please <a href="%2$s" target="_blank" rel="noopener noreferrer">contact our support team</a>.',
-										'woocommerce-pdf-invoices-packing-slips'
-									),
+									__( 'The legacy %1$s add-on is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce and cannot remain active. If you need help finding a replacement or alternative solution, please <a href="%2$s" target="_blank" rel="noopener noreferrer">contact our support team</a>.', 'woocommerce-pdf-invoices-packing-slips' ),
 									'<strong>' . esc_html( $name ) . '</strong>',
 									esc_url( 'https://wpovernight.com/contact/' )
 								)

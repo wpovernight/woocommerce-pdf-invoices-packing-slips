@@ -118,11 +118,51 @@ class WPO_WCPDF {
 			array( $this, 'deactivate_legacy_addons' )
 		);
 
-		// Also handle existing installations after an update.
+		// Deactivate legacy extensions that were already active after an update.
 		add_action(
 			'plugins_loaded',
 			array( $this, 'deactivate_legacy_addons' ),
 			PHP_INT_MIN
+		);
+
+		// Block regular activation attempts.
+		add_action(
+			'activate_plugin',
+			array( $this, 'block_legacy_addon_activation' ),
+			PHP_INT_MIN,
+			1
+		);
+
+		// Prevent legacy extensions from being added to the active plugins option.
+		add_filter(
+			'pre_update_option_active_plugins',
+			array( $this, 'filter_legacy_addons_from_active_plugin_option' ),
+			PHP_INT_MAX,
+			3
+		);
+
+		// Prevent legacy extensions from being network activated.
+		add_filter(
+			'pre_update_site_option_active_sitewide_plugins',
+			array( $this, 'filter_legacy_addons_from_active_plugin_option' ),
+			PHP_INT_MAX,
+			3
+		);
+
+		// Remove activation links from the regular Plugins screen.
+		add_filter(
+			'plugin_action_links',
+			array( $this, 'filter_legacy_addon_action_links' ),
+			10,
+			4
+		);
+
+		// Remove activation links from the Network Plugins screen.
+		add_filter(
+			'network_admin_plugin_action_links',
+			array( $this, 'filter_legacy_addon_action_links' ),
+			10,
+			4
 		);
 	}
 	
@@ -405,23 +445,135 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function deactivate_legacy_addons(): void {
+		$active_legacy_addons = array_filter(
+			array_keys( $this->legacy_addons ),
+			array( $this, 'plugin_is_activated' )
+		);
+
+		if ( empty( $active_legacy_addons ) ) {
+			return;
+		}
+
 		if ( ! function_exists( 'deactivate_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		foreach ( $this->legacy_addons as $plugin_basename => $name ) {
-			if ( ! $this->plugin_is_activated( $plugin_basename ) ) {
-				continue;
-			}
+		deactivate_plugins( $active_legacy_addons );
 
-			deactivate_plugins( $plugin_basename );
+		foreach ( $active_legacy_addons as $plugin_basename ) {
+			$this->set_legacy_addon_notice( $plugin_basename );
+		}
+	}
 
-			set_transient(
-				$this->get_legacy_addon_transient_name( $plugin_basename ),
-				'yes',
-				DAY_IN_SECONDS
+	/**
+	 * Block activation of legacy add-ons.
+	 *
+	 * @param string $plugin Plugin basename.
+	 * @return void
+	 */
+	public function block_legacy_addon_activation( string $plugin ): void {
+		if ( ! $this->is_legacy_addon( $plugin ) ) {
+			return;
+		}
+
+		$name = $this->legacy_addons[ $plugin ];
+
+		$this->set_legacy_addon_notice( $plugin );
+
+		$message = sprintf(
+			/* translators: %s: legacy add-on name */
+			__( 'The legacy %s add-on cannot be activated because it is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce.', 'woocommerce-pdf-invoices-packing-slips' ),
+			$name
+		);
+
+		if ( wp_doing_ajax() ) {
+			wp_send_json_error(
+				array(
+					'plugin'       => $plugin,
+					'pluginName'   => $name,
+					'errorCode'    => 'wpo_wcpdf_legacy_addon',
+					'errorMessage' => $message,
+				),
+				409
 			);
 		}
+
+		wp_die(
+			esc_html( $message ),
+			esc_html__( 'Plugin activation blocked', 'woocommerce-pdf-invoices-packing-slips' ),
+			array(
+				'response'  => 409,
+				'back_link' => true,
+			)
+		);
+	}
+
+	/**
+	 * Prevent legacy add-ons from being added to an active plugins option.
+	 *
+	 * @param mixed  $plugins     New option value.
+	 * @param mixed  $old_plugins Previous option value.
+	 * @param string $option      Option name.
+	 * @return array
+	 */
+	public function filter_legacy_addons_from_active_plugin_option( mixed $plugins, mixed $old_plugins, string $option ): array {
+		$plugins             = is_array( $plugins ) ? $plugins : array();
+		$old_plugins         = is_array( $old_plugins ) ? $old_plugins : array();
+		$legacy_addons       = array_keys( $this->legacy_addons );
+		$is_networkwide_list = 'active_sitewide_plugins' === $option;
+
+		if ( $is_networkwide_list ) {
+			$activation_attempts = array_intersect_key(
+				array_diff_key( $plugins, $old_plugins ),
+				$this->legacy_addons
+			);
+
+			foreach ( array_keys( $activation_attempts ) as $plugin_basename ) {
+				$this->set_legacy_addon_notice( $plugin_basename );
+			}
+
+			return array_diff_key( $plugins, $this->legacy_addons );
+		}
+
+		$activation_attempts = array_intersect(
+			array_diff( $plugins, $old_plugins ),
+			$legacy_addons
+		);
+
+		foreach ( $activation_attempts as $plugin_basename ) {
+			$this->set_legacy_addon_notice( $plugin_basename );
+		}
+
+		return array_values(
+			array_diff( $plugins, $legacy_addons )
+		);
+	}
+
+	/**
+	 * Remove activation links from legacy add-ons.
+	 *
+	 * @param array  $actions     Plugin action links.
+	 * @param string $plugin_file Plugin basename.
+	 * @param array  $plugin_data Plugin data.
+	 * @param string $context     Plugins list context.
+	 * @return array
+	 */
+	public function filter_legacy_addon_action_links( array $actions, string $plugin_file, array $plugin_data, string $context ): array {
+		if ( ! $this->is_legacy_addon( $plugin_file ) ) {
+			return $actions;
+		}
+
+		unset(
+			$actions['activate'],
+			$actions['network_activate']
+		);
+
+		$actions['wpo_wcpdf_legacy_addon'] = sprintf(
+			'<span aria-disabled="true">%s</span>',
+			esc_html__( 'Legacy add-on — activation unavailable', 'woocommerce-pdf-invoices-packing-slips' )
+		);
+
+		return $actions;
 	}
 	
 	/**
@@ -585,12 +737,38 @@ class WPO_WCPDF {
 	 * Check whether a plugin is active.
 	 *
 	 * @param string $plugin_basename Plugin basename.
-	 * @return string
+	 * @return bool
 	 */
-	private function plugin_is_activated( string $plugin_basename ): string {
-		return in_array( $plugin_basename, $this->get_active_plugins(), true )
-			? $plugin_basename
-			: '';
+	private function plugin_is_activated( string $plugin_basename ): bool {
+		return in_array(
+			$plugin_basename,
+			$this->get_active_plugins(),
+			true
+		);
+	}
+
+	/**
+	 * Check whether a plugin is a legacy add-on.
+	 *
+	 * @param string $plugin_basename Plugin basename.
+	 * @return bool
+	 */
+	private function is_legacy_addon( string $plugin_basename ): bool {
+		return isset( $this->legacy_addons[ $plugin_basename ] );
+	}
+
+	/**
+	 * Store the notice state for a legacy add-on.
+	 *
+	 * @param string $plugin_basename Plugin basename.
+	 * @return void
+	 */
+	private function set_legacy_addon_notice( string $plugin_basename ): void {
+		set_transient(
+			$this->get_legacy_addon_transient_name( $plugin_basename ),
+			'yes',
+			DAY_IN_SECONDS
+		);
 	}
 
 } // class WPO_WCPDF
