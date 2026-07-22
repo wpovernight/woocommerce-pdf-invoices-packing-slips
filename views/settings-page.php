@@ -76,7 +76,7 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 
 		<div class="sidebar">
 			<?php do_action( 'wpo_wcpdf_after_sidebar', $active_tab, $active_section, $nonce ); ?>
-			<?php if ( ! in_array( $active_section, $excluded_sections ) ) : ?>
+			<?php if ( ! in_array( $active_section, $excluded_sections, true ) ) : ?>
 				<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 			<?php endif; ?>
 				<?php
@@ -92,7 +92,7 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 					}
 					do_action( 'wpo_wcpdf_after_settings', $active_tab, $active_section, $nonce );
 				?>
-			<?php if ( ! in_array( $active_section, $excluded_sections ) ) : ?>
+			<?php if ( ! in_array( $active_section, $excluded_sections, true ) ) : ?>
 				</form>
 			<?php endif; ?>
 			<?php do_action( 'wpo_wcpdf_after_settings_form', $active_tab, $active_section, $nonce ); ?>
@@ -105,10 +105,11 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 
 		<div class="preview-document">
 			<?php
-				$documents     = WPO_WCPDF()->documents->get_documents( 'enabled', 'any' );
-				$document_type = 'invoice';
-				$document      = null;
-				$output_format = 'pdf';
+				$documents_instance = WPO_WCPDF()->get_instance( 'documents' );
+				$documents          = $documents_instance->get_documents( 'enabled', 'any' );
+				$document_type      = 'invoice';
+				$document           = null;
+				$output_format      = 'pdf';
 
 				if ( ! empty( $_GET['section'] ) ) {
 					$document_type = sanitize_text_field( wp_unslash( $_GET['section'] ) );
@@ -117,7 +118,7 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 				}
 
 				if ( $document_type ) {
-					$document = WPO_WCPDF()->documents->get_document( $document_type, null );
+					$document = $documents_instance->get_document( $document_type, null );
 				}
 
 				if ( ! empty( $_GET['output_format'] ) ) {
@@ -156,7 +157,7 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 									}
 								}
 
-								$is_active    = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats ) );
+								$is_active    = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats, true ) );
 								$active_class = $is_active ? 'active' : '';
 								$tab_title    = strtoupper( esc_html( $document_output_format ) );
 

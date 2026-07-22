@@ -29,34 +29,32 @@ class Peppol {
 	 * Constructor
 	 */
 	public function __construct() {
-		if (  ! wpo_ips_edi_peppol_is_available() ) {
-			return;
-		}
-		
-		// Peppol My Account
-		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
+		// REST / Store API / checkout processing hooks.
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
+
+		$this->peppol_display_checkout_block_fields();
+		$this->peppol_set_checkout_block_fields_value();
+
+		add_action( 'woocommerce_set_additional_field_value', array( $this, 'peppol_save_checkout_block_fields' ), 10, 4 );
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
 		add_action( 'woocommerce_checkout_order_created', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 999, 1 );
 
+		if ( ! \wpo_ips_is_frontend_page_request() ) {
+			return;
+		}
+
+		// Pure frontend page hooks only.
+		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
 
 		add_rewrite_endpoint( 'peppol', EP_PAGES );
 
-		// Classic checkout hooks
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 		add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );
 		add_action( 'woocommerce_after_checkout_validation', array( $this, 'peppol_validate_classic_checkout_field_values' ), 10, 2 );
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'peppol_save_classic_checkout_fields' ), 10, 2 );
-		
-		// Blocks/store-api hooks
-		$this->peppol_display_checkout_block_fields();
-		$this->peppol_set_checkout_block_fields_value();
-		
-		add_action( 'woocommerce_set_additional_field_value', array( $this, 'peppol_save_checkout_block_fields' ), 10, 4 );
-		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
 
-		// Enqueue scripts for both classic and block checkout.
 		add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_checkout_scripts' ), 20 );
 	}
 
@@ -309,6 +307,10 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_set_checkout_block_fields_value(): void {
+		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
+			return;
+		}
+
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
@@ -829,7 +831,7 @@ class Peppol {
 					'wpo_ips_edi_peppol_classic_checkout_input_wrapper_selector',
 					'#peppol_endpoint_id_field'
 				),
-				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'classic' ),
+				'vat_field_selector'             => \WPO_WCPDF()->get_instance( 'vat_plugins' )->get_form_selector( 'classic' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)
@@ -897,7 +899,7 @@ class Peppol {
 					'wpo_ips_edi_peppol_block_checkout_input_wrapper_selector',
 					'.wc-block-components-address-form__wpo-ips-edi-peppol-endpoint-id'
 				),
-				'vat_field_selector'             => \WPO_WCPDF()->vat_plugins->get_form_selector( 'block' ),
+				'vat_field_selector'             => \WPO_WCPDF()->get_instance( 'vat_plugins' )->get_form_selector( 'block' ),
 				'peppol_autofill_endpoint_route' => '/wpo-ips/v1/peppol-endpoint',
 				'override_link_text'             => __( 'Override (edit manually)', 'woocommerce-pdf-invoices-packing-slips' ),
 			)

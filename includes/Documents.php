@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS;
 
+use WPO\IPS\Documents\OrderDocument;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -9,22 +11,15 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents' ) ) :
 
 class Documents {
 
-	/** @var array Array of document classes */
-	public $documents = array();
-
-	/** @var Documents The single instance of the class */
-	protected static $_instance = null;
+	public array $documents           = array();
+	protected static ?self $_instance = null;
 
 	/**
-	 * Main Documents Instance.
+	 * Singleton instance accessor.
 	 *
-	 * Ensures only one instance of Documents is loaded or can be loaded.
-	 *
-	 * @since 2.0
-	 * @static
-	 * @return Documents Main instance
+	 * @return self
 	 */
-	public static function instance() {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -32,17 +27,24 @@ class Documents {
 	}
 
 	/**
-	 * Constructor for the document class hooks in all documents that can be created.
-	 *
+	 * Constructor.
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ), 15 ); // after regular 10 actions but before most 'follow-up' actions (usually 20+)
+		if ( apply_filters( 'wpo_ips_should_init_documents', wpo_ips_is_document_context_request(), $this ) ) {
+			add_action( 'init', array( $this, 'init' ), 15 );
+		}
 	}
 
 	/**
 	 * Init document classes.
+	 * 
+	 * @return void
 	 */
-	public function init() {
+	public function init(): void {
+		if ( ! empty( $this->documents ) ) {
+			return;
+		}
+
 		// Load Invoice & Packing Slip
 		$this->documents['\WPO\IPS\Documents\Invoice']     = new \WPO\IPS\Documents\Invoice();
 		$this->documents['\WPO\IPS\Documents\PackingSlip'] = new \WPO\IPS\Documents\PackingSlip();
@@ -56,12 +58,11 @@ class Documents {
 	/**
 	 * Return the document classes - used in admin to load settings.
 	 *
-	 * @param $filter
-	 * @param $output_format  Can be 'pdf', 'xml' or anything for all
-	 *
+	 * @param string $filter
+	 * @param string $output_format  Can be 'pdf', 'xml' or anything for all
 	 * @return array
 	 */
-	public function get_documents( $filter = 'enabled', $output_format = 'pdf' ) {
+	public function get_documents( string $filter = 'enabled', string $output_format = 'pdf' ): array {
 		if ( empty( $this->documents ) ) {
 			$this->init();
 		}
@@ -78,7 +79,7 @@ class Documents {
 				switch ( $output_format ) {
 					case 'pdf':
 					case 'xml':
-						if ( in_array( $output_format, $document_output_formats ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
+						if ( in_array( $output_format, $document_output_formats, true ) && is_callable( array( $document, 'is_enabled' ) ) && $document->is_enabled( $output_format ) ) {
 							$documents[ $class_name ] = $document;
 						}
 						break;
@@ -98,10 +99,23 @@ class Documents {
 			$documents = $this->documents;
 		}
 
-		return apply_filters( 'wpo_wcpdf_get_documents', $documents, $filter, $output_format, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_get_documents',
+			$documents,
+			$filter,
+			$output_format,
+			$this
+		);
 	}
 
-	public function get_document( $document_type, $order ) {
+	/**
+	 * Return an instance of the document class for a given document type and order.
+	 *
+	 * @param string $document_type
+	 * @param int|object|null $order
+	 * @return OrderDocument|false
+	 */
+	public function get_document( string $document_type, int|object|null $order ): OrderDocument|false {
 		foreach ( $this->get_documents( 'all' ) as $class_name => $document ) {
 			if ( $document->get_type() == $document_type && class_exists( $class_name ) ) {
 				return new $class_name( $order );
@@ -111,7 +125,12 @@ class Documents {
 		return false;
 	}
 
-	public function get_document_titles() {
+	/**
+	 * Return an array of document titles, indexed by document type.
+	 *
+	 * @return array
+	 */
+	public function get_document_titles(): array {
 		$documents       = $this->get_documents();
 		$document_titles = array();
 

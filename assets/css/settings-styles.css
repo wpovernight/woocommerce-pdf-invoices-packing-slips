@@ -2,7 +2,7 @@ span.wpo-warning {
 	display: inline-block;
 	border: 1px solid red;
 	border-left: 4px solid red;
-	padding: 5px 15px;
+	padding: 0.3125em 0.9375em;
 	background-color: white;
 }
 .wcpdf-extensions-ad,
@@ -11,9 +11,9 @@ span.wpo-warning {
 	min-height: 90px;
 	border: 1px solid #6e1edc;
 	background-color: #f1e9fc;
-	padding: 15px;
+	padding: 0.9375em;
 	padding-left: 100px;
-	margin-top: 30px;
+	margin-top: 1.875em;
 }
 
 img.wpo-helper {
@@ -25,28 +25,28 @@ img.wpo-helper {
 .wcpdf-extensions-ad h3,
 .wcpdf-promo-ad h3 {
 	margin: 0;
-	padding: 20px;
+	padding: 1.25em;
 	font-weight: normal;
 	font-family: serif;
-	letter-spacing: -1px;
+	letter-spacing: -0.0625em;
 	font-size: 2.25em;
 }
 
 .wcpdf-promo-ad p {
 	margin: 0;
-	padding: 0 20px;
+	padding: 0 1.25em;
 	font-size: 1.15em;
 }
 
 .wcpdf-promo-ad p.upgrade-tab {
-	margin-top: 30px;
+	margin-top: 1.875em;
 	font-style: italic;
 	font-size: 1em;
 }
 
 .wcpdf-promo-ad p.expiration {
 	font-size: 0.8em;
-	padding-top: 8px;
+	padding-top: 0.5em;
 }
 
 .wcpdf-extensions-ad a,
@@ -56,7 +56,7 @@ img.wpo-helper {
 
 .wcpdf-extensions-ad a.dismiss,
 .wcpdf-promo-ad a.dismiss {
-	padding: 10px 20px;
+	padding: 0.625em 1.25em;
 }
 
 .wcpdf-promo-ad p strong.code {
@@ -70,13 +70,13 @@ img.wpo-helper {
 }
 
 .wcpdf-extensions-ad i {
-	padding-left: 20px;
+	padding-left: 1.25em;
 }
 
 .wcpdf-extensions-ad ul,
 .wcpdf-promo-ad ul {
 	margin: 0;
-	margin-left: 40px;
+	margin-left: 2.5em;
 }
 
 .wcpdf-extensions li {
@@ -113,7 +113,7 @@ img.wpo-helper {
 }
 
 .wcpdf-extensions .more {
-	padding: 10px;
+	padding: 0.625em;
 	background-color: white;
 	border: 1px solid #ccc;
 	border-radius: 5px;
@@ -125,12 +125,12 @@ img.wpo-helper {
 
 .dropbox-logo {
 	margin-bottom: -10px;
-	margin-right: 10px;
+	margin-right: 0.625em;
 }
 .cloud-logo {
 	margin-bottom: -10px;
 	margin-top: -5px;
-	margin-right: 10px;
+	margin-right: 0.625em;
 }
 
 #img-header_logo {
@@ -159,7 +159,7 @@ table.wcpdf_documents_settings_list tr.odd {
 }
 
 table.wcpdf_documents_settings_list td {
-	padding: 5px;
+	padding: 0.3125em;
 }
 
 table.wcpdf_documents_settings_list a {
@@ -180,7 +180,7 @@ table.wcpdf_documents_settings_list td.title {
 
 .wcpdf-settings-sections ul li {
 	float: left;
-	margin-right: 10px;
+	margin-right: 0.625em;
 }
 
 .wcpdf-settings-sections ul li a {
@@ -200,40 +200,54 @@ table.wcpdf_documents_settings_list td.title {
 
 .wcpdf_document_settings_sections {
 	position: relative;
+	width: 100%;
+	max-width: none;
+	box-sizing: border-box;
 }
 
 .wcpdf_document_settings_sections > span {
-	font-size: 14px;
-	font-weight: 600;
-	margin-bottom: 0.6em;
 	display: inline-block;
+	margin-bottom: 0.5em;
+	font-size: 0.875em;
+	font-weight: 600;
+	color: #3c434a;
 }
 
 .wcpdf_document_settings_sections > h2 {
-	cursor: pointer;
-	padding: 1em 0.8em;
+	margin: 0;
+	padding: 0.9333em 1.0667em;
+	width: 100%;
+	box-sizing: border-box;
 	border: 1px solid #c3c4c7;
-	background: #ffffff;
-	border-radius: 0.5em;
-	margin: 0 0 0.5em;
+	border-radius: 0.5333em;
+	background: #fff;
+	font-size: 0.9375em;
+	font-weight: 600;
+	line-height: 1.4;
+	color: #1d2327;
+	cursor: pointer;
+	position: relative;
+	z-index: 101;
 }
 
 .wcpdf_document_settings_sections ul {
-	background: white;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	display: block;
-	height: auto;
 	display: none;
-	box-sizing: border-box;
 	position: absolute;
-	border-left: 1px solid #c3c4c7;
-	border-right: 1px solid #c3c4c7;
-	z-index: 1000;
-	box-shadow: 0 35px 35px -8px rgba(0, 0, 0, 0.1);
-	-webkit-box-shadow: 0 35px 35px -8px rgba(0, 0, 0, 0.1);
+	top: 100%;
+	left: 0;
+	right: 0;
+	width: 100%;
+	box-sizing: border-box;
+	z-index: 100;
+	margin: -1px 0 0;
+	padding: 0;
+	list-style: none;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-top: none;
+	border-radius: 0 0 8px 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+	overflow: hidden auto;
 }
 
 .wcpdf_document_settings_sections ul.active {
@@ -241,60 +255,51 @@ table.wcpdf_documents_settings_list td.title {
 }
 
 .wcpdf_document_settings_sections ul li {
-	box-sizing: border-box;
+	margin: 0;
 	padding: 0;
-	margin-bottom: 0;
-	border-bottom: 1px solid #eaeaea;
-	font-size: 1.1em;
+	border-bottom: 1px solid #f0f0f1;
 }
 
 .wcpdf_document_settings_sections ul li:last-child {
-	border-color: #c3c4c7;
-}
-
-.wcpdf_document_settings_sections ul li:hover {
-	cursor: pointer;
-	background: #51266b;
-	color: white;
-}
-
-.wcpdf_document_settings_sections ul li:hover a {
-	color: white;
+	border-bottom: none;
 }
 
 .wcpdf_document_settings_sections ul li a {
-	color: black;
-	text-decoration: none;
-	padding: 1.2em 1.6em;
 	display: block;
+	padding: 0.625em 1em;
+	color: #1e1e1e;
+	text-decoration: none;
+	line-height: 1.4;
+}
+
+.wcpdf_document_settings_sections ul li a:hover,
+.wcpdf_document_settings_sections ul li a:focus {
+	background-color: #f0f0f1;
+	color: #1d2327;
+	outline: none;
 }
 
 .wcpdf_document_settings_sections .arrow-down {
-	font-size: 0.7em;
-	color: #999;
-	margin-left: 8px;
+	font-size: 0.75em;
+	color: #646970;
+	margin-left: 0.5em;
 	font-weight: normal;
 	float: right;
 }
 
-.wcpdf_document_settings_sections p:hover,
-.wcpdf_document_settings_sections p:hover > .arrow-down {
-	color: #222;
-}
-
 .wcpdf_advanced_numbers_choose_table {
-	margin-top: 20px;
+	margin-top: 1.25em;
 }
 
 .wcpdf_advanced_numbers_choose_table .number-table-data-info {
 	border-top: 1px solid #eaeaea;
-	margin-bottom: 20px;
+	margin-bottom: 1.25em;
 }
 
 .wcpdf_advanced_numbers_choose_table .item-number {
 	background-color: #d63638;
 	color: white;
-	padding: 3px 6px;
+	padding: 0.1875em 0.375em;
 	border-radius: 3px;
 }
 
@@ -311,7 +316,7 @@ table.wcpdf_documents_settings_list td.title {
 }
 
 .wcpdf_document_settings_document_output_formats {
-	margin-bottom: 30px;
+	margin-bottom: 1.875em;
 }
 
 .edit-next-number {
@@ -326,7 +331,7 @@ table.wcpdf_documents_settings_list td.title {
 
 .wpo-wcpdf-pointer.wp-pointer-top .wp-pointer-arrow,
 .wpo-wcpdf-pointer.wp-pointer-top .wp-pointer-arrow-inner {
-		border-bottom-color: #51266b;
+	border-bottom-color: #51266b;
 }
 
 .wpo-wcpdf-pointer .wp-pointer-content h3 {
@@ -345,12 +350,12 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .wrap [class$="icon32"] + h2 {
-	font-size: 18px;
+	font-size: 1.125em;
 	padding: 1em;
 }
 
 .wrap .notice {
-	margin: 15px 0 0;
+	margin: 0.9375em 0 0;
 }
 
 .nav-tab-wrapper a.nav-tab {
@@ -359,7 +364,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-bottom: 3px solid transparent;
 	padding-bottom: 0.5em;
 	margin: 0 1.2em;
-	font-size: 15px;
+	font-size: 0.9375em;
 }
 
 .nav-tab-wrapper a.nav-tab.nav-tab-active {
@@ -376,7 +381,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .wcpdf-settings-sub-sections a.nav-tab {
-	font-size: 13px;
+	font-size: 0.8125em;
 }
 
 .doc-output-toggle-group {
@@ -404,8 +409,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .doc-output-toggle {
 	display: inline-block;
-	padding: 6px 16px;
-	font-size: 14px;
+	padding: 0.375em 1em;
+	font-size: 0.875em;
 	text-decoration: none;
 	border: none;
 	background-color: #fff;
@@ -437,21 +442,21 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	background: #F9F9F9;
 	border: 1px solid #D5D7DA;
 	border-radius: 8px;
-	padding: 20px;
-	margin: 20px 0;
+	padding: 1.25em;
+	margin: 1.25em 0;
 }
 
 .edi-tax-defaults-card h3 {
-	margin: 0 0 10px;
-	font-size: 16px;
+	margin: 0 0 0.625em;
+	font-size: 1em;
 	font-weight: 600;
 }
 
 .edi-tax-defaults-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: 20px;
-	margin-top: 20px;
+	gap: 1.25em;
+	margin-top: 1.25em;
 }
 
 .edi-tax-defaults-field {
@@ -460,8 +465,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .edi-tax-defaults-field h4 {
-	margin-bottom: 6px;
-	font-size: 13px;
+	margin-bottom: 0.375em;
+	font-size: 0.8125em;
 	font-weight: 500;
 	color: #1d2327;
 }
@@ -469,22 +474,22 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .edi-tax-defaults-control select {
 	width: 100%;
 	max-width: 100%;
-	padding: 6px 2em 6px 8px;
+	padding: 0.375em 2em 0.375em 0.5em;
 	border: 1px solid #d1d5db;
 	border-radius: 4px;
 	background-color: #fff;
-	font-size: 13px;
+	font-size: 0.8125em;
 }
 
 .edi-tax-defaults-control .current {
-	margin-top: 6px;
+	margin-top: 0.375em;
 }
 
 .edi-tax-defaults-control .current code {
 	background: #D5D7DA;
-	padding: 2px 6px;
+	padding: 0.125em 0.375em;
 	border-radius: 4px;
-	font-size: 12px;
+	font-size: 0.75em;
 	color: #414651;
 }
 
@@ -501,29 +506,29 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .edi-tax-class-table table > thead > tr > th {
 	background-color: #fafafa;
 	border-bottom: 1px solid #E9EAEB !important;
-	padding: 16px;
+	padding: 1em;
 }
 
 .edi-tax-class-table table > tbody > tr > td {
 	border-bottom: 1px solid #E9EAEB !important;
-	padding: 16px;
+	padding: 1em;
 }
 
 .edi-tax-class-table table > tbody > tr > td > select {
 	width: 100%;
 	max-width: 100%;
-	padding: 6px 2em 6px 8px;
+	padding: 0.375em 2em 0.375em 0.5em;
 	border: 1px solid #d1d5db;
 	border-radius: 4px;
 	background-color: #fff;
-	font-size: 13px;
+	font-size: 0.8125em;
 }
 
 .edi-tax-class-table table > tbody > tr > td code {
 	background: #D5D7DA;
-	padding: 2px 6px;
+	padding: 0.125em 0.375em;
 	border-radius: 4px;
-	font-size: 12px;
+	font-size: 0.75em;
 	color: #414651;
 	white-space: nowrap;
 }
@@ -558,12 +563,12 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	background: #fff;
 	padding: 2em 0 1em;
 }
+
 #wpo-wcpdf-preview-wrapper .sidebar > .settings-search {
 	margin-left: 2em;
 	width: calc(100% - 4em);
 	max-width: 50vw;
 }
-
 
 #wpo-wcpdf-preview-wrapper .sidebar .settings-search > input {
 	width: 100%;
@@ -659,6 +664,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	font-size: 0.85em;
 	padding-top: 0.7em;
 }
+
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td p.description > code {
 	font-size: inherit;
 }
@@ -688,7 +694,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper {
 	display: flex;
-	gap: 5px;
+	gap: 0.3125em;
 	position: relative;
 }
 
@@ -719,8 +725,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	position: absolute;
 	background-color: #555;
 	color: #fff;
-	padding: 5px 8px;
-	font-size: 12px;
+	padding: 0.3125em 0.5em;
+	font-size: 0.75em;
 	border-radius: 4px;
 	white-space: nowrap;
 	opacity: 0;
@@ -776,7 +782,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper .sidebar .settings_category h2 {
 	border-bottom: 1px solid #c3c4c7;
-	padding: 1em 0 1em 5px;
+	padding: 1em 0 1em 0.3125em;
 	margin: 0;
 	font-weight: normal;
 	color: #222;
@@ -796,13 +802,13 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-bottom: 1px solid #c3c4c7;
 	margin-top: 0;
 	background: #ffffff;
-	margin-bottom: 20px;
+	margin-bottom: 1.25em;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .settings_category h2::after {
 	content: '\f347';
 	font-family: 'dashicons';
-	font-size: 16px;
+	font-size: 1em;
 	color: #82878c;
 	position: absolute;
 	right: 5px;
@@ -824,8 +830,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-settings .form-table .ui-tabs-nav {
-	padding-left: 0!important;
-	margin-left: 0!important;
+	padding-left: 0 !important;
+	margin-left: 0 !important;
 }
 
 #wpo-wcpdf-settings .translations input,
@@ -853,8 +859,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-settings table#document-link-access-type td {
 	padding-top: 0;
-	padding-bottom: 6px;
-	font-size: 12px;
+	padding-bottom: 0.375em;
+	font-size: 0.75em;
 }
 
 #wpo-wcpdf-settings .system-status-table,
@@ -873,13 +879,13 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-settings.status caption > a,
 #wpo-wcpdf-settings.edi caption > a {
-	margin-left: 6px;
+	margin-left: 0.375em;
 	text-decoration: none;
 }
 
 #wpo-wcpdf-settings.edi table.form-table > tbody > tr.edi-multiple label {
 	display: block;
-	margin-bottom: 5px;
+	margin-bottom: 0.3125em;
 }
 
 #wpo-wcpdf-settings .system-status-table > tbody > tr:nth-of-type(even) {
@@ -914,7 +920,7 @@ button.button-wpo.button,
 .button.button-wpo.button-primary {
 	height: 36px !important;
 	min-height: 36px !important;
-	padding: 0 14px !important;
+	padding: 0 0.875em !important;
 	line-height: normal !important;
 	background-color: #6E1EDC !important;
 	color: #fff !important;
@@ -953,12 +959,12 @@ button.button-edi-save-taxes {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
-	gap: 8px;
+	gap: 0.5em;
 }
 
 #wpo-wcpdf-settings .edi-customer-identifiers input[type="text"]{
 	max-width: 120px;
-	padding: 0 6px;
+	padding: 0 0.375em;
 }
 
 #wpo-wcpdf-preview-wrapper .preview-document {
@@ -1068,7 +1074,7 @@ button.button-edi-save-taxes {
 	display: block;
 	max-width: 800px;
 	max-height: 85vh;
-	width: auto!important;
+	width: auto !important;
 	margin: 2em auto;
 	background: white;
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
@@ -1095,7 +1101,7 @@ button.button-edi-save-taxes {
 .preview-document .preview-data-wrapper .preview-order-data,
 .preview-document .preview-data-wrapper .preview-document-type {
 	float: right;
-	margin-right: 26px;
+	margin-right: 1.625em;
 	position: relative;
 }
 
@@ -1230,7 +1236,7 @@ button.button-edi-save-taxes {
 .preview-document .preview-data .arrow-down {
 	font-size: 0.8em;
 	color: #999;
-	margin-left: 8px;
+	margin-left: 0.5em;
 }
 
 .preview-document .preview-data p:hover,
@@ -1246,7 +1252,7 @@ button.button-edi-save-taxes {
 	width: 300px;
 	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	-webkit-box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
-	padding: 20px 0;
+	padding: 1.25em 0;
 	background-color: white;
 	z-index: 99;
 }
@@ -1257,8 +1263,8 @@ button.button-edi-save-taxes {
 	border-right: 1px solid #999;
 	border-top: 1px solid #999;
 	color: #000;
-	padding: 10px;
-	margin: 0 20px;
+	padding: 0.625em;
+	margin: 0 1.25em;
 	text-decoration: none;
 	cursor: pointer;
 }
@@ -1278,7 +1284,7 @@ button.button-edi-save-taxes {
 
 .preview-document .preview-data #preview-order-search-results .date,
 .preview-document .preview-data #preview-order-search-results .total {
-	margin-top: 6px;
+	margin-top: 0.375em;
 	display: inline-block;
 }
 
@@ -1287,7 +1293,7 @@ button.button-edi-save-taxes {
 }
 
 .preview-document .preview-data #preview-order-search-results .error {
-	margin: 0 20px;
+	margin: 0 1.25em;
 }
 
 .preview-document .preview-order-search-wrapper {
@@ -1336,13 +1342,13 @@ button.button-edi-save-taxes {
 
 #wpo-wcpdf-preview-wrapper .slider.slide-left {
 	text-align: right;
-	padding-right: 10px;
+	padding-right: 0.625em;
 	border-right: 1px solid #ccc;
 }
 
 #wpo-wcpdf-preview-wrapper .slider.slide-right {
 	text-align: left;
-	padding-left: 10px;
+	padding-left: 0.625em;
 	border-left: 1px solid #ccc;
 	display: none;
 }
@@ -1406,11 +1412,11 @@ button.button-edi-save-taxes {
 
 #wpo-wcpdf-preview-wrapper.static .preview-document,
 #wpo-wcpdf-preview-wrapper.static .gutter {
-	position: static!important;
+	position: static !important;
 }
 
 #wpo-wcpdf-preview-wrapper.static .sidebar {
-	height: 170vh!important;
+	height: 170vh !important;
 	overflow: hidden;
 }
 
@@ -1422,7 +1428,7 @@ button.button-edi-save-taxes {
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-state="sidebar"] .select2.select2-container {
-	width: 100%!important;
+	width: 100% !important;
 }
 
 #wpo-wcpdf-preview-wrapper input#due_date_days {
@@ -1438,7 +1444,7 @@ sup.wcpdf_pro {
 	background-color: #51266b;
 	color: white;
 	font-size: 7pt;
-	padding: 1px 2px;
+	padding: 0.0625em 0.125em;
 	border-radius: 2px;
 }
 
@@ -1450,7 +1456,7 @@ sup.wcpdf_pro {
 #wpo-wcpdf-settings ul#edi-standard-changelog {
 	display: none;
 	list-style: disc;
-	padding-left: 20px;
+	padding-left: 1.25em;
 }
 
 @media screen and (min-width: 1920px) {
@@ -1465,7 +1471,7 @@ sup.wcpdf_pro {
 	}
 
 	.preview-document .preview > #preview-canvas {
-		width: 80vw!important;
+		width: 80vw !important;
 	}
 
 	#wpo-wcpdf-preview-wrapper .sidebar > form {
@@ -1473,7 +1479,7 @@ sup.wcpdf_pro {
 	}
 
 	#wpo-wcpdf-preview-wrapper[data-preview-state="closed"] .select2.select2-container {
-		width: 100%!important;
+		width: 100% !important;
 	}
 
 	#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr,
@@ -1509,7 +1515,7 @@ sup.wcpdf_pro {
 	#wpo-wcpdf-preview-wrapper .multiple-text-input tr td:nth-child(2),
 	#wpo-wcpdf-preview-wrapper .multiple-text-input tr td:nth-child(3) {
 		float: left;
-		margin-bottom: 10px;
+		margin-bottom: 0.625em;
 	}
 
 	#wpo-wcpdf-preview-wrapper .multiple-text-input tr td .woocommerce-help-tip:after {
@@ -1536,7 +1542,7 @@ sup.wcpdf_pro {
 
 #plugin-recommendations h1 {
 	font-family: serif;
-	letter-spacing: -1px;
+	letter-spacing: -0.0625em;
 	font-size: 3em;
 }
 
@@ -1581,7 +1587,7 @@ sup.wcpdf_pro {
 
 #upgrade-table td.feature-label span.description {
 	display: inline-block;
-	padding-top: 10px;
+	padding-top: 0.625em;
 	font-size: 0.8em;
 	line-height: 1.4em;
 	font-weight: normal;
@@ -1600,7 +1606,6 @@ div.upgrade-table-description a,
 #upgrade-table a {
 	color: #6e1edc;
 	white-space: nowrap;
-
 }
 
 #upgrade-table .upgrade-links h4 {
@@ -1670,7 +1675,7 @@ div.upgrade-table-description a,
 	background-color: white;
 	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	box-sizing: border-box;
-	font-size: 15px;
+	font-size: 0.9375em;
 	overflow: hidden;
 	transition: 0.2s;
 }
@@ -1705,7 +1710,7 @@ div.upgrade-table-description a,
 
 #plugin-recommendations .recommendation-card p {
 	text-align: left;
-	padding-bottom: 10px;
+	padding-bottom: 0.625em;
 }
 
 #plugin-recommendations .recommendation-card a.upgrade_button {
@@ -1726,7 +1731,7 @@ div.upgrade-table-description a,
 	background: #6e1edc;
 	color: #fff;
 	font-size: 0.6em;
-	padding: 4px 9px;
+	padding: 0.25em 0.5625em;
 	border-radius: 16px;
 	line-height: 1;
 	margin: 0 1em;
@@ -1757,7 +1762,7 @@ div.upgrade-table-description a,
 	}
 
 	#upgrade-table td.feature-label span.description {
-		padding-top: 6px;
+		padding-top: 0.375em;
 	}
 
 	#plugin-recommendations .card-container {
@@ -1813,7 +1818,7 @@ div.upgrade-table-description a,
 
 	#upgrade-table th,
 	#upgrade-table td {
-		padding: 0.5em 0.8em!important;
+		padding: 0.5em 0.8em !important;
 	}
 
 	#upgrade-table td span.feature-available {

@@ -1,5 +1,7 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
-
+<?php
+defined( 'ABSPATH' ) or exit;
+$settings_instance = \WPO_WCPDF()->get_instance( 'settings' );
+?>
 <div id="debug-tools">
 	<div class="wrapper">
 		<?php do_action( 'wpo_wcpdf_before_debug_tools', $this ); ?>
@@ -30,7 +32,7 @@
 		</div>
 		<!-- /install_fonts -->
 		<!-- reschedule_yearly_reset -->
-		<?php if ( ! WPO_WCPDF()->settings->yearly_reset_action_is_scheduled() ) : ?>
+		<?php if ( ! $settings_instance->yearly_reset_action_is_scheduled() ) : ?>
 		<div class="tool">
 			<h4><?php esc_html_e( 'Reschedule the yearly reset of the numbering system', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
 			<p><?php esc_html_e( "You seem to have the yearly reset enabled for one of your documents but the action that performs this isn't scheduled yet.", 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
@@ -216,7 +218,7 @@
 			</form>
 		</div>
 		<!-- /reset_settings -->
-		<?php if ( WPO_WCPDF()->settings->upgrade->are_any_extensions_installed() ) : ?>
+		<?php if ( $settings_instance->get_instance( 'upgrade' )->are_any_extensions_installed() ) : ?>
 			<!-- clear_extensions_license_cache -->
 			<div class="tool">
 				<h4><?php esc_html_e( 'Clear extensions license caching', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
@@ -234,9 +236,9 @@
 		<?php do_action( 'wpo_wcpdf_after_debug_tools', $this ); ?>
 	</div>
 	<!-- danger_zone (admin access only) -->
-	<?php if ( current_user_can( 'administrator' ) && isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ) : ?>
+	<?php if ( current_user_can( 'administrator' ) && isset( $settings_instance->debug_settings['enable_danger_zone_tools'] ) ) : ?>
 		<?php
-			$documents  = WPO_WCPDF()->documents->get_documents( 'all' );
+			$documents  = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 			$date_types = array(
 				'date_created'   => __( 'Order creation date', 'woocommerce-pdf-invoices-packing-slips' ),
 				'date_modified'  => __( 'Order modification date', 'woocommerce-pdf-invoices-packing-slips' ),

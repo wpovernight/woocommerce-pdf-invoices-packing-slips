@@ -24,6 +24,7 @@ class Document {
 	 * @param string $syntax
 	 * @param string $format
 	 * @param OrderDocument $order_document
+	 * @throws \Exception
 	 */
 	public function __construct( string $syntax, string $format, OrderDocument $order_document ) {
 		$this->syntax          = $syntax;
@@ -61,7 +62,7 @@ class Document {
 			return null;
 		}
 
-		if ( ! in_array( $document_type, array_keys( $format['documents'] ) ) ) {
+		if ( ! in_array( $document_type, array_keys( $format['documents'] ), true ) ) {
 			wpo_ips_edi_log(
 				sprintf(
 					'Document type "%s" is not supported for format "%s".',
@@ -108,7 +109,7 @@ class Document {
 	 * @return string
 	 */
 	public function get_type_code(): string {
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_ips_edi_document_type_code',
 			$this->format_document->get_type_code(),
 			$this
@@ -121,7 +122,7 @@ class Document {
 	 * @return string
 	 */
 	public function get_quantity_role(): string {
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_ips_edi_document_quantity_role',
 			is_callable( array( $this->format_document, 'get_quantity_role' ) )
 				? $this->format_document->get_quantity_role()
@@ -136,7 +137,7 @@ class Document {
 	 * @return string
 	 */
 	public function get_root_element(): string {
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_ips_edi_document_root_element',
 			$this->format_document->get_root_element(),
 			$this
@@ -149,7 +150,7 @@ class Document {
 	 * @return array
 	 */
 	public function get_additional_attributes(): array {
-		return apply_filters(
+		return (array) apply_filters(
 			'wpo_ips_edi_document_additional_attributes',
 			$this->format_document->get_additional_attributes(),
 			$this
@@ -162,7 +163,7 @@ class Document {
 	 * @return array
 	 */
 	public function get_namespaces(): array {
-		return apply_filters(
+		return (array) apply_filters(
 			'wpo_ips_edi_document_namespaces',
 			$this->format_document->get_namespaces(),
 			$this
@@ -250,7 +251,11 @@ class Document {
 			}
 		}
 
-		return apply_filters( 'wpo_ips_edi_document_data', $data, $this );
+		return (array) apply_filters(
+			'wpo_ips_edi_document_data',
+			$data,
+			$this
+		);
 	}
 
 	/**
