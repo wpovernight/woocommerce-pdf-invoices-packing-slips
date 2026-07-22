@@ -16,6 +16,7 @@
 		}
 	},
 	"require": {
+		"php": ">=7.4",
 		"dompdf/dompdf": "^3.1",
 		"symfony/polyfill-mbstring": "^1.31",
 		"symfony/polyfill-iconv": "^1.31",
@@ -83,6 +84,8 @@
 		}
 	},
 	"config": {
-		"platform-check": false
+		"platform": {
+            "php": "7.4.0"
+        }
 	}
 }
