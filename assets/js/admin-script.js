@@ -948,8 +948,13 @@ jQuery( function( $ ) {
 				return;
 			}
 
+			const needle = query.toLowerCase().trim();
+
 			matches = wpo_wcpdf_admin.search_index.filter( function ( item ) {
-				return item.label.toLowerCase().indexOf( query.toLowerCase().trim() ) !== -1;
+				const label   = item.label ? item.label.toLowerCase() : '';
+				const section = item.section ? item.section.toLowerCase() : '';
+
+				return label.indexOf( needle ) !== -1 || section.indexOf( needle ) !== -1;
 			} );
 
 			if ( ! matches.length ) {
@@ -959,12 +964,18 @@ jQuery( function( $ ) {
 
 			$.each( matches, function ( index, item ) {
 				const $item = $( '<li class="settings-search-item"></li>' )
-					.text( item.label )
 					.attr( 'data-index', index )
 					.on( 'mousedown', function ( e ) {
 						e.preventDefault();
 						navigateToSetting( item );
 					} );
+
+				$( '<span class="settings-search-item-label"></span>' ).text( item.label ).appendTo( $item );
+
+				if ( item.section ) {
+					$( '<span class="settings-search-item-section"></span>' ).text( item.section ).appendTo( $item );
+				}
+
 				$dropdown.append( $item );
 			} );
 
