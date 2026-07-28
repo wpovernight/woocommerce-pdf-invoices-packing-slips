@@ -1503,7 +1503,7 @@ class Settings {
 	 * @return array
 	 */
 	public function get_search_index( string $page ): array {
-		global $wp_settings_fields;
+		global $wp_settings_fields, $wp_settings_sections;
 
 		$index = array();
 
@@ -1512,6 +1512,10 @@ class Settings {
 		}
 
 		foreach ( $wp_settings_fields[ $page ] as $section_id => $fields ) {
+			$section_title = isset( $wp_settings_sections[ $page ][ $section_id ]['title'] )
+				? wp_strip_all_tags( $wp_settings_sections[ $page ][ $section_id ]['title'] )
+				: '';
+
 			foreach ( $fields as $field_id => $field ) {
 				$title = wp_strip_all_tags( $field['title'] );
 
@@ -1522,6 +1526,7 @@ class Settings {
 				$index[] = array(
 					'id'       => $field_id,
 					'label'    => $title,
+					'section'  => $section_title,
 					'category' => $section_id,
 				);
 			}
