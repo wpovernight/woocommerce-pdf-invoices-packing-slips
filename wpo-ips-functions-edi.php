@@ -23,58 +23,176 @@ function wpo_ips_edi_sanitize_string( string $string ): string {
 }
 
 /**
- * Get EDI tax data from fallback
+ * Determine whether the given category can be used for a zero-tax classification.
  *
- * @param string                  $key      Can be category, scheme, or reason
- * @param int|null                $rate_id  The tax rate ID
- * @param \WC_Abstract_Order|null $order    The order object
+ * @param string $category Category code.
+ * @return bool
+ */
+function wpo_ips_edi_is_zero_tax_category( string $category ): bool {
+	return apply_filters(
+		'wpo_ips_edi_is_zero_tax_category',
+		in_array(
+			strtoupper( trim( $category ) ),
+			array( 'AE', 'E', 'G', 'K', 'O', 'Z' ),
+			true
+		),
+		$category
+	);
+}
+
+/**
+ * Get the preferred zero-tax row from the configured zero-rate settings.
+ * 
+ * Preference order:
+ * 1. First specific zero-tax category that is not Z
+ * 2. First generic Z row
+ *
+ * @param array  $edi_tax_settings EDI tax settings.
+ * @param string $key              Can be category, scheme, or reason.
  * @return string
  */
-function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\WC_Abstract_Order $order ): string {
+function wpo_ips_edi_get_preferred_zero_rate_tax_data( array $edi_tax_settings, string $key ): string {
 	$result = '';
 
-	if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ) ) ) {
-		return $result;
-	}
+	if ( empty( $edi_tax_settings['class']['zero-rate'][ $key ] ) || 'default' !== $edi_tax_settings['class']['zero-rate'][ $key ] ) {
+		$class_value = $edi_tax_settings['class']['zero-rate'][ $key ] ?? '';
 
-	$tax_rate_class   = '';
-	$edi_tax_settings = wpo_ips_edi_get_tax_settings();
-
-	if ( ! is_null( $rate_id ) && class_exists( '\WC_TAX' ) && is_callable( array( '\WC_TAX', '_get_tax_rate' ) ) ) {
-		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
-
-		if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
-			$result         = isset( $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] ) ? $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] : '';
-			$tax_rate_class = $tax_rate->tax_rate_class;
+		if ( ! empty( $class_value ) && 'default' !== $class_value ) {
+			$result = $class_value;
 		}
 	}
 
-	if ( empty( $tax_rate_class ) ) {
-		$tax_rate_class = 'standard';
+	$generic_row_value  = '';
+	$specific_row_value = '';
+
+	if ( empty( $edi_tax_settings['rate'] ) || ! is_array( $edi_tax_settings['rate'] ) ) {
+		return $result;
 	}
 
-	if ( empty( $result ) || 'default' === $result ) {
-		$result = isset( $edi_tax_settings['class'][ $tax_rate_class ][ $key ] ) ? $edi_tax_settings['class'][ $tax_rate_class ][ $key ] : '';
+	foreach ( $edi_tax_settings['rate'] as $rate_settings ) {
+		if ( ! is_array( $rate_settings ) ) {
+			continue;
+		}
+
+		$category = strtoupper( trim( (string) ( $rate_settings['category'] ?? '' ) ) );
+
+		if ( ! wpo_ips_edi_is_zero_tax_category( $category ) ) {
+			continue;
+		}
+
+		$value = isset( $rate_settings[ $key ] ) ? (string) $rate_settings[ $key ] : '';
+
+		if ( '' === $value || 'default' === $value ) {
+			continue;
+		}
+
+		if ( 'Z' === $category ) {
+			if ( '' === $generic_row_value ) {
+				$generic_row_value = $value;
+			}
+		} else {
+			if ( '' === $specific_row_value ) {
+				$specific_row_value = $value;
+			}
+		}
 	}
 
-	// check if order is tax exempt
-	if ( wpo_wcpdf_order_is_vat_exempt( $order ) ) {
+	if ( '' !== $specific_row_value ) {
+		return $specific_row_value;
+	}
+
+	if ( '' !== $generic_row_value ) {
+		return $generic_row_value;
+	}
+
+	return $result;
+}
+
+/**
+ * Get EDI tax data from fallback.
+ *
+ * @param string                  $key      Can be category, scheme, or reason.
+ * @param int|null                $rate_id  The tax rate ID.
+ * @param \WC_Abstract_Order|null $order    The order object.
+ * @return string
+ */
+function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\WC_Abstract_Order $order ): string {
+	if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ), true ) ) {
+		return '';
+	}
+
+	$is_empty_or_default = static function ( $value ): bool {
+		return '' === $value || 'default' === $value;
+	};
+
+	$vat_exempt_defaults = array(
+		'scheme'   => 'VAT',
+		'category' => 'AE',
+		'reason'   => 'VATEX-EU-AE',
+	);
+
+	$result           = '';
+	$tax_rate_class   = '';
+	$edi_tax_settings = wpo_ips_edi_get_tax_settings();
+	$is_vat_exempt    = $order instanceof \WC_Abstract_Order && wpo_wcpdf_order_is_vat_exempt( $order );
+
+	if ( ! is_null( $rate_id ) && class_exists( '\WC_Tax' ) && is_callable( array( '\WC_Tax', '_get_tax_rate' ) ) ) {
+		$tax_rate = \WC_Tax::_get_tax_rate( $rate_id, OBJECT );
+
+		if ( ! empty( $tax_rate ) && is_numeric( $tax_rate->tax_rate ) ) {
+			$result         = isset( $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ] )
+				? (string) $edi_tax_settings['rate'][ $tax_rate->tax_rate_id ][ $key ]
+				: '';
+			$tax_rate_class = (string) $tax_rate->tax_rate_class;
+		}
+	}
+
+	// For VAT-exempt orders, generic lookups should resolve from the zero-rate
+	// configuration instead of the standard class.
+	if ( $is_vat_exempt && is_null( $rate_id ) ) {
+		$result = (string) wpo_ips_edi_get_preferred_zero_rate_tax_data( $edi_tax_settings, $key );
+
+		if ( 'category' === $key && ! $is_empty_or_default( $result ) && ! wpo_ips_edi_is_zero_tax_category( $result ) ) {
+			$result = '';
+		}
+	}
+
+	if ( '' === $tax_rate_class ) {
+		$tax_rate_class = $is_vat_exempt ? 'zero-rate' : 'standard';
+	}
+
+	if ( $is_empty_or_default( $result ) ) {
+		$result = isset( $edi_tax_settings['class'][ $tax_rate_class ][ $key ] )
+			? (string) $edi_tax_settings['class'][ $tax_rate_class ][ $key ]
+			: '';
+	}
+
+	if ( $is_vat_exempt ) {
+		$preferred_zero_rate = (string) wpo_ips_edi_get_preferred_zero_rate_tax_data( $edi_tax_settings, $key );
+
 		switch ( $key ) {
-			case 'scheme':
-				$result = 'VAT';
-				break;
 			case 'category':
-				$result = 'AE';
+				if ( $is_empty_or_default( $result ) || ! wpo_ips_edi_is_zero_tax_category( $result ) ) {
+					$result = ( ! $is_empty_or_default( $preferred_zero_rate ) && wpo_ips_edi_is_zero_tax_category( $preferred_zero_rate ) )
+						? $preferred_zero_rate
+						: $vat_exempt_defaults['category'];
+				}
 				break;
+
+			case 'scheme':
 			case 'reason':
-				$result = 'VATEX-EU-AE';
+				if ( $is_empty_or_default( $result ) ) {
+					$result = ! $is_empty_or_default( $preferred_zero_rate )
+						? $preferred_zero_rate
+						: $vat_exempt_defaults[ $key ];
+				}
 				break;
 		}
 
 		$result = apply_filters( 'wpo_ips_edi_get_tax_data_from_fallback_vat_exempt', $result, $key, $rate_id, $order );
 	}
 
-	return $result;
+	return (string) $result;
 }
 
 /**
@@ -126,7 +244,7 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 	if ( ! wpo_ips_edi_peppol_is_available() ) {
 		return; // only save for Peppol formats
 	}
-	
+
 	$identifier     = '';
 	$scheme         = '';
 	$save_meta_data = false;
@@ -148,15 +266,18 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 			$identifier = $raw;
 		}
 	}
-	
+
 	if ( empty( $identifier ) || empty( $scheme ) ) {
-		$user_id = $order->get_customer_id();
-		if ( empty( $user_id ) ) {
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
+			? $order->get_customer_id()
+			: 0;
+
+		if ( $customer_id <= 0 ) {
 			return;
 		}
 
-		$identifier = get_user_meta( $user_id, 'peppol_endpoint_id', true );
-		$scheme     = get_user_meta( $user_id, 'peppol_endpoint_eas', true );
+		$identifier = get_user_meta( $customer_id, 'peppol_endpoint_id', true );
+		$scheme     = get_user_meta( $customer_id, 'peppol_endpoint_eas', true );
 	}
 
 	if ( ! empty( $identifier ) ) {
@@ -172,7 +293,7 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 	if ( ! $save_meta_data ) {
 		return;
 	}
-	
+
 	$order->save_meta_data();
 }
 
@@ -316,10 +437,9 @@ function wpo_ips_edi_file_headers( string $filename, $size ): void {
 	$charset = apply_filters( 'wpo_ips_edi_file_header_content_type_charset', 'UTF-8' );
 
 	header( 'Content-Description: File Transfer' );
-	header( 'Content-Type: text/xml; charset=' . $charset );
+	header( 'Content-Type: application/xml; charset=' . $charset );
 	header( 'Content-Disposition: attachment; filename=' . $filename );
 	header( 'Content-Transfer-Encoding: binary' );
-	header( 'Connection: Keep-Alive' );
 	header( 'Expires: 0' );
 	header( 'Cache-Control: must-revalidate, post-check=0, pre-check=0' );
 	header( 'Pragma: public' );
@@ -520,9 +640,12 @@ function wpo_ips_edi_log( string $message, string $level = 'info', ?\Throwable $
  * @return bool True if the prefix is valid, false otherwise.
  */
 function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
-	$vat_number = strtoupper( trim( $vat_number ) );
+	$vat_number = wpo_ips_edi_normalize_vat_number( $vat_number );
 
-	// Special handling for Greece
+	if ( strlen( $vat_number ) <= 2 ) {
+		return false;
+	}
+
 	if ( 'EL' === substr( $vat_number, 0, 2 ) ) {
 		return true;
 	}
@@ -552,6 +675,628 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
 }
 
 /**
+ * Normalize a VAT country code for EDI/VIES-style output.
+ *
+ * Greece uses EL as VAT prefix, while WooCommerce stores the country as GR.
+ *
+ * @param string $country_code Country code.
+ * @return string
+ */
+function wpo_ips_edi_normalize_vat_country_code( string $country_code ): string {
+	$country_code = strtoupper( trim( $country_code ) );
+
+	if ( 'GR' === $country_code ) {
+		return 'EL';
+	}
+
+	return $country_code;
+}
+
+/**
+ * Normalize a VAT number while keeping the country prefix if present.
+ *
+ * @param string $vat_number VAT number.
+ * @return string
+ */
+function wpo_ips_edi_normalize_vat_number( string $vat_number ): string {
+	$vat_number = wpo_ips_edi_sanitize_string( $vat_number );
+	$vat_number = strtoupper( trim( $vat_number ) );
+
+	if ( '' === $vat_number ) {
+		return '';
+	}
+
+	// Remove spaces, dots, dashes, slashes and other non-alphanumeric characters.
+	return preg_replace( '/[^A-Z0-9]/', '', $vat_number ) ?: '';
+}
+
+/**
+ * Split a VAT number into country prefix and identifier.
+ *
+ * Examples:
+ * - "BE0203430576" => array( 'country' => 'BE', 'id' => '0203430576' )
+ * - "0203430576"   => array( 'country' => '',   'id' => '0203430576' )
+ *
+ * @param string $vat_number VAT number.
+ * @return array
+ */
+function wpo_ips_edi_split_vat_number( string $vat_number ): array {
+	$vat_number = wpo_ips_edi_normalize_vat_number( $vat_number );
+
+	if ( '' === $vat_number ) {
+		return array(
+			'country' => '',
+			'id'      => '',
+		);
+	}
+
+	$prefix = substr( $vat_number, 0, 2 );
+
+	if (
+		strlen( $vat_number ) > 2 &&
+		1 === preg_match( '/^[A-Z]{2}$/', $prefix ) &&
+		wpo_ips_edi_vat_number_has_country_prefix( $vat_number )
+	) {
+		return array(
+			'country' => wpo_ips_edi_normalize_vat_country_code( $prefix ),
+			'id'      => substr( $vat_number, 2 ),
+		);
+	}
+
+	return array(
+		'country' => '',
+		'id'      => $vat_number,
+	);
+}
+
+/**
+ * Format a VAT number for EDI output.
+ *
+ * @param string $vat_number      VAT number.
+ * @param string $billing_country Billing country code.
+ * @return string
+ */
+function wpo_ips_edi_format_vat_number( string $vat_number, string $billing_country = '' ): string {
+	$parts = wpo_ips_edi_split_vat_number( $vat_number );
+
+	if ( '' === $parts['id'] ) {
+		return '';
+	}
+
+	$country = $parts['country'];
+
+	if ( '' === $country ) {
+		$country = wpo_ips_edi_normalize_vat_country_code( $billing_country );
+	}
+
+	$formatted = '' !== $country ? $country . $parts['id'] : $parts['id'];
+
+	return apply_filters(
+		'wpo_ips_edi_format_vat_number',
+		$formatted,
+		$vat_number,
+		$billing_country,
+		$parts
+	);
+}
+
+/**
+ * Get the formatted customer VAT number for EDI output.
+ *
+ * @param \WC_Order $order Order object.
+ * @return string|null
+ */
+function wpo_ips_edi_get_order_customer_vat_number( \WC_Order $order ): ?string {
+	$vat_number = wpo_wcpdf_get_order_customer_vat_number( $order );
+
+	if ( ! empty( $vat_number ) ) {
+		$vat_number = wpo_ips_edi_format_vat_number(
+			(string) $vat_number,
+			$order->get_billing_country()
+		);
+	}
+
+	return apply_filters(
+		'wpo_ips_edi_order_customer_vat_number',
+		! empty( $vat_number ) ? $vat_number : null,
+		$order
+	);
+}
+
+/**
+ * Build PEPPOL endpoint ID candidates from VAT number.
+ *
+ * @param string $billing_country The billing country code (ISO 3166-1 alpha-2).
+ * @param string $vat_number      The VAT number.
+ * @return array
+ */
+function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_country, string $vat_number ): array {
+	$billing_country = strtoupper( trim( $billing_country ) );
+	$vat_number      = wpo_ips_edi_normalize_vat_number( $vat_number );
+
+	if ( '' === $billing_country || '' === $vat_number ) {
+		return array();
+	}
+
+	$prefix = substr( $vat_number, 0, 2 );
+
+	// If VAT looks like it has a prefix, ensure it's valid.
+	if (
+		strlen( $vat_number ) > 2 &&
+		1 === preg_match( '/^[A-Z]{2}$/', $prefix ) &&
+		! wpo_ips_edi_vat_number_has_country_prefix( $vat_number )
+	) {
+		return array();
+	}
+
+	$parts = wpo_ips_edi_split_vat_number( $vat_number );
+
+	// If the VAT number has a country prefix, make sure it matches the billing country.
+	if ( '' !== $parts['country'] ) {
+		$billing_vat_country = wpo_ips_edi_normalize_vat_country_code( $billing_country );
+
+		if ( $parts['country'] !== $billing_vat_country ) {
+			return array();
+		}
+	}
+
+	/*
+	 * Format after validation so local VAT numbers are expanded using the
+	 * billing country. Example: 123456789 + PT becomes PT123456789.
+	 */
+	$vat_number = wpo_ips_edi_format_vat_number( $vat_number, $billing_country );
+	$vat_number = wpo_ips_edi_normalize_vat_number( $vat_number );
+
+	if ( '' === $vat_number ) {
+		return array();
+	}
+
+	$mappings = wpo_ips_edi_get_peppol_vat_mappings();
+
+	if ( empty( $mappings[ $billing_country ] ) ) {
+		return array();
+	}
+
+	$cfg     = $mappings[ $billing_country ];
+	$configs = ! empty( $cfg['mappings'] ) && is_array( $cfg['mappings'] )
+		? $cfg['mappings']
+		: array( $cfg );
+
+	$candidates = array();
+
+	foreach ( $configs as $config ) {
+		$value = $vat_number;
+
+		if ( '' === $value ) {
+			continue;
+		}
+
+		if ( ! empty( $config['strip_prefixes'] ) && is_array( $config['strip_prefixes'] ) ) {
+			foreach ( $config['strip_prefixes'] as $strip_prefix ) {
+				$strip_prefix = strtoupper( trim( (string) $strip_prefix ) );
+
+				if ( '' === $strip_prefix ) {
+					continue;
+				}
+
+				$value = (string) preg_replace(
+					'/^' . preg_quote( $strip_prefix, '/' ) . '/i',
+					'',
+					$value
+				);
+			}
+		}
+
+		if ( ! empty( $config['keep_pattern'] ) && is_string( $config['keep_pattern'] ) ) {
+			if ( preg_match_all( $config['keep_pattern'], $value, $matches ) ) {
+				$value = implode( '', $matches[0] );
+			} else {
+				$value = '';
+			}
+		}
+
+		$value = trim( $value );
+
+		if ( '' === $value ) {
+			continue;
+		}
+
+		if ( ! empty( $config['length'] ) ) {
+			$lengths = is_array( $config['length'] )
+				? $config['length']
+				: array( $config['length'] );
+
+			$lengths = array_values( array_filter( array_map( 'absint', $lengths ) ) );
+
+			if ( ! empty( $lengths ) && ! in_array( strlen( $value ), $lengths, true ) ) {
+				continue;
+			}
+		}
+
+		$eas = (string) ( $config['eas'] ?? '' );
+
+		if ( '' === $eas ) {
+			continue;
+		}
+
+		$candidates[] = array(
+			'eas'         => $eas,
+			'endpoint_id' => sprintf( '%s:%s', $eas, $value ),
+		);
+	}
+
+	return $candidates;
+}
+
+/**
+ * Get PEPPOL VAT number mappings.
+ *
+ * @return array
+ */
+function wpo_ips_edi_get_peppol_vat_mappings(): array {
+	$mappings = array(
+		'AT' => array(
+			'name'     => 'Austria',
+			'mappings' => array(
+				array(
+					'eas'            => '9914',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'BE' => array(
+			'name'     => 'Belgium',
+			'mappings' => array(
+				array(
+					'eas'            => '0208',
+					'strip_prefixes' => array( 'BE' ),
+					'keep_pattern'   => '/\d+/',
+					'length'         => 10,
+				),
+				array(
+					'eas'            => '9925',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 12,
+				),
+			),
+		),
+		'BG' => array(
+			'name'     => 'Bulgaria',
+			'mappings' => array(
+				array(
+					'eas'            => '9926',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 11, 12 ),
+				),
+			),
+		),
+		'CY' => array(
+			'name'     => 'Cyprus',
+			'mappings' => array(
+				array(
+					'eas'            => '9928',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'CZ' => array(
+			'name'     => 'Czech Republic',
+			'mappings' => array(
+				array(
+					'eas'            => '9929',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 10, 11, 12 ),
+				),
+			),
+		),
+		'DE' => array(
+			'name'     => 'Germany',
+			'mappings' => array(
+				array(
+					'eas'            => '9930',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'DK' => array(
+			'name'     => 'Denmark',
+			'mappings' => array(
+				array(
+					'eas'            => '0184',
+					'strip_prefixes' => array( 'DK' ),
+					'keep_pattern'   => '/\d+/',
+					'length'         => 8,
+				),
+			),
+		),
+		'EE' => array(
+			'name'     => 'Estonia',
+			'mappings' => array(
+				array(
+					'eas'            => '9931',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'ES' => array(
+			'name'     => 'Spain',
+			'mappings' => array(
+				array(
+					'eas'            => '9920',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'FI' => array(
+			'name'     => 'Finland',
+			'mappings' => array(
+				array(
+					'eas'            => '0213',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'FR' => array(
+			'name'     => 'France',
+			'mappings' => array(
+				array(
+					'eas'            => '0002',
+					'strip_prefixes' => array( 'FR' ),
+					'keep_pattern'   => '/\d{9}$/',
+					'length'         => 9,
+				),
+				array(
+					'eas'            => '9957',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 13,
+				),
+			),
+		),
+		'GB' => array(
+			'name'     => 'United Kingdom',
+			'mappings' => array(
+				array(
+					'eas'            => '9932',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 11, 14 ),
+				),
+			),
+		),
+		'GR' => array(
+			'name'     => 'Greece',
+			'mappings' => array(
+				array(
+					'eas'            => '9933',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'HR' => array(
+			'name'     => 'Croatia',
+			'mappings' => array(
+				array(
+					'eas'            => '9934',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 13,
+				),
+			),
+		),
+		'HU' => array(
+			'name'     => 'Hungary',
+			'mappings' => array(
+				array(
+					'eas'            => '9910',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'IE' => array(
+			'name'     => 'Ireland',
+			'mappings' => array(
+				array(
+					'eas'            => '9935',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 10, 11 ),
+				),
+			),
+		),
+		'IT' => array(
+			'name'     => 'Italy',
+			'mappings' => array(
+				array(
+					'eas'            => '0211',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 13,
+				),
+			),
+		),
+		'LT' => array(
+			'name'     => 'Lithuania',
+			'mappings' => array(
+				array(
+					'eas'            => '9937',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => array( 11, 14 ),
+				),
+			),
+		),
+		'LU' => array(
+			'name'     => 'Luxembourg',
+			'mappings' => array(
+				array(
+					'eas'            => '9938',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'LV' => array(
+			'name'     => 'Latvia',
+			'mappings' => array(
+				array(
+					'eas'            => '9939',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 13,
+				),
+			),
+		),
+		'MT' => array(
+			'name'     => 'Malta',
+			'mappings' => array(
+				array(
+					'eas'            => '9943',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'NL' => array(
+			'name'     => 'Netherlands',
+			'mappings' => array(
+				array(
+					'eas'            => '9944',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 14,
+				),
+			),
+		),
+		'NO' => array(
+			'name'     => 'Norway',
+			'mappings' => array(
+				array(
+					'eas'            => '0192',
+					'strip_prefixes' => array( 'NO' ),
+					'keep_pattern'   => '/\d+/',
+					'length'         => 9,
+				),
+			),
+		),
+		'PL' => array(
+			'name'     => 'Poland',
+			'mappings' => array(
+				array(
+					'eas'            => '9945',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 12,
+				),
+			),
+		),
+		'PT' => array(
+			'name'     => 'Portugal',
+			'mappings' => array(
+				array(
+					'eas'            => '9946',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 11,
+				),
+			),
+		),
+		'RO' => array(
+			'name'     => 'Romania',
+			'mappings' => array(
+				array(
+					'eas'            => '9947',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => range( 4, 12 ),
+				),
+			),
+		),
+		'SE' => array(
+			'name'     => 'Sweden',
+			'mappings' => array(
+				array(
+					'eas'            => '0007',
+					'strip_prefixes' => array( 'SE' ),
+					'keep_pattern'   => '/^\d{10}/',
+					'length'         => 10,
+				),
+			),
+		),
+		'SI' => array(
+			'name'     => 'Slovenia',
+			'mappings' => array(
+				array(
+					'eas'            => '9949',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 10,
+				),
+			),
+		),
+		'SK' => array(
+			'name'     => 'Slovakia',
+			'mappings' => array(
+				array(
+					'eas'            => '9950',
+					'strip_prefixes' => array(),
+					'keep_pattern'   => '/[A-Z0-9]+/',
+					'length'         => 12,
+				),
+			),
+		),
+	);
+
+	return apply_filters( 'wpo_ips_edi_peppol_vat_mappings', $mappings );
+}
+
+/**
+ * Format a company registration number for EDI output.
+ *
+ * This intentionally avoids digits-only normalization because some countries use
+ * alphanumeric company registration numbers. By default, it trims the value and
+ * removes whitespace only.
+ *
+ * @param string $registration_number Registration number to format.
+ * @param string $country             Country code in ISO 3166-1 alpha-2 format.
+ * @return string
+ */
+function wpo_ips_edi_format_registration_number( string $registration_number, string $country = '' ): string {
+	$raw_registration_number = $registration_number;
+	$registration_number     = trim( wp_strip_all_tags( $registration_number ) );
+	$registration_number     = preg_replace( '/\s+/', '', $registration_number ) ?? '';
+	$country                 = strtoupper( trim( $country ) );
+
+	return (string) apply_filters(
+		'wpo_ips_edi_format_registration_number',
+		$registration_number,
+		$country,
+		$raw_registration_number
+	);
+}
+
+/**
  * Get supplier identifiers data for EDI.
  *
  * @return array
@@ -559,6 +1304,17 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings = WPO_WCPDF()->settings->general;
 	$language         = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
+	
+	$supplier_country = $general_settings->get_setting( 'shop_address_country', $language );
+	$supplier_vat     = $general_settings->get_setting( 'vat_number', $language );
+
+	if ( ! empty( $supplier_vat ) ) {
+		$supplier_vat = wpo_ips_edi_format_vat_number(
+			(string) $supplier_vat,
+			(string) $supplier_country
+		);
+	}
+	
 	$data             = array();
 
 	if ( empty( $language ) ) {
@@ -598,7 +1354,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 		),
 		'vat_number' => array(
 			'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => $general_settings->get_setting( 'vat_number', $language ),
+			'value'    => $supplier_vat,
 			'required' => true,
 		),
 		'coc_number' => array(
@@ -614,31 +1370,13 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	);
 
 	if ( wpo_ips_edi_peppol_is_available() ) {
-		$endpoint_id             = wpo_ips_edi_get_settings( 'peppol_endpoint_id' );
-		$endpoint_scheme         = wpo_ips_edi_get_settings( 'peppol_endpoint_eas' );
-		$legal_identifier        = wpo_ips_edi_get_settings( 'peppol_legal_identifier' );
-		$legal_identifier_scheme = wpo_ips_edi_get_settings( 'peppol_legal_identifier_icd' );
-
-		$legal_identifier_value  = $legal_identifier && ! empty( $data[ $language ][ $legal_identifier ]['value'] )
-			? $data[ $language ][ $legal_identifier ]['value']
-			: '';
-
-		if ( 'vat_number' === $legal_identifier && wpo_ips_edi_vat_number_has_country_prefix( $legal_identifier_value ) ) {
-			$legal_identifier_value = substr( $legal_identifier_value, 2 );
-		}
+		$endpoint_id     = wpo_ips_edi_get_settings( 'peppol_endpoint_id' );
+		$endpoint_scheme = wpo_ips_edi_get_settings( 'peppol_endpoint_eas' );
 
 		$data[ $language ]['peppol_endpoint_id'] = array(
 			'label'    => __( 'PEPPOL Endpoint ID', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'    => ! empty( $endpoint_scheme ) && ! empty( $endpoint_id )
 				? sprintf( '%s:%s', $endpoint_scheme, $endpoint_id )
-				: '',
-			'required' => true,
-		);
-
-		$data[ $language ]['peppol_legal_identifier'] = array(
-			'label'    => __( 'PEPPOL Legal Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => ! empty( $legal_identifier_scheme ) && ! empty( $legal_identifier ) && ! empty( $legal_identifier_value )
-				? sprintf( '%s:%s', $legal_identifier_scheme, $legal_identifier_value )
 				: '',
 			'required' => true,
 		);
@@ -692,7 +1430,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		),
 		'vat_number' => array(
 			'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
-			'value'    => apply_filters( 'wpo_ips_edi_order_customer_vat_number', wpo_wcpdf_get_order_customer_vat_number( $order ), $order ),
+			'value'    => wpo_ips_edi_get_order_customer_vat_number( $order ),
 			'required' => true,
 		),
 		'email' => array(
@@ -742,10 +1480,18 @@ function wpo_ips_edi_peppol_enabled_for_location( string $location ): bool {
 		return false;
 	}
 
-	$location_setting = wpo_ips_edi_get_settings( 'peppol_customer_identifier_fields_location' );
+	$location_setting = wpo_ips_edi_get_settings( 'peppol_endpoint_id_field_location' );
+
+	// Valid options
+	$valid = array( 'checkout', 'my_account', 'both', 'none' );
 
 	// Always return false if the field is not properly set
-	if ( empty( $location_setting ) || ! in_array( $location_setting, array( 'checkout', 'my_account', 'both' ), true ) ) {
+	if ( empty( $location_setting ) || ! in_array( $location_setting, $valid, true ) ) {
+		return false;
+	}
+
+	// Explicitly disabled everywhere
+	if ( 'none' === $location_setting ) {
 		return false;
 	}
 
@@ -775,6 +1521,10 @@ function wpo_ips_edi_peppol_identifier_input_mode(): string {
  * @param array $request $_POST / REST payload.
  */
 function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $request ): void {
+	if ( $user_id <= 0 ) {
+		return;
+	}
+
 	$mode = wpo_ips_edi_peppol_identifier_input_mode();
 
 	// [ text‑field , scheme‑field ]
@@ -871,13 +1621,23 @@ function wpo_ips_edi_generate_action_button_html( string $url, string $class, st
 		return '';
 	}
 
+	$atts = apply_filters(
+		'wpo_ips_edi_generate_action_button_html_atts',
+		array(
+			'url'   => $url,
+			'class' => $class,
+			'label' => $label,
+			'icon'  => $icon,
+		)
+	);
+
 	return sprintf(
 		'<a href="%1$s" class="%2$s" alt="%3$s" title="%3$s">
 			<span class="dashicons %4$s"></span>
 		</a>',
-		esc_url( $url ),
-		esc_attr( $class ),
-		esc_attr( $label ),
-		esc_attr( $icon )
+		esc_url( $atts['url'] ),
+		esc_attr( $atts['class'] ),
+		esc_attr( $atts['label'] ),
+		esc_attr( $atts['icon'] )
 	);
 }

@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
+class ComposerStaticInit799089b7d5c8c7fc7a692559c75d6491
 {
     public static $files = array (
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
@@ -12,12 +12,12 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     );
 
     public static $prefixLengthsPsr4 = array (
-        'W' => 
+        'W' =>
         array (
             'WPO\\IPS\\EDI\\' => 12,
             'WPO\\IPS\\' => 8,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
@@ -25,19 +25,19 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     );
 
     public static $prefixDirsPsr4 = array (
-        'WPO\\IPS\\EDI\\' => 
+        'WPO\\IPS\\EDI\\' =>
         array (
             0 => __DIR__ . '/../..' . '/edi',
         ),
-        'WPO\\IPS\\' => 
+        'WPO\\IPS\\' =>
         array (
             0 => __DIR__ . '/../..' . '/includes',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Iconv\\' => 
+        'Symfony\\Polyfill\\Iconv\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
         ),
@@ -52,6 +52,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\Compatibility\\FileSystem' => __DIR__ . '/../..' . '/includes/Compatibility/FileSystem.php',
         'WPO\\IPS\\Compatibility\\OrderUtil' => __DIR__ . '/../..' . '/includes/Compatibility/OrderUtil.php',
         'WPO\\IPS\\Compatibility\\ThirdPartyPlugins' => __DIR__ . '/../..' . '/includes/Compatibility/ThirdPartyPlugins.php',
+        'WPO\\IPS\\Compatibility\\VatPlugins' => __DIR__ . '/../..' . '/includes/Compatibility/VatPlugins.php',
         'WPO\\IPS\\Documents' => __DIR__ . '/../..' . '/includes/Documents.php',
         'WPO\\IPS\\Documents\\BulkDocument' => __DIR__ . '/../..' . '/includes/Documents/BulkDocument.php',
         'WPO\\IPS\\Documents\\DocumentNumber' => __DIR__ . '/../..' . '/includes/Documents/DocumentNumber.php',
@@ -68,6 +69,7 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
         'WPO\\IPS\\EDI\\Interfaces\\FormatInterface' => __DIR__ . '/../..' . '/edi/Interfaces/FormatInterface.php',
         'WPO\\IPS\\EDI\\Interfaces\\HandlerInterface' => __DIR__ . '/../..' . '/edi/Interfaces/HandlerInterface.php',
         'WPO\\IPS\\EDI\\Interfaces\\HybridFormatInterface' => __DIR__ . '/../..' . '/edi/Interfaces/HybridFormatInterface.php',
+        'WPO\\IPS\\EDI\\Peppol' => __DIR__ . '/../..' . '/edi/Peppol.php',
         'WPO\\IPS\\EDI\\SabreBuilder' => __DIR__ . '/../..' . '/edi/SabreBuilder.php',
         'WPO\\IPS\\EDI\\Standards\\EN16931' => __DIR__ . '/../..' . '/edi/Standards/EN16931.php',
         'WPO\\IPS\\EDI\\Syntaxes\\Cii\\Abstracts\\AbstractCiiFormat' => __DIR__ . '/../..' . '/edi/Syntaxes/Cii/Abstracts/AbstractCiiFormat.php',
@@ -138,9 +140,9 @@ class ComposerStaticInit8da09a8f6b5e759115e893ca39030504
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit8da09a8f6b5e759115e893ca39030504::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit8da09a8f6b5e759115e893ca39030504::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit8da09a8f6b5e759115e893ca39030504::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit799089b7d5c8c7fc7a692559c75d6491::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit799089b7d5c8c7fc7a692559c75d6491::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit799089b7d5c8c7fc7a692559c75d6491::$classMap;
 
         }, null, ClassLoader::class);
     }

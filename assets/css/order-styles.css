@@ -166,22 +166,35 @@ ul.wpo-ips-edi-actions > li {
 #wpo_ips-edi-box .edi-order-actions table th:last-child,
 #wpo_ips-edi-box .edi-order-actions table td:last-child {
 	text-align: right;
+	white-space: nowrap;
+}
+
+#wpo_ips-edi-box .edi-order-actions tbody td:last-child {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	flex-wrap: nowrap;
 }
 
 #wpo_ips-edi-box .inside > .edi-order-actions .xml {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	width: 32px;
 	height: 32px;
 	padding: 0;
 	margin-left: 3px;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	clear: both;
+	line-height: 1.2;
 }
 
 #wpo_ips-edi-box .inside > .edi-order-actions .xml .dashicons {
 	font-size: 18px;
-	line-height: 1;
+	line-height: 1.2;
+}
+
+#wpo_ips-edi-box .inside > .edi-order-actions .xml.resend .dashicons,
+#wpo_ips-edi-box .inside > .edi-order-actions .xml.send .dashicons {
+	color: white !important;
 }
 
 #wpo_ips-edi-box .inside > .edi-order-actions .xml.disabled {

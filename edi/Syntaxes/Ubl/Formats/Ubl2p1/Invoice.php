@@ -13,7 +13,7 @@ class Invoice extends AbstractUblFormat {
 	public string $type = 'invoice';
 	public string $slug = 'ubl-invoice-2p1';
 	public string $name = 'UBL Invoice 2.1';
-	
+
 	/**
 	 * Get the type code
 	 *
@@ -22,7 +22,7 @@ class Invoice extends AbstractUblFormat {
 	public function get_type_code(): string {
 		return '380';
 	}
-	
+
 	/**
 	 * Get the quantity role
 	 *
@@ -40,7 +40,7 @@ class Invoice extends AbstractUblFormat {
 	public function get_root_element(): string {
 		return 'Invoice';
 	}
-	
+
 	/**
 	 * Get the format additional attributes
 	 *
@@ -62,7 +62,7 @@ class Invoice extends AbstractUblFormat {
 			''    => 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2',
 		);
 	}
-	
+
 	/**
 	 * Get the format structure
 	 *
@@ -135,7 +135,7 @@ class Invoice extends AbstractUblFormat {
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\AccountingCustomerPartyHandler::class,
 			),
 			'delivery' => array(
-				'enabled' => false,
+				'enabled' => true,
 				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Handlers\DeliveryHandler::class,
 			),
 			'payment_means' => array(

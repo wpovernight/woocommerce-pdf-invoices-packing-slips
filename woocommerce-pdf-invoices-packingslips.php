@@ -4,14 +4,14 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or Electronic Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              5.3.1
+ * Version:              5.15.2
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
  * License:              GPLv2 or later
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 3.3
- * WC tested up to:      10.4
+ * WC tested up to:      10.9
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -22,13 +22,14 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public $version              = '5.3.1';
+	public $version              = '5.15.2';
 	public $version_php          = '7.4';
 	public $version_woo          = '3.3';
 	public $version_wp           = '4.4';
 	public $plugin_basename;
 	public $legacy_addons;
 	public $third_party_plugins;
+	public $vat_plugins;
 	public $order_util;
 	public $file_system;
 	public $settings;
@@ -87,6 +88,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'legacy_addon_notices' ) );
 		add_action( 'admin_notices', array( $this, 'unstable_option_announcement_notice' ) );
 		add_action( 'admin_notices', array( $this, 'new_unstable_version_available_notice' ) );
+		add_action( 'admin_notices', array( $this, 'php_81_upgrade_notice' ) );
 		add_action( 'wpo_wcpdf_new_github_prerelease_available', array( $this, 'set_new_unstable_version_available_option' ), 10, 3 );
 		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
@@ -163,6 +165,7 @@ class WPO_WCPDF {
 
 		// Compatibility classes
 		$this->third_party_plugins = \WPO\IPS\Compatibility\ThirdPartyPlugins::instance();
+		$this->vat_plugins         = \WPO\IPS\Compatibility\VatPlugins::instance();
 		$this->order_util          = \WPO\IPS\Compatibility\OrderUtil::instance();
 		$this->file_system         = \WPO\IPS\Compatibility\FileSystem::instance();
 
@@ -176,6 +179,9 @@ class WPO_WCPDF {
 		$this->frontend            = \WPO\IPS\Frontend::instance();
 		$this->install             = \WPO\IPS\Install::instance();
 		$this->font_synchronizer   = \WPO\IPS\FontSynchronizer::instance();
+
+		// EDI classes
+		\WPO\IPS\EDI\Peppol::instance();
 	}
 
 	/**
@@ -220,7 +226,7 @@ class WPO_WCPDF {
 	 *
 	 * @return void
 	 */
-	public function need_woocommerce() {
+	public function need_woocommerce(): void {
 		$error_message = sprintf(
 			/* translators: 1. open anchor tag, 2. close anchor tag, 3. Woo version */
 			esc_html__( 'PDF Invoices & Packing Slips for WooCommerce requires %1$sWooCommerce%2$s version %3$s or higher to be installed & activated!' , 'woocommerce-pdf-invoices-packing-slips' ),
@@ -238,16 +244,18 @@ class WPO_WCPDF {
 
 	/**
 	 * Check if woocommerce is activated
+	 *
+	 * @return bool
 	 */
-	public function is_woocommerce_activated() {
-		$blog_plugins = get_option( 'active_plugins', array() );
-		$site_plugins = is_multisite() ? (array) maybe_unserialize( get_site_option('active_sitewide_plugins' ) ) : array();
+	public function is_woocommerce_activated(): bool {
+		$blog_plugins    = (array) get_option( 'active_plugins', array() );
+		$site_plugins    = is_multisite() ? (array) get_site_option( 'active_sitewide_plugins', array() ) : array();
+		$is_wc_activated = false;
 
-		if ( in_array( 'woocommerce/woocommerce.php', $blog_plugins ) || isset( $site_plugins['woocommerce/woocommerce.php'] ) ) {
+		if ( in_array( 'woocommerce/woocommerce.php', $blog_plugins, true ) || isset( $site_plugins['woocommerce/woocommerce.php'] ) ) {
 			$is_wc_activated = true;
-		} else {
-			$is_wc_activated = false;
 		}
+
 		return apply_filters( 'wpo_wcpdf_is_woocommerce_activated', $is_wc_activated );
 	}
 
@@ -256,7 +264,7 @@ class WPO_WCPDF {
 	 *
 	 * @return void
 	 */
-	public function woocommerce_hpos_compatible() {
+	public function woocommerce_hpos_compatible(): void {
 		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
 			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
 		}
@@ -285,6 +293,78 @@ class WPO_WCPDF {
 		$message .= '</div>';
 
 		echo wp_kses_post( $message );
+	}
+	
+	/**
+	 * Upcoming PHP 8.1 requirement notice.
+	 *
+	 * @return void
+	 */
+	public function php_81_upgrade_notice(): void {
+		$dismiss_option = 'wpo_wcpdf_dismiss_php_81_upgrade_notice';
+		$dismiss_arg    = 'wpo_wcpdf_dismiss_php_81_upgrade_notice';
+		$nonce_action   = 'wcpdf_dismiss_php_81_upgrade_notice';
+
+		if ( version_compare( PHP_VERSION, '8.1', '>=' ) ) {
+			return;
+		}
+
+		if ( ! empty( $this->settings ) && method_exists( $this->settings, 'user_can_manage_settings' ) ) {
+			if ( ! $this->settings->user_can_manage_settings() ) {
+				return;
+			}
+		} elseif ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( isset( $_GET[ $dismiss_arg ], $_GET['_wpnonce'] ) ) {
+			if ( wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), $nonce_action ) ) {
+				update_option( $dismiss_option, 'yes' );
+			} else {
+				wcpdf_log_error( 'Invalid nonce while dismissing PHP 8.1 upgrade notice.' );
+			}
+
+			wp_safe_redirect( remove_query_arg( array( $dismiss_arg, '_wpnonce' ) ) );
+			exit;
+		}
+
+		if ( 'yes' === get_option( $dismiss_option, 'no' ) ) {
+			return;
+		}
+
+		$dismiss_url = wp_nonce_url(
+			add_query_arg( $dismiss_arg, '1' ),
+			$nonce_action
+		);
+		?>
+		<div class="notice notice-warning">
+			<p>
+				<strong><?php esc_html_e( 'Upcoming PHP requirement change', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong>
+			</p>
+			<p>
+				<?php
+					printf(
+						/* translators: 1. current PHP version, 2. plugin name, 3. future required PHP version */
+						esc_html__( 'Your site is currently running PHP %1$s. In the upcoming major version 6 of %2$s, planned for release in a couple of weeks, the minimum required PHP version will be raised to %3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_html( PHP_VERSION ),
+						'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
+						'8.1'
+					);
+				?>
+			</p>
+			<p>
+				<?php esc_html_e( 'To avoid any disruption, please contact your hosting provider and ask them to upgrade PHP, or update PHP yourself if you manage the server.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</p>
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( 'https://docs.wpovernight.com/general/how-to-update-your-php-version/' ); ?>" target="_blank" rel="noopener noreferrer">
+					<?php esc_html_e( 'Learn how to update PHP', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+				<a class="button" href="<?php echo esc_url( $dismiss_url ); ?>">
+					<?php esc_html_e( 'Dismiss this notice', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+			</p>
+		</div>
+		<?php
 	}
 
 	/**

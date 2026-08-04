@@ -243,7 +243,13 @@ class Invoice extends OrderDocumentMethods {
 					'id'			  => 'attach_to_email_ids',
 					'fields_callback' => array( $this, 'get_wc_emails' ),
 					/* translators: directory path */
-					'description'	  => ! WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? '<span class="wpo-warning">' . sprintf( __( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ), WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ).'</span>':'',
+					'description'	  => ! \WPO_WCPDF()->file_system->is_writable( \WPO_WCPDF()->main->get_tmp_path( 'attachments' ) )
+						? '<span class="wpo-warning">' . sprintf(
+							/* translators: 1. directory path */
+							__( 'It looks like the temp folder (<code>%s</code>) is not writable, check the permissions for this folder! Without having write access to this folder, the plugin will not be able to email invoices.', 'woocommerce-pdf-invoices-packing-slips' ),
+							WPO_WCPDF()->main->get_tmp_path( 'attachments' )
+						  ) . '</span>'
+						: '',
 				)
 			),
 			array(
@@ -275,7 +281,6 @@ class Invoice extends OrderDocumentMethods {
 						'when_different'=> __( 'Only when different from billing address' , 'woocommerce-pdf-invoices-packing-slips' ),
 						'always'		=> __( 'Always' , 'woocommerce-pdf-invoices-packing-slips' ),
 					),
-					// 'description'		=> __( 'Display shipping address (in addition to the default billing address) if different from billing address', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
 			),
 			array(
@@ -437,7 +442,14 @@ class Invoice extends OrderDocumentMethods {
 							'size'        => 20,
 							'type'        => 'number',
 							/* translators: document type */
-							'description' => sprintf( __( 'Enter the number of digits you want to use as padding. For instance, enter <code>6</code> to display the %s number <code>123</code> as <code>000123</code>, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ), __( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ) ),
+							'description' => sprintf(
+								/* translators: 1. example number, 2. document type, 3. example number without padding, 4. example number with padding */
+								__( 'Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ),
+								'<code>6</code>',
+								__( 'invoice', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<code>123</code>',
+								'<code>000123</code>'
+							),
 						),
 					),
 					'description' => sprintf(
@@ -520,6 +532,23 @@ class Invoice extends OrderDocumentMethods {
 					'option_name'	=> $option_name,
 					'id'			=> 'invoice_number_search',
 					'description'   => __( 'The search process may be slower on non-HPOS stores. For a more efficient search, you can utilize the <a href="https://woocommerce.com/document/high-performance-order-storage/" target="_blank">HPOS</a> feature to search for orders by invoice numbers using the search type selector. Additionally, it allows you to search for multiple orders using a comma-separated list of invoice numbers.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			),
+			array(
+				'type'		    => 'setting',
+				'id'		    => 'invoice_number_partial_search',
+				'title'		    => __( 'Enable partial invoice number matching', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback'	    => 'checkbox',
+				'section'	    => $this->type,
+				'args'		    => array(
+					'option_name'	    => $option_name,
+					'id'			    => 'invoice_number_partial_search',
+					'description'	    => __( 'When enabled, searching for an invoice number will also match partial values (e.g. searching "123" will match "INV-123"). Requires invoice number search to be enabled.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes'	=> array(
+						'data-show_for_option_name'   => $option_name . '[invoice_number_search]',
+						'data-show_for_option_values' => wp_json_encode( array( '1' ) ),
+						'data-keep_current_value'     => true,
+					),
 				)
 			),
 			array(
@@ -698,6 +727,7 @@ class Invoice extends OrderDocumentMethods {
 						'invoice_number_column',
 						'invoice_date_column',
 						'invoice_number_search',
+						'invoice_number_partial_search',
 					),
 				),
 				'advanced'         => array(

@@ -3,6 +3,8 @@ Welcome to the PDF Invoices & Packing Slips for WooCommerce repository on GitHub
 
 If you are not a developer, please use the [PDF Invoices & Packing Slips for WooCommerce support forum](http://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips) on WordPress.org.
 
+Composer installation instructions are available in [composer.md](composer.md).
+
 ## Support
 This repository is not suitable for support. Please don't use our issue tracker for support requests, but for core plugin issues only. Support can take place in the appropriate channels:
 

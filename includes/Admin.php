@@ -437,16 +437,16 @@ class Admin {
 
 	/**
 	 * Check if the invoice number search is enabled.
+	 * 
+	 * @param  bool $check_partial Check if the partial search is enabled.
+	 * 
+	 * @return bool
 	 */
-	public function invoice_number_search_enabled() {
-		$is_enabled       = false;
+	public function invoice_number_search_enabled( bool $check_partial = false ): bool {
 		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
+		$setting_key      = $check_partial ? 'invoice_number_partial_search' : 'invoice_number_search';
 
-		if ( isset( $invoice_settings['invoice_number_search'] ) ) {
-			$is_enabled = true;
-		}
-
-		return $is_enabled;
+		return isset( $invoice_settings[ $setting_key ] );
 	}
 
 
@@ -625,8 +625,8 @@ class Admin {
 
 				$meta_box_actions[$document->get_type()] = array(
 					'url'                   => esc_url( $document_url ),
-					'alt'                   => "PDF " . $document_title,
-					'title'                 => "PDF " . $document_title,
+					'alt'                   => $document_title,
+					'title'                 => $document_title,
 					'exists'                => $document_exists,
 					'printed'               => $document_printed,
 					'printed_data'          => $document_printed_data,
@@ -706,29 +706,28 @@ class Admin {
 		$documents        = WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' );
 
 		foreach ( $documents as $document ) {
-			$document_title = $document->get_title();
-			$document_type  = $document->get_type();
-			
+			$document_type = $document->get_type();
+
 			if ( 'credit-note' === $document_type && $order instanceof \WC_Order ) {
 				$refunds = $order->get_refunds();
 				if ( empty( $refunds ) ) {
 					continue;
 				}
-				
+
 				foreach ( $refunds as $refund ) {
 					if ( ! $refund instanceof \WC_Order_Refund ) {
 						continue;
 					}
-					
+
 					$xml_action = $this->get_order_meta_box_document_xml_action( $document_type, $refund );
-					
+
 					if ( ! empty( $xml_action ) ) {
 						$meta_box_actions[ $document_type . '::' . $refund->get_id() ] = $xml_action;
 					}
 				}
 			} else {
 				$xml_action = $this->get_order_meta_box_document_xml_action( $document_type, $order );
-				
+
 				if ( ! empty( $xml_action ) ) {
 					$meta_box_actions[ $document_type . '::' . $order->get_id() ] = $xml_action;
 				}
@@ -737,14 +736,27 @@ class Admin {
 
 		$meta_box_actions = apply_filters( 'wpo_ips_edi_meta_box_actions', $meta_box_actions, $order->get_id() );
 
-		if ( 0 === count( $meta_box_actions ) ) {
+		if ( empty( $meta_box_actions ) ) {
 			echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'E-Documents require that the PDF version of the same document type is generated first.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p></div>';
+		}
+
+		if (
+			( $order->get_cart_tax() > 0 || $order->get_shipping_tax() > 0 ) &&
+			empty( wpo_ips_edi_get_tax_settings() )
+		) {
+			echo '<div class="notice notice-warning inline"><p>' .
+				sprintf(
+					/* translators: settings link */
+					esc_html__( 'Tax Classification for E-Documents is not set. Please configure it in %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=edi&section=taxes' ) ) . '" target="_blank">' . esc_html__( 'the settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+				) .
+			'</p></div>';
 		}
 
 		// Peppol specific
 		echo $this->get_order_meta_box_peppol_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		
-		if ( count( $meta_box_actions ) > 0 ) :
+
+		if ( ! empty( $meta_box_actions ) ) :
 		?>
 		<div class="edi-order-actions">
 			<table class="widefat">
@@ -752,19 +764,20 @@ class Admin {
 					<tr>
 						<td>XML</td>
 						<td><?php esc_html_e( 'Actions', 'woocommerce-pdf-invoices-packing-slips' ); ?></td>
-					</tr>	
+					</tr>
 				</thead>
 				<tbody>
 					<?php
 						foreach ( $meta_box_actions as $document_type => $data ) {
-							$url      = $data['url']     ?? '';
-							$class    = $data['class']   ?? '';
-							$alt      = $data['alt']     ?? '';
-							$title    = $data['title']   ?? '';
-							$target   = $data['target']  ?? '';
-							$network  = $data['network'] ?? array(); // network links
-							$status   = $data['status']  ?? '';
-							$disabled = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
+							$url             = $data['url']     ?? '';
+							$class           = $data['class']   ?? '';
+							$alt             = $data['alt']     ?? '';
+							$title           = $data['title']   ?? '';
+							$target          = $data['target']  ?? '';
+							$network         = $data['network'] ?? array(); // network links
+							$status          = $data['status']  ?? '';
+							$action_id       = absint( $data['action_id'] ?? 0 );
+							$send_disabled   = in_array( $status, array( 'scheduled', 'sent' ), true ) ? ' disabled' : '';
 
 							$network_buttons = '';
 
@@ -782,7 +795,7 @@ class Admin {
 
 									$network_buttons = \wpo_ips_edi_generate_action_button_html(
 										$dispatch_url,
-										'button xml sent' . $disabled,
+										'button xml sent' . $send_disabled,
 										$label,
 										'dashicons-cloud-saved'
 									);
@@ -790,7 +803,6 @@ class Admin {
 								} else {
 									// First time sending
 									if ( empty( $status ) ) {
-										$action_id     = $data['action_id'] ?? 0;
 										$scheduled_url = $network['scheduled'] ?? '';
 
 										// Already scheduled
@@ -818,7 +830,7 @@ class Admin {
 
 											$send_button = \wpo_ips_edi_generate_action_button_html(
 												$dispatch_url,
-												'button button-primary xml send' . $disabled,
+												'button button-primary xml send' . $send_disabled,
 												$send_label,
 												'dashicons-cloud-upload'
 											);
@@ -836,7 +848,7 @@ class Admin {
 
 										$resend_button = \wpo_ips_edi_generate_action_button_html(
 											$dispatch_url,
-											'button button-primary xml resend' . $disabled,
+											'button button-primary xml resend' . $send_disabled,
 											$resend_label,
 											'dashicons-cloud-upload'
 										);
@@ -849,7 +861,7 @@ class Admin {
 
 										$update_button = \wpo_ips_edi_generate_action_button_html(
 											$update_status_url,
-											'button xml update ' . $class . $disabled,
+											'button xml update ' . $class,
 											$update_label,
 											'dashicons-update-alt'
 										);
@@ -894,46 +906,69 @@ class Admin {
 	 * @return void
 	 */
 	public function ajax_edi_save_order_customer_peppol_identifiers(): void {
+		// Nonce check.
 		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' )
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
+		// Authorization.
+		if ( ! current_user_can( 'edit_shop_orders' ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'You do not have permission to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				403
+			);
 		}
 
 		$request  = stripslashes_deep( $_POST );
 		$order_id = isset( $request['order_id'] ) ? absint( $request['order_id'] ) : 0;
-		$values   = isset( $request['values'] ) ? $request['values'] : array();
+		$values   = isset( $request['values'] ) && is_array( $request['values'] ) ? $request['values'] : array();
 
-		if ( empty( $order_id ) || empty( $values ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' )
-			) );
+		if ( ! $order_id || empty( $values ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				400
+			);
 		}
 
 		$order = wc_get_order( $order_id );
 
 		if ( ! $order ) {
-			wp_send_json_error( array(
-				'message' => __( 'Order not found.', 'woocommerce-pdf-invoices-packing-slips' )
-			) );
+			wp_send_json_error(
+				array(
+					'message' => __( 'Order not found.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				404
+			);
 		}
 
-		$customer_id = is_callable( array( $order, 'get_customer_id' ) )
-			? $order->get_customer_id()
-			: 0;
-
-		if ( empty( $customer_id ) ) {
-			wp_send_json_error( array(
-				'message' => __( 'Customer ID is missing.', 'woocommerce-pdf-invoices-packing-slips' )
-			) );
+		// Ensure the current user can edit this order in admin.
+		if ( ! current_user_can( 'edit_post', $order->get_id() ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'You do not have permission to edit this order.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+				403
+			);
 		}
+
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) ) ? (int) $order->get_customer_id() : 0;
 
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $values );
 
-		wp_send_json_success( array(
-			'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),
-		) );
+		wp_send_json_success(
+			array(
+				'message' => __( 'Peppol identifiers saved successfully.', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
 	}
 
 	public function data_input_box_content( $post_or_order_object ) {
@@ -1267,7 +1302,7 @@ class Admin {
 											<?php esc_html_e( 'Number padding', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 											<?php
 												$tip_text = sprintf(
-													/* translators: %1$s: code, %2$s: document title, %3$s: number, %4$s: padded number */
+													/* translators: 1. example number, 2. document type, 3. example number without padding, 4. example number with padding */
 													__( 'Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached.' , 'woocommerce-pdf-invoices-packing-slips' ),
 													'<code>6</code>',
 													esc_html( $document->get_title() ),
@@ -1471,8 +1506,9 @@ class Admin {
 
 				if ( $is_new ) {
 					WPO_WCPDF()->main->log_document_creation_to_order_notes( $invoice, 'document_data' );
-					WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
 				}
+
+				WPO_WCPDF()->main->mark_document_printed( $invoice, 'document_data' );
 			}
 
 			// allow other documents to hook here and save their form data
@@ -1652,6 +1688,7 @@ class Admin {
 				if ( 'regenerate' === $action_type && $document->exists() ) {
 					$document->regenerate( $order, $document_data );
 					WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', true, $request );
+					WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
@@ -1683,9 +1720,10 @@ class Admin {
 					if ( $is_new ) {
 						WPO_WCPDF()->main->log_document_creation_to_order_notes( $document, 'document_data' );
 						WPO_WCPDF()->main->log_document_creation_trigger_to_order_meta( $document, 'document_data', false, $request );
-						WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
 					}
-					$response      = array(
+
+					WPO_WCPDF()->main->mark_document_printed( $document, 'document_data' );
+					$response = array(
 						'message' => $notice_messages[$notice]['success'],
 					);
 
@@ -1988,7 +2026,7 @@ class Admin {
 
 		$query->set( 'orderby', $this->is_invoice_number_numeric() ? 'meta_value_num' : 'meta_value' );
 	}
-	
+
 	/**
 	 * Get XML document action for order meta box
 	 *
@@ -2002,15 +2040,15 @@ class Admin {
 		if ( ! $document || ! $document->exists() ) {
 			return array();
 		}
-		
+
 		$is_refund_order  = is_a( $order, 'WC_Order_Refund' );
 		$document_url     = WPO_WCPDF()->endpoint->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
 		$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 		$class            = array( $document_type, 'xml', 'exists' );
-		
+
 		$number_instance  = $document->get_number();
 		$number_formatted = ! empty( $number_instance ) ? $number_instance->get_formatted() : '';
-		
+
 		$xml_title        = sprintf(
 			'%s %s<br><span class="order-id">%s: %d</span>',
 			$document_title,
@@ -2018,7 +2056,7 @@ class Admin {
 			$is_refund_order ? __( 'RFND', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'ORD', 'woocommerce-pdf-invoices-packing-slips' ),
 			$order->get_id()
 		);
-		
+
 		return array(
 			'url'    => $document_url,
 			'alt'    => sprintf(
@@ -2032,7 +2070,7 @@ class Admin {
 			'target' => '_blank',
 		);
 	}
-	
+
 	/**
 	 * Get Peppol identifiers to display for the order
 	 *
@@ -2043,7 +2081,7 @@ class Admin {
 		if ( ! wpo_ips_edi_peppol_is_available() ) {
 			return;
 		}
-		
+
 		$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
 		$peppol_identifiers = array();
 
@@ -2067,6 +2105,10 @@ class Admin {
 					<tbody style="display:none;">
 						<?php
 							foreach ( $identifiers_data as $key => $identifier ) {
+								if ( 'vat_number' === $key ) {
+									continue;
+								}
+
 								$value    = $identifier['value'];
 								$required = $identifier['required'];
 								$display  = $value ?: sprintf(
@@ -2085,15 +2127,40 @@ class Admin {
 								<?php endif; ?>
 									<td>
 										<?php echo wp_kses_post( $display ); ?>
-										<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
-											<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
-										<?php endif; ?>
 									</td>
 								</tr>
 								<?php
 							}
 						?>
 					</tbody>
+					<?php if ( isset( $identifiers_data['vat_number'] ) ) : ?>
+						<?php
+							$value    = $identifiers_data['vat_number']['value'];
+							$required = $identifiers_data['vat_number']['required'];
+							$display  = $value ?: sprintf(
+								'<span class="%s">%s</span>',
+								$required
+									? 'missing'
+									: 'optional',
+								$required
+									? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+									: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+							);
+						?>
+						<tfoot>
+							<tr>
+							<?php if ( 'full' === wpo_ips_edi_peppol_identifier_input_mode() ) : ?>
+								<td><?php echo esc_html( $identifiers_data['vat_number']['label'] ); ?></td>
+							<?php endif; ?>
+								<td>
+									<?php echo wp_kses_post( $display ); ?>
+									<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
+										<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
+									<?php endif; ?>
+								</td>
+							</tr>
+						</tfoot>
+					<?php endif; ?>
 				</table>
 			</div>
 			<?php if ( ! empty( $peppol_identifiers ) ) : ?>

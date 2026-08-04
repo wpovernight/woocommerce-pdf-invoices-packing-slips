@@ -12,20 +12,20 @@ class EN16931 extends AbstractStandard {
 
 	public static string $slug    = 'en16931';
 	public static string $name    = 'EN16931';
-	public static string $version = '16.0';
+	public static string $version = '16.0'; // https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931
 
 	/**
 	 * Get the VAT category codes according to code list.
-	 * 
+	 *
 	 * - Column [VAT CAT]
-	 * 
+	 *
 	 * @return array
 	 */
 	public static function get_vat_cat(): array {
 		$defaults = array(
 			'VAT' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-		
+
 		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vat_cat', array() );
 
 		return $extra + $defaults;
@@ -33,7 +33,7 @@ class EN16931 extends AbstractStandard {
 
 	/**
 	 * Get the Duty, tax or fee categories according to code list.
-	 * 
+	 *
 	 * - Column [5305]
 	 *
 	 * @return array
@@ -50,15 +50,15 @@ class EN16931 extends AbstractStandard {
 			'S'  => __( 'Standard rate', 'woocommerce-pdf-invoices-packing-slips' ),
 			'Z'  => __( 'Zero rated goods', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-		
+
 		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_5305', array() );
 
 		return $extra + $defaults;
 	}
-	
+
 	/**
 	 * Get the VAT exemption reason codes according to code list.
-	 * 
+	 *
 	 * - Column [VATEX]
 	 *
 	 * @return array
@@ -157,15 +157,15 @@ class EN16931 extends AbstractStandard {
 			'VATEX-FR-FRANCHISE'     => __( 'France domestic VAT franchise in base', 'woocommerce-pdf-invoices-packing-slips' ),
 			'VATEX-FR-298SEXDECIESA' => __( 'Exempt based on article 298 sexdecies A of the Code Général des Impôts (CGI ; General tax code)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-		
+
 		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vatex', array() );
 
 		return $extra + $defaults;
 	}
-	
+
 	/**
 	 * Get VATEX remarks according to code list.
-	 * 
+	 *
 	 * - Column [VATEX]
 	 *
 	 * @return array
@@ -188,7 +188,7 @@ class EN16931 extends AbstractStandard {
 				'VATEX-EU-IC'            => sprintf( $reason_common_remark, '<code>K</code>' ),
 				'VATEX-EU-J'             => sprintf( $reason_common_remark, '<code>E</code>' ),
 				'VATEX-EU-O'             => sprintf( $reason_common_remark, '<code>O</code>' ),
-				
+
 				// France specific VAT exemption remarks
 				'VATEX-FR-FRANCHISE'     => __( 'For domestic invoicing in France', 'woocommerce-pdf-invoices-packing-slips' ),
 				'VATEX-FR-CNWVAT'        => __( 'For domestic Credit Notes only in France', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -218,15 +218,15 @@ class EN16931 extends AbstractStandard {
 				'VATEX-FR-AE'            => $domestic_invoicing_france_remark,
 			),
 		);
-		
+
 		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_vatex_remarks', array() );
 
 		return $extra + $defaults;
 	}
-	
+
 	/**
 	 * Get the Electronic address scheme identifier according to code list.
-	 * 
+	 *
 	 * - Column [EAS]
 	 *
 	 * @return array
@@ -332,15 +332,15 @@ class EN16931 extends AbstractStandard {
 			'AU'   => __( 'File Transfer Protocol', 'woocommerce-pdf-invoices-packing-slips' ),
 			'EM'   => __( 'Electronic mail (SMPT)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-		
+
 		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_eas', array() );
 
 		return $extra + $defaults;
 	}
-	
+
 	/**
 	 * Get the Identifier scheme code according to code list.
-	 * 
+	 *
 	 * - Column [ICD]
 	 *
 	 * @return array
@@ -587,15 +587,15 @@ class EN16931 extends AbstractStandard {
 			'0243' => __( 'Name unknown', 'woocommerce-pdf-invoices-packing-slips' ),
 			'0244' => __( 'Tax Identification (Tax ID), Nigeria', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
-		
+
 		$extra = (array) apply_filters( 'wpo_ips_edi_en16931_icd', array() );
 
 		return $extra + $defaults;
 	}
-	
+
 	/**
 	 * Get the Payment Meanbs code according to code list.
-	 * 
+	 *
 	 * - Column [Payment]
 	 *
 	 * @return array

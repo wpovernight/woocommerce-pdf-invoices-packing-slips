@@ -18,7 +18,7 @@ class LineHandler extends AbstractUblHandler {
 	 */
 	public function handle( array $data, array $options = array() ): array {
 		$root_element         = $this->document->get_root_element();
-		$quantity_role		  = $this->document->get_quantity_role();
+		$quantity_role        = $this->document->get_quantity_role();
 		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
 		$items                = $this->document->order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 		$currency             = $this->document->order->get_currency();
@@ -26,24 +26,32 @@ class LineHandler extends AbstractUblHandler {
 		// Build the tax totals array
 		foreach ( $items as $item_id => $item ) {
 			// Resolve tax meta for this line
-			$meta = $this->resolve_item_tax_meta( $item );
+			$meta       = $this->resolve_item_tax_meta( $item );
+			$category   = strtoupper( (string) ( $meta['category'] ?? '' ) );
+			$scheme     = (string) ( $meta['scheme'] ?? 'VAT' );
+			$percentage = $meta['percentage'] ?? null;
 
 			$tax_category = array(
 				array(
 					'name'  => 'cbc:ID',
-					'value' => $meta['category'],
+					'value' => $category,
 				),
-				array(
+			);
+
+			// For VAT category O ("Not subject to VAT"), do NOT emit Percent.
+			if ( 'O' !== $category && null !== $percentage && '' !== $percentage ) {
+				$tax_category[] = array(
 					'name'  => 'cbc:Percent',
-					'value' => $this->format_decimal( $meta['percentage'], 1 ),
-				),
-				array(
-					'name'  => 'cac:TaxScheme',
-					'value' => array(
-						array(
-							'name'  => 'cbc:ID',
-							'value' => $meta['scheme'],
-						),
+					'value' => $this->format_decimal( $percentage, 1 ),
+				);
+			}
+
+			$tax_category[] = array(
+				'name'  => 'cac:TaxScheme',
+				'value' => array(
+					array(
+						'name'  => 'cbc:ID',
+						'value' => $scheme,
 					),
 				),
 			);
@@ -51,14 +59,35 @@ class LineHandler extends AbstractUblHandler {
 			// Price parts
 			$parts = $this->compute_item_price_parts( $item, (bool) $include_coupon_lines );
 
-			$gross_unit    = $this->format_decimal( $parts['gross_unit'], 2 );
-			$net_unit      = $this->format_decimal( $parts['net_unit'],   2 );
-			$unit_discount = max( 0.0, $this->format_decimal( $parts['gross_unit'] - $parts['net_unit'], 2 ) );
+			$price_decimal_places = $this->get_line_price_decimal_places( $parts );
+			$qty                  = abs( (float) $parts['qty'] );
+
+			$xml_gross_unit_f = $qty > 0
+				? (float) $this->format_decimal( abs( (float) $parts['gross_total'] ) / $qty, $price_decimal_places )
+				: 0.0;
+
+			$xml_net_unit_f = $qty > 0
+				? (float) $this->format_decimal( abs( (float) $parts['net_total'] ) / $qty, $price_decimal_places )
+				: (float) $this->format_decimal( abs( (float) $parts['net_total'] ), $price_decimal_places );
+
+			$xml_unit_discount_f = $xml_gross_unit_f - $xml_net_unit_f;
+			if ( $xml_unit_discount_f < 0 ) {
+				$xml_unit_discount_f = 0.0;
+			}
+
+			$xml_unit_discount_f = (float) $this->format_decimal( $xml_unit_discount_f, $price_decimal_places );
+
+			// Recompute net from gross - discount to guarantee equality in XML.
+			$xml_net_unit_f = $xml_gross_unit_f - $xml_unit_discount_f;
+
+			$gross_unit    = $this->format_decimal( $xml_gross_unit_f, $price_decimal_places );
+			$net_unit      = $this->format_decimal( $xml_net_unit_f, $price_decimal_places );
+			$unit_discount = $this->format_decimal( $xml_unit_discount_f, $price_decimal_places );
 
 			$price_value = array(
 				array(
 					'name'       => 'cbc:PriceAmount',
-					'value'      => $this->format_decimal( abs( $parts['net_unit'] ) ),
+					'value'      => abs( (float) $net_unit ), // unit net price always positive (Credit Notes as well)
 					'attributes' => array(
 						'currencyID' => $currency,
 					),
@@ -72,8 +101,8 @@ class LineHandler extends AbstractUblHandler {
 				),
 			);
 
-			// Only show AllowanceCharge when there is a discount at price level
-			if ( $unit_discount > 0 ) {
+			// Emit price-level AllowanceCharge when there is a discount at item price level.
+			if ( $xml_unit_discount_f > 0 && $xml_gross_unit_f > 0 ) {
 				$price_value[] = array(
 					'name'  => 'cac:AllowanceCharge',
 					'value' => array(
@@ -83,14 +112,14 @@ class LineHandler extends AbstractUblHandler {
 						),
 						array(
 							'name'       => 'cbc:Amount',
-							'value'      => $this->format_decimal( $unit_discount ),
+							'value'      => abs( (float) $unit_discount ),
 							'attributes' => array(
 								'currencyID' => $currency,
 							),
 						),
 						array(
 							'name'       => 'cbc:BaseAmount',
-							'value'      => $gross_unit,
+							'value'      => abs( (float) $gross_unit ),
 							'attributes' => array(
 								'currencyID' => $currency,
 							),
@@ -99,11 +128,19 @@ class LineHandler extends AbstractUblHandler {
 				);
 			}
 
+			$item_name = apply_filters(
+				'wpo_ips_edi_ubl_item_name',
+				wpo_ips_edi_sanitize_string( $item->get_name() ),
+				$item,
+				$this->document->order,
+				$this
+			);
+
 			// Build base Item node
 			$item_value = array(
 				array(
 					'name'  => 'cbc:Name',
-					'value' => wpo_ips_edi_sanitize_string( $item->get_name() ),
+					'value' => $item_name,
 				),
 				array(
 					'name'  => 'cac:ClassifiedTaxCategory',
@@ -133,13 +170,15 @@ class LineHandler extends AbstractUblHandler {
 					}
 				}
 			}
-			
-			$quantity_value = $parts['qty'];
 
-			// For credit notes: quantity must carry the sign, price stays positive
-			if ( 'Credited' === $quantity_role && $parts['net_total'] < 0 ) {
+			$quantity_value = abs( (float) $parts['qty'] );
+
+			if ( (float) $parts['net_total'] < 0 ) {
 				$quantity_value = -abs( $quantity_value );
 			}
+
+			// Use Woo’s net_total for the line extension amount.
+			$net_line_total = $this->format_decimal( $parts['net_total'], 2 );
 
 			$line = array(
 				'name'  => "cac:{$root_element}Line",
@@ -157,7 +196,7 @@ class LineHandler extends AbstractUblHandler {
 					),
 					array(
 						'name'       => 'cbc:LineExtensionAmount',
-						'value'      => $this->format_decimal( $parts['net_total'] ),
+						'value'      => $net_line_total,
 						'attributes' => array(
 							'currencyID' => $currency,
 						),
@@ -175,11 +214,11 @@ class LineHandler extends AbstractUblHandler {
 
 			$data[] = apply_filters( 'wpo_ips_edi_ubl_line', $line, $data, $options, $item, $this );
 		}
-		
+
 		// Append coupon lines as negative lines
 		if ( $include_coupon_lines ) {
 			$coupons = $this->document->order->get_items( 'coupon' );
-			
+
 			if ( empty( $coupons ) ) {
 				return $data;
 			}
@@ -194,7 +233,7 @@ class LineHandler extends AbstractUblHandler {
 
 		return $data;
 	}
-	
+
 	/**
 	 * Create the Line array for a single coupon item.
 	 *
@@ -210,7 +249,7 @@ class LineHandler extends AbstractUblHandler {
 
 		$code              = method_exists( $coupon_item, 'get_code' ) ? $coupon_item->get_code() : '';
 		$discount_excl_tax = (float) $coupon_item->get_discount();
-		$net_total         = -1 * $this->format_decimal( $discount_excl_tax, 2 );
+		$net_total         = -1.0 * (float) $this->format_decimal( $discount_excl_tax, 2 );
 
 		if ( 0.0 === $net_total ) {
 			return null;
@@ -234,28 +273,39 @@ class LineHandler extends AbstractUblHandler {
 			$this
 		);
 
+		$zero_meta = $this->get_zero_tax_meta( $this->document->order );
+		$category  = strtoupper( (string) ( $zero_meta['category'] ?? 'Z' ) );
+		$scheme    = (string) ( $zero_meta['scheme'] ?? 'VAT' );
+
 		$tax_category = array(
 			array(
 				'name'  => 'cbc:ID',
-				'value' => 'Z',
+				'value' => $category,
 			),
-			array(
+		);
+
+		// For coupons with category O ("Not subject to VAT"), do not emit Percent.
+		if ( 'O' !== $category ) {
+			$tax_category[] = array(
 				'name'  => 'cbc:Percent',
 				'value' => '0.0',
-			),
-			array(
-				'name'  => 'cac:TaxScheme',
-				'value' => array(
-					array(
-						'name'  => 'cbc:ID',
-						'value' => 'VAT',
-					),
+			);
+		}
+
+		$tax_category[] = array(
+			'name'  => 'cac:TaxScheme',
+			'value' => array(
+				array(
+					'name'  => 'cbc:ID',
+					'value' => $scheme,
 				),
 			),
 		);
-		
+
 		$root_element  = $this->document->get_root_element();
 		$quantity_role = $this->document->get_quantity_role();
+
+		$quantity_value = $net_total < 0 ? -1 : 1;
 
 		$line = array(
 			'name'  => "cac:{$root_element}Line",
@@ -266,7 +316,7 @@ class LineHandler extends AbstractUblHandler {
 				),
 				array(
 					'name'       => "cbc:{$quantity_role}Quantity",
-					'value'      => 1,
+					'value'      => $quantity_value,
 					'attributes' => array(
 						'unitCode' => 'C62',
 					),
@@ -296,7 +346,7 @@ class LineHandler extends AbstractUblHandler {
 					'value' => array(
 						array(
 							'name'       => 'cbc:PriceAmount',
-							'value'      => $this->format_decimal( $net_total ), // unit price (negative)
+							'value'      => $this->format_decimal( abs( $net_total ) ),
 							'attributes' => array(
 								'currencyID' => $currency,
 							),
@@ -312,7 +362,7 @@ class LineHandler extends AbstractUblHandler {
 				),
 			),
 		);
-		
+
 		return apply_filters( 'wpo_ips_edi_ubl_coupon_line', $line, $coupon_item, $this );
 	}
 

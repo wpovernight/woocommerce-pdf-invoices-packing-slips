@@ -155,16 +155,13 @@ abstract class OrderDocument {
 	}
 
 	public function get_order_settings() {
-		$order_settings = array();
-
-		if ( ! empty( $this->order ) ) {
-			$order_settings = $this->order->get_meta( "_wcpdf_{$this->slug}_settings" );
-			if ( ! empty( $order_settings ) && ! is_array( $order_settings ) ) {
-				$order_settings = maybe_unserialize( $order_settings );
-			}
+		if ( empty( $this->order ) ) {
+			return array();
 		}
 
-		return $order_settings;
+		$order_settings = $this->order->get_meta( "_wcpdf_{$this->slug}_settings" );
+
+		return is_array( $order_settings ) ? $order_settings : array();
 	}
 
 	public function get_settings( $latest = false, $output_format = 'pdf' ) {
@@ -215,7 +212,16 @@ abstract class OrderDocument {
 				// this is either the first time the document is generated, or historical settings are disabled
 				// in both cases, we store the document settings
 				// exclude non historical settings from being saved in order meta
-				$this->order->update_meta_data( "_wcpdf_{$this->slug}_settings", array_diff_key( (array) $settings, array_flip( $this->get_non_historical_settings() ) ) );
+				$settings_to_store = is_array( $settings ) ? $settings : array();
+				$settings_to_store = array_diff_key(
+					$settings_to_store,
+					array_flip( $this->get_non_historical_settings() )
+				);
+
+				$this->order->update_meta_data(
+					"_wcpdf_{$this->slug}_settings",
+					$this->sanitize_settings_for_storage( $settings_to_store )
+				);
 
 				if ( 'invoice' === $this->slug ) {
 					if ( isset( $settings['display_date'] ) && 'order_date' === $settings['display_date'] ) {
@@ -574,6 +580,42 @@ abstract class OrderDocument {
 			}
 		}
 		return apply_filters( 'wpo_wcpdf_document_is_allowed', $allowed, $this );
+	}
+
+	/**
+	 * Check if document is allowed to be displayed on the My Account page.
+	 *
+	 * @param string $default
+	 * @param string $output_format
+	 * @return bool
+	 */
+	public function is_allowed_in_my_account( string $default = '', string $output_format = 'pdf' ): bool {
+		$allowed = false;
+
+		if ( $this->is_enabled() ) {
+			$button_setting = $this->get_setting( 'my_account_buttons', $default, $output_format );
+
+			switch ( $button_setting ) {
+				case 'available':
+					$allowed = $this->exists();
+					break;
+				case 'always':
+					$allowed = true;
+					break;
+				case 'custom':
+					$allowed_statuses = $this->get_setting( 'my_account_restrict', array(), $output_format );
+					$order_status     = is_callable( array( $this->order, 'get_status' ) )
+						? $this->order->get_status()
+						: false;
+
+					$allowed = ! empty( $allowed_statuses )
+						&& $order_status
+						&& in_array( $order_status, array_keys( $allowed_statuses ), true );
+					break;
+			}
+		}
+
+		return apply_filters( 'wpo_ips_document_is_allowed_in_my_account', $allowed, $default, $output_format, $this );
 	}
 
 	public function exists() {
@@ -1126,7 +1168,12 @@ abstract class OrderDocument {
 
 	public function set_number( $value, $order = null ) {
 		$order = empty( $order ) ? $this->order : $order;
-		$value = maybe_unserialize( $value ); // fix incorrectly stored meta
+
+		// Ignore incorrectly stored serialized meta and only handle expected value types.
+		if ( is_string( $value ) && is_serialized( $value ) ) {
+			wcpdf_log_error( "Unexpected serialized string found for document number meta. Ignoring value. Meta value: {$value}" );
+			$value = null;
+		}
 
 		if ( is_array( $value ) ) {
 			$filtered_value = array_filter( $value );
@@ -1638,7 +1685,7 @@ abstract class OrderDocument {
 		$args = $args + $default_args;
 
 		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ), array(
-				'order' => $this->order,
+				'order'    => $this->order,
 				'order_id' => $this->order_id,
 			)
 		);
@@ -1702,11 +1749,20 @@ abstract class OrderDocument {
 
 		wpo_ips_edi_file_headers( $quoted, $size );
 
-		ob_clean();
-		flush();
+		// Disable output compression.
+		@ini_set( 'zlib.output_compression', 'Off' ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
+
+		// Clear all output buffers to prevent stray bytes/newlines before the XML declaration.
+		while ( ob_get_level() ) {
+			ob_end_clean();
+		}
 
 		if ( WPO_WCPDF()->file_system->exists( $filename_or_contents ) ) {
-			echo WPO_WCPDF()->file_system->get_contents( $filename_or_contents ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			$sent = WPO_WCPDF()->file_system->output_file( $filename_or_contents );
+			if ( false === $sent ) {
+				wcpdf_log_error( sprintf( 'Could not output XML file (%s)', $filename_or_contents ), 'critical' );
+			}
+
 			wp_delete_file( $filename_or_contents );
 		}
 
@@ -1793,11 +1849,11 @@ abstract class OrderDocument {
 	*/
 
 	/**
-	 * get all emails registered in WooCommerce
-	 * @param  boolean $remove_defaults switch to remove default woocommerce emails
-	 * @return array   $emails       list of all email ids/slugs and names
+	 * Get all emails registered in WooCommerce
+	 * 
+	 * @return array
 	 */
-	public function get_wc_emails() {
+	public function get_wc_emails(): array {
 		// only run this in the context of the settings page or setup wizard
 		// prevents WPML language mixups
 		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -1807,7 +1863,7 @@ abstract class OrderDocument {
 		}
 
 		// get emails from WooCommerce
-		if (function_exists('WC')) {
+		if ( function_exists( 'WC' ) ) {
 			$mailer = WC()->mailer();
 		} else {
 			global $woocommerce;
@@ -1818,6 +1874,7 @@ abstract class OrderDocument {
 
 			$mailer = $woocommerce->mailer();
 		}
+
 		$wc_emails = $mailer->get_emails();
 
 		$non_order_emails = array(
@@ -1826,20 +1883,26 @@ abstract class OrderDocument {
 		);
 
 		$emails = array();
-		foreach ($wc_emails as $class => $email) {
-			if ( !is_object( $email ) ) {
+
+		foreach ( $wc_emails as $class => $email ) {
+			if ( ! is_object( $email ) ) {
 				continue;
 			}
-			if ( !in_array( $email->id, $non_order_emails ) ) {
-				switch ($email->id) {
+
+			if ( ! in_array( $email->id, $non_order_emails ) ) {
+				switch ( $email->id ) {
 					case 'new_order':
-						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					case 'customer_invoice':
-						$emails[$email->id] = sprintf('%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						break;
+					case 'cancelled_order':
+					case 'failed_order':
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
 						break;
 					default:
-						$emails[$email->id] = $email->title;
+						$emails[ $email->id ] = $email->title;
 						break;
 				}
 			}
@@ -2207,6 +2270,27 @@ abstract class OrderDocument {
 	protected function normalize_filter_args( $filter ) {
 		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_normalize_filter_args' );
 		return wpo_ips_normalize_filter_args( $filter );
+	}
+
+	/**
+	 * Recursively sanitize settings for storage by removing any objects or resources, which cannot be stored in the database.
+	 *
+	 * @param array $settings
+	 * @return array
+	 */
+	protected function sanitize_settings_for_storage( array $settings ): array {
+		foreach ( $settings as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$settings[ $key ] = $this->sanitize_settings_for_storage( $value );
+				continue;
+			}
+
+			if ( is_object( $value ) || is_resource( $value ) ) {
+				unset( $settings[ $key ] );
+			}
+		}
+
+		return $settings;
 	}
 
 }

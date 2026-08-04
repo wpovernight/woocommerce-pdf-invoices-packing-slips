@@ -75,6 +75,20 @@ class PaymentMeansHandler extends AbstractUblHandler {
 				);
 			}
 
+			$account_bic = $payment['bic'] ?? '';
+
+			if ( ! empty( $account_bic ) ) {
+				$account['value'][] = array(
+					'name'  => 'cac:FinancialInstitutionBranch',
+					'value' => array(
+						array(
+							'name'  => 'cbc:ID',
+							'value' => strtoupper( preg_replace( '/\s+/', '', $account_bic ) ),
+						),
+					),
+				);
+			}
+
 			$payment_means['value'][] = $account;
 
 		// Add transaction ID

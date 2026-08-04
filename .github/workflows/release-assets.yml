@@ -23,11 +23,13 @@ jobs:
           echo "zip_file_name=$PLUGIN_SLUG.$VERSION.zip" >> $GITHUB_ENV
 
       - name: Checkout Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
+          ref: ${{ github.event.release.tag_name }}
           path: ${{ env.plugin_slug }}
           submodules: true
+          fetch-depth: 1
 
       - name: Check stable version in readme.txt
         run: |

@@ -656,12 +656,12 @@ class Install {
 					$general_settings['shop_address_state'] = $new_states_by_locale;
 					update_option( 'wpo_wcpdf_settings_general', $general_settings );
 				}
-				
+
 				// reset shop address notice option
 				delete_option( 'wpo_wcpdf_dismiss_shop_address_notice' );
 			}
 		}
-		
+
 		// 5.0.0-pr1149.1: migrate UBL tax settings to IPS EDI settings
 		if ( version_compare( $installed_version, '5.0.0-pr1149.1', '<' ) ) {
 			$ubl_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes', array() );
@@ -671,31 +671,88 @@ class Install {
 					delete_option( 'wpo_wcpdf_settings_ubl_taxes' );
 				}
 			}
-			
+
 			$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
-			
+
 			if ( ! empty( $invoice_settings['ubl'] ) ) {
 				$edi_settings = array(
 					'document_types' => array( 'invoice' ),
 					'syntax'         => 'ubl',
 					'ubl_format'     => 'ubl-2p1',
 				);
-				
+
 				if ( ! empty( $invoice_settings['ubl']['enabled'] ) ) {
 					$edi_settings['enabled'] = $invoice_settings['ubl']['enabled'];
 				}
-				
+
 				if ( ! empty( $invoice_settings['ubl']['include_encrypted_pdf'] ) ) {
 					$edi_settings['embed_encrypted_pdf'] = $invoice_settings['ubl']['include_encrypted_pdf'];
 				}
-				
+
 				if ( ! empty( $invoice_settings['ubl']['attach_to_email_ids'] ) ) {
 					$edi_settings['send_attachments'] = '1';
 				}
-				
+
 				update_option( 'wpo_ips_edi_settings', $edi_settings );
 				unset( $invoice_settings['ubl'] );
 				update_option( 'wpo_wcpdf_documents_settings_invoice', $invoice_settings );
+			}
+		}
+
+		// 5.9.0-i1457.1: migrate EDI settings
+		if ( version_compare( $installed_version, '5.9.0-i1457.1', '<' ) ) {
+			$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+
+			// migrate Endpoint ID location key
+			if ( isset( $edi_settings['peppol_customer_identifier_fields_location'] ) ) {
+				$edi_settings['peppol_endpoint_id_field_location'] = $edi_settings['peppol_customer_identifier_fields_location'];
+				unset( $edi_settings['peppol_customer_identifier_fields_location'] );
+			}
+
+			// remove supplier Legal Entity ID fields
+			unset( $edi_settings['peppol_legal_identifier'] );
+			unset( $edi_settings['peppol_legal_identifier_icd'] );
+
+			update_option( 'wpo_ips_edi_settings', $edi_settings );
+		}
+
+		// 5.9.1-i1477.1: migrate EDI setting
+		if ( version_compare( $installed_version, '5.9.1-i1477.1', '<' ) ) {
+			$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+
+			// migrate checkout script type setting
+			if (
+				isset( $edi_settings['peppol_checkout_script_type'] ) &&
+				'' === $edi_settings['peppol_checkout_script_type']
+			) {
+				$edi_settings['peppol_checkout_script_type'] = 'auto';
+				update_option( 'wpo_ips_edi_settings', $edi_settings );
+			}
+		}
+		
+		// 5.10.0-i1490.1: migrate EDI setting
+		if ( version_compare( $installed_version, '5.10.0-i1490.1', '<' ) ) {
+			$edi_settings = get_option( 'wpo_ips_edi_settings', array() );
+			$updated      = false;
+
+			// Migrate supplier bank details payment methods setting.
+			if ( ! isset( $edi_settings['supplier_bank_details'] ) ) {
+				$edi_settings['supplier_bank_details'] = array( 'bacs' );
+				$updated = true;
+			}
+
+			// Migrate selected BACS account setting when multiple accounts exist.
+			if ( ! isset( $edi_settings['supplier_bacs_account'] ) ) {
+				$bacs_account_options = wpo_ips_get_bacs_account_options();
+
+				if ( count( $bacs_account_options ) > 1 ) {
+					$edi_settings['supplier_bacs_account'] = (string) array_key_first( $bacs_account_options );
+					$updated = true;
+				}
+			}
+
+			if ( $updated ) {
+				update_option( 'wpo_ips_edi_settings', $edi_settings );
 			}
 		}
 

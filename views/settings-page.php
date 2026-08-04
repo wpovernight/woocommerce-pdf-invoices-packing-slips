@@ -14,7 +14,11 @@ $review_invitation = sprintf(
 );
 $active_tab        = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : $default_tab;
 $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash( $_GET['section'] ) ) : '';
+
+// Exclude tabs having their own forms.
+$excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections', array( 'tools' ) );
 ?>
+
 <script type="text/javascript">
 	jQuery( function( $ ) {
 		$("#footer-thankyou").html('<?php echo wp_kses_post( $review_invitation ); ?>');
@@ -71,7 +75,7 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 	<div id="wpo-wcpdf-preview-wrapper" class="<?php echo esc_attr( $active_tab ); ?>" data-preview-states="<?php echo esc_attr( $preview_states ); ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo esc_attr( $preview_states_lock ); ?>">
 
 		<div class="sidebar">
-			<?php $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections', array( 'tools' ) ); // tools have their own forms ?>
+			<?php do_action( 'wpo_wcpdf_after_sidebar', $active_tab, $active_section, $nonce ); ?>
 			<?php if ( ! in_array( $active_section, $excluded_sections ) ) : ?>
 				<form method="post" action="options.php" id="wpo-wcpdf-settings" class="<?php echo esc_attr( "{$active_tab} {$active_section}" ); ?>">
 			<?php endif; ?>
@@ -111,11 +115,11 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 				} elseif ( ! empty( $_GET['preview'] ) ) {
 					$document_type = sanitize_text_field( wp_unslash( $_GET['preview'] ) );
 				}
-				
+
 				if ( $document_type ) {
 					$document = WPO_WCPDF()->documents->get_document( $document_type, null );
 				}
-				
+
 				if ( ! empty( $_GET['output_format'] ) ) {
 					$output_format = sanitize_text_field( wp_unslash( $_GET['output_format'] ) );
 				}
@@ -139,13 +143,22 @@ $active_section    = isset( $_GET['section'] ) ? sanitize_text_field( wp_unslash
 					<div class="doc-output-toggle-group">
 						<?php
 							foreach ( $document->output_formats as $document_output_format ) {
-								if ( 'xml' === $document_output_format && ( ! wpo_ips_edi_is_available() || ! wpo_ips_edi_preview_is_enabled() ) ) {
-									continue;
+								if ( 'xml' === $document_output_format ) {
+									if ( ! wpo_ips_edi_is_available() || ! wpo_ips_edi_preview_is_enabled() ) {
+										continue;
+									}
+
+									$format           = wpo_ips_edi_get_current_format( true );
+									$format_doc_types = is_array( $format['documents'] ) ? array_keys( $format['documents'] ) : array();
+
+									if ( ! in_array( $document_type, $format_doc_types, true ) ) {
+										continue;
+									}
 								}
 
-								$is_active = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats ) );
+								$is_active    = ( $output_format === $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $document->output_formats ) );
 								$active_class = $is_active ? 'active' : '';
-								$tab_title = strtoupper( esc_html( $document_output_format ) );
+								$tab_title    = strtoupper( esc_html( $document_output_format ) );
 
 								printf(
 									'<a href="%1$s" class="doc-output-toggle %2$s">%3$s</a>',

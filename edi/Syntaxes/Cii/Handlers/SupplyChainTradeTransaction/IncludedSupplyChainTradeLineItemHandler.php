@@ -24,50 +24,77 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 			// Resolve tax meta for this line
 			$meta = $this->resolve_item_tax_meta( $item );
 
+			$tax_children = array(
+				array(
+					'name'  => 'ram:TypeCode',
+					'value' => $meta['scheme'],
+				),
+				array(
+					'name'  => 'ram:CategoryCode',
+					'value' => $meta['category'],
+				),
+			);
+
+			// For VAT category O ("Not subject to VAT"), do NOT emit RateApplicablePercent.
+			if ( 'O' !== strtoupper( (string) ( $meta['category'] ?? '' ) ) && isset( $meta['percentage'] ) && '' !== $meta['percentage'] ) {
+				$tax_children[] = array(
+					'name'  => 'ram:RateApplicablePercent',
+					'value' => $this->format_decimal( $meta['percentage'], 1 ),
+				);
+			}
+
 			$tax_nodes = array(
 				array(
 					'name'  => 'ram:ApplicableTradeTax',
-					'value' => array(
-						array(
-							'name'  => 'ram:TypeCode',
-							'value' => $meta['scheme'],
-						),
-						array(
-							'name'  => 'ram:CategoryCode',
-							'value' => $meta['category'],
-						),
-						array(
-							'name'  => 'ram:RateApplicablePercent',
-							'value' => $this->format_decimal( $meta['percentage'], 1 ),
-						),
-					),
+					'value' => $tax_children,
 				),
 			);
 
 			// Price parts
 			$parts = $this->compute_item_price_parts( $item, false );
 
-			$gross_unit    = $this->format_decimal( $parts['gross_unit'], 2 );
-			$net_unit      = $this->format_decimal( $parts['net_unit'],   2 );
-			$unit_discount = max( 0.0, $this->format_decimal( $parts['gross_unit'] - $parts['net_unit'], 2 ) );
+			$price_decimal_places = $this->get_line_price_decimal_places( $parts );
+			$qty                  = (float) $parts['qty'];
 
-			$price_children = array(
+			$xml_gross_unit_f = $qty > 0
+				? (float) $this->format_decimal( (float) $parts['gross_total'] / $qty, $price_decimal_places )
+				: 0.0;
+
+			$xml_net_unit_f = $qty > 0
+				? (float) $this->format_decimal( (float) $parts['net_total'] / $qty, $price_decimal_places )
+				: (float) $this->format_decimal( $parts['net_total'], $price_decimal_places );
+
+			$xml_unit_discount_f = $xml_gross_unit_f - $xml_net_unit_f;
+			if ( $xml_unit_discount_f < 0 ) {
+				$xml_unit_discount_f = 0.0;
+			}
+
+			$xml_unit_discount_f = (float) $this->format_decimal( $xml_unit_discount_f, $price_decimal_places );
+
+			// Recompute net from gross - discount to guarantee equality in XML.
+			$xml_net_unit_f = $xml_gross_unit_f - $xml_unit_discount_f;
+
+			$gross_unit    = $this->format_decimal( $xml_gross_unit_f, $price_decimal_places );
+			$net_unit      = $this->format_decimal( $xml_net_unit_f, $price_decimal_places );
+			$unit_discount = $this->format_decimal( $xml_unit_discount_f, $price_decimal_places );
+
+			$gross_price_children = array(
 				array(
 					'name'  => 'ram:ChargeAmount',
-					'value' => $this->format_decimal( $parts['net_unit'], 2 ),
+					'value' => $gross_unit,
 				),
 				array(
 					'name'       => 'ram:BasisQuantity',
 					'value'      => 1,
 					'attributes' => array(
-						'unitCode' => 'C62'
-					)
+						'unitCode' => 'C62',
+					),
 				),
 			);
 
-			// Only products can have a price-level discount
-			if ( $unit_discount > 0 && is_a( $item, 'WC_Order_Item_Product' ) ) {
-				$price_children[] = array(
+			// Emit price-level allowance on the gross price for discounted product lines.
+			if ( $xml_unit_discount_f > 0 && $xml_gross_unit_f > 0 && is_a( $item, 'WC_Order_Item_Product' ) ) {
+				$gross_price_children[] = array(
 					'name'  => 'ram:AppliedTradeAllowanceCharge',
 					'value' => array(
 						array(
@@ -75,21 +102,31 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 							'value' => array(
 								array(
 									'name'  => 'udt:Indicator',
-									'value' => 'false'
+									'value' => 'false',
 								),
 							),
 						),
 						array(
 							'name'  => 'ram:ActualAmount',
-							'value' => $this->format_decimal( $unit_discount ),
-						),
-						array(
-							'name'  => 'ram:BasisAmount',
-							'value' => $gross_unit,
+							'value' => $unit_discount,
 						),
 					),
 				);
 			}
+
+			$net_price_children = array(
+				array(
+					'name'  => 'ram:ChargeAmount',
+					'value' => $net_unit,
+				),
+				array(
+					'name'       => 'ram:BasisQuantity',
+					'value'      => 1,
+					'attributes' => array(
+						'unitCode' => 'C62',
+					),
+				),
+			);
 
 			// Build SpecifiedTradeProduct
 			$product_value = array(
@@ -122,6 +159,12 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 				}
 			}
 
+			$quantity_value = $parts['qty'];
+
+			// Use Woo’s net_total for the line total amount.
+			$net_line_total_f = (float) $this->format_decimal( $parts['net_total'], 2 );
+			$net_line_total   = $this->format_decimal( $net_line_total_f, 2 );
+
 			$line_item = array(
 				'name'  => 'ram:IncludedSupplyChainTradeLineItem',
 				'value' => array(
@@ -129,7 +172,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'name'  => 'ram:AssociatedDocumentLineDocument',
 						'value' => array(
 							array(
-								'name' => 'ram:LineID',
+								'name'  => 'ram:LineID',
 								'value' => $item_id,
 							),
 						),
@@ -142,8 +185,12 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'name'  => 'ram:SpecifiedLineTradeAgreement',
 						'value' => array(
 							array(
+								'name'  => 'ram:GrossPriceProductTradePrice',
+								'value' => $gross_price_children,
+							),
+							array(
 								'name'  => 'ram:NetPriceProductTradePrice',
-								'value' => $price_children,
+								'value' => $net_price_children,
 							),
 						),
 					),
@@ -152,7 +199,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 						'value' => array(
 							array(
 								'name'       => 'ram:BilledQuantity',
-								'value'      => $parts['qty'],
+								'value'      => $quantity_value,
 								'attributes' => array(
 									'unitCode' => 'C62',
 								),
@@ -169,7 +216,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 									'value' => array(
 										array(
 											'name'  => 'ram:LineTotalAmount',
-											'value' => $this->format_decimal( $parts['net_total'] ),
+											'value' => $net_line_total,
 										),
 									),
 								),

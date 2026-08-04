@@ -126,6 +126,7 @@ jQuery( function( $ ) {
 	let $previewNonceInput        = $( '#wpo-wcpdf-preview-wrapper input[name="nonce"]' );
 	let $previewSettingsForm      = $( '#wpo-wcpdf-settings' );
 	let previewXhr                = null;
+	let previewSearchXhr          = null;
 
 	// variables
 	let previewOrderId, previewDocumentType, previewOutputFormat, previewNonce, previewSettingsFormData, previewTimeout, previewSearchTimeout, previousWindowWidth;
@@ -146,8 +147,45 @@ jQuery( function( $ ) {
 		$previewOrderIdInput.val( '' ).trigger( 'change' );
 	}
 
+	function getPreviewOrderIdFromUrl() {
+		const params = new URLSearchParams( window.location.search );
+		return params.get( 'preview_order' ) || '';
+	}
+
+	function setPreviewOrderIdInUrl( orderId ) {
+		function updateParams( params ) {
+			if ( orderId ) {
+				params.set( 'preview_order', orderId );
+			} else {
+				params.delete( 'preview_order' );
+			}
+			return params;
+		}
+
+		const params = updateParams( new URLSearchParams( window.location.search ) );
+		history.replaceState( null, '', '?' + params.toString() );
+
+		// Update document section links so they carry the param on navigation
+		$( '.wcpdf_document_settings_sections a, .doc-output-toggle-group .doc-output-toggle' ).each( function() {
+			const href       = $( this ).attr( 'href' );
+			const [ path ]   = href.split( '?' );
+			const linkParams = updateParams( new URLSearchParams( href.split( '?' )[1] ) );
+			$( this ).attr( 'href', path + '?' + linkParams.toString() );
+		} );
+	}
+
 	resetDocumentType();      // force document type reset
-	resetOrderId();           // force order ID reset
+
+	let urlOrderId = parseInt( getPreviewOrderIdFromUrl(), 10 ) || '';
+	if ( urlOrderId ) {
+		$previewOrderIdInput.val( urlOrderId );
+		$( '.preview-document .order-search-label' ).text( '#' + urlOrderId );
+		$( '.preview-document p.last-order' ).hide();
+		$( '.preview-document p.order-search' ).show();
+	} else {
+		resetOrderId();       // force order ID reset
+	}
+
 	loadPreviewData();        // load preview data
 
 	previousWindowWidth = $( window ).width();
@@ -284,7 +322,7 @@ jQuery( function( $ ) {
 		$previewData.find( 'ul' ).toggleClass( 'active' );
 	} );
 
-	$( '.preview-document .preview-data ul > li' ).on( 'click', function() {
+	$( '.preview-document .preview-order-data ul > li' ).on( 'click', function() {
 		let $previewData = $( this ).closest( '.preview-data' );
 		$previewData.find( 'ul' ).toggleClass( 'active' );
 		if ( $( this ).hasClass( 'order-search' ) ) {
@@ -297,6 +335,7 @@ jQuery( function( $ ) {
 			$previewData.find( 'input[name="preview-order-search"]' ).removeClass( 'active' ).val( '' );
 			$previewData.find( '#preview-order-search-results' ).hide();
 			$previewData.find( 'img.preview-order-search-clear' ).hide(); // remove the clear button
+			setPreviewOrderIdInUrl( '' );
 			resetOrderId()    // force order ID reset
 			triggerPreview(); // trigger preview
 		}
@@ -319,8 +358,10 @@ jQuery( function( $ ) {
 	// Preview on user click in search result
 	$( document ).on( 'click', '#preview-order-search-results a', function( event ) {
 		event.preventDefault();
-		$( '.preview-document .order-search-label').text( '#' + $( this ).data( 'order_id' ) );
-		$previewOrderIdInput.val( $( this ).data( 'order_id' ) ).trigger( 'change' );
+		let selectedOrderId = $( this ).data( 'order_id' );
+		setPreviewOrderIdInUrl( selectedOrderId );
+		$( '.preview-document .order-search-label' ).text( '#' + selectedOrderId );
+		$previewOrderIdInput.val( selectedOrderId ).trigger( 'change' );
 		$( this ).closest( 'div' ).hide();                   // hide results div
 		$( this ).closest( 'div' ).children( 'a' ).remove(); // remove all results
 		triggerPreview();
@@ -328,7 +369,7 @@ jQuery( function( $ ) {
 
 	// Check for settings change
 	$( document ).on( 'keyup paste', '#wpo-wcpdf-settings input, #wpo-wcpdf-settings textarea', settingsChanged );
-	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select', function( event ) {
+	$( document ).on( 'change', '#wpo-wcpdf-settings input[type="checkbox"], #wpo-wcpdf-settings input[type="radio"], #wpo-wcpdf-settings select, #wpo-wcpdf-settings input[type="color"]', function( event ) {
 		if ( 'shop_address_country' === event.target.id || ! event.isTrigger ) { // exclude programmatic triggers that aren't actually changing anything
 			settingsChanged( event );
 		}
@@ -515,10 +556,35 @@ jQuery( function( $ ) {
 	$previewDocumentTypeInput.on( 'change', function() {
 		let inputValue = $( this ).val();
 		if ( inputValue.length ) {
-			let inputName  = $( this ).attr( 'name' );
-			let $ul        = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list[data-input-name='+inputName+']' );
-			let $li        = $ul.find( 'li[data-value='+inputValue+']' );
+			let inputName   = $( this ).attr( 'name' );
+			let $ul         = $( '#wpo-wcpdf-preview-wrapper ul.preview-data-option-list[data-input-name='+inputName+']' );
+			let $li         = $ul.find( 'li[data-value='+inputValue+']' );
+			let xmlDocTypes = wpo_wcpdf_admin.xml_document_types || [];
+			let supportsXml = xmlDocTypes.indexOf( inputValue ) !== -1;
+			let $xmlToggle  = $( '.doc-output-toggle-group .doc-output-toggle' ).filter( function() {
+				return $( this ).text().trim().toLowerCase() === 'xml';
+			} );
+
 			$ul.parent().find( '.current-label' ).text( $li.text() );
+
+			// show/hide XML toggle based on whether the document type supports it
+			$xmlToggle.toggle( supportsXml );
+
+			// if XML is not supported and the current format is XML, fall back to PDF
+			if ( ! supportsXml && $previewOutputFormatInput.val() === 'xml' ) {
+				$previewOutputFormatInput.val( 'pdf' );
+
+				$preview.empty();
+
+				const formatParams = new URLSearchParams( window.location.search );
+				formatParams.delete( 'output_format' );
+				history.replaceState( null, '', '?' + formatParams.toString() );
+
+				$( '.doc-output-toggle-group .doc-output-toggle' ).removeClass( 'active' ).filter( function() {
+					return $( this ).text().trim().toLowerCase() === 'pdf';
+				} ).addClass( 'active' );
+			}
+
 			triggerPreview();
 		}
 	} ).trigger( 'change' );
@@ -674,12 +740,17 @@ jQuery( function( $ ) {
 		$div.parent().find( 'img.preview-order-search-clear' ).hide(); // hide the clear button
 		$div.children( '.error' ).remove();                            // remove previous errors
 		$div.children( 'a' ).remove();                                 // remove previous results
-		$div.hide();                                                   // hide search results
+		$div.hide();
 
-		$.ajax( {
-			type:    'POST',
-			url:     wpo_wcpdf_admin.ajaxurl,
-			data:    data,
+		previewSearchXhr = $.ajax( {
+			type: 'POST',
+			url:  wpo_wcpdf_admin.ajaxurl,
+			data: data,
+			beforeSend: function( jqXHR, settings ) {
+				if ( previewSearchXhr != null ) {
+					previewSearchXhr.abort();
+				}
+			},
 			success: function( response ) {
 				if ( response.data ) {
 					if ( response.data.error ) {
@@ -700,7 +771,14 @@ jQuery( function( $ ) {
 
 				$elem.removeClass( 'ajax-waiting' );
 				$elem.closest( 'div' ).find( 'img.preview-order-search-clear' ).show();
-			}
+			},
+			error: function( jqXHR, textStatus ) {
+				if ( textStatus !== 'abort' ) {
+					$div.append( '<span class="error">' + jqXHR.status + ': ' + jqXHR.statusText + '</span>' );
+					$div.show();
+					$elem.removeClass( 'ajax-waiting' );
+				}
+			},
 		} );
 	}
 
@@ -724,7 +802,7 @@ jQuery( function( $ ) {
 		};
 
 		const sections = $( '.settings_category h2' );
-		
+
 		if ( sections.length === 0 ) {
 			return; // No sections found
 		}
@@ -735,7 +813,7 @@ jQuery( function( $ ) {
 			const $panel    = $header.next( '.form-table' );
 			const $category = $header.parent( '.settings_category' );
 			const idBase    = $category.attr( 'id' ) || $header.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
-			
+
 			// Ensure header has an id and compute explicit ids
 			if ( ! $header.attr( 'id' ) ) {
 				$header.attr( 'id', `${idBase}_header` );
@@ -762,7 +840,7 @@ jQuery( function( $ ) {
 			const $category  = $header.parent( '.settings_category' );
 			const categoryId = $category.attr( 'id' ) || `wcpdf_${tab}_section_${index}`;
 			const $panel     = $header.next( '.form-table' );
-			
+
 			// Check localStorage for saved state
 			const stored = localStorage.getItem( `wcpdf_${tab}_settings_accordion_state_${categoryId}` );
 			let shouldOpen = false;
@@ -825,7 +903,198 @@ jQuery( function( $ ) {
 	// Initialize accordion
 	settingsAccordion();
 	//----------> /Settings Accordion <----------//
-	
+
+	//----------> Settings Search <----------//
+
+	function settingsSearch() {
+		const $input = $( '#wpo-settings-search' );
+
+		if ( ! $input.length ) {
+			return;
+		}
+
+		// Check if search index is available.
+		if ( ! wpo_wcpdf_admin.search_index.length ) {
+			return;
+		}
+
+		const $searchContainer = $input.closest( '.settings-search' );
+
+		// Create dropdown container.
+		$searchContainer.find( '.settings-search-dropdown' ).remove();
+		const $dropdown = $( '<ul class="settings-search-dropdown"></ul>' );
+		$searchContainer.append( $dropdown );
+
+		let activeIndex = -1;
+		let matches     = [];
+
+		function findSettingRow( item ) {
+			const $category = $( '#' + item.category );
+
+			if ( ! $category.length ) {
+				return $();
+			}
+
+			return $category.find( '[name*="[' + item.id + ']"]' ).first().closest( 'tr' );
+		}
+
+		function renderResults( query ) {
+			$dropdown.empty();
+			activeIndex = -1;
+			matches     = [];
+
+			if ( ! query ) {
+				$dropdown.hide();
+				return;
+			}
+
+			const needle = query.toLowerCase().trim();
+
+			matches = wpo_wcpdf_admin.search_index.filter( function ( item ) {
+				const label   = item.label ? item.label.toLowerCase() : '';
+				const section = item.section ? item.section.toLowerCase() : '';
+
+				return label.indexOf( needle ) !== -1 || section.indexOf( needle ) !== -1;
+			} );
+
+			if ( ! matches.length ) {
+				$dropdown.hide();
+				return;
+			}
+
+			$.each( matches, function ( index, item ) {
+				const $item = $( '<li class="settings-search-item"></li>' )
+					.attr( 'data-index', index )
+					.on( 'mousedown', function ( e ) {
+						e.preventDefault();
+						navigateToSetting( item );
+					} );
+
+				$( '<span class="settings-search-item-label"></span>' ).text( item.label ).appendTo( $item );
+
+				if ( item.section ) {
+					$( '<span class="settings-search-item-section"></span>' ).text( item.section ).appendTo( $item );
+				}
+
+				$dropdown.append( $item );
+			} );
+
+			$dropdown.show();
+		}
+
+		function setActiveItem( index ) {
+			const $items = $dropdown.find( '.settings-search-item' );
+
+			if ( ! $items.length ) {
+				return;
+			}
+
+			// Clamp index.
+			if ( index < 0 ) {
+				index = $items.length - 1;
+			} else if ( index >= $items.length ) {
+				index = 0;
+			}
+
+			activeIndex = index;
+			$items.removeClass( 'active' );
+			$items.eq( activeIndex ).addClass( 'active' );
+
+			// Scroll into view.
+			const el = $items.get( activeIndex );
+			if ( el ) {
+				el.scrollIntoView( { block: 'nearest' } );
+			}
+		}
+
+		function navigateToSetting( item ) {
+			$dropdown.hide();
+			$input.val( '' );
+
+			const $category = $( '#' + item.category );
+
+			// Early return if category is not found.
+			if ( ! $category.length ) {
+				return;
+			}
+
+			// Find the target row by setting ID.
+			const $row = findSettingRow( item );
+
+			// Early return if row is not found.
+			if ( ! $row.length ) {
+				return;
+			}
+
+			// Open the category and store the state in the local storage.
+			const $header = $category.find( '> h2' );
+			const $panel  = $header.next( '.form-table' );
+
+			// Open the accordion section if closed.
+			if ( $panel.length && ! $panel.is( ':visible' ) ) {
+				$header.addClass( 'active' ).attr( 'aria-expanded', true );
+				$panel.show().attr( 'aria-hidden', 'false' );
+
+				const params = new URLSearchParams( window.location.search );
+				const tab    = params.get( 'tab' ) || 'general';
+
+				localStorage.setItem( `wcpdf_${tab}_settings_accordion_state_${item.category}`, 'true' );
+			}
+
+			// Scroll to and highlight the row.
+			const offset = $row.offset().top - 150;
+			$( 'html, body' ).animate( { scrollTop: offset }, 300, function () {
+				$row.addClass( 'settings-search-highlight' );
+				setTimeout( function () {
+					$row.removeClass( 'settings-search-highlight' );
+				}, 1500 );
+			} );
+		}
+
+		// Input events.
+		$input.on( 'input', function () {
+			renderResults( $( this ).val().trim() );
+		} );
+
+		$input.on( 'keydown', function ( e ) {
+			if ( ! $dropdown.is( ':visible' ) ) {
+				return;
+			}
+
+			if ( 'ArrowDown' === e.key ) {
+				e.preventDefault();
+				setActiveItem( activeIndex + 1 );
+			} else if ( 'ArrowUp' === e.key ) {
+				e.preventDefault();
+				setActiveItem( activeIndex - 1 );
+			} else if ( 'Enter' === e.key ) {
+				e.preventDefault();
+				if ( activeIndex >= 0 && matches[ activeIndex ] ) {
+					navigateToSetting( matches[ activeIndex ] );
+				}
+			} else if ( 'Escape' === e.key ) {
+				$dropdown.hide();
+				$input.val( '' );
+			}
+		} );
+
+		$( document ).on( 'mousedown', function ( e ) {
+			if ( ! $( e.target ).closest( '.settings-search' ).length ) {
+				$dropdown.hide();
+			}
+		} );
+
+		$input.on( 'focus', function () {
+			const val = $( this ).val().trim();
+			if ( val ) {
+				renderResults( val );
+			}
+		} );
+	}
+
+	settingsSearch();
+	//----------> /Settings Search <----------//
+
 	//----------> Conditional Visibility <----------//
 	const bound = new Set();
 
@@ -843,10 +1112,18 @@ jQuery( function( $ ) {
 	} );
 
 	function toggle_conditional_visibility( e ) {
-		const $this  = $( e.target );
-		let name     = $this.prop( 'name' ).replace( '[]', '' ); // normalize multiselect
+		const $this = $( e.target );
+		let name    = ( $this.prop( 'name' ) || '' ).replace( /\[\]$/, '' );
+
+		if ( ! name ) {
+			return;
+		}
+
 		let value    = $this.val();
 		let checkbox = false;
+
+		const $controllerRow     = $this.closest( 'tr' );
+		const controllerIsVisible = ! $controllerRow.length || $controllerRow.is( ':visible' );
 
 		if ( $this.is( ':checkbox' ) ) {
 			value    = $this.is( ':checked' );
@@ -854,37 +1131,53 @@ jQuery( function( $ ) {
 		}
 
 		$( "[data-show_for_option_name='" + name + "']" ).each( function() {
+			const $conditional = $( this );
+			const $row         = $conditional.closest( 'tr' );
+
 			let show       = false;
-			let show_for   = $( this ).data( 'show_for_option_values' );
-			let keep_value = $( this ).data( 'keep_current_value' );
-			
-			if ( checkbox ) {
-				show = value; // for checkboxes, checked = show
-			} else if ( Array.isArray( value ) ) { // Multiselect
-				show = value.some( item => show_for.includes( item ) );
-			} else {
-				show = show_for.includes( value );
+			let show_for   = $conditional.data( 'show_for_option_values' );
+			let keep_value = $conditional.data( 'keep_current_value' );
+
+			if ( ! Array.isArray( show_for ) ) {
+				show_for = [ show_for ];
 			}
 
-			let $row = $( this ).closest( 'tr' );
+			show_for = show_for.map( String );
+
+			if ( ! controllerIsVisible ) {
+				show = false;
+			} else if ( checkbox ) {
+				show = value;
+			} else if ( Array.isArray( value ) ) {
+				show = value.some( item => show_for.includes( String( item ) ) );
+			} else {
+				show = show_for.includes( String( value ) );
+			}
 
 			if ( show ) {
+				const wasHidden = ! $row.is( ':visible' );
+
 				$row.show();
 
 				if ( checkbox ) {
 					$row.find( ':input[type=checkbox]' ).val( '1' );
 				}
+
+				// Re-evaluate nested conditionals when this row becomes visible.
+				if ( wasHidden ) {
+					$row.find( ':input' ).trigger( 'change' );
+				}
 			} else {
 				$row.hide()
 					.find( ':input' ).each( function () {
 						const $input = $( this );
-						
-						// Don't reset value
+
+						// Even when keeping the value, trigger change so child conditionals are hidden too.
 						if ( keep_value ) {
+							$input.trigger( 'change' );
 							return;
 						}
 
-						// Reset the input value
 						if ( $input.is( 'select' ) ) {
 							if ( $input.prop( 'multiple' ) ) {
 								$input.val( [] );
@@ -903,7 +1196,7 @@ jQuery( function( $ ) {
 		} );
 	}
 	//----------> /Conditional Visibility <----------//
-	
+
 	//----------> Sync Address <----------//
 
 	$( '#wpo-wcpdf-settings .sync-address' ).on( 'click', function( event ) {
@@ -968,5 +1261,17 @@ jQuery( function( $ ) {
 	} );
 
 	//----------> /Sync Address <----------//
-	
+
+	document.querySelector( '[name="wpo_wcpdf_settings_general[template_path]"]' )
+		?.addEventListener( 'change', function() {
+			const selectedTemplate = this.value;
+			const $colorInput      = $( '#template_color' );
+			const defaults         = $colorInput.data( 'template_color_defaults' ) || {};
+			const savedValue       = $colorInput.data( 'saved_value' ) || '';
+			const defaultColor     = defaults[ selectedTemplate ] || '';
+
+			if ( ! savedValue && defaultColor ) {
+				$colorInput.val( defaultColor );
+			}
+		}, true ); // true = capture phase, fires before jQuery handlers
 } );

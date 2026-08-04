@@ -1125,7 +1125,7 @@ class SettingsCallbacks {
 		$output = array(); // Create our array for storing the validated options.
 
 		if ( ! empty( $input ) && is_array( $input ) ) {
-			if ( ! empty( $input['wpo_wcpdf_setting_store_empty'] ) && is_array( $input['wpo_wcpdf_setting_store_empty'] ) ) { //perhaps we should use a more unique/specific name for this
+			if ( ! empty( $input['wpo_wcpdf_setting_store_empty'] ) && is_array( $input['wpo_wcpdf_setting_store_empty'] ) ) {
 				foreach ( $input['wpo_wcpdf_setting_store_empty'] as $key ) {
 					if ( empty( $input[ $key ] ) ) {
 						$output[ $key ] = 0;
@@ -1133,7 +1133,7 @@ class SettingsCallbacks {
 				}
 				unset( $input['wpo_wcpdf_setting_store_empty'] );
 			}
-		
+			
 			// Loop through each of the incoming options.
 			foreach ( $input as $key => $value ) {
 				if ( is_array( $value ) ) {
@@ -1141,6 +1141,11 @@ class SettingsCallbacks {
 						$output[ $key ][ $sub_key ] = $sub_value;
 					}
 				} else {
+					// Normalize identifiers like VAT / CoC on save.
+					if ( in_array( $key, array( 'vat_number', 'coc_number' ), true ) ) {
+						$value = $this->normalize_identifier( (string) $value );
+					}
+
 					$output[ $key ] = $value;
 				}
 			}
@@ -1190,6 +1195,25 @@ class SettingsCallbacks {
 			esc_html( $action_button['text'] ),
 			! empty( $action_button['icon'] ) ? sprintf( '<span class="dashicons dashicons-%s"></span>', esc_attr( $action_button['icon'] ) ) : ''
 		);
+	}
+	
+	/**
+	 * Normalize identifier-like values (VAT / CoC).
+	 *
+	 * @param string $value
+	 * @return string
+	 */
+	protected function normalize_identifier( string $value ): string {
+		$value = wp_strip_all_tags( $value );
+		$value = trim( $value );
+
+		// Uppercase for consistency (VAT formats often expect it).
+		$value = strtoupper( $value );
+
+		// Keep only A-Z and 0-9, strip spaces, dots, dashes, etc.
+		$value = preg_replace( '/[^A-Z0-9]/', '', $value );
+
+		return $value;
 	}
 	
 }
