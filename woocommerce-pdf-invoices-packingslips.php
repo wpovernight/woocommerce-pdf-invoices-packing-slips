@@ -42,6 +42,10 @@ class WPO_WCPDF {
 	public $install;
 	public $font_synchronizer;
 
+	private const V6_MIN_PHP_VERSION = '8.1';
+	private const V6_MIN_WP_VERSION  = '5.3';
+	private const V6_MIN_WC_VERSION  = '4.0';
+
 	protected static $_instance = null;
 
 	/**
@@ -293,352 +297,6 @@ class WPO_WCPDF {
 		$message .= '</div>';
 
 		echo wp_kses_post( $message );
-	}
-	
-	/**
-	 * Get the items that should be addressed before updating to version 6.
-	 *
-	 * @return array
-	 */
-	private function get_v6_upgrade_issues(): array {
-		global $wp_version;
-
-		$issues = array();
-
-		if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
-			$issues['php'] = array(
-				'title'   => __( 'PHP version', 'woocommerce-pdf-invoices-packing-slips' ),
-				'message' => sprintf(
-					/* translators: 1. current PHP version, 2. required PHP version */
-					__( 'Your site is currently running PHP %1$s. Version 6 requires PHP %2$s or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
-					PHP_VERSION,
-					'8.1'
-				),
-			);
-		}
-
-		if ( version_compare( $wp_version, '5.3', '<' ) ) {
-			$issues['wordpress'] = array(
-				'title'   => __( 'WordPress version', 'woocommerce-pdf-invoices-packing-slips' ),
-				'message' => sprintf(
-					/* translators: 1. current WordPress version, 2. required WordPress version */
-					__( 'Your site is currently running WordPress %1$s. Version 6 requires WordPress %2$s or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
-					$wp_version,
-					'5.3'
-				),
-			);
-		}
-
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '4.0', '<' ) ) {
-			$issues['woocommerce'] = array(
-				'title'   => __( 'WooCommerce version', 'woocommerce-pdf-invoices-packing-slips' ),
-				'message' => sprintf(
-					/* translators: 1. current WooCommerce version, 2. required WooCommerce version */
-					__( 'Your site is currently running WooCommerce %1$s. Version 6 requires WooCommerce %2$s or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
-					WC_VERSION,
-					'4.0'
-				),
-			);
-		}
-
-		$custom_documents = $this->get_v6_custom_documents();
-
-		if ( ! empty( $custom_documents ) ) {
-			$issues['custom_documents'] = array(
-				'title'     => __( 'Custom documents', 'woocommerce-pdf-invoices-packing-slips' ),
-				'message'   => __( 'Version 6 includes significant changes to the document base class. The custom documents below may no longer work and could trigger a critical error after the update. Please contact us before updating so we can help determine the required changes.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'documents' => $custom_documents,
-			);
-		}
-
-		return is_array( $issues ) ? $issues : array();
-	}
-
-	/**
-	 * Get custom documents that may require changes for version 6.
-	 *
-	 * @return array<string,string>
-	 */
-	private function get_v6_custom_documents(): array {
-		if ( empty( $this->documents ) || ! method_exists( $this->documents, 'get_documents' ) ) {
-			return array();
-		}
-
-		$official_document_classes = array(
-			// Free plugin.
-			'WPO\\IPS\\Documents\\Invoice',
-			'WPO\\IPS\\Documents\\PackingSlip',
-
-			// Professional plugin (old classes).
-			'WPO\\WC\\PDF_Invoices\\Documents\\Proforma',
-			'WPO\\WC\\PDF_Invoices\\Documents\\Credit_Note',
-			'WPO\\WC\\PDF_Invoices\\Documents\\Receipt',
-
-			// Professional plugin (new classes).
-			'WPO\\IPS\\Documents\\Proforma',
-			'WPO\\IPS\\Documents\\CreditNote',
-			'WPO\\IPS\\Documents\\Receipt',
-			'WPO\\IPS\\Documents\\DeliveryNote',
-		);
-
-		$official_document_classes = array_values(
-			array_unique(
-				array_filter(
-					array_map(
-						static function ( $class_name ): string {
-							return is_string( $class_name )
-								? ltrim( $class_name, '\\' )
-								: '';
-						},
-						(array) $official_document_classes
-					)
-				)
-			)
-		);
-
-		$custom_documents = array();
-
-		foreach ( $this->documents->get_documents( 'all', 'any' ) as $document ) {
-			if ( ! is_object( $document ) ) {
-				continue;
-			}
-
-			$class_name = ltrim( get_class( $document ), '\\' );
-
-			if ( in_array( $class_name, $official_document_classes, true ) ) {
-				continue;
-			}
-
-			$title = '';
-
-			try {
-				if ( is_callable( array( $document, 'get_title' ) ) ) {
-					$title = (string) $document->get_title();
-				}
-			} catch ( \Throwable $exception ) {
-				wcpdf_log_error(
-					sprintf(
-						'Could not retrieve the title for custom document %1$s: %2$s',
-						$class_name,
-						$exception->getMessage()
-					)
-				);
-			}
-
-			if ( empty( $title ) ) {
-				$class_parts = explode( '\\', $class_name );
-				$title       = end( $class_parts );
-			}
-
-			$custom_documents[ $class_name ] = $title;
-		}
-
-		ksort( $custom_documents );
-
-		return $custom_documents;
-	}
-
-	/**
-	 * Upcoming version 6 requirements and compatibility notice.
-	 *
-	 * @return void
-	 */
-	public function v6_upgrade_notice(): void {
-		$dismiss_option = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
-		$dismiss_arg    = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
-
-		if ( version_compare( $this->version, '6.0.0', '>=' ) ) {
-			return;
-		}
-
-		if ( ! empty( $this->settings ) && method_exists( $this->settings, 'user_can_manage_settings' ) ) {
-			if ( ! $this->settings->user_can_manage_settings() ) {
-				return;
-			}
-		} elseif ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		$issues = $this->get_v6_upgrade_issues();
-
-		if ( empty( $issues ) ) {
-			delete_option( $dismiss_option );
-
-			return;
-		}
-
-		$signature_parts = array_keys( $issues );
-
-		if ( ! empty( $issues['custom_documents']['documents'] ) ) {
-			$signature_parts = array_merge(
-				$signature_parts,
-				array_keys( $issues['custom_documents']['documents'] )
-			);
-		}
-
-		$signature    = md5( wp_json_encode( $signature_parts ) );
-		$nonce_action = 'wcpdf_dismiss_v6_upgrade_notice_' . $signature;
-
-		if ( isset( $_GET[ $dismiss_arg ], $_GET['_wpnonce'] ) ) {
-			$requested_signature = sanitize_text_field(
-				wp_unslash( $_GET[ $dismiss_arg ] )
-			);
-
-			$nonce = sanitize_text_field(
-				wp_unslash( $_GET['_wpnonce'] )
-			);
-
-			if (
-				hash_equals( $signature, $requested_signature ) &&
-				wp_verify_nonce( $nonce, $nonce_action )
-			) {
-				update_option( $dismiss_option, $signature );
-			} else {
-				wcpdf_log_error(
-					'Invalid request while dismissing version 6 upgrade notice.'
-				);
-			}
-
-			wp_safe_redirect(
-				remove_query_arg(
-					array(
-						$dismiss_arg,
-						'_wpnonce',
-					)
-				)
-			);
-
-			exit;
-		}
-
-		if ( hash_equals( $signature, (string) get_option( $dismiss_option, '' ) ) ) {
-			return;
-		}
-
-		$dismiss_url = wp_nonce_url(
-			add_query_arg( $dismiss_arg, $signature ),
-			$nonce_action
-		);
-
-		$has_custom_issue = isset( $issues['custom_documents'] );
-		$has_php_issue    = isset( $issues['php'] );
-		$has_update_issue = isset( $issues['wordpress'] ) || isset( $issues['woocommerce'] );
-
-		$notice_class = $has_custom_issue
-			? 'notice notice-error'
-			: 'notice notice-warning';
-
-		$v6_guide_url = 'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/before-updating-to-version-6/';
-		?>
-		<div class="<?php echo esc_attr( $notice_class ); ?>">
-			<p>
-				<strong><?php esc_html_e( 'Prepare your site for version 6', 'woocommerce-pdf-invoices-packing-slips' ); ?></strong>
-			</p>
-
-			<p>
-				<?php esc_html_e( 'Version 6 introduces important compatibility changes and new minimum requirements. Please review the upgrade guide and address the items below before updating.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-			</p>
-
-			<p>
-				<a
-					class="button button-primary"
-					href="<?php echo esc_url( $v6_guide_url ); ?>"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<?php esc_html_e( 'Read the version 6 upgrade guide', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-				</a>
-
-				<?php if ( $has_custom_issue ) : ?>
-					<a
-						class="button"
-						href="<?php echo esc_url( 'https://wpovernight.com/contact/' ); ?>"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<?php esc_html_e( 'Contact support', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-					</a>
-				<?php endif; ?>
-
-				<?php if ( $has_php_issue ) : ?>
-					<a
-						class="button"
-						href="<?php echo esc_url( 'https://docs.wpovernight.com/general/how-to-update-your-php-version/' ); ?>"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						<?php esc_html_e( 'Learn how to update PHP', 'woocommerce-pdf-invoices-packing-slips' );
-					?>
-					</a>
-				<?php endif; ?>
-
-				<?php if ( $has_update_issue ) : ?>
-					<a
-						class="button"
-						href="<?php echo esc_url( admin_url( 'update-core.php' ) ); ?>"
-					>
-						<?php esc_html_e( 'Review available updates', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-					</a>
-				<?php endif; ?>
-			</p>
-
-			<hr>
-
-			<?php foreach ( $issues as $issue_key => $issue ) : ?>
-				<div style="margin: 16px 0;">
-					<p style="margin-bottom: 4px;">
-						<strong><?php echo esc_html( $issue['title'] ); ?></strong>
-					</p>
-
-					<p style="margin-top: 0;">
-						<?php echo esc_html( $issue['message'] ); ?>
-					</p>
-
-					<?php if ( ! empty( $issue['documents'] ) ) : ?>
-						<table
-							class="widefat striped"
-							style="max-width: 760px; margin-top: 10px;"
-						>
-							<thead>
-								<tr>
-									<th>
-										<?php esc_html_e( 'Document', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-									</th>
-
-									<th>
-										<?php esc_html_e( 'Class', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-									</th>
-								</tr>
-							</thead>
-
-							<tbody>
-								<?php foreach ( $issue['documents'] as $class_name => $title ) : ?>
-									<tr>
-										<td>
-											<strong>
-												<?php echo esc_html( $title ); ?>
-											</strong>
-										</td>
-										<td>
-											<code>
-												<?php echo esc_html( $class_name ); ?>
-											</code>
-										</td>
-									</tr>
-								<?php endforeach; ?>
-							</tbody>
-						</table>
-					<?php endif; ?>
-				</div>
-			<?php endforeach; ?>
-
-			<p>
-				<a href="<?php echo esc_url( $dismiss_url ); ?>">
-					<?php esc_html_e( 'Dismiss this notice', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-				</a>
-			</p>
-		</div>
-		<?php
 	}
 
 	/**
@@ -1177,6 +835,522 @@ class WPO_WCPDF {
 		}
 
 		return apply_filters( 'plugin_locale', $locale, 'woocommerce-pdf-invoices-packing-slips' );
+	}
+
+	/*----------------> V6 NOTICE <----------------*/
+
+	/**
+	 * Upcoming version 6 requirements and compatibility notice.
+	 *
+	 * @return void
+	 */
+	public function v6_upgrade_notice(): void {
+		$dismiss_option = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
+		$dismiss_arg    = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
+
+		if ( version_compare( $this->version, '6.0.0', '>=' ) ) {
+			return;
+		}
+
+		if ( ! empty( $this->settings ) && method_exists( $this->settings, 'user_can_manage_settings' ) ) {
+			if ( ! $this->settings->user_can_manage_settings() ) {
+				return;
+			}
+		} elseif ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$checks = $this->get_v6_upgrade_checks();
+
+		if ( empty( $checks ) ) {
+			return;
+		}
+
+		$all_passed     = true;
+		$signature_data = array();
+
+		foreach ( $checks as $check_key => $check ) {
+			$passed = ! empty( $check['passed'] );
+
+			if ( ! $passed ) {
+				$all_passed = false;
+			}
+
+			$signature_data[ $check_key ] = array(
+				'passed'    => $passed,
+				'documents' => ! empty( $check['documents'] )
+					? array_keys( $check['documents'] )
+					: array(),
+			);
+		}
+
+		$signature    = md5( wp_json_encode( $signature_data ) );
+		$nonce_action = 'wcpdf_dismiss_v6_upgrade_notice_' . $signature;
+
+		if ( isset( $_GET[ $dismiss_arg ], $_GET['_wpnonce'] ) ) {
+			$requested_signature = sanitize_text_field(
+				wp_unslash( $_GET[ $dismiss_arg ] )
+			);
+
+			$nonce = sanitize_text_field(
+				wp_unslash( $_GET['_wpnonce'] )
+			);
+
+			if (
+				hash_equals( $signature, $requested_signature ) &&
+				wp_verify_nonce( $nonce, $nonce_action )
+			) {
+				update_option( $dismiss_option, $signature );
+			} else {
+				wcpdf_log_error(
+					'Invalid request while dismissing version 6 upgrade notice.'
+				);
+			}
+
+			wp_safe_redirect(
+				remove_query_arg(
+					array(
+						$dismiss_arg,
+						'_wpnonce',
+					)
+				)
+			);
+
+			exit;
+		}
+
+		if ( hash_equals( $signature, (string) get_option( $dismiss_option, '' ) ) ) {
+			return;
+		}
+
+		$dismiss_url = wp_nonce_url(
+			add_query_arg( $dismiss_arg, $signature ),
+			$nonce_action
+		);
+
+		$upgrade_guide_url = 'https://docs.wpovernight.com/general/before-updating-to-version-6/';
+		$update_url        = $all_passed ? $this->get_v6_update_url() : '';
+
+		$checklist_id = 'wpo-wcpdf-v6-upgrade-checklist';
+		$ready_id     = 'wpo-wcpdf-v6-upgrade-ready';
+
+		if ( $all_passed ) {
+			wp_enqueue_script( 'jquery' );
+
+			wp_add_inline_script(
+				'jquery',
+				sprintf(
+					'window.setTimeout(function () {
+						var checklist = document.getElementById(%1$s);
+						var ready = document.getElementById(%2$s);
+
+						if (checklist && ready) {
+							checklist.style.display = "none";
+							ready.style.display = "block";
+						}
+					}, 2500);',
+					wp_json_encode( $checklist_id ),
+					wp_json_encode( $ready_id )
+				)
+			);
+		}
+
+		$notice_class = $all_passed
+			? 'notice notice-info'
+			: 'notice notice-warning';
+		?>
+		<div id="<?php echo esc_attr( $checklist_id ); ?>" class="<?php echo esc_attr( $notice_class ); ?>">
+			<p>
+				<strong>
+					<?php esc_html_e( 'Action required: PDF Invoices & Packing Slips for WooCommerce compatibility with version 6', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</strong>
+			</p>
+
+			<p>
+				<?php esc_html_e( 'Version 6 brings significant improvements. To ensure a smooth transition and avoid interruptions to your store, please review these compatibility checks before updating.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</p>
+
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( $upgrade_guide_url ); ?>" target="_blank" rel="noopener noreferrer">
+					<?php esc_html_e( 'Read the version 6 upgrade guide', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+			</p>
+
+			<?php foreach ( $checks as $check ) : ?>
+				<?php $this->render_v6_upgrade_check( $check ); ?>
+			<?php endforeach; ?>
+
+			<p>
+				<a href="<?php echo esc_url( $dismiss_url ); ?>">
+					<?php esc_html_e( 'Dismiss this notice', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</a>
+			</p>
+		</div>
+
+		<?php if ( $all_passed ) : ?>
+			<div id="<?php echo esc_attr( $ready_id ); ?>" class="notice notice-success" style="display: none;">
+				<p>
+					<strong>
+						<?php esc_html_e( 'PDF Invoices & Packing Slips for WooCommerce is ready for version 6!', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+					</strong>
+				</p>
+
+				<p>
+					<?php esc_html_e( 'All compatibility checks have passed. Your site is ready for the version 6 update.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</p>
+
+				<p>
+					<?php if ( ! empty( $update_url ) ) : ?>
+						<a class="button button-primary" href="<?php echo esc_url( $update_url ); ?>">
+							<?php esc_html_e( 'Update now', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+						</a>
+					<?php endif; ?>
+
+					<a class="button" href="<?php echo esc_url( $upgrade_guide_url ); ?>" target="_blank" rel="noopener noreferrer">
+						<?php esc_html_e( 'Read the version 6 upgrade guide', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+					</a>
+				</p>
+
+				<p>
+					<a href="<?php echo esc_url( $dismiss_url ); ?>">
+						<?php esc_html_e( 'Dismiss this notice', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+					</a>
+				</p>
+			</div>
+		<?php endif; ?>
+		<?php
+	}
+
+	/**
+	 * Get the compatibility checks for version 6.
+	 *
+	 * @return array
+	 */
+	private function get_v6_upgrade_checks(): array {
+		global $wp_version;
+
+		$woocommerce_version = defined( 'WC_VERSION' ) ? WC_VERSION : '';
+		$custom_documents    = $this->get_v6_custom_documents();
+
+		$wordpress_passed = version_compare(
+			$wp_version,
+			self::V6_MIN_WP_VERSION,
+			'>='
+		);
+
+		$woocommerce_passed = ! empty( $woocommerce_version ) && version_compare(
+			$woocommerce_version,
+			self::V6_MIN_WC_VERSION,
+			'>='
+		);
+
+		$php_passed = version_compare(
+			PHP_VERSION,
+			self::V6_MIN_PHP_VERSION,
+			'>='
+		);
+
+		$checks = array(
+			'wordpress' => array(
+				'title'           => __( 'WordPress version', 'woocommerce-pdf-invoices-packing-slips' ),
+				'passed'          => $wordpress_passed,
+				'current'         => $wp_version,
+				'required'        => self::V6_MIN_WP_VERSION . '+',
+				'message'         => $wordpress_passed
+					? __( 'Up to date.', 'woocommerce-pdf-invoices-packing-slips' )
+					: sprintf(
+						/* translators: required WordPress version */
+						__( 'Update required. Version 6 requires WordPress %s or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
+						self::V6_MIN_WP_VERSION
+					),
+				'action_label'    => __( 'Update WordPress', 'woocommerce-pdf-invoices-packing-slips' ),
+				'action_url'      => admin_url( 'update-core.php' ),
+				'action_external' => false,
+			),
+			'woocommerce' => array(
+				'title'           => __( 'WooCommerce version', 'woocommerce-pdf-invoices-packing-slips' ),
+				'passed'          => $woocommerce_passed,
+				'current'         => $woocommerce_version ?: __( 'Not detected', 'woocommerce-pdf-invoices-packing-slips' ),
+				'required'        => self::V6_MIN_WC_VERSION . '+',
+				'message'         => $woocommerce_passed
+					? __( 'Up to date.', 'woocommerce-pdf-invoices-packing-slips' )
+					: sprintf(
+						/* translators: required WooCommerce version */
+						__( 'Update required. Version 6 requires WooCommerce %s or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
+						self::V6_MIN_WC_VERSION
+					),
+				'action_label'    => __( 'Update WooCommerce', 'woocommerce-pdf-invoices-packing-slips' ),
+				'action_url'      => admin_url( 'update-core.php' ),
+				'action_external' => false,
+			),
+			'php' => array(
+				'title'           => __( 'PHP version', 'woocommerce-pdf-invoices-packing-slips' ),
+				'passed'          => $php_passed,
+				'current'         => PHP_VERSION,
+				'required'        => self::V6_MIN_PHP_VERSION . '+',
+				'message'         => $php_passed
+					? __( 'Up to date.', 'woocommerce-pdf-invoices-packing-slips' )
+					: sprintf(
+						/* translators: required PHP version */
+						__( 'Update required. Version 6 requires PHP %s or higher.', 'woocommerce-pdf-invoices-packing-slips' ),
+						self::V6_MIN_PHP_VERSION
+					),
+				'action_label'    => __( 'Learn how to update PHP', 'woocommerce-pdf-invoices-packing-slips' ),
+				'action_url'      => 'https://docs.wpovernight.com/general/how-to-update-your-php-version/',
+				'action_external' => true,
+			),
+			'custom_documents' => array(
+				'title'           => __( 'Custom documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'passed'          => empty( $custom_documents ),
+				'message'         => empty( $custom_documents )
+					? __( 'No unverified custom documents were detected.', 'woocommerce-pdf-invoices-packing-slips' )
+					: __( 'The document base class has changed in version 6. The custom documents below might need adjustments. Please contact us before updating so we can review them with you.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'action_label'    => __( 'Contact support', 'woocommerce-pdf-invoices-packing-slips' ),
+				'action_url'      => 'https://wpovernight.com/contact/',
+				'action_external' => true,
+				'documents'       => $custom_documents,
+			),
+		);
+
+		$checks = apply_filters(
+			'wpo_wcpdf_v6_upgrade_checks',
+			$checks,
+			$this
+		);
+
+		return is_array( $checks ) ? $checks : array();
+	}
+
+	/**
+	 * Get custom documents that have not been verified for version 6.
+	 *
+	 * @return array<string,string>
+	 */
+	private function get_v6_custom_documents(): array {
+		if ( empty( $this->documents ) || ! method_exists( $this->documents, 'get_documents' ) ) {
+			return array();
+		}
+
+		$compatible_document_classes = apply_filters(
+			'wpo_wcpdf_v6_compatible_document_classes',
+			array(
+				// Free plugin.
+				'WPO\\IPS\\Documents\\Invoice',
+				'WPO\\IPS\\Documents\\PackingSlip',
+
+				// Professional plugin (old).
+				'WPO\\WC\\PDF_Invoices\\Documents\\Proforma',
+				'WPO\\WC\\PDF_Invoices\\Documents\\Credit_Note',
+				'WPO\\WC\\PDF_Invoices\\Documents\\Receipt',
+
+				// Professional plugin (new).
+				'WPO\\IPS\\Documents\\Proforma',
+				'WPO\\IPS\\Documents\\CreditNote',
+				'WPO\\IPS\\Documents\\Receipt',
+				'WPO\\IPS\\Documents\\DeliveryNote',
+			),
+			$this
+		);
+
+		$compatible_document_classes = array_values(
+			array_unique(
+				array_filter(
+					array_map(
+						static function ( $class_name ): string {
+							return is_string( $class_name )
+								? ltrim( $class_name, '\\' )
+								: '';
+						},
+						(array) $compatible_document_classes
+					)
+				)
+			)
+		);
+
+		$custom_documents = array();
+
+		foreach ( (array) $this->documents->get_documents( 'all', 'any' ) as $document ) {
+			if ( ! is_object( $document ) ) {
+				continue;
+			}
+
+			$class_name = ltrim( get_class( $document ), '\\' );
+
+			if ( in_array( $class_name, $compatible_document_classes, true ) ) {
+				continue;
+			}
+
+			$title = '';
+
+			try {
+				if ( is_callable( array( $document, 'get_title' ) ) ) {
+					$title = (string) $document->get_title();
+				}
+			} catch ( \Throwable $exception ) {
+				wcpdf_log_error(
+					sprintf(
+						'Could not retrieve the title for custom document %1$s: %2$s',
+						$class_name,
+						$exception->getMessage()
+					)
+				);
+			}
+
+			if ( empty( $title ) ) {
+				$class_parts = explode( '\\', $class_name );
+				$title       = end( $class_parts );
+			}
+
+			$custom_documents[ $class_name ] = $title;
+		}
+
+		ksort( $custom_documents );
+
+		return $custom_documents;
+	}
+
+	/**
+	 * Render a version 6 compatibility check.
+	 *
+	 * @param array $check Check data.
+	 *
+	 * @return void
+	 */
+	private function render_v6_upgrade_check( array $check ): void {
+		$passed      = ! empty( $check['passed'] );
+		$icon        = $passed ? 'dashicons-yes-alt' : 'dashicons-warning';
+		$icon_color  = $passed ? '#00a32a' : '#dba617';
+		$text_color  = $passed ? '#646970' : '#1d2327';
+		$status_text = $passed
+			? __( 'Requirement met', 'woocommerce-pdf-invoices-packing-slips' )
+			: __( 'Action required', 'woocommerce-pdf-invoices-packing-slips' );
+		?>
+		<div style="margin: 10px 0; padding: 12px 14px; border: 1px solid #dcdcde; background: #f6f7f7;">
+			<div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+				<div style="display: flex; align-items: flex-start; flex: 1 1 400px; gap: 8px;">
+					<span class="dashicons <?php echo esc_attr( $icon ); ?>" style="color: <?php echo esc_attr( $icon_color ); ?>;" aria-hidden="true"></span>
+
+					<span class="screen-reader-text">
+						<?php echo esc_html( $status_text ); ?>
+					</span>
+
+					<div>
+						<strong style="color: <?php echo esc_attr( $text_color ); ?>;">
+							<?php echo esc_html( $check['title'] ); ?>
+						</strong>
+
+						<p style="margin: 4px 0 0; color: <?php echo esc_attr( $text_color ); ?>;">
+							<?php echo esc_html( $check['message'] ); ?>
+						</p>
+					</div>
+				</div>
+
+				<?php if ( ! $passed ) : ?>
+					<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+						<?php if ( isset( $check['current'] ) ) : ?>
+							<code>
+								<?php
+								printf(
+									/* translators: current software version */
+									esc_html__( 'Current: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+									esc_html( $check['current'] )
+								);
+								?>
+							</code>
+						<?php endif; ?>
+
+						<?php if ( isset( $check['required'] ) ) : ?>
+							<code>
+								<?php
+								printf(
+									/* translators: required software version */
+									esc_html__( 'Required: %s', 'woocommerce-pdf-invoices-packing-slips' ),
+									esc_html( $check['required'] )
+								);
+								?>
+							</code>
+						<?php endif; ?>
+
+						<?php if ( ! empty( $check['action_url'] ) && ! empty( $check['action_label'] ) ) : ?>
+							<a class="button" href="<?php echo esc_url( $check['action_url'] ); ?>"
+							<?php if ( ! empty( $check['action_external'] ) ) : ?>
+								target="_blank"
+								rel="noopener noreferrer"
+							<?php endif; ?>
+							>
+								<?php echo esc_html( $check['action_label'] ); ?>
+							</a>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
+			</div>
+
+			<?php if ( ! $passed && ! empty( $check['documents'] ) ) : ?>
+				<table class="widefat striped" style="max-width: 720px; margin: 12px 0 0 28px;">
+					<thead>
+						<tr>
+							<th>
+								<?php esc_html_e( 'Document', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+							</th>
+
+							<th>
+								<?php esc_html_e( 'Class', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+							</th>
+						</tr>
+					</thead>
+
+					<tbody>
+						<?php foreach ( $check['documents'] as $class_name => $title ) : ?>
+						<tr>
+							<td>
+								<?php echo esc_html( $title ); ?>
+							</td>
+
+							<td>
+								<code><?php echo esc_html( $class_name ); ?></code>
+							</td>
+						</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Get the version 6 plugin update URL when available.
+	 *
+	 * @return string
+	 */
+	private function get_v6_update_url(): string {
+		if ( ! current_user_can( 'update_plugins' ) ) {
+			return '';
+		}
+
+		$updates = get_site_transient( 'update_plugins' );
+
+		if (
+			! is_object( $updates ) ||
+			empty( $updates->response[ $this->plugin_basename ] ) ||
+			empty( $updates->response[ $this->plugin_basename ]->new_version )
+		) {
+			return '';
+		}
+
+		$new_version = $updates->response[ $this->plugin_basename ]->new_version;
+
+		if ( version_compare( $new_version, '6.0.0', '<' ) ) {
+			return '';
+		}
+
+		return wp_nonce_url(
+			self_admin_url(
+				'update.php?action=upgrade-plugin&plugin=' .
+				urlencode( $this->plugin_basename )
+			),
+			'upgrade-plugin_' . $this->plugin_basename
+		);
 	}
 
 } // class WPO_WCPDF
