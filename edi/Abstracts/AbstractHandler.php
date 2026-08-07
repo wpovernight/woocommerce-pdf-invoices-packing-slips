@@ -612,13 +612,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	/**
 	 * Get the number of decimal places needed for XML unit prices.
 	 *
-	 * Some WooCommerce line totals cannot be reproduced by multiplying a
-	 * 2-decimal unit price by the quantity. This can happen when discounts are
-	 * distributed across multiple units, for example 187.98 / 4 = 46.995.
-	 *
-	 * Line totals should remain rounded to 2 decimals, but unit prices may need
-	 * higher precision so that PriceAmount, BaseAmount, AllowanceCharge and
-	 * LineExtensionAmount remain consistent.
+	 * Line totals remain rounded to 2 decimals, but unit prices may require
+	 * additional precision to ensure that multiplying the unit price by the
+	 * quantity reproduces the original line total.
 	 *
 	 * @param array $parts {
 	 *     Price parts for the order item.
@@ -630,37 +626,82 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return int
 	 */
 	protected function get_line_price_decimal_places( array $parts ): int {
-		$decimal_places = 2;
-		$qty            = isset( $parts['qty'] ) ? abs( (float) $parts['qty'] ) : 0.0;
+		$qty = isset( $parts['qty'] )
+			? abs( (float) $parts['qty'] )
+			: 0.0;
+
+		$minimum_decimal_places = 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' )
+			? 4
+			: 2;
 
 		if ( $qty <= 0 ) {
-			return $decimal_places;
+			return $minimum_decimal_places;
 		}
 
-		if ( 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' ) ) {
-			return 4;
-		}
+		$maximum_decimal_places = 12;
 
-		$net_total   = isset( $parts['net_total'] ) ? (float) $parts['net_total'] : 0.0;
-		$gross_total = isset( $parts['gross_total'] ) ? (float) $parts['gross_total'] : 0.0;
+		$net_total = isset( $parts['net_total'] )
+			? abs( (float) $parts['net_total'] )
+			: 0.0;
 
-		$net_unit_2dp   = (float) $this->format_decimal( $net_total / $qty, 2 );
-		$gross_unit_2dp = (float) $this->format_decimal( $gross_total / $qty, 2 );
+		$gross_total = isset( $parts['gross_total'] )
+			? abs( (float) $parts['gross_total'] )
+			: 0.0;
 
-		$net_total_from_unit_2dp   = $this->format_decimal( $net_unit_2dp * $qty, 2 );
-		$gross_total_from_unit_2dp = $this->format_decimal( $gross_unit_2dp * $qty, 2 );
+		$expected_net_total   = $this->format_decimal( $net_total, 2 );
+		$expected_gross_total = $this->format_decimal( $gross_total, 2 );
 
-		$net_total_2dp   = $this->format_decimal( $net_total, 2 );
-		$gross_total_2dp = $this->format_decimal( $gross_total, 2 );
-
-		if (
-			$net_total_from_unit_2dp !== $net_total_2dp ||
-			$gross_total_from_unit_2dp !== $gross_total_2dp
+		for (
+			$decimal_places = $minimum_decimal_places;
+			$decimal_places <= $maximum_decimal_places;
+			$decimal_places++
 		) {
-			$decimal_places = 4;
+			$gross_unit = (float) $this->format_decimal(
+				$gross_total / $qty,
+				$decimal_places
+			);
+
+			$net_unit = (float) $this->format_decimal(
+				$net_total / $qty,
+				$decimal_places
+			);
+
+			/*
+			 * Match the calculation performed later by the UBL and CII line
+			 * handlers. They calculate and round the unit discount, then
+			 * reconstruct the net unit price from the gross price.
+			 */
+			$unit_discount = max( 0.0, $gross_unit - $net_unit );
+
+			$unit_discount = (float) $this->format_decimal(
+				$unit_discount,
+				$decimal_places
+			);
+
+			$net_unit = (float) $this->format_decimal(
+				$gross_unit - $unit_discount,
+				$decimal_places
+			);
+
+			$calculated_net_total = $this->format_decimal(
+				$net_unit * $qty,
+				2
+			);
+
+			$calculated_gross_total = $this->format_decimal(
+				$gross_unit * $qty,
+				2
+			);
+
+			if (
+				$calculated_net_total === $expected_net_total &&
+				$calculated_gross_total === $expected_gross_total
+			) {
+				return $decimal_places;
+			}
 		}
 
-		return $decimal_places;
+		return $maximum_decimal_places;
 	}
 
 	/**
