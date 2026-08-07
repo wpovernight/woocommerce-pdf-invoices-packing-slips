@@ -133,6 +133,10 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_tax_scheme(): ?array {
+		if ( $this->has_tax_category( 'O' ) ) {
+			return null;
+		}
+
 		$order      = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$vat_number = \wpo_ips_edi_get_order_customer_vat_number( $order );
 
