@@ -962,12 +962,12 @@ class WPO_WCPDF {
 		<div id="<?php echo esc_attr( $checklist_id ); ?>" class="<?php echo esc_attr( $notice_class ); ?>">
 			<p>
 				<strong>
-					<?php esc_html_e( 'Action required: PDF Invoices & Packing Slips for WooCommerce compatibility with version 6', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+					<?php esc_html_e( 'Action required: Prepare your website for the upcoming release of PDF Invoices & Packing Slips for WooCommerce version 6', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				</strong>
 			</p>
 
 			<p>
-				<?php esc_html_e( 'Version 6 brings significant improvements. To ensure a smooth transition and avoid interruptions to your store, please review these compatibility checks before updating.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				<?php esc_html_e( 'Version 6 introduces significant improvements, compatibility changes and new minimum requirements. Please be sure to review the upgrade guide below and address the actionable items before updating.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 			</p>
 
 			<p>
