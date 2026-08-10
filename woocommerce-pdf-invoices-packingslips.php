@@ -1217,13 +1217,27 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	private function render_v6_upgrade_check( array $check ): void {
-		$passed      = ! empty( $check['passed'] );
-		$icon        = $passed ? 'dashicons-yes-alt' : 'dashicons-warning';
-		$icon_color  = $passed ? '#00a32a' : '#dba617';
-		$text_color  = $passed ? '#646970' : '#1d2327';
-		$status_text = $passed
-			? __( 'Requirement met', 'woocommerce-pdf-invoices-packing-slips' )
-			: __( 'Action required', 'woocommerce-pdf-invoices-packing-slips' );
+		if (
+			! isset( $check['title'], $check['message'] ) ||
+			! array_key_exists( 'passed', $check )
+		) {
+			return;
+		}
+
+		$title           = (string) $check['title'];
+		$message         = (string) $check['message'];
+		$passed          = (bool) $check['passed'];
+		$current         = isset( $check['current'] ) ? (string) $check['current'] : '';
+		$required        = isset( $check['required'] ) ? (string) $check['required'] : '';
+		$action_url      = isset( $check['action_url'] ) ? (string) $check['action_url'] : '';
+		$action_label    = isset( $check['action_label'] ) ? (string) $check['action_label'] : '';
+		$action_external = ! empty( $check['action_external'] );
+		$documents       = isset( $check['documents'] ) && is_array( $check['documents'] ) ? $check['documents'] : array();
+
+		$icon            = $passed ? 'dashicons-yes-alt' : 'dashicons-warning';
+		$icon_color      = $passed ? '#00a32a' : '#dba617';
+		$text_color      = $passed ? '#646970' : '#1d2327';
+		$status_text     = $passed ? __( 'Requirement met', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Action required', 'woocommerce-pdf-invoices-packing-slips' );
 		?>
 		<div style="margin: 10px 0; padding: 12px 14px; border: 1px solid #dcdcde; background: #f6f7f7;">
 			<div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
@@ -1236,63 +1250,62 @@ class WPO_WCPDF {
 
 					<div>
 						<strong style="color: <?php echo esc_attr( $text_color ); ?>;">
-							<?php echo esc_html( $check['title'] ); ?>
+							<?php echo esc_html( $title ); ?>
 						</strong>
 
 						<p style="margin: 4px 0 0; color: <?php echo esc_attr( $text_color ); ?>;">
-							<?php echo esc_html( $check['message'] ); ?>
+							<?php echo esc_html( $message ); ?>
 						</p>
 					</div>
 				</div>
 
 				<?php if ( ! $passed ) : ?>
 					<div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-						<?php if ( isset( $check['current'] ) ) : ?>
+						<?php if ( '' !== $current ) : ?>
 							<code>
 								<?php
 								printf(
 									/* translators: current software version */
 									esc_html__( 'Current: %s', 'woocommerce-pdf-invoices-packing-slips' ),
-									esc_html( $check['current'] )
+									esc_html( $current )
 								);
 								?>
 							</code>
 						<?php endif; ?>
 
-						<?php if ( isset( $check['required'] ) ) : ?>
+						<?php if ( '' !== $required ) : ?>
 							<code>
 								<?php
 								printf(
 									/* translators: required software version */
 									esc_html__( 'Required: %s', 'woocommerce-pdf-invoices-packing-slips' ),
-									esc_html( $check['required'] )
+									esc_html( $required )
 								);
 								?>
 							</code>
 						<?php endif; ?>
 
-						<?php if ( ! empty( $check['action_url'] ) && ! empty( $check['action_label'] ) ) : ?>
-							<a class="button" href="<?php echo esc_url( $check['action_url'] ); ?>"
-							<?php if ( ! empty( $check['action_external'] ) ) : ?>
+						<?php if ( ! empty( $action_url ) && ! empty( $action_label ) ) : ?>
+							<a class="button" href="<?php echo esc_url( $action_url ); ?>"
+							<?php if ( $action_external ) : ?>
 								target="_blank"
 								rel="noopener noreferrer"
 							<?php endif; ?>
 							>
-								<?php echo esc_html( $check['action_label'] ); ?>
+								<?php echo esc_html( $action_label ); ?>
 							</a>
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>
 			</div>
 
-			<?php if ( ! $passed && ! empty( $check['documents'] ) ) : ?>
+			<?php if ( ! $passed && ! empty( $documents ) ) : ?>
 				<table class="widefat striped" style="max-width: 720px; margin: 12px 0 0 28px;">
 					<thead>
 						<tr>
 							<th>
 								<?php esc_html_e( 'Document', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 							</th>
-
 							<th>
 								<?php esc_html_e( 'Class', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 							</th>
@@ -1300,12 +1313,11 @@ class WPO_WCPDF {
 					</thead>
 
 					<tbody>
-						<?php foreach ( $check['documents'] as $class_name => $title ) : ?>
+						<?php foreach ( $documents as $class_name => $document_title ) : ?>
 						<tr>
 							<td>
-								<?php echo esc_html( $title ); ?>
+								<?php echo esc_html( $document_title ); ?>
 							</td>
-
 							<td>
 								<code><?php echo esc_html( $class_name ); ?></code>
 							</td>
