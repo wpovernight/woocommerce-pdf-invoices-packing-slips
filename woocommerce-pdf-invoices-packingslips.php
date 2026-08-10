@@ -846,13 +846,13 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function v6_upgrade_notice(): void {
-		$dismiss_option = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
-		$dismiss_arg    = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
-		$nonce_action   = 'wcpdf_dismiss_v6_upgrade_notice';
-
 		if ( version_compare( $this->version, '6.0.0', '>=' ) ) {
 			return;
 		}
+
+		$dismiss_option = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
+		$dismiss_arg    = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
+		$nonce_action   = 'wcpdf_dismiss_v6_upgrade_notice';
 
 		if ( ! empty( $this->settings ) && method_exists( $this->settings, 'user_can_manage_settings' ) ) {
 			if ( ! $this->settings->user_can_manage_settings() ) {
