@@ -959,36 +959,8 @@ class WPO_WCPDF {
 			? 'notice notice-info'
 			: 'notice notice-warning';
 		?>
-		<div id="<?php echo esc_attr( $checklist_id ); ?>" class="<?php echo esc_attr( $notice_class ); ?>">
-			<p>
-				<strong>
-					<?php esc_html_e( 'Action required: Prepare your website for the upcoming release of PDF Invoices & Packing Slips for WooCommerce version 6', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-				</strong>
-			</p>
-
-			<p>
-				<?php esc_html_e( 'Version 6 introduces significant improvements, compatibility changes and new minimum requirements. Please be sure to review the upgrade guide below and address the actionable items before updating.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-			</p>
-
-			<p>
-				<a class="button button-primary" href="<?php echo esc_url( $upgrade_guide_url ); ?>" target="_blank" rel="noopener noreferrer">
-					<?php esc_html_e( 'Read the version 6 upgrade guide', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-				</a>
-			</p>
-
-			<?php foreach ( $checks as $check ) : ?>
-				<?php $this->render_v6_upgrade_check( $check ); ?>
-			<?php endforeach; ?>
-
-			<p>
-				<a href="<?php echo esc_url( $dismiss_url ); ?>">
-					<?php esc_html_e( 'Dismiss this notice', 'woocommerce-pdf-invoices-packing-slips' ); ?>
-				</a>
-			</p>
-		</div>
-
 		<?php if ( $all_passed ) : ?>
-			<div id="<?php echo esc_attr( $ready_id ); ?>" class="notice notice-success" style="display: none;">
+			<div id="<?php echo esc_attr( $ready_id ); ?>" class="notice notice-success">
 				<p>
 					<strong>
 						<?php esc_html_e( 'PDF Invoices & Packing Slips for WooCommerce is ready for version 6!', 'woocommerce-pdf-invoices-packing-slips' ); ?>
@@ -1010,6 +982,34 @@ class WPO_WCPDF {
 						<?php esc_html_e( 'Read the version 6 upgrade guide', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 					</a>
 				</p>
+
+				<p>
+					<a href="<?php echo esc_url( $dismiss_url ); ?>">
+						<?php esc_html_e( 'Dismiss this notice', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+					</a>
+				</p>
+			</div>
+		<?php else: ?>
+			<div id="<?php echo esc_attr( $checklist_id ); ?>" class="<?php echo esc_attr( $notice_class ); ?>">
+				<p>
+					<strong>
+						<?php esc_html_e( 'Action required: Prepare your website for the upcoming release of PDF Invoices & Packing Slips for WooCommerce version 6', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+					</strong>
+				</p>
+
+				<p>
+					<?php esc_html_e( 'Version 6 introduces significant improvements, compatibility changes and new minimum requirements. Please be sure to review the upgrade guide below and address the actionable items before updating.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</p>
+
+				<p>
+					<a class="button button-primary" href="<?php echo esc_url( $upgrade_guide_url ); ?>" target="_blank" rel="noopener noreferrer">
+						<?php esc_html_e( 'Read the version 6 upgrade guide', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+					</a>
+				</p>
+
+				<?php foreach ( $checks as $check ) : ?>
+					<?php $this->render_v6_upgrade_check( $check ); ?>
+				<?php endforeach; ?>
 
 				<p>
 					<a href="<?php echo esc_url( $dismiss_url ); ?>">
