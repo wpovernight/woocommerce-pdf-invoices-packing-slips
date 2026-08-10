@@ -847,6 +847,7 @@ class WPO_WCPDF {
 	public function v6_upgrade_notice(): void {
 		$dismiss_option = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
 		$dismiss_arg    = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
+		$nonce_action   = 'wcpdf_dismiss_v6_upgrade_notice';
 
 		if ( version_compare( $this->version, '6.0.0', '>=' ) ) {
 			return;
@@ -860,47 +861,14 @@ class WPO_WCPDF {
 			return;
 		}
 
-		$checks = $this->get_v6_upgrade_checks();
-
-		if ( empty( $checks ) ) {
-			return;
-		}
-
-		$all_passed     = true;
-		$signature_data = array();
-
-		foreach ( $checks as $check_key => $check ) {
-			$passed = ! empty( $check['passed'] );
-
-			if ( ! $passed ) {
-				$all_passed = false;
-			}
-
-			$signature_data[ $check_key ] = array(
-				'passed'    => $passed,
-				'documents' => ! empty( $check['documents'] )
-					? array_keys( $check['documents'] )
-					: array(),
-			);
-		}
-
-		$signature    = md5( wp_json_encode( $signature_data ) );
-		$nonce_action = 'wcpdf_dismiss_v6_upgrade_notice_' . $signature;
-
+		// Handle dismissal before running the compatibility checks.
 		if ( isset( $_GET[ $dismiss_arg ], $_GET['_wpnonce'] ) ) {
-			$requested_signature = sanitize_text_field(
-				wp_unslash( $_GET[ $dismiss_arg ] )
-			);
-
 			$nonce = sanitize_text_field(
 				wp_unslash( $_GET['_wpnonce'] )
 			);
 
-			if (
-				hash_equals( $signature, $requested_signature ) &&
-				wp_verify_nonce( $nonce, $nonce_action )
-			) {
-				update_option( $dismiss_option, $signature );
+			if ( wp_verify_nonce( $nonce, $nonce_action ) ) {
+				update_option( $dismiss_option, 'yes' );
 			} else {
 				wcpdf_log_error(
 					'Invalid request while dismissing version 6 upgrade notice.'
@@ -919,16 +887,31 @@ class WPO_WCPDF {
 			exit;
 		}
 
-		if ( hash_equals( $signature, (string) get_option( $dismiss_option, '' ) ) ) {
+		if ( 'yes' === get_option( $dismiss_option, 'no' ) ) {
 			return;
 		}
 
+		$checks = $this->get_v6_upgrade_checks();
+
+		if ( empty( $checks ) ) {
+			return;
+		}
+
+		$all_passed = true;
+
+		foreach ( $checks as $check ) {
+			if ( empty( $check['passed'] ) ) {
+				$all_passed = false;
+				break;
+			}
+		}
+
 		$dismiss_url = wp_nonce_url(
-			add_query_arg( $dismiss_arg, $signature ),
+			add_query_arg( $dismiss_arg, '1' ),
 			$nonce_action
 		);
 
-		$upgrade_guide_url = 'https://docs.wpovernight.com/general/before-updating-to-version-6/';
+		$upgrade_guide_url = 'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/preparing-your-store-for-version-6/';
 		$update_url        = $all_passed ? $this->get_v6_update_url() : '';
 
 		$checklist_id = 'wpo-wcpdf-v6-upgrade-checklist';
