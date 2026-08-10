@@ -93,6 +93,7 @@ class WPO_WCPDF {
 		add_action( 'admin_notices', array( $this, 'unstable_option_announcement_notice' ) );
 		add_action( 'admin_notices', array( $this, 'new_unstable_version_available_notice' ) );
 		add_action( 'admin_notices', array( $this, 'v6_upgrade_notice' ) );
+		add_action( 'admin_init', array( $this, 'handle_v6_upgrade_notice_dismissal' ) );
 		add_action( 'wpo_wcpdf_new_github_prerelease_available', array( $this, 'set_new_unstable_version_available_option' ), 10, 3 );
 		add_action( 'init', array( '\\WPO\\IPS\\Semaphore', 'init_cleanup' ), 999 ); // wait AS to initialize
 
@@ -861,32 +862,6 @@ class WPO_WCPDF {
 			return;
 		}
 
-		// Handle dismissal before running the compatibility checks.
-		if ( isset( $_GET[ $dismiss_arg ], $_GET['_wpnonce'] ) ) {
-			$nonce = sanitize_text_field(
-				wp_unslash( $_GET['_wpnonce'] )
-			);
-
-			if ( wp_verify_nonce( $nonce, $nonce_action ) ) {
-				update_option( $dismiss_option, 'yes' );
-			} else {
-				wcpdf_log_error(
-					'Invalid request while dismissing version 6 upgrade notice.'
-				);
-			}
-
-			wp_safe_redirect(
-				remove_query_arg(
-					array(
-						$dismiss_arg,
-						'_wpnonce',
-					)
-				)
-			);
-
-			exit;
-		}
-
 		if ( 'yes' === get_option( $dismiss_option, 'no' ) ) {
 			return;
 		}
@@ -913,12 +888,9 @@ class WPO_WCPDF {
 
 		$upgrade_guide_url = 'https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/preparing-your-store-for-version-6/';
 		$update_url        = $all_passed ? $this->get_v6_update_url() : '';
-
-		$checklist_id = 'wpo-wcpdf-v6-upgrade-checklist';
-		$ready_id     = 'wpo-wcpdf-v6-upgrade-ready';
 		?>
 		<?php if ( $all_passed ) : ?>
-			<div id="<?php echo esc_attr( $ready_id ); ?>" class="notice notice-success">
+			<div class="notice notice-success">
 				<p>
 					<strong>
 						<?php esc_html_e( 'PDF Invoices & Packing Slips for WooCommerce is ready for version 6!', 'woocommerce-pdf-invoices-packing-slips' ); ?>
@@ -948,7 +920,7 @@ class WPO_WCPDF {
 				</p>
 			</div>
 		<?php else: ?>
-			<div id="<?php echo esc_attr( $checklist_id ); ?>" class="notice notice-warning">
+			<div class="notice notice-warning">
 				<p>
 					<strong>
 						<?php esc_html_e( 'Action required: Prepare your website for the upcoming release of PDF Invoices & Packing Slips for WooCommerce version 6', 'woocommerce-pdf-invoices-packing-slips' ); ?>
@@ -977,6 +949,52 @@ class WPO_WCPDF {
 			</div>
 		<?php endif; ?>
 		<?php
+	}
+
+	/**
+	 * Handle dismissal for the V6 upgrade notice.
+	 *
+	 * @return void
+	 */
+	public function handle_v6_upgrade_notice_dismissal(): void {
+		if ( version_compare( $this->version, '6.0.0', '>=' ) ) {
+			return;
+		}
+
+		$dismiss_option = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
+		$dismiss_arg    = 'wpo_wcpdf_dismiss_v6_upgrade_notice';
+		$nonce_action   = 'wcpdf_dismiss_v6_upgrade_notice';
+
+		if ( ! isset( $_GET[ $dismiss_arg ], $_GET['_wpnonce'] ) ) {
+			return;
+		}
+
+		if ( ! empty( $this->settings ) && method_exists( $this->settings, 'user_can_manage_settings' ) ) {
+			if ( ! $this->settings->user_can_manage_settings() ) {
+				return;
+			}
+		} elseif ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$nonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) );
+
+		if ( wp_verify_nonce( $nonce, $nonce_action ) ) {
+			update_option( $dismiss_option, 'yes' );
+		} else {
+			wcpdf_log_error( 'Invalid request while dismissing version 6 upgrade notice.' );
+		}
+
+		wp_safe_redirect(
+			remove_query_arg(
+				array(
+					$dismiss_arg,
+					'_wpnonce',
+				)
+			)
+		);
+
+		exit;
 	}
 
 	/**
