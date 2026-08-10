@@ -916,31 +916,6 @@ class WPO_WCPDF {
 
 		$checklist_id = 'wpo-wcpdf-v6-upgrade-checklist';
 		$ready_id     = 'wpo-wcpdf-v6-upgrade-ready';
-
-		if ( $all_passed ) {
-			wp_enqueue_script( 'jquery' );
-
-			wp_add_inline_script(
-				'jquery',
-				sprintf(
-					'window.setTimeout(function () {
-						var checklist = document.getElementById(%1$s);
-						var ready = document.getElementById(%2$s);
-
-						if (checklist && ready) {
-							checklist.style.display = "none";
-							ready.style.display = "block";
-						}
-					}, 2500);',
-					wp_json_encode( $checklist_id ),
-					wp_json_encode( $ready_id )
-				)
-			);
-		}
-
-		$notice_class = $all_passed
-			? 'notice notice-info'
-			: 'notice notice-warning';
 		?>
 		<?php if ( $all_passed ) : ?>
 			<div id="<?php echo esc_attr( $ready_id ); ?>" class="notice notice-success">
@@ -973,7 +948,7 @@ class WPO_WCPDF {
 				</p>
 			</div>
 		<?php else: ?>
-			<div id="<?php echo esc_attr( $checklist_id ); ?>" class="<?php echo esc_attr( $notice_class ); ?>">
+			<div id="<?php echo esc_attr( $checklist_id ); ?>" class="notice notice-warning">
 				<p>
 					<strong>
 						<?php esc_html_e( 'Action required: Prepare your website for the upcoming release of PDF Invoices & Packing Slips for WooCommerce version 6', 'woocommerce-pdf-invoices-packing-slips' ); ?>
