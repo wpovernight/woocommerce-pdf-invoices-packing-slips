@@ -1124,6 +1124,14 @@ class WPO_WCPDF {
 				'WPO\\IPS\\Documents\\CreditNote',
 				'WPO\\IPS\\Documents\\Receipt',
 				'WPO\\IPS\\Documents\\DeliveryNote',
+
+				// Order Proposal plugin (old).
+				'PDF_Proposal',
+				'PDF_Order_Confirmation',
+
+				// Order Proposal plugin (new).
+				'WPO\\IPS\\Documents\\Proposal',
+				'WPO\\IPS\\Documents\\OrderConfirmation',
 			),
 			$this
 		);
