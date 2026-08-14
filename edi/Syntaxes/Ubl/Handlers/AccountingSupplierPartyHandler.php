@@ -138,6 +138,10 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_tax_scheme(): ?array {
+		if ( $this->has_tax_category( 'O' ) ) {
+			return null;
+		}
+
 		$supplier   = $this->get_supplier_data();
 		$vat_number = (string) ( $supplier['vat_number'] ?? '' );
 		$values     = array();
