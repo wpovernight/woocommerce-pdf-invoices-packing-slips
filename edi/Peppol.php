@@ -33,10 +33,12 @@ class Peppol {
 			return;
 		}
 		
-		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
+
+		// Peppol Endpoint Derivation
 		add_action( 'woocommerce_checkout_order_created', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 999, 1 );
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 998, 1 );
 
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
@@ -54,7 +56,7 @@ class Peppol {
 		$this->peppol_set_checkout_block_fields_value();
 		
 		add_action( 'woocommerce_set_additional_field_value', array( $this, 'peppol_save_checkout_block_fields' ), 10, 4 );
-		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 10, 1 );
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_remove_order_checkout_block_fields_meta' ), 999, 1 );
 
 		// Enqueue scripts for both classic and block checkout.
 		add_action( 'wp_enqueue_scripts', array( $this, 'peppol_enqueue_checkout_scripts' ), 20 );
