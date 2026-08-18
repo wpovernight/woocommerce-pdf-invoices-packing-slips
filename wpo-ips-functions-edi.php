@@ -921,6 +921,7 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 
 		$candidates[] = array(
 			'eas'         => $eas,
+			'value'       => $value,
 			'endpoint_id' => sprintf( '%s:%s', $eas, $value ),
 		);
 	}
