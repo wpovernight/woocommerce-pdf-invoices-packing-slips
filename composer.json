@@ -86,6 +86,7 @@
 	"config": {
 		"platform": {
 			"php": "8.1"
-		}
+		},
+		"platform-check": false
 	}
 }
