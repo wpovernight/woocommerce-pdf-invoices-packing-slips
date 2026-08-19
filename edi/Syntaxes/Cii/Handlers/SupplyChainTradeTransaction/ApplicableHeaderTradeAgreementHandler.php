@@ -56,9 +56,8 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			return null;
 		}
 
-		if ( empty( $vat_number ) ) {
-			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty. Please check your shop settings.', 'error' );
-			return null;
+		if ( empty( $vat_number ) && empty( $coc_number ) ) {
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Both seller VAT number and company registration number are empty.', 'error' );
 		}
 
 		$postcode       = (string) ( $seller['postcode']     ?? '' );
@@ -107,7 +106,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 						),
 					),
 
-					array(
+					! empty( $vat_number ) && ! $this->has_tax_category( 'O' ) ? array(
 						'name'  => 'ram:SpecifiedTaxRegistration',
 						'value' => array(
 							array(
@@ -118,7 +117,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 								),
 							),
 						),
-					),
+					) : null,
 				),
 			),
 		);

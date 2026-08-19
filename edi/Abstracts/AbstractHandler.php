@@ -1388,4 +1388,22 @@ abstract class AbstractHandler implements HandlerInterface {
 		return $target_key;
 	}
 
+	/**
+	 * Check whether the document contains a specific tax category.
+	 *
+	 * @param string $category Tax category code.
+	 * @return bool
+	 */
+	protected function has_tax_category( string $category ): bool {
+		$category = strtoupper( trim( $category ) );
+
+		foreach ( $this->get_grouped_order_tax_data() as $tax_group ) {
+			if ( $category === strtoupper( (string) ( $tax_group['category'] ?? '' ) ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 }

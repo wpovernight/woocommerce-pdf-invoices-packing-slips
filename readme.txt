@@ -110,6 +110,19 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.16.0 (2026-08-17) =
+- New: Add logging for automatic Peppol Endpoint ID derivation
+- New: Add version 6 upgrade readiness notice
+- New: Update DOMPDF to version 3.1.6
+- New: Include settings sections in search results, making related options easier to find
+- Fix: Peppol Endpoint derivation with EU VAT for WooCommerce
+- Fix: CII seller party generation when VAT number is missing
+- Fix: EDI VAT identifiers for category O invoices
+- Fix: EDI line totals for high-quantity items
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 11.0
+- Tested: Tested up WordPress 7.1
+
 = 5.15.2 (2026-07-13) =
 - Fix: UBL Supplier `PartyLegalEntity` to omit empty values
 - Fix: Deprecated emoji styles callback in setup wizard

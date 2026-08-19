@@ -17,18 +17,9 @@ class DeliveryHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
-		$grouped_tax_data = $this->get_grouped_order_tax_data();
-		$has_k_category   = false;
-
-		foreach ( $grouped_tax_data as $tax_group ) {
-			if ( 'K' === strtoupper( (string) ( $tax_group['category'] ?? '' ) ) ) {
-				$has_k_category = true;
-				break;
-			}
-		}
-
-		$delivery_date = '';
-		$country_code  = '';
+		$has_k_category = $this->has_tax_category( 'K' );
+		$delivery_date  = '';
+		$country_code   = '';
 
 		if ( $has_k_category ) {
 			$completed_date = $this->document->order->get_date_completed();
