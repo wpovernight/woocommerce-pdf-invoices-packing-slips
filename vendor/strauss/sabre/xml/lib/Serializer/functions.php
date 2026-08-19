@@ -147,7 +147,7 @@ function repeatingElements(Writer $writer, array $items, string $childElementNam
  *
  * You can even mix the two array syntaxes.
  *
- * @param string|int|float|bool|array<int|string, mixed>|object $value
+ * @param string|int|float|bool|array<int|string, mixed>|object|null $value
  */
 function standardSerializer(Writer $writer, $value): void
 {
@@ -168,8 +168,8 @@ function standardSerializer(Writer $writer, $value): void
         // describes a 'name' and optionally 'attributes' and 'value'.
 
         $name = $value['name'];
-        $attributes = isset($value['attributes']) ? $value['attributes'] : [];
-        $value = isset($value['value']) ? $value['value'] : null;
+        $attributes = $value['attributes'] ?? [];
+        $value = $value['value'] ?? null;
 
         $writer->startElement($name);
         $writer->writeAttributes($attributes);
@@ -181,7 +181,7 @@ function standardSerializer(Writer $writer, $value): void
                 // This item has a numeric index. We just loop through the
                 // array and throw it back in the writer.
                 standardSerializer($writer, $item);
-            } elseif (is_string($name) && is_array($item) && isset($item['attributes'])) {
+            } elseif (is_array($item) && isset($item['attributes'])) {
                 // The key is used for a name, but $item has 'attributes' and
                 // possibly 'value'
                 $writer->startElement($name);

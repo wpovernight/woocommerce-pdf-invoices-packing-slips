@@ -33,10 +33,12 @@ class Peppol {
 			return;
 		}
 		
-		// Peppol My Account
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'rest_api_init', array( $this, 'peppol_register_checkout_autofill_endpoint_route' ) );
+
+		// Peppol Endpoint Derivation
 		add_action( 'woocommerce_checkout_order_created', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 999, 1 );
+		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 999, 1 );
 
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
@@ -725,6 +727,8 @@ class Peppol {
 	 * @return void
 	 */
 	public function peppol_handle_new_order_automatic_endpoint_id_derivation( \WC_Order $order ): void {
+		$order_id = $order->get_id();
+
 		if ( ! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ) {
 			return;
 		}
@@ -739,12 +743,35 @@ class Peppol {
 		$vat_number      = wpo_wcpdf_get_order_customer_vat_number( $order );
 
 		if ( empty( $billing_country ) || empty( $vat_number ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'Automatic Peppol Endpoint ID derivation skipped for order #%d: missing billing country or VAT number.',
+					$order_id
+				)
+			);
+
 			return;
 		}
+
+		wpo_ips_edi_log(
+			sprintf(
+				'Attempting automatic Peppol Endpoint ID derivation for order #%d using billing country "%s".',
+				$order_id,
+				$billing_country
+			)
+		);
 
 		$result = $this->peppol_find_valid_endpoint_from_vat( $billing_country, $vat_number );
 
 		if ( empty( $result['endpoint_id'] ) || empty( $result['eas'] ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'Automatic Peppol Endpoint ID derivation failed for order #%d: no valid Endpoint ID or EAS was found.',
+					$order_id
+				),
+				'warning'
+			);
+
 			return;
 		}
 
@@ -769,6 +796,14 @@ class Peppol {
 		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $data );
 
 		wpo_ips_edi_maybe_save_order_peppol_data( $order, $data );
+
+		wpo_ips_edi_log(
+			sprintf(
+				'Automatically derived and saved Peppol Endpoint ID for order #%d with EAS "%s".',
+				$order_id,
+				$result['eas']
+			)
+		);
 	}
 
 	/**

@@ -210,8 +210,13 @@ class Frontend {
 			'document_type' => 'invoice',
 		), $atts );
 
+		$values['order_id']      = absint( $values['order_id'] );
+		$values['document_type'] = sanitize_key( $values['document_type'] );
+		$has_explicit_order_id   = ! empty( $values['order_id'] );
+
 		$is_document_type_valid = false;
 		$documents              = WPO_WCPDF()->documents->get_documents();
+
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() === $values['document_type'] ) {
 				$is_document_type_valid = true;
@@ -235,7 +240,9 @@ class Frontend {
 		}
 
 		// Get $order
-		if ( empty( $values['order_id'] ) ) {
+		$order = null;
+
+		if ( ! $has_explicit_order_id ) {
 			if ( is_checkout() && is_wc_endpoint_url( 'order-received' ) && isset( $wp->query_vars['order-received'] ) ) {
 				$order = wc_get_order( $wp->query_vars['order-received'] );
 			} elseif ( is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
@@ -246,6 +253,10 @@ class Frontend {
 		}
 
 		if ( empty( $order ) || ! is_object( $order ) ) {
+			return '';
+		}
+
+		if ( $has_explicit_order_id && ! $this->current_user_can_access_shortcode_order( $order, $values['document_type'] ) ) {
 			return '';
 		}
 

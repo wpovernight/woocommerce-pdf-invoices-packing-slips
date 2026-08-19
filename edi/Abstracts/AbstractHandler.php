@@ -46,12 +46,18 @@ abstract class AbstractHandler implements HandlerInterface {
 			$language = 'default';
 		}
 
-		$value = $general_settings->get_setting( $key, $language ) ?: '';
+		$value   = $general_settings->get_setting( $key, $language ) ?: '';
+		$country = $general_settings->get_setting( 'shop_address_country', $language ) ?: '';
 
 		if ( 'vat_number' === $key && '' !== $value ) {
-			$country = $general_settings->get_setting( 'shop_address_country', $language ) ?: '';
-
 			$value = wpo_ips_edi_format_vat_number(
+				(string) $value,
+				(string) $country
+			);
+		}
+
+		if ( 'coc_number' === $key && '' !== $value ) {
+			$value = wpo_ips_edi_format_registration_number(
 				(string) $value,
 				(string) $country
 			);
@@ -351,6 +357,11 @@ abstract class AbstractHandler implements HandlerInterface {
 				}
 			}
 
+			if ( $this->is_credit_note_document() && $this->should_normalize_credit_note_signs() ) {
+				$line_sign = (float) $net_total < 0 ? -1 : 1;
+				$item_tax  = abs( $item_tax ) * $line_sign;
+			}
+
 			if ( ! isset( $groups[ $key ] ) ) {
 				$groups[ $key ] = array(
 					'total_ex'   => 0.0,
@@ -385,7 +396,16 @@ abstract class AbstractHandler implements HandlerInterface {
 		$groups = $this->ensure_one_zero_tax_group( $groups );
 		$groups = array_values( $groups );
 
-		return apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
+		$groups = apply_filters( 'wpo_ips_edi_order_tax_data', $groups, $this );
+
+		if (
+			is_array( $groups ) &&
+			apply_filters( 'wpo_ips_edi_reconcile_tax_groups_to_lines', true, $this->document->order, $this )
+		) {
+			$groups = $this->reconcile_tax_groups_to_line_totals( $groups, $this->document->order );
+		}
+
+		return array_values( $groups );
 	}
 
 	/**
@@ -486,7 +506,13 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		// Reconcile to WooCommerce order total.
-		$order_total   = (float) $order->get_total();
+		$order_total = (float) $order->get_total();
+
+		if ( $this->is_credit_note_document() && $this->should_normalize_credit_note_signs() ) {
+			$document_sign = $total_inc_tax < 0 || ( 0.0 === $total_inc_tax && $lines_net_rounded < 0 ) ? -1 : 1;
+			$order_total   = abs( $order_total ) * $document_sign;
+		}
+
 		$rounding_diff = wc_round_tax_total( $order_total - $total_inc_tax );
 
 		// Config / inputs.
@@ -586,13 +612,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	/**
 	 * Get the number of decimal places needed for XML unit prices.
 	 *
-	 * Some WooCommerce line totals cannot be reproduced by multiplying a
-	 * 2-decimal unit price by the quantity. This can happen when discounts are
-	 * distributed across multiple units, for example 187.98 / 4 = 46.995.
-	 *
-	 * Line totals should remain rounded to 2 decimals, but unit prices may need
-	 * higher precision so that PriceAmount, BaseAmount, AllowanceCharge and
-	 * LineExtensionAmount remain consistent.
+	 * Line totals remain rounded to 2 decimals, but unit prices may require
+	 * additional precision to ensure that multiplying the unit price by the
+	 * quantity reproduces the original line total.
 	 *
 	 * @param array $parts {
 	 *     Price parts for the order item.
@@ -604,37 +626,82 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return int
 	 */
 	protected function get_line_price_decimal_places( array $parts ): int {
-		$decimal_places = 2;
-		$qty            = isset( $parts['qty'] ) ? abs( (float) $parts['qty'] ) : 0.0;
+		$qty = isset( $parts['qty'] )
+			? abs( (float) $parts['qty'] )
+			: 0.0;
+
+		$minimum_decimal_places = 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' )
+			? 4
+			: 2;
 
 		if ( $qty <= 0 ) {
-			return $decimal_places;
+			return $minimum_decimal_places;
 		}
 
-		if ( 'yes' === get_option( 'woocommerce_tax_round_at_subtotal' ) ) {
-			return 4;
-		}
+		$maximum_decimal_places = 12;
 
-		$net_total   = isset( $parts['net_total'] ) ? (float) $parts['net_total'] : 0.0;
-		$gross_total = isset( $parts['gross_total'] ) ? (float) $parts['gross_total'] : 0.0;
+		$net_total = isset( $parts['net_total'] )
+			? abs( (float) $parts['net_total'] )
+			: 0.0;
 
-		$net_unit_2dp   = (float) $this->format_decimal( $net_total / $qty, 2 );
-		$gross_unit_2dp = (float) $this->format_decimal( $gross_total / $qty, 2 );
+		$gross_total = isset( $parts['gross_total'] )
+			? abs( (float) $parts['gross_total'] )
+			: 0.0;
 
-		$net_total_from_unit_2dp   = $this->format_decimal( $net_unit_2dp * $qty, 2 );
-		$gross_total_from_unit_2dp = $this->format_decimal( $gross_unit_2dp * $qty, 2 );
+		$expected_net_total   = $this->format_decimal( $net_total, 2 );
+		$expected_gross_total = $this->format_decimal( $gross_total, 2 );
 
-		$net_total_2dp   = $this->format_decimal( $net_total, 2 );
-		$gross_total_2dp = $this->format_decimal( $gross_total, 2 );
-
-		if (
-			$net_total_from_unit_2dp !== $net_total_2dp ||
-			$gross_total_from_unit_2dp !== $gross_total_2dp
+		for (
+			$decimal_places = $minimum_decimal_places;
+			$decimal_places <= $maximum_decimal_places;
+			$decimal_places++
 		) {
-			$decimal_places = 4;
+			$gross_unit = (float) $this->format_decimal(
+				$gross_total / $qty,
+				$decimal_places
+			);
+
+			$net_unit = (float) $this->format_decimal(
+				$net_total / $qty,
+				$decimal_places
+			);
+
+			/*
+			 * Match the calculation performed later by the UBL and CII line
+			 * handlers. They calculate and round the unit discount, then
+			 * reconstruct the net unit price from the gross price.
+			 */
+			$unit_discount = max( 0.0, $gross_unit - $net_unit );
+
+			$unit_discount = (float) $this->format_decimal(
+				$unit_discount,
+				$decimal_places
+			);
+
+			$net_unit = (float) $this->format_decimal(
+				$gross_unit - $unit_discount,
+				$decimal_places
+			);
+
+			$calculated_net_total = $this->format_decimal(
+				$net_unit * $qty,
+				2
+			);
+
+			$calculated_gross_total = $this->format_decimal(
+				$gross_unit * $qty,
+				2
+			);
+
+			if (
+				$calculated_net_total === $expected_net_total &&
+				$calculated_gross_total === $expected_gross_total
+			) {
+				return $decimal_places;
+			}
 		}
 
-		return $decimal_places;
+		return $maximum_decimal_places;
 	}
 
 	/**
@@ -849,26 +916,34 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * Compute line totals, unit prices and unit discount for an item.
 	 *
 	 * @param \WC_Order_Item $item
-	 * @param bool $lock_net_to_subtotal
+	 * @param bool           $lock_net_to_subtotal
 	 * @return array
 	 */
 	protected function compute_item_price_parts( $item, bool $lock_net_to_subtotal = false ): array {
 		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
 			$gross_total = (float) $item->get_subtotal();                                                  // ex-VAT, before discounts
 			$net_total   = (float) ( $lock_net_to_subtotal ? $item->get_subtotal() : $item->get_total() ); // ex-VAT, after discounts
-			$qty         = max( 1, (int) $item->get_quantity() );
+			$qty         = max( 1, absint( $item->get_quantity() ) );
 		} else {
 			$gross_total = (float) $item->get_total();
 			$net_total   = (float) $item->get_total();
 			$qty         = 1;
 		}
 
-		$gross_unit = $qty > 0 ? $gross_total / $qty : 0.0;
-		$net_unit   = $qty > 0 ? $net_total   / $qty : (float) $item->get_total();
+		$line_sign = $net_total < 0 ? -1 : 1;
+
+		if ( $this->is_credit_note_document() && $this->should_normalize_credit_note_signs() ) {
+			$line_sign   = $this->get_credit_note_line_sign( $item, $net_total );
+			$gross_total = abs( $gross_total ) * $line_sign;
+			$net_total   = abs( $net_total ) * $line_sign;
+		}
+
+		$gross_unit = $qty > 0 ? abs( $gross_total ) / $qty : 0.0;
+		$net_unit   = $qty > 0 ? abs( $net_total ) / $qty : abs( (float) $item->get_total() );
 
 		$unit_discount = max( 0.0, $gross_unit - $net_unit );
 
-		return compact( 'gross_total', 'net_total', 'qty', 'gross_unit', 'net_unit', 'unit_discount' );
+		return compact( 'gross_total', 'net_total', 'qty', 'gross_unit', 'net_unit', 'unit_discount', 'line_sign' );
 	}
 
 	/**
@@ -1110,6 +1185,206 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		return $fallback;
+	}
+
+	/**
+	 * Check whether the current EDI document is a credit note.
+	 *
+	 * @return bool
+	 */
+	protected function is_credit_note_document(): bool {
+		$document_type = is_callable( array( $this->document->order_document, 'get_type' ) )
+			? (string) $this->document->order_document->get_type()
+			: '';
+
+		$root_element = is_callable( array( $this->document, 'get_root_element' ) )
+			? (string) $this->document->get_root_element()
+			: '';
+
+		$quantity_role = is_callable( array( $this->document, 'get_quantity_role' ) )
+			? (string) $this->document->get_quantity_role()
+			: '';
+
+		return (
+			'credit-note' === $document_type ||
+			'CreditNote' === $root_element ||
+			'Credited' === $quantity_role
+		);
+	}
+
+	/**
+	 * Whether credit note signs should be normalized from WooCommerce refund signs
+	 * to Peppol CreditNote signs.
+	 *
+	 * @return bool
+	 */
+	protected function should_normalize_credit_note_signs(): bool {
+		return (bool) apply_filters(
+			'wpo_ips_edi_normalize_credit_note_signs',
+			true,
+			$this
+		);
+	}
+
+	/**
+	 * Get the sign that should be used for a credit note line.
+	 *
+	 * For normal WooCommerce refunds, refund item totals are negative, but Peppol
+	 * CreditNote lines should mirror the original invoice line sign.
+	 *
+	 * @param \WC_Order_Item $item
+	 * @param float          $fallback_amount
+	 * @return int
+	 */
+	protected function get_credit_note_line_sign( \WC_Order_Item $item, float $fallback_amount = 0.0 ): int {
+		$sign = 1;
+
+		if ( ! $this->is_credit_note_document() || ! $this->should_normalize_credit_note_signs() ) {
+			return $fallback_amount < 0 ? -1 : 1;
+		}
+
+		$refunded_item_id = is_callable( array( $item, 'get_meta' ) )
+			? absint( $item->get_meta( '_refunded_item_id', true ) )
+			: 0;
+
+		if ( $refunded_item_id > 0 ) {
+			$parent_order = wpo_ips_edi_get_parent_order( $this->document->order );
+
+			if ( $parent_order && is_callable( array( $parent_order, 'get_item' ) ) ) {
+				$original_item = $parent_order->get_item( $refunded_item_id );
+
+				if ( $original_item instanceof \WC_Order_Item ) {
+					$original_total = is_callable( array( $original_item, 'get_total' ) )
+						? (float) $original_item->get_total()
+						: 0.0;
+
+					if ( 0.0 !== $original_total ) {
+						$sign = $original_total < 0 ? -1 : 1;
+					} elseif ( is_callable( array( $original_item, 'get_quantity' ) ) ) {
+						$sign = (float) $original_item->get_quantity() < 0 ? -1 : 1;
+					}
+				}
+			}
+		}
+
+		return (int) apply_filters(
+			'wpo_ips_edi_credit_note_line_sign',
+			$sign,
+			$item,
+			$this->document->order,
+			$this
+		);
+	}
+
+	/**
+	 * Reconcile VAT breakdown taxable amounts with the line net total.
+	 *
+	 * @param array              $groups Grouped tax data.
+	 * @param \WC_Abstract_Order $order  WooCommerce order.
+	 * @return array
+	 */
+	protected function reconcile_tax_groups_to_line_totals( array $groups, \WC_Abstract_Order $order ): array {
+		if ( empty( $groups ) ) {
+			return $groups;
+		}
+
+		$lines_net = (float) $this->format_decimal( $this->get_lines_net_total( $order ), 2 );
+
+		$groups_total = 0.0;
+
+		foreach ( $groups as $group ) {
+			$groups_total += (float) $this->format_decimal( $group['total_ex'] ?? 0, 2 );
+		}
+
+		$groups_total = (float) $this->format_decimal( $groups_total, 2 );
+		$diff         = (float) $this->format_decimal( $lines_net - $groups_total, 2 );
+
+		if ( abs( $diff ) < 0.01 ) {
+			return $groups;
+		}
+
+		$target_key = $this->get_tax_group_reconciliation_key( $groups );
+
+		if ( null === $target_key ) {
+			return $groups;
+		}
+
+		$groups[ $target_key ]['total_ex'] = (float) $this->format_decimal(
+			(float) ( $groups[ $target_key ]['total_ex'] ?? 0 ) + $diff,
+			2
+		);
+
+		wpo_ips_edi_log(
+			sprintf(
+				'Reconciled tax group taxable amount for order #%d: lines_net=%s, groups_total=%s, diff=%s',
+				$order->get_id(),
+				$this->format_decimal( $lines_net ),
+				$this->format_decimal( $groups_total ),
+				$this->format_decimal( $diff )
+			),
+			'warning'
+		);
+
+		return $groups;
+	}
+
+	/**
+	 * Pick the safest tax group to receive a minor taxable amount reconciliation.
+	 *
+	 * Prefer the configured zero-tax group, otherwise use the group with the
+	 * largest taxable amount.
+	 *
+	 * @param array $groups Grouped tax data.
+	 * @return int|string|null
+	 */
+	protected function get_tax_group_reconciliation_key( array $groups ) {
+		$zero_meta = $this->get_preferred_zero_tax_meta( $this->document->order );
+
+		foreach ( $groups as $key => $group ) {
+			$percentage = (float) ( $group['percentage'] ?? 0 );
+			$category   = strtoupper( (string) ( $group['category'] ?? '' ) );
+			$scheme     = strtoupper( (string) ( $group['scheme'] ?? 'VAT' ) );
+
+			if (
+				0.0 === $percentage &&
+				$category === strtoupper( $zero_meta['category'] ) &&
+				$scheme === strtoupper( $zero_meta['scheme'] )
+			) {
+				return $key;
+			}
+		}
+
+		$target_key = null;
+		$max_amount = null;
+
+		foreach ( $groups as $key => $group ) {
+			$amount = abs( (float) ( $group['total_ex'] ?? 0 ) );
+
+			if ( null === $max_amount || $amount > $max_amount ) {
+				$max_amount = $amount;
+				$target_key = $key;
+			}
+		}
+
+		return $target_key;
+	}
+
+	/**
+	 * Check whether the document contains a specific tax category.
+	 *
+	 * @param string $category Tax category code.
+	 * @return bool
+	 */
+	protected function has_tax_category( string $category ): bool {
+		$category = strtoupper( trim( $category ) );
+
+		foreach ( $this->get_grouped_order_tax_data() as $tax_group ) {
+			if ( $category === strtoupper( (string) ( $tax_group['category'] ?? '' ) ) ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }
