@@ -224,6 +224,7 @@ class WPO_WCPDF {
 			( defined( 'REST_REQUEST' ) && REST_REQUEST )
 		) {
 			$this->get_instance( 'frontend' );
+			$this->get_instance( 'checkout_field' );
 		}
 
 		// Peppol only when enabled and relevant

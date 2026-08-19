@@ -2750,7 +2750,7 @@ abstract class OrderDocument {
 		$checkout_field_instance = \WPO_WCPDF()->get_instance( 'checkout_field' );
 
 		if (
-			! is_null( $checkout_field_instance ) ||
+			is_null( $checkout_field_instance ) ||
 			empty( $this->get_setting( 'display_checkout_field' ) ) ||
 			empty( $this->order )
 		) {

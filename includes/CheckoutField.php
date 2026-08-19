@@ -509,7 +509,7 @@ class CheckoutField {
 		/** @var \WPO\IPS\Compatibility\VatPlugins $vat_plugins_instance */
 		$vat_plugins_instance = \WPO_WCPDF()->get_instance( 'vat_plugins' );
 
-		if ( ! is_null( $vat_plugins_instance ) && $vat_plugins_instance->has_active() ) {
+		if ( is_null( $vat_plugins_instance ) || $vat_plugins_instance->has_active() ) {
 			return false;
 		}
 
