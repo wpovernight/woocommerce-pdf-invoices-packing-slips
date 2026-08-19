@@ -28,7 +28,11 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			) ),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party', $customer_party, $this );
+		return (array) apply_filters(
+			'wpo_ips_edi_ubl_customer_party',
+			$customer_party,
+			$this
+		);
 	}
 
 	/**
@@ -52,7 +56,15 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party_endpoint_id', $endpoint, $this );
+		$endpoint = apply_filters(
+			'wpo_ips_edi_ubl_customer_party_endpoint_id',
+			$endpoint,
+			$this
+		);
+
+		return is_array( $endpoint )
+			? $endpoint
+			: null;
 	}
 
 	/**
@@ -85,7 +97,15 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_customer_party_legal_entity', $party_legal_entity, $this );
+		$party_legal_entity = apply_filters(
+			'wpo_ips_edi_ubl_customer_party_legal_entity',
+			$party_legal_entity,
+			$this
+		);
+
+		return is_array( $party_legal_entity )
+			? $party_legal_entity
+			: null;
 	}
 
 	/**

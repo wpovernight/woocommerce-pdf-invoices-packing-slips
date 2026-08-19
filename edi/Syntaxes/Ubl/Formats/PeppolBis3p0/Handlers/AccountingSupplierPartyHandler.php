@@ -28,7 +28,11 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			) ),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_supplier_party', $supplier_party, $this );
+		return (array) apply_filters(
+			'wpo_ips_edi_ubl_supplier_party',
+			$supplier_party,
+			$this
+		);
 	}
 
 	/**
@@ -52,7 +56,15 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_endpoint_id', $endpoint, $this );
+		$endpoint = apply_filters(
+			'wpo_ips_edi_ubl_supplier_party_endpoint_id',
+			$endpoint,
+			$this
+		);
+
+		return is_array( $endpoint )
+			? $endpoint
+			: null;
 	}
 
 	/**

@@ -27,18 +27,22 @@ class Frontend {
 	 * Constructor
 	 */
 	public function __construct() {
-		// PDF download link on My Account page
-		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 ); // needs to be triggered later because of Jetpack query string: https://github.com/Automattic/jetpack/blob/1a062c5388083c7f15b9a3e82e61fde838e83047/projects/plugins/jetpack/modules/woocommerce-analytics/classes/class-jetpack-woocommerce-analytics-my-account.php#L235
-		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
-
-		// REST API
-		add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 ); // support for legacy WC REST API
-		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
-
 		// Shortcodes
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
+
+		// REST
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
+			add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
+		}
+
+		// Account
+		if ( wpo_ips_is_account_page() ) {
+			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 );
+			add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
+		}
 	}
 
 	/**
@@ -56,7 +60,11 @@ class Frontend {
 		$invoice        = wcpdf_get_document( $document_type, $order );
 
 		if ( ! $invoice ) {
-			return apply_filters( 'wpo_wcpdf_myaccount_actions', $actions, $order );
+			return (array) apply_filters(
+				'wpo_wcpdf_myaccount_actions',
+				$actions,
+				$order
+			);
 		}
 
 		$invoice_allowed = $invoice->is_allowed_in_my_account( 'available' );
@@ -75,7 +83,7 @@ class Frontend {
 				? $invoice->get_title()
 				: $document_title;
 
-			$endpoint_instance = WPO_WCPDF()->endpoint;
+			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
 			$actions[ $document_type ] = array(
 				'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
@@ -90,7 +98,11 @@ class Frontend {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_myaccount_actions', $actions, $order );
+		return (array) apply_filters(
+			'wpo_wcpdf_myaccount_actions',
+			$actions,
+			$order
+		);
 	}
 
 	/**
@@ -99,21 +111,23 @@ class Frontend {
 	 * @return void
 	 */
 	public function open_my_account_link_on_new_tab(): void {
-		$is_account        = function_exists( 'is_account_page' )        && is_account_page();
-		$is_order_received = function_exists( 'is_order_received_page' ) && is_order_received_page();
+		$is_account        = \wpo_ips_is_account_page();
+		$is_order_received = \wpo_ips_is_order_received_page();
 
 		if ( $is_account || $is_order_received ) {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 
 			if ( isset( $general_settings['download_display'] ) && 'display' === $general_settings['download_display'] ) {
-				$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-				$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+				$suffix               = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+				$file_path            = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+				$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-				if ( WPO_WCPDF()->file_system->exists( $file_path ) ) {
-					$script = WPO_WCPDF()->file_system->get_contents( $file_path );
+				if ( $file_system_instance->exists( $file_path ) ) {
+					$script            = $file_system_instance->get_contents( $file_path );
+					$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
-					if ( $script && WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
-						$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
+					if ( $script && $endpoint_instance->pretty_links_enabled() ) {
+						$script = str_replace( 'generate_wpo_wcpdf', $endpoint_instance->get_identifier(), $script );
 					}
 
 					wp_add_inline_script( 'jquery', $script );
@@ -127,7 +141,6 @@ class Frontend {
 	 *
 	 * @param array $data
 	 * @param \WC_Abstract_Order $order
-	 *
 	 * @return array
 	 */
 	public function add_invoice_number_to_wc_legacy_order_api( array $data, \WC_Abstract_Order $order ): array {
@@ -142,7 +155,6 @@ class Frontend {
 	 * @param \WP_REST_Response $response
 	 * @param \WC_Data $order
 	 * @param \WP_REST_Request $request
-	 *
 	 * @return \WP_REST_Response
 	 */
 	public function add_invoice_number_to_wc_order_api( \WP_REST_Response $response, \WC_Data $order, \WP_REST_Request $request ): \WP_REST_Response {
@@ -156,10 +168,10 @@ class Frontend {
 	/**
 	 * Retrieve formatted invoice number for a given order
 	 *
-	 * @param \WC_Abstract_Order|\WC_Order $order
+	 * @param \WC_Abstract_Order $order
 	 * @return string
 	 */
-	private function get_invoice_number( $order ): string {
+	private function get_invoice_number( \WC_Abstract_Order $order ): string {
 		$invoice_number = '';
 
 		$this->disable_storing_document_settings();
@@ -215,7 +227,7 @@ class Frontend {
 		$has_explicit_order_id   = ! empty( $values['order_id'] );
 
 		$is_document_type_valid = false;
-		$documents              = WPO_WCPDF()->documents->get_documents();
+		$documents              = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() === $values['document_type'] ) {
@@ -245,7 +257,7 @@ class Frontend {
 		if ( ! $has_explicit_order_id ) {
 			if ( is_checkout() && is_wc_endpoint_url( 'order-received' ) && isset( $wp->query_vars['order-received'] ) ) {
 				$order = wc_get_order( $wp->query_vars['order-received'] );
-			} elseif ( is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
+			} elseif ( \wpo_ips_is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
 				$order = wc_get_order( $wp->query_vars['view-order'] );
 			}
 		} else {
@@ -266,7 +278,7 @@ class Frontend {
 			return '';
 		}
 
-		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
+		$pdf_url = WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
 
 		if ( 'wcpdf_document_link' === $shortcode_tag ) {
 			return esc_url( $pdf_url );
@@ -289,7 +301,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function disable_storing_document_settings(): void {
-		add_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
+		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'prevent_storing_document_settings' ), 9999 );
 	}
 
 	/**
@@ -299,7 +311,16 @@ class Frontend {
 	 * @return void
 	 */
 	public function restore_storing_document_settings(): void {
-		remove_filter( 'wpo_wcpdf_document_store_settings', '__return_false', 9999 );
+		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'prevent_storing_document_settings' ), 9999 );
+	}
+
+	/**
+	 * Prevent document settings from being stored during temporary document checks.
+	 *
+	 * @return bool
+	 */
+	public function prevent_storing_document_settings(): bool {
+		return false;
 	}
 
 }
