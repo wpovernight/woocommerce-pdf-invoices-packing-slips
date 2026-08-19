@@ -506,7 +506,10 @@ class CheckoutField {
 	 * @return bool
 	 */
 	public function is_vat_number(): bool {
-		if ( ! empty( WPO_WCPDF()->vat_plugins ) && WPO_WCPDF()->vat_plugins->has_active() ) {
+		/** @var \WPO\IPS\Compatibility\VatPlugins $vat_plugins_instance */
+		$vat_plugins_instance = \WPO_WCPDF()->get_instance( 'vat_plugins' );
+
+		if ( ! is_null( $vat_plugins_instance ) && $vat_plugins_instance->has_active() ) {
 			return false;
 		}
 

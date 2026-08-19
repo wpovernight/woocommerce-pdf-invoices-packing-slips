@@ -2746,15 +2746,18 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_checkout_field_value(): string {
+		/** @var \WPO\IPS\CheckoutField $checkout_field_instance */
+		$checkout_field_instance = \WPO_WCPDF()->get_instance( 'checkout_field' );
+
 		if (
-			! WPO_WCPDF()->checkout_field->is_enabled() ||
+			! is_null( $checkout_field_instance ) ||
 			empty( $this->get_setting( 'display_checkout_field' ) ) ||
 			empty( $this->order )
 		) {
 			return '';
 		}
 
-		$checkout_field_value = $this->order->get_meta( \WPO\IPS\CheckoutField::ORDER_META_KEY, true );
+		$checkout_field_value = $this->order->get_meta( $checkout_field_instance::ORDER_META_KEY, true );
 		$checkout_field_value = trim( $checkout_field_value );
 
 		return apply_filters( 'wpo_wcpdf_checkout_field_value', $checkout_field_value, $this );

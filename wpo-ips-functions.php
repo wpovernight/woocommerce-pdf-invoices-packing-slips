@@ -1244,9 +1244,12 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
 
+	/** @var \WPO\IPS\CheckoutField $checkout_field_instance */
+	$checkout_field_instance = WPO_WCPDF()->get_instance( 'checkout_field' );
+
 	// Maybe add General Checkout Field key
-	if ( WPO_WCPDF()->checkout_field->is_vat_number() ) {
-		array_unshift( $vat_meta_keys, \WPO\IPS\CheckoutField::ORDER_META_KEY );
+	if ( ! is_null( $checkout_field_instance ) && $checkout_field_instance->is_vat_number() ) {
+		array_unshift( $vat_meta_keys, $checkout_field_instance::ORDER_META_KEY );
 	}
 
 	$vat_number = null;
