@@ -1207,7 +1207,9 @@ abstract class OrderDocument {
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
 				break;
 			case 'checkout_field':
-				$title = WPO_WCPDF()->checkout_field->get_label() . ':';
+				/** @var \WPO\IPS\CheckoutField|null $checkout_field_instance */
+				$checkout_field_instance = WPO_WCPDF()->get_instance( 'checkout_field' );
+				$title                   = is_null( $checkout_field_instance ) ? '' : $checkout_field_instance->get_label() . ':';
 				break;
 			default:
 				$title = '';

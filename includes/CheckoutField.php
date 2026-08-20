@@ -67,10 +67,11 @@ class CheckoutField {
 			'save_classic_checkout_field'
 		), 10, 2 );
 
-		add_action( 'woocommerce_admin_order_data_after_billing_address', array(
+		// Order edit page (billing column).
+		add_filter( 'woocommerce_admin_billing_fields', array(
 			$this,
-			'display_admin_billing'
-		), 10, 1 );
+			'add_admin_billing_field'
+		), 10, 3 );
 
 		// My Account (Account details).
 		if ( $this->is_my_account_enabled() ) {
@@ -321,22 +322,71 @@ class CheckoutField {
 	}
 
 	/**
-	 * Display the optional checkout field under the Billing address in wp-admin.
+	 * Add the optional checkout field to the billing fields of the order edit page.
 	 *
-	 * @param \WC_Order $order
+	 * @param array              $fields  Billing fields.
+	 * @param \WC_Order|bool     $order   Order object (false when WooCommerce initializes the fields without an order).
+	 * @param string             $context Field context ('view' or 'edit').
+	 * @return array
+	 */
+	public function add_admin_billing_field( $fields, $order = false, string $context = 'edit' ): array {
+		if ( ! is_array( $fields ) ) {
+			$fields = array();
+		}
+
+		if ( ! $order instanceof \WC_Order ) {
+			return $fields;
+		}
+
+		$field = array(
+			'id'              => self::ORDER_META_KEY,
+			'label'           => $this->get_label(),
+			'value'           => trim( (string) $order->get_meta( self::ORDER_META_KEY, true ) ),
+			'type'            => 'text',
+			'wrapper_class'   => 'form-field-wide',
+			'show'            => true,
+			'update_callback' => array( $this, 'save_admin_billing_field' ),
+		);
+
+		// Add description if treated as VAT number.
+		if ( $this->is_vat_number() ) {
+			$field['description'] = __( 'Please include the country prefix (for example NL123456789).', 'woocommerce-pdf-invoices-packing-slips' );
+			$field['desc_tip']    = false;
+		}
+
+		/**
+		 * Allow filtering the checkout field definition used in the order edit page.
+		 *
+		 * @param array     $field   Field definition.
+		 * @param \WC_Order $order   Order object.
+		 * @param string    $context Field context ('view' or 'edit').
+		 */
+		$fields[ self::FIELD_KEY ] = apply_filters( 'wpo_ips_checkout_field_admin_billing_args', $field, $order, $context );
+
+		return $fields;
+	}
+
+	/**
+	 * Save the optional checkout field from the order edit page.
+	 *
+	 * @param string    $key   Field ID.
+	 * @param mixed     $value Submitted value.
+	 * @param \WC_Order $order Order object.
 	 * @return void
 	 */
-	public function display_admin_billing( \WC_Order $order ): void {
-		$value = (string) $order->get_meta( self::ORDER_META_KEY, true );
-		$value = trim( $value );
-
-		if ( '' === $value ) {
+	public function save_admin_billing_field( string $key, $value, \WC_Order $order ): void {
+		if ( self::ORDER_META_KEY !== $key ) {
 			return;
 		}
 
-		$label = $this->get_label();
+		$value = sanitize_text_field( (string) $value );
+		$value = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $value );
 
-		echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
+		if ( '' === trim( $value ) ) {
+			$order->delete_meta_data( self::ORDER_META_KEY );
+		} else {
+			$order->update_meta_data( self::ORDER_META_KEY, $value );
+		}
 	}
 
 	/**
@@ -506,6 +556,12 @@ class CheckoutField {
 	 * @return bool
 	 */
 	public function is_vat_number(): bool {
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+
+		if ( empty( $general_settings['checkout_field_as_vat_number'] ?? '' ) ) {
+			return false;
+		}
+
 		/** @var \WPO\IPS\Compatibility\VatPlugins $vat_plugins_instance */
 		$vat_plugins_instance = \WPO_WCPDF()->get_instance( 'vat_plugins' );
 

@@ -224,6 +224,17 @@ class WPO_WCPDF {
 			( defined( 'REST_REQUEST' ) && REST_REQUEST )
 		) {
 			$this->get_instance( 'frontend' );
+		}
+
+		// Checkout field: frontend contexts and order edit page and document generation
+		if (
+			$is_admin_like                   ||
+			$is_document_context             ||
+			wpo_ips_is_account_page()        ||
+			wpo_ips_is_order_received_page() ||
+			$is_checkout_context             ||
+			( defined( 'REST_REQUEST' ) && REST_REQUEST )
+		) {
 			$this->get_instance( 'checkout_field' );
 		}
 
