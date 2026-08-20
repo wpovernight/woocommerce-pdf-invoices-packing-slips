@@ -23,7 +23,7 @@ abstract class OrderDocument {
 	public bool $enabled;
 	public array $output_formats             = array();
 
-	
+
 	protected array $linked_documents        = array();
 	protected array $data                    = array();
 	protected array $resolved_settings_cache = array();
@@ -77,7 +77,7 @@ abstract class OrderDocument {
 	 */
 	public function init_settings_data(): void {
 		$this->reset_resolved_settings_cache();
-		
+
 		// order
 		$this->order_settings  = $this->get_order_settings();
 		// pdf
@@ -112,7 +112,7 @@ abstract class OrderDocument {
 
 		return is_array( $order_settings ) ? $order_settings : array();
 	}
-	
+
 	/**
 	 * Get document settings.
 	 *
@@ -1125,6 +1125,24 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Get the checkout field title.
+	 *
+	 * @return string
+	 */
+	public function get_checkout_field_title(): string {
+		return $this->get_title_for( 'checkout_field' );
+	}
+
+	/**
+	 * Print the checkout field title.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_title(): void {
+		echo esc_html( $this->get_checkout_field_title() );
+	}
+
+	/**
 	 * Get the title for a specific slug
 	 *
 	 * @param string $slug
@@ -1187,6 +1205,11 @@ abstract class OrderDocument {
 				break;
 			case 'customer_notes':
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'checkout_field':
+				/** @var \WPO\IPS\CheckoutField|null $checkout_field_instance */
+				$checkout_field_instance = WPO_WCPDF()->get_instance( 'checkout_field' );
+				$title                   = is_null( $checkout_field_instance ) ? '' : $checkout_field_instance->get_label() . ':';
 				break;
 			default:
 				$title = '';
@@ -1426,7 +1449,7 @@ abstract class OrderDocument {
 
 	/**
 	 * Output template styles
-	 * 
+	 *
 	 * @return void
 	 */
 	public function template_styles(): void {
@@ -1489,7 +1512,7 @@ abstract class OrderDocument {
 		$logo_height = ! empty( $this->settings['header_logo_height'] )
 			? str_replace( ' ', '', $this->settings['header_logo_height'] )
 			: null;
-		
+
 		$logo_height = apply_filters(
 			'wpo_wcpdf_header_logo_height',
 			$logo_height,
@@ -1610,14 +1633,14 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show custom company name or default to blog name
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_name(): string {
 		$default = get_bloginfo( 'name' );
 		return $this->get_settings_text( 'shop_name', $default, false );
 	}
-	
+
 	/**
 	 * Print shop name
 	 *
@@ -1629,13 +1652,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show company VAT number
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_vat_number(): string {
 		return $this->get_settings_text( 'vat_number', '', false );
 	}
-	
+
 	/**
 	 * Print company VAT number
 	 *
@@ -1647,13 +1670,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show company COC number
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_coc_number(): string {
 		return $this->get_settings_text( 'coc_number', '', false );
 	}
-	
+
 	/**
 	 * Print company COC number
 	 *
@@ -1665,13 +1688,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address line 1 if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address_line_1(): string {
 		return $this->get_settings_text( 'shop_address_line_1' );
 	}
-	
+
 	/**
 	 * Print shop/company address line 1
 	 *
@@ -1683,13 +1706,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address line 2 if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address_line_2(): string {
 		return $this->get_settings_text( 'shop_address_line_2' );
 	}
-	
+
 	/**
 	 * Print shop/company address line 2
 	 *
@@ -1701,13 +1724,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address country if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address_country(): string {
 		return wpo_wcpdf_get_country_name_from_code( $this->get_shop_address_country_code() );
 	}
-	
+
 	/**
 	 * Print shop/company address country
 	 *
@@ -1719,13 +1742,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address country code if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address_country_code(): string {
 		return $this->get_settings_text( 'shop_address_country', '', false );
 	}
-	
+
 	/**
 	 * Print shop/company address country code
 	 *
@@ -1737,13 +1760,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address state if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address_state(): string {
 		return $this->get_settings_text( 'shop_address_state' );
 	}
-	
+
 	/**
 	 * Print shop/company address state
 	 *
@@ -1755,13 +1778,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address city if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address_city(): string {
 		return $this->get_settings_text( 'shop_address_city' );
 	}
-	
+
 	/**
 	 * Print shop/company address city
 	 *
@@ -1773,13 +1796,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address postcode if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address_postcode(): string {
 		return $this->get_settings_text( 'shop_address_postcode' );
 	}
-	
+
 	/**
 	 * Print shop/company address postcode
 	 *
@@ -1791,13 +1814,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address additional info if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address_additional(): string {
 		return $this->get_settings_text( 'shop_address_additional' );
 	}
-	
+
 	/**
 	 * Print shop/company address additional info
 	 *
@@ -1809,7 +1832,7 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company address if provided
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_address(): string {
@@ -1837,7 +1860,7 @@ abstract class OrderDocument {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Print shop/company address
 	 *
@@ -1849,13 +1872,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company phone number if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_phone_number(): string {
 		return $this->get_settings_text( 'shop_phone_number', '', false );
 	}
-	
+
 	/**
 	 * Print shop/company phone number
 	 *
@@ -1867,13 +1890,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company email address if provided.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_shop_email_address(): string {
 		return $this->get_settings_text( 'shop_email_address', '', false );
 	}
-	
+
 	/**
 	 * Print shop/company email address
 	 *
@@ -1885,7 +1908,7 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show shop/company footer imprint, copyright etc.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_footer(): string {
@@ -1895,7 +1918,7 @@ abstract class OrderDocument {
 		do_action( 'wpo_wcpdf_after_footer', $this->get_type(), $this->order );
 		return ob_get_clean();
 	}
-	
+
 	/**
 	 * Print shop/company footer imprint, copyright etc.
 	 *
@@ -1907,14 +1930,14 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show Extra field 1
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_extra_1(): string {
 		return $this->get_settings_text( 'extra_1' );
 
 	}
-	
+
 	/**
 	 * Print Extra field 1
 	 *
@@ -1926,13 +1949,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show Extra field 2
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_extra_2(): string {
 		return $this->get_settings_text( 'extra_2' );
 	}
-	
+
 	/**
 	 * Print Extra field 2
 	 *
@@ -1944,13 +1967,13 @@ abstract class OrderDocument {
 
 	/**
 	 * Return/Show Extra field 3
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_extra_3(): string {
 		return $this->get_settings_text( 'extra_3' );
 	}
-	
+
 	/**
 	 * Print Extra field 3
 	 *
@@ -2014,7 +2037,7 @@ abstract class OrderDocument {
 			? $pdf
 			: null;
 	}
-	
+
 	/**
 	 * Get the PDF file contents for preview.
 	 *
@@ -2100,7 +2123,7 @@ abstract class OrderDocument {
 
 	/**
 	 * Output the HTML document.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function output_html(): void {
@@ -2156,7 +2179,7 @@ abstract class OrderDocument {
 		while ( ob_get_level() ) {
 			ob_end_clean();
 		}
-		
+
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
 		if ( $file_system_instance->exists( $filename_or_contents ) ) {
@@ -2280,7 +2303,7 @@ abstract class OrderDocument {
 
 	/**
 	 * Get all emails registered in WooCommerce
-	 * 
+	 *
 	 * @return array
 	 */
 	public function get_wc_emails(): array {
@@ -2446,7 +2469,7 @@ abstract class OrderDocument {
 
 	/**
 	 * Get the default table name of the Sequential Number Store
-	 * 
+	 *
 	 * @param  string $store_base_name
 	 * @param  string $method
 	 * @return string $table_name
@@ -2718,7 +2741,39 @@ abstract class OrderDocument {
 	public function show_due_date(): bool {
 		return $this->get_due_date() > 0;
 	}
-	
+
+	/**
+	 * Return the value of the checkout field.
+	 *
+	 * @return string
+	 */
+	public function get_checkout_field_value(): string {
+		/** @var \WPO\IPS\CheckoutField $checkout_field_instance */
+		$checkout_field_instance = \WPO_WCPDF()->get_instance( 'checkout_field' );
+
+		if (
+			is_null( $checkout_field_instance ) ||
+			empty( $this->get_setting( 'display_checkout_field' ) ) ||
+			empty( $this->order )
+		) {
+			return '';
+		}
+
+		$checkout_field_value = $this->order->get_meta( $checkout_field_instance::ORDER_META_KEY, true );
+		$checkout_field_value = trim( $checkout_field_value );
+
+		return apply_filters( 'wpo_wcpdf_checkout_field_value', $checkout_field_value, $this );
+	}
+
+	/**
+	 * Print the checkout field value.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_value(): void {
+		echo esc_html( $this->get_checkout_field_value() );
+	}
+
 	/**
 	 * Get non historical settings keys.
 	 *
@@ -2742,7 +2797,7 @@ abstract class OrderDocument {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Reset the resolved settings cache.
 	 *

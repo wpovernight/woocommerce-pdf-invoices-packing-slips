@@ -557,7 +557,7 @@ class SettingsGeneral {
 			array(
 				'type'     => 'setting',
 				'id'       => 'checkout_field_enable',
-				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => __( 'Enable checkout field', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
 				'section'  => 'general_settings',
 				'args'     => array(
@@ -569,7 +569,7 @@ class SettingsGeneral {
 			array(
 				'type'     => 'setting',
 				'id'       => 'checkout_field_label',
-				'title'    => __( 'Label', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => __( 'Checkout field label', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(

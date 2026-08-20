@@ -35,6 +35,7 @@ use WPO\IPS\FontSynchronizer;
 use WPO\IPS\EDI\Peppol;
 use WPO\IPS\Notices;
 use WPO\IPS\SetupWizard;
+use WPO\IPS\CheckoutField;
 
 if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
@@ -46,7 +47,7 @@ class WPO_WCPDF {
 	public string $version_wp                      = '5.3';
 	public ?string $plugin_basename                = null;
 	public array $legacy_addons                    = array();
-	
+
 	public ?ThirdPartyPlugins $third_party_plugins = null;
 	public ?VatPlugins $vat_plugins                = null;
 	public ?OrderUtil $order_util                  = null;
@@ -63,17 +64,18 @@ class WPO_WCPDF {
 	public ?Peppol $peppol                         = null;
 	public ?Notices $notices                       = null;
 	public ?SetupWizard $setup_wizard              = null;
+	public ?CheckoutField $checkout_field          = null;
 
 	protected ?bool $dependencies_ready            = null;
 	protected ?bool $woocommerce_activated         = null;
-	
+
 	protected static ?self $_instance              = null;
 
 	/**
 	 * Main Plugin Instance
 	 *
 	 * Ensures only one instance of plugin is loaded or can be loaded.
-	 * 
+	 *
 	 * @return self
 	 */
 	public static function instance(): self {
@@ -165,10 +167,10 @@ class WPO_WCPDF {
 			4
 		);
 	}
-	
+
 	/**
 	 * Load the main plugin classes and functions
-	 * 
+	 *
 	 * @return void
 	 */
 	public function includes(): void {
@@ -224,6 +226,18 @@ class WPO_WCPDF {
 			$this->get_instance( 'frontend' );
 		}
 
+		// Checkout field: frontend contexts and order edit page and document generation
+		if (
+			$is_admin_like                   ||
+			$is_document_context             ||
+			wpo_ips_is_account_page()        ||
+			wpo_ips_is_order_received_page() ||
+			$is_checkout_context             ||
+			( defined( 'REST_REQUEST' ) && REST_REQUEST )
+		) {
+			$this->get_instance( 'checkout_field' );
+		}
+
 		// Peppol only when enabled and relevant
 		if (
 			function_exists( 'wpo_ips_edi_peppol_is_available' ) &&
@@ -238,7 +252,7 @@ class WPO_WCPDF {
 			$this->get_instance( 'peppol' );
 		}
 	}
-	
+
 	/**
 	 * Get a plugin class instance by slug.
 	 *
@@ -266,6 +280,7 @@ class WPO_WCPDF {
 				'peppol'              => Peppol::class,
 				'notices'             => Notices::class,
 				'setup_wizard'        => SetupWizard::class,
+				'checkout_field'      => CheckoutField::class,
 			),
 			$this
 		);
@@ -295,7 +310,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Is the dependency version supported?
-	 * 
+	 *
 	 * @param string $dependency
 	 * @return bool
 	 */
@@ -315,7 +330,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Load the translation / textdomain files
-	 * 
+	 *
 	 * @param bool $force_reload
 	 * @return void
 	 */
@@ -349,7 +364,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Instantiate classes when woocommerce is activated
-	 * 
+	 *
 	 * @return void
 	 */
 	public function load_classes(): void {
@@ -371,7 +386,7 @@ class WPO_WCPDF {
 		if ( null !== $this->dependencies_ready ) {
 			return $this->dependencies_ready;
 		}
-	
+
 		// Check if WooCommerce is activated and meets the minimum version
 		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
 			Notices::maybe_add_admin_notice( array( Notices::class, 'need_woocommerce_notice' ) );
@@ -420,7 +435,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Show plugin changes. Code adapted from W3 Total Cache.
-	 * 
+	 *
 	 * @param array $args Update message args.
 	 * @return void
 	 */
@@ -575,7 +590,7 @@ class WPO_WCPDF {
 
 		return $actions;
 	}
-	
+
 	/**
 	 * Get transient name for legacy addon notice based on the addon filename.
 	 *
@@ -621,7 +636,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Get the plugin url.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function plugin_url(): string {
@@ -630,16 +645,16 @@ class WPO_WCPDF {
 
 	/**
 	 * Get the plugin path.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function plugin_path(): string {
 		return untrailingslashit( plugin_dir_path( __FILE__ ) );
 	}
-	
+
 	/**
 	 * Define constant if not already set
-	 * 
+	 *
 	 * @param  string $name
 	 * @param  mixed $value
 	 * @return void
@@ -649,10 +664,10 @@ class WPO_WCPDF {
 			define( $name, $value );
 		}
 	}
-	
+
 	/**
 	 * Determine the site locale
-	 * 
+	 *
 	 * @return string
 	 */
 	private function determine_locale(): string {
@@ -668,7 +683,7 @@ class WPO_WCPDF {
 			'woocommerce-pdf-invoices-packing-slips'
 		);
 	}
-	
+
 	/**
 	 * Parse update notice from readme file.
 	 *
@@ -713,10 +728,10 @@ class WPO_WCPDF {
 
 		return wp_kses_post( $upgrade_notice );
 	}
-	
+
 	/**
 	 * Get an array of all active plugins, including multisite
-	 * 
+	 *
 	 * @return array active plugin paths
 	 */
 	private function get_active_plugins(): array {
@@ -732,7 +747,7 @@ class WPO_WCPDF {
 
 		return $active_plugins;
 	}
-	
+
 	/**
 	 * Check whether a plugin is active.
 	 *
