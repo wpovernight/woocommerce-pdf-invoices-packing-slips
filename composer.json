@@ -86,6 +86,7 @@
 	"config": {
 		"platform": {
             "php": "7.4.0"
-        }
+        },
+        "platform-check": false
 	}
 }
