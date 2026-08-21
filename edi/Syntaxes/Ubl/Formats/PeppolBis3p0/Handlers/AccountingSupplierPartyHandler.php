@@ -20,6 +20,7 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 			'name'  => 'cac:Party',
 			'value' => array_filter( array(
 				$this->get_party_endpoint_id(),
+				$this->get_party_identification(),
 				$this->get_party_name(),
 				$this->get_party_postal_address(),
 				$this->get_party_tax_scheme(),
@@ -53,6 +54,67 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 		);
 
 		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_endpoint_id', $endpoint, $this );
+	}
+
+	/**
+	 * Returns the seller identifier for VAT category O invoices.
+	 *
+	 * @return array|null
+	 */
+	public function get_party_identification(): ?array {
+		if ( ! $this->has_tax_category( 'O' ) ) {
+			return null;
+		}
+
+		$supplier     = $this->get_supplier_data();
+		$vat_number   = (string) ( $supplier['vat_number'] ?? '' );
+		$country_code = (string) ( $supplier['country_code'] ?? '' );
+
+		if ( empty( $vat_number ) ) {
+			return null;
+		}
+
+		$identifier = $vat_number;
+		$scheme     = '';
+		$icd_codes  = EN16931::get_icd();
+		$candidates = wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( $country_code, $vat_number );
+
+		foreach ( $candidates as $candidate ) {
+			$candidate_scheme = (string) ( $candidate['eas'] ?? '' );
+			$candidate_value  = (string) ( $candidate['value'] ?? '' );
+
+			if (
+				'' === $candidate_scheme ||
+				'' === $candidate_value ||
+				! array_key_exists( $candidate_scheme, $icd_codes )
+			) {
+				continue;
+			}
+
+			$scheme     = $candidate_scheme;
+			$identifier = $candidate_value;
+			break;
+		}
+
+		$id = array(
+			'name'  => 'cbc:ID',
+			'value' => wpo_ips_edi_sanitize_string( $identifier ),
+		);
+
+		if ( '' !== $scheme ) {
+			$id['attributes'] = array(
+				'schemeID' => $scheme,
+			);
+		}
+
+		$party_identification = array(
+			'name'  => 'cac:PartyIdentification',
+			'value' => array(
+				$id,
+			),
+		);
+
+		return apply_filters( 'wpo_ips_edi_ubl_supplier_party_identification', $party_identification, $this );
 	}
 
 	/**
