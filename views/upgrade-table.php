@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		echo '<tr><td class="first feature-label">' . esc_html( $feature['label'] );
 		echo ! empty( $feature['description'] ) ? '<br><span class="description">' . wp_kses_post( $feature['description'] ) . '</span></td>' : '</td>';
 		foreach ( array( 'pro', 'templates', 'bundle' ) as $extension ) {
-			echo in_array( $extension, $feature['extensions'] ) ? '<td class="' . esc_attr( $extension ) . '"><span class="feature-available"></span></td>' : '<td class="' . esc_attr( $extension ) . '">-</td>';
+			echo in_array( $extension, $feature['extensions'], true ) ? '<td class="' . esc_attr( $extension ) . '"><span class="feature-available"></span></td>' : '<td class="' . esc_attr( $extension ) . '">-</td>';
 		}
 		echo '<td align="left" class="last">&nbsp;</td></tr>';
 	}
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			
 			// check if pro and templates are enabled
 			foreach ( $default_extensions as $extension ) {
-				$extension_is_enabled = WPO_WCPDF()->settings->upgrade->extension_is_enabled( $extension );
+				$extension_is_enabled = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'upgrade' )->extension_is_enabled( $extension );
 				
 				if ( $extension_is_enabled ) {
 					$extensions_enabled[]  = $extension;
@@ -55,7 +55,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			// pro, templates & bundle columns
 			foreach ( $extension_license_infos as $extension => $info ) {
-				$extension_is_enabled = in_array( $extension, $extensions_enabled );
+				$extension_is_enabled = in_array( $extension, $extensions_enabled, true );
 				$bundle_is_enabled    = array() === array_diff( array( 'pro', 'templates' ), $extensions_enabled );
 				
 				// enabled
@@ -87,7 +87,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				// disabled
 				} else {
 					// add bundle to disabled extensions
-					if ( 'bundle' === $extension && ! in_array( $extension, $extensions_disabled ) ) {
+					if ( 'bundle' === $extension && ! in_array( $extension, $extensions_disabled, true ) ) {
 						$extensions_disabled[] = $extension;
 					}
 					

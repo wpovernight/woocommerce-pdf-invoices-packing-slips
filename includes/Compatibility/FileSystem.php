@@ -1,57 +1,29 @@
 <?php
-/**
- * WordPress FileSystem compatibility class.
- *
- * @since 4.2
- */
-
 namespace WPO\IPS\Compatibility;
 
-defined( 'ABSPATH' ) or exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 if ( ! class_exists( '\\WPO\\IPS\\Compatibility\\FileSystem' ) ) :
 
 class FileSystem {
 
-	/**
-	 * Default filesystem method.
-	 */
-	public const FILESYSTEM_DEFAULT = 'php';
-
-	/**
-	 * Available filesystem methods.
-	 */
-	public const FILESYSTEM_METHODS = array( 'php', 'wp' );
-
-	/**
-	 * Filesystem method enabled.
-	 * @var string
-	 */
-	public string $system_enabled = self::FILESYSTEM_DEFAULT;
-
-	/**
-	 * Suppress errors.
-	 * @var bool
-	 */
-	public bool $suppress_errors = false;
-
-	/**
-	 * WP_Filesystem instance.
-	 * @var \WP_Filesystem_Direct|null
-	 */
+	public const FILESYSTEM_DEFAULT              = 'php';
+	public const FILESYSTEM_METHODS              = array( 'php', 'wp' );
+	
+	public string $system_enabled                = self::FILESYSTEM_DEFAULT;
+	public bool $suppress_errors                 = false;
 	public ?\WP_Filesystem_Direct $wp_filesystem = null;
+	
+	protected static ?self $_instance            = null;
 
 	/**
 	 * Singleton instance.
-	 * @var self|null
-	 */
-	protected static ?self $_instance = null;
-
-	/**
-	 * Singleton instance.
+	 * 
 	 * @return self
 	 */
-	public static function instance() {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -87,6 +59,7 @@ class FileSystem {
 
 	/**
 	 * Check if WP_Filesystem is enabled.
+	 * 
 	 * @return bool
 	 */
 	public function is_wp_filesystem(): bool {
@@ -95,6 +68,7 @@ class FileSystem {
 
 	/**
 	 * Check if PHP file functions are being used.
+	 * 
 	 * @return bool
 	 */
 	public function is_php_filesystem(): bool {
@@ -103,6 +77,7 @@ class FileSystem {
 
 	/**
 	 * Initialize WP_Filesystem
+	 * 
 	 * @return void
 	 */
 	public function initialize_wp_filesystem(): void {
@@ -126,6 +101,7 @@ class FileSystem {
 
 	/**
 	 * Change the filesystem setting value
+	 * 
 	 * @param string $method
 	 * @return string
 	 */
@@ -140,10 +116,11 @@ class FileSystem {
 
 	/**
 	 * Get file contents
+	 * 
 	 * @param string $filename
 	 * @return string|bool
 	 */
-	public function get_contents( string $filename ) {
+	public function get_contents( string $filename ): string|bool {
 		if ( empty( $filename ) ) {
 			return false;
 		}
@@ -154,6 +131,7 @@ class FileSystem {
 
 	/**
 	 * Check if file is readable
+	 * 
 	 * @param string $filename
 	 * @return bool
 	 */
@@ -168,12 +146,13 @@ class FileSystem {
 
 	/**
 	 * Write file contents
+	 * 
 	 * @param string $filename
 	 * @param string $contents
 	 * @param int|false $mode
 	 * @return int|bool
 	 */
-	public function put_contents( string $filename, string $contents, $mode = false ) {
+	public function put_contents( string $filename, string $contents, int|false $mode = false ): int|bool {
 		if ( empty( $filename ) || empty( $contents ) ) {
 			return false;
 		}
@@ -224,6 +203,7 @@ class FileSystem {
 
 	/**
 	 * Check if file exists
+	 * 
 	 * @param string $filename
 	 * @return bool
 	 */
@@ -238,6 +218,7 @@ class FileSystem {
 
 	/**
 	 * Check if directory exists
+	 * 
 	 * @param string $filename
 	 * @return bool
 	 */
@@ -251,7 +232,24 @@ class FileSystem {
 	}
 
 	/**
+	 * Check if path is a regular file.
+	 *
+	 * @param string $filename File path.
+	 * @return bool
+	 */
+	public function is_file( string $filename ): bool {
+		if ( empty( $filename ) ) {
+			return false;
+		}
+
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->is_file( $filename ) :
+			( $this->suppress_errors ? @is_file( $filename ) : is_file( $filename ) );
+	}
+
+	/**
 	 * Create a directory
+	 * 
 	 * @param string $path
 	 * @return bool
 	 */
@@ -266,6 +264,7 @@ class FileSystem {
 
 	/**
 	 * Check if file is writable
+	 * 
 	 * @param string $filename
 	 * @return bool
 	 */
@@ -283,6 +282,7 @@ class FileSystem {
 
 	/**
 	 * Delete a file
+	 * 
 	 * @param string $filename
 	 * @param bool $recursive
 	 * @return bool
@@ -298,10 +298,11 @@ class FileSystem {
 
 	/**
 	 * Get directory listing
+	 * 
 	 * @param string $path
 	 * @return array|bool
 	 */
-	public function dirlist( string $path ) {
+	public function dirlist( string $path ): array|bool {
 		if ( empty( $path ) ) {
 			return false;
 		}
@@ -312,10 +313,11 @@ class FileSystem {
 
 	/**
 	 * Get file modification time
+	 * 
 	 * @param string $filename
 	 * @return int|bool
 	 */
-	public function mtime( string $filename ) {
+	public function mtime( string $filename ): int|bool {
 		if ( empty( $filename ) ) {
 			return false;
 		}
