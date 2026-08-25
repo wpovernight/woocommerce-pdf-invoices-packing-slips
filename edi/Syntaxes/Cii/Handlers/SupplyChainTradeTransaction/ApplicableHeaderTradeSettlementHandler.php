@@ -160,6 +160,12 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				continue;
 			}
 
+			// Only emit exemption data for 0% non-Z with an explicit reason.
+			$has_exemption = 0.0 === $percent && 'Z' !== $category && 'NONE' !== $reason;
+			$reason_label  = $has_exemption
+				? ( ! empty( $tax_reasons[ $reason ] ) ? $tax_reasons[ $reason ] : $reason )
+				: '';
+
 			$node_value = array(
 				array(
 					'name'  => 'ram:CalculatedAmount',
@@ -169,35 +175,39 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 					'name'  => 'ram:TypeCode',
 					'value' => $scheme ?: 'VAT',
 				),
-				array(
-					'name'  => 'ram:BasisAmount',
-					'value' => $this->format_decimal( $basis ),
-				),
-				array(
-					'name'  => 'ram:CategoryCode',
-					'value' => $category,
-				),
 			);
+
+			// ExemptionReason must precede BasisAmount in the CII TradeTaxType sequence.
+			if ( $has_exemption ) {
+				$node_value[] = array(
+					'name'  => 'ram:ExemptionReason',
+					'value' => $reason_label,
+				);
+			}
+
+			$node_value[] = array(
+				'name'  => 'ram:BasisAmount',
+				'value' => $this->format_decimal( $basis ),
+			);
+
+			$node_value[] = array(
+				'name'  => 'ram:CategoryCode',
+				'value' => $category,
+			);
+
+			// ExemptionReasonCode must precede RateApplicablePercent.
+			if ( $has_exemption ) {
+				$node_value[] = array(
+					'name'  => 'ram:ExemptionReasonCode',
+					'value' => $reason,
+				);
+			}
 
 			// For category O ("Not subject to VAT"), do not emit RateApplicablePercent.
 			if ( 'O' !== $category ) {
 				$node_value[] = array(
 					'name'  => 'ram:RateApplicablePercent',
 					'value' => $this->format_decimal( $percent, 1 ),
-				);
-			}
-
-			// Only emit exemption data for 0% non-Z with an explicit reason.
-			if ( 0.0 === $percent && 'Z' !== $category && 'NONE' !== $reason ) {
-				$reason_label = ! empty( $tax_reasons[ $reason ] ) ? $tax_reasons[ $reason ] : $reason;
-
-				$node_value[] = array(
-					'name'  => 'ram:ExemptionReasonCode',
-					'value' => $reason,
-				);
-				$node_value[] = array(
-					'name'  => 'ram:ExemptionReason',
-					'value' => $reason_label,
 				);
 			}
 
