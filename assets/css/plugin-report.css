@@ -1,0 +1,198 @@
+body {
+	font-family: 'DejaVu Sans', sans-serif;
+	font-size: 10px;
+	line-height: 1.3;
+	color: #000000;
+	margin: 15px;
+	background: #ffffff;
+}
+
+h1, h2, h3, h4 {
+	margin: 0 0 6px 0;
+	font-weight: bold;
+	color: #000000;
+}
+
+p {
+	margin: 0 0 4px 0;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+/* Header */
+.report-header {
+	border-bottom: 1px solid #000000;
+	padding-bottom: 6px;
+	margin-bottom: 10px;
+}
+
+.report-title {
+	font-size: 14px;
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+
+/* Meta info */
+.report-meta {
+	border: 1px solid #000000;
+	padding: 6px;
+	margin-top: 4px;
+}
+
+.report-meta-table td {
+	padding: 2px 3px;
+	vertical-align: top;
+}
+
+.report-meta-label {
+	font-weight: bold;
+	width: 30%;
+}
+
+/* Extensions */
+.extensions-section {
+	border: 1px solid #000000;
+	padding: 6px;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+
+.extensions-title {
+	font-weight: bold;
+	font-size: 9px;
+	margin-bottom: 3px;
+}
+
+.extensions-list {
+	margin: 0;
+	padding-left: 12px;
+}
+
+.extensions-list li {
+	font-size: 9px;
+	margin-bottom: 1px;
+}
+
+.extension-name {
+	font-weight: bold;
+}
+
+/* Sections */
+.section {
+	margin-bottom: 10px;
+}
+
+.section-title {
+	font-size: 11px;
+	font-weight: bold;
+	margin-bottom: 4px;
+	border-bottom: 1px solid #000000;
+	padding-bottom: 3px;
+}
+
+/* System info block */
+.system-info {
+	border: 1px solid #000000;
+	padding: 6px;
+	margin-bottom: 6px;
+}
+
+/* Config + settings tables */
+.config-table tr,
+.settings-table tr {
+	page-break-inside: avoid;
+}
+
+.config-table td {
+	padding: 3px 3px;
+	border-top: 1px solid #cccccc;
+	vertical-align: top;
+}
+
+.config-table tr:first-child td {
+	border-top: none;
+}
+
+.config-table td:first-child {
+	font-weight: bold;
+	width: 35%;
+}
+
+/* Settings groups */
+.settings-group {
+	border: 1px solid #000000;
+	margin-bottom: 8px;
+}
+
+.group-header {
+	padding: 4px 6px;
+	font-weight: bold;
+	font-size: 10px;
+	border-bottom: 1px solid #000000;
+}
+
+.settings-table td {
+	padding: 3px 6px;
+	border-top: 1px solid #eeeeee;
+	vertical-align: top;
+}
+
+.settings-table tr:first-child td {
+	border-top: none;
+}
+
+.setting-name {
+	font-weight: bold;
+	width: 40%;
+}
+
+.setting-value code {
+	font-family: "Courier New", monospace;
+	font-size: 9px;
+	padding: 0 2px;
+	border: 1px solid #cccccc;
+}
+
+/* Badges */
+.badge {
+	display: inline-block;
+	padding: 1px 3px;
+	font-size: 8px;
+	font-weight: bold;
+	border: 1px solid #000000;
+	text-transform: uppercase;
+}
+
+/* Config item helper */
+.config-item {
+	margin: 0;
+}
+
+.config-item div {
+	margin-bottom: 2px;
+}
+
+.config-item strong {
+	display: inline-block;
+	min-width: 46px;
+}
+
+/* Log Output */
+.log-output {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+}
+
+/* Footer */
+.footer {
+	margin-top: 15px;
+	padding-top: 6px;
+	border-top: 1px solid #000000;
+	text-align: center;
+	font-size: 8px;
+	color: #000000;
+}

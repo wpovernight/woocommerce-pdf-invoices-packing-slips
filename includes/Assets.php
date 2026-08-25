@@ -1,0 +1,431 @@
+<?php
+namespace WPO\IPS;
+
+use WPO\IPS\EDI\Standards\EN16931;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+if ( ! class_exists( '\\WPO\\IPS\\Assets' ) ) :
+
+class Assets {
+
+	protected static ?self $_instance = null;
+	
+	/**
+	 * Singleton instance accessor.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
+		if ( is_null( self::$_instance ) ) {
+			self::$_instance = new self();
+		}
+		return self::$_instance;
+	}
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
+		add_filter( 'script_loader_tag', array( $this, 'edi_prism_add_data_manual_attr' ), 10, 3 );
+	}
+
+	/**
+	 * Load styles & scripts
+	 * 
+	 * @param string $hook
+	 * @return void
+	 */
+	public function backend_scripts_styles( string $hook ): void {
+		$suffix        = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$pdfjs_version = '4.3.136';
+
+		global $wp_version;
+
+		if ( \wpo_ips_is_order_page() ) {
+
+			// STYLES
+			if ( ! wp_style_is( 'thickbox', 'enqueue' ) ) {
+				wp_enqueue_style( 'thickbox' );
+			}
+
+			wp_enqueue_style(
+				'wpo-wcpdf-order-styles',
+				WPO_WCPDF()->plugin_url() . '/assets/css/order-styles' . $suffix . '.css',
+				array(),
+				WPO_WCPDF_VERSION
+			);
+
+			// SCRIPTS
+			wp_enqueue_script(
+				'wpo-wcpdf',
+				WPO_WCPDF()->plugin_url() . '/assets/js/order-script' . $suffix . '.js',
+				array(
+					'jquery',
+					wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				),
+				WPO_WCPDF_VERSION,
+				true
+			);
+
+			wp_localize_script(
+				'wpo-wcpdf',
+				'wpo_wcpdf_ajax',
+				array(
+					'ajaxurl'                      => admin_url( 'admin-ajax.php' ), // URL to WordPress ajax handling page
+					'nonce'                        => wp_create_nonce( 'generate_wpo_wcpdf' ),
+					'bulk_actions'                 => array_keys( wcpdf_get_bulk_actions() ),
+					'select_orders'                => __( 'You have to select order(s) first!', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_delete'               => __( 'Are you sure you want to delete this document? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'confirm_regenerate'           => __( 'Are you sure you want to regenerate this document? This will make the document reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'sticky_document_data_metabox' => apply_filters( 'wpo_wcpdf_sticky_document_data_metabox', true ),
+					'error_loading_number_preview' => __( 'Error loading preview', 'woocommerce-pdf-invoices-packing-slips' ),
+					'error_fetching_refund_ids'    => __( 'Error fetching refund order IDs', 'woocommerce-pdf-invoices-packing-slips' ),
+					'error_no_refunds_found'       => __( 'No refunds found for this order', 'woocommerce-pdf-invoices-packing-slips' ),
+					'edi_metabox'                  => array(
+						'show' => __( 'Show', 'woocommerce-pdf-invoices-packing-slips' ),
+						'hide' => __( 'Hide', 'woocommerce-pdf-invoices-packing-slips' ),
+						'fail' => __( 'Could not save identifiers. Please try again.', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+				)
+			);
+		}
+
+		// only load on our own settings page
+		// maybe find a way to refer directly to WPO\IPS\Settings::$options_page_hook ?
+		if ( ! empty( $hook ) && false !== strpos( $hook, 'wpo_wcpdf_options_page' ) ) {
+			$tab = filter_input( INPUT_GET, 'tab', FILTER_DEFAULT );
+			$tab = sanitize_text_field( $tab );
+
+			wp_enqueue_style(
+				'wpo-wcpdf-settings-styles',
+				WPO_WCPDF()->plugin_url() . '/assets/css/settings-styles' . $suffix . '.css',
+				array('woocommerce_admin_styles'),
+				WPO_WCPDF_VERSION
+			);
+			wp_add_inline_style( 'wpo-wcpdf-settings-styles', ".next-number-input.ajax-waiting {
+				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/spinner.gif'.") !important;
+				background-position: 95% 50% !important;
+				background-repeat: no-repeat !important;
+			}" );
+			wp_add_inline_style( 'wpo-wcpdf-settings-styles', "#preview-order-search.ajax-waiting {
+				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/spinner.gif'.") !important;
+				background-repeat: no-repeat !important;
+				background-position: right 10px center !important;
+			}" );
+			wp_add_inline_style( 'wpo-wcpdf-settings-styles', "#wpo-wcpdf-preview-wrapper .slider.slide-left:after {
+					content: '".__( 'Preview', 'woocommerce-pdf-invoices-packing-slips' )."';
+				}
+				#wpo-wcpdf-preview-wrapper .slider.slide-right:after {
+					content: '".__( 'Settings', 'woocommerce-pdf-invoices-packing-slips' )."';
+			}" );
+			wp_add_inline_style( 'wpo-wcpdf-settings-styles', "#upgrade-table td span.feature-available {
+				background-image: url(".WPO_WCPDF()->plugin_url().'/assets/images/checkmark.svg'.") !important;
+			}" );
+
+			if ( ! wp_script_is( 'wc-enhanced-select', 'enqueued' ) ) {
+				wp_enqueue_script( 'wc-enhanced-select' );
+			}
+
+			if ( ! wp_script_is( 'wp-pointer', 'enqueued' ) ) {
+				wp_enqueue_script( 'wp-pointer' );
+			}
+
+			$tiptip_handle = version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip';
+
+			if ( ! wp_script_is( $tiptip_handle, 'enqueued' ) ) {
+				wp_enqueue_script( $tiptip_handle );
+			}
+
+			$admin_deps = array(
+				'jquery',
+				'wc-enhanced-select',
+				'wp-pointer',
+				'jquery-ui-datepicker',
+				wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				wp_script_is( 'wc-jquery-tiptip', 'registered' ) ? 'wc-jquery-tiptip' : 'jquery-tiptip',
+			);
+
+			// edi preview
+			if ( wpo_ips_edi_preview_is_enabled() ) {
+				wp_enqueue_style(
+					'wpo-ips-edi-prism',
+					WPO_WCPDF()->plugin_url() . '/assets/css/prism.min.css',
+					array(),
+					'1.30.0'
+				);
+
+				wp_enqueue_script(
+					'wpo-ips-edi-prism-core',
+					WPO_WCPDF()->plugin_url() . '/assets/js/prism.min.js',
+					array(),
+					'1.30.0',
+					true
+				);
+
+				$admin_deps[] = 'wpo-ips-edi-prism-core';
+			}
+
+			wp_enqueue_script(
+				'wpo-wcpdf-admin',
+				WPO_WCPDF()->plugin_url() . '/assets/js/admin-script' . $suffix . '.js',
+				$admin_deps,
+				WPO_WCPDF_VERSION,
+				true
+			);
+
+			$search_index = $this->get_settings_search_index( $tab );
+
+			wp_localize_script(
+				'wpo-wcpdf-admin',
+				'wpo_wcpdf_admin',
+				array(
+					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+					'search_index'              => $search_index,
+					'nonce'                     => wp_create_nonce( 'wpo_wcpdf_admin_nonce' ),
+					'template_paths'            => WPO_WCPDF()->get_instance( 'settings' )->get_installed_templates(),
+					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.min.js?ver=' . $pdfjs_version, // taken from https://cdnjs.com/libraries/pdf.js
+					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
+						// general
+						'download_display',
+						'test_mode',
+						'checkout_field_enable',
+						'checkout_field_label',
+						'checkout_field_as_vat_number',
+						'checkout_field_enable_my_account',
+						// document
+						'enabled',
+						'archive_pdf',
+						'auto_generate_for_statuses',
+						'attach_to_email_ids',
+						'disable_for_statuses',
+						'reset_number_yearly',
+						'my_account_buttons',
+						'invoice_number_column',
+						'invoice_date_column',
+						'disable_free',
+						'use_latest_settings',
+						'mark_printed',
+						'unmark_printed',
+						'include_email_link',
+						'include_email_link_placement',
+					) ),
+					'pointers'                  => array(
+						'wcpdf_document_settings_sections' => array(
+							'target'        => '.wcpdf_document_settings_sections',
+							'content'       => sprintf(
+								'<h3>%s</h3><p>%s</p>',
+								__( 'Document settings', 'woocommerce-pdf-invoices-packing-slips' ),
+								__( 'Select a document in the dropdown menu above to edit its settings.', 'woocommerce-pdf-invoices-packing-slips' )
+							),
+							'pointer_class' => 'wp-pointer arrow-top wpo-wcpdf-pointer',
+							'pointer_width' => 300,
+							'position'      => array(
+								'edge'  => 'top',
+								'align' => 'left',
+							),
+						),
+					),
+					'dismissed_pointers'        => get_user_meta( get_current_user_id(), 'dismissed_wp_pointers', true ),
+					'mysql_int_size_limit'      => sprintf(
+						/* translators: mysql int size */
+						__( 'The number should be smaller than %s. Please note you should add your next document number without prefix, suffix or padding.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>2147483647</code>'
+					),
+					'shop_country_changed_messages' => array(
+						'loading' => __( 'Loading', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+						'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
+						'error'   => __( 'Error loading', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+					'xml_document_types'        => array_values( array_map(
+						fn( $document ) => $document->get_type(),
+						\WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'xml' )
+					) ),
+				)
+			);
+
+			// preview PDFJS
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			if ( ! isset( $debug_settings['disable_preview'] ) ) {
+				wp_enqueue_script(
+					'wpo-wcpdf-pdfjs',
+					WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.min.js', // taken from https://cdnjs.com/libraries/pdf.js
+					array(),
+					$pdfjs_version,
+					true
+				);
+			}
+
+			wp_enqueue_media();
+
+			wp_enqueue_script(
+				'wpo-wcpdf-media-upload',
+				WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
+				array( 'jquery' ),
+				WPO_WCPDF_VERSION,
+				true
+			);
+
+			// status/debug page scripts
+			if ( 'debug' === $tab ) {
+				wp_enqueue_style( 'jquery-ui-style' );
+				wp_enqueue_script( 'jquery-ui-datepicker' );
+
+				wp_enqueue_style(
+					'wpo-wcpdf-debug-tools-styles',
+					WPO_WCPDF()->plugin_url() . '/assets/css/debug-tools' . $suffix . '.css',
+					array(),
+					WPO_WCPDF_VERSION
+				);
+
+				wp_enqueue_script(
+					'wpo-wcpdf-debug',
+					WPO_WCPDF()->plugin_url() . '/assets/js/debug-script' . $suffix . '.js',
+					array(
+						'jquery',
+						'jquery-ui-datepicker',
+						wp_script_is( 'wc-jquery-blockui', 'registered' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+					),
+					WPO_WCPDF_VERSION,
+					true
+				);
+
+				wp_localize_script(
+					'wpo-wcpdf-debug',
+					'wpo_wcpdf_debug',
+					array(
+						'ajaxurl'                         => admin_url( 'admin-ajax.php' ),
+						'nonce'                           => wp_create_nonce( 'wpo_wcpdf_debug_nonce' ),
+						'download_label'                  => __( 'Download', 'woocommerce-pdf-invoices-packing-slips' ),
+						'confirm_reset'                   => __( 'Are you sure you want to reset this settings? This cannot be undone.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'select_document_type'            => __( 'Please select a document type', 'woocommerce-pdf-invoices-packing-slips' ),
+						'forbidden'                       => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'confirm_plugin_report_sensitive' => __( 'The report may contain sensitive data such as license keys and log contents. Are you sure you want to include this information?', 'woocommerce-pdf-invoices-packing-slips' ),
+						'danger_zone'                     => array(
+							'enabled' => isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_danger_zone_tools'] ) ? true : false,
+							'message' => sprintf(
+								/* translators: 1. open anchor tag, 2. close anchor tag */
+								__( '<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
+								'<a href="' . esc_url( add_query_arg( 'section', 'tools' ) ) . '#danger_zone">',
+								'</a>'
+							),
+						),
+					)
+				);
+
+			}
+
+			// edi
+			if ( 'edi' === $tab ) {
+				wp_enqueue_script(
+					'wpo-ips-edi',
+					WPO_WCPDF()->plugin_url() . '/assets/js/edi-script' . $suffix . '.js',
+					array( 'jquery', 'jquery-blockui' ),
+					WPO_WCPDF_VERSION,
+					true
+				);
+
+				wp_localize_script(
+					'wpo-ips-edi',
+					'wpo_ips_edi',
+					array(
+						'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
+						'nonce'                     => wp_create_nonce( 'wpo_ips_edi_nonce' ),
+						'code'                      => __( 'Code', 'woocommerce-pdf-invoices-packing-slips' ),
+						'new'                       => __( 'New', 'woocommerce-pdf-invoices-packing-slips' ),
+						'unsaved'                   => __( 'unsaved', 'woocommerce-pdf-invoices-packing-slips' ),
+						'remarks'                   => EN16931::get_vatex_remarks(),
+						'missing'                   => __( 'Missing', 'woocommerce-pdf-invoices-packing-slips' ),
+						'optional'                  => __( 'Optional', 'woocommerce-pdf-invoices-packing-slips' ),
+						'vat_warning'               => __( 'VAT number should start with a country prefix (e.g. NL123456789B01).', 'woocommerce-pdf-invoices-packing-slips' ),
+						'error_loading_identifiers' => __( 'Error loading identifiers', 'woocommerce-pdf-invoices-packing-slips' ),
+						'loading'                   => __( 'Loading...', 'woocommerce-pdf-invoices-packing-slips' ),
+						'valid_number'              => __( 'Order ID must be a valid number', 'woocommerce-pdf-invoices-packing-slips' ),
+						'enter_order_id'            => __( 'Please enter an Order ID.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'no_identifiers_found'      => __( 'No customer identifiers found.', 'woocommerce-pdf-invoices-packing-slips' ),
+					)
+				);
+			}
+		}
+
+		if (
+			$hook === 'woocommerce_page_wc-admin' &&
+			WPO_WCPDF()->get_instance( 'order_util' )->is_wc_admin_page()
+		) {
+			wp_enqueue_script(
+				'wpo-wcpdf-analytics-order',
+				WPO_WCPDF()->plugin_url() . '/assets/js/analytics-order' . $suffix . '.js',
+				array( 'wp-hooks' ),
+				WPO_WCPDF_VERSION,
+				true
+			);
+
+			wp_localize_script(
+				'wpo-wcpdf-analytics-order',
+				'wpo_wcpdf_analytics_order',
+				array(
+					'label' => __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
+	}
+
+	/**
+	 * Build the search index for the current settings tab.
+	 *
+	 * @param string $tab
+	 * @return array
+	 */
+	private function get_settings_search_index( string $tab ): array {
+		$page = '';
+
+		switch ( $tab ) {
+			case 'general':
+			case '':
+				$page = 'wpo_wcpdf_settings_general';
+				break;
+			case 'documents':
+				$section = filter_input( INPUT_GET, 'section', FILTER_DEFAULT );
+				$section = ! empty( $section ) ? sanitize_text_field( $section ) : 'invoice';
+				$page    = 'wpo_wcpdf_documents_settings_' . $section;
+				break;
+			case 'debug':
+				$section = filter_input( INPUT_GET, 'section', FILTER_DEFAULT );
+				$section = ! empty( $section ) ? sanitize_text_field( $section ) : 'settings';
+				if ( 'settings' === $section ) {
+					$page = 'wpo_wcpdf_settings_debug';
+				}
+				break;
+		}
+
+		if ( empty( $page ) ) {
+			return array();
+		}
+
+		return WPO_WCPDF()->get_instance( 'settings' )->get_search_index( $page );
+	}
+
+	/**
+	 * Adds the `data-manual` attribute to Prism's <script> tag so that Prism
+	 * stays in “manual” mode (i.e. it won't auto-highlight the entire page;
+	 * you will call `Prism.highlightElement()` yourself).
+	 *
+	 * @param string $tag
+	 * @param string $handle
+	 * @param string $src
+	 *
+	 * @return string
+	 */
+	public function edi_prism_add_data_manual_attr( string $tag, string $handle, string $src ): string {
+		return ( $handle === 'wpo-ips-edi-prism-core' )
+        	? str_replace( '<script ', '<script data-manual ', $tag )
+        	: $tag;
+	}
+
+}
+
+endif; // class_exists

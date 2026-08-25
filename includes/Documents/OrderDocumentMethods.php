@@ -1,0 +1,1767 @@
+<?php
+namespace WPO\IPS\Documents;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+if ( ! class_exists( '\\WPO\\IPS\\Documents\\OrderDocumentMethods' ) ) :
+
+abstract class OrderDocumentMethods extends OrderDocument {
+
+	/**
+	 * Check if the order is a refund.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return bool
+	 */
+	public function is_refund( \WC_Abstract_Order $order ): bool {
+		return 'shop_order_refund' === $order->get_type();
+	}
+
+	/**
+	 * Get the parent order ID for a refund order.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return int|null
+	 */
+	public function get_refund_parent_id( \WC_Abstract_Order $order ): ?int {
+		return $order->get_parent_id();
+	}
+
+	/**
+	 * Get the parent order for a refund order.
+	 *
+	 * @param \WC_Abstract_Order $order Order object.
+	 * @return \WC_Abstract_Order|null
+	 */
+	public function get_refund_parent( \WC_Abstract_Order $order ): ?\WC_Abstract_Order {
+		// Only try if this is actually a refund.
+		if ( ! $this->is_refund( $order ) ) {
+			return $order;
+		}
+
+		$parent_order_id = $this->get_refund_parent_id( $order );
+
+		if ( ! $parent_order_id ) {
+			return null;
+		}
+
+		$parent_order = wc_get_order( $parent_order_id );
+
+		return $parent_order instanceof \WC_Abstract_Order ? $parent_order : null;
+	}
+
+	/**
+	 * Check if billing address and shipping address are equal
+	 * 
+	 * @return bool
+	 */
+	public function ships_to_different_address(): bool {
+		// always prefer parent address for refunds
+		if ( $this->is_refund( $this->order ) ) {
+			$order = $this->get_refund_parent( $this->order );
+		} else {
+			$order = $this->order;
+		}
+
+		// only check if there is a shipping address at all
+		if ( $formatted_shipping_address = $order->get_formatted_shipping_address() ) {
+			$address_comparison_fields = apply_filters( 'wpo_wcpdf_address_comparison_fields', array(
+				'first_name',
+				'last_name',
+				'company',
+				'address_1',
+				'address_2',
+				'city',
+				'state',
+				'postcode',
+				'country'
+			), $this );
+
+			foreach ( $address_comparison_fields as $address_field ) {
+				$billing_field  = call_user_func( array( $order, "get_billing_{$address_field}" ) );
+				$shipping_field = call_user_func( array( $order, "get_shipping_{$address_field}" ) );
+				if ( $shipping_field != $billing_field ) {
+					// this address field is different -> ships to different address!
+					return true;
+				}
+			}
+		}
+
+		//if we got here, it means the addresses are equal -> doesn't ship to different address!
+		return (bool) apply_filters(
+			'wpo_wcpdf_ships_to_different_address',
+			false,
+			$order,
+			$this
+		);
+	}
+
+	/**
+	 * Get the billing address
+	 *
+	 * @return string
+	 */
+	public function get_billing_address(): string {
+		$original_order = $this->order;
+		$address        = '';
+
+		if ( $this->is_refund( $original_order ) ) {
+			$this->order = $this->get_refund_parent( $original_order ) ?: $original_order;
+		}
+
+		if ( is_callable( array( $this->order, 'get_formatted_billing_address' ) ) ) {
+			$address = $this->order->get_formatted_billing_address();
+		}
+
+		if ( empty( $address ) ) {
+			$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
+		$address = apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+
+		if ( is_null( $address ) ) {
+			$address = '';
+		}
+
+		// Restore the original order if modified.
+		$this->order = $original_order;
+
+		return $address;
+	}
+	
+	/**
+	 * Print the billing address
+	 *
+	 * @return void
+	 */
+	public function billing_address(): void {
+		echo wp_kses_post( $this->get_billing_address() );
+	}
+
+	/**
+	 * Check whether the billing address should be shown
+	 * 
+	 * @return bool
+	 */
+	public function show_billing_address(): bool {
+		if ( 'packing-slip' !== $this->get_type() ) {
+			return true;
+		} else {
+			return ! empty( $this->settings['display_billing_address'] ) && ( $this->ships_to_different_address() || 'always' === $this->settings['display_billing_address'] );
+		}
+	}
+
+	/**
+	 * Return/Show billing email
+	 * 
+	 * @return string
+	 */
+	public function get_billing_email(): string {
+		// normal order
+		if ( ! $this->is_refund( $this->order ) && is_callable( array( $this->order, 'get_billing_email' ) ) ) {
+			$billing_email = $this->order->get_billing_email();
+		// refund order
+		} else {
+			// try parent
+			$parent_order  = $this->get_refund_parent( $this->order );
+			$billing_email = $parent_order->get_billing_email();
+		}
+
+		return (string) apply_filters(
+			'wpo_wcpdf_billing_email',
+			sanitize_email( $billing_email ),
+			$this
+		);
+	}
+	
+	/**
+	 * Print the billing email
+	 * 
+	 * @return void
+	 */
+	public function billing_email(): void {
+		echo esc_html( $this->get_billing_email() );
+	}
+
+	/**
+	 * Get billing or shipping phone
+	 * 
+	 * @param string $phone_type 'billing' or 'shipping'
+	 * @return string
+	 */
+	public function get_phone( string $phone_type = 'billing' ): string {
+		$phone = '';
+		if ( ! empty( $order = $this->is_refund( $this->order ) ? $this->get_refund_parent( $this->order ) : $this->order ) ) {
+			$getter = "get_{$phone_type}_phone";
+			$phone  = is_callable( array( $order, $getter ) ) ? call_user_func( array( $order, $getter ) ) : $phone;
+		}
+
+		return wpo_wcpdf_sanitize_phone_number( $phone );
+	}
+
+	/**
+	 * Get the billing phone
+	 *
+	 * @return string
+	 */
+	public function get_billing_phone(): string {
+		return (string) apply_filters(
+			'wpo_wcpdf_billing_phone',
+			$this->get_phone( 'billing' ),
+			$this
+		);
+	}
+
+	/**
+	 * Get the shipping phone
+	 *
+	 * @param bool $fallback_to_billing
+	 * @return string
+	 */
+	public function get_shipping_phone( bool $fallback_to_billing = false ): string {
+		$phone = $this->get_phone( 'shipping' );
+
+		if ( $fallback_to_billing && empty( $phone ) ) {
+			$phone = $this->get_billing_phone();
+		}
+
+		return (string) apply_filters(
+			'wpo_wcpdf_shipping_phone',
+			$phone,
+			$this
+		);
+	}
+
+	/**
+	 * Print the billing phone
+	 *
+	 * @return void
+	 */
+	public function billing_phone(): void {
+		echo esc_html( $this->get_billing_phone() );
+	}
+
+	/**
+	 * Print the shipping phone
+	 *
+	 * @param bool $fallback_to_billing
+	 * @return void
+	 */
+	public function shipping_phone( bool $fallback_to_billing = false ): void {
+		echo esc_html( $this->get_shipping_phone( $fallback_to_billing ) );
+	}
+
+	/**
+	 * Get the shipping address
+	 *
+	 * @return string
+	 */
+	public function get_shipping_address(): string {
+		$original_order = $this->order;
+		$address        = '';
+
+		if ( $this->is_refund( $original_order ) ) {
+			$this->order = $this->get_refund_parent( $original_order ) ?: $original_order;
+		}
+
+		if ( is_callable( array( $this->order, 'get_formatted_shipping_address' ) ) ) {
+			$address = $this->order->get_formatted_shipping_address();
+		}
+
+		if ( empty( $address ) ) {
+			if (
+				apply_filters( 'wpo_wcpdf_shipping_address_fallback', ( 'packing-slip' === $this->get_type() ), $this ) &&
+				is_callable( array( $this->order, 'get_formatted_billing_address' ) )
+			) {
+				$address = $this->order->get_formatted_billing_address();
+			} else {
+				$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
+			}
+		}
+
+		$address = apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+
+		if ( is_null( $address ) ) {
+			$address = '';
+		}
+
+		// Restore the original order if modified.
+		$this->order = $original_order;
+
+		return $address;
+	}
+	
+	/**
+	 * Print the shipping address
+	 *
+	 * @return void
+	 */
+	public function shipping_address(): void {
+		echo wp_kses_post( $this->get_shipping_address() );
+	}
+
+	/**
+	 * Check whether the shipping address should be shown
+	 *
+	 * @return bool
+	 */
+	public function show_shipping_address(): bool {
+		if ( 'packing-slip' !== $this->get_type() ) {
+			return ! empty( $this->settings['display_shipping_address'] ) && ( $this->ships_to_different_address() || 'always' === $this->settings['display_shipping_address'] );
+		} else {
+			return true;
+		}
+	}
+
+	/**
+	 * Get a custom field value.
+	 *
+	 * @param string $field_name Field name.
+	 * @return mixed
+	 */
+	public function get_custom_field( string $field_name ): mixed {
+		$custom_field = null;
+
+		if ( ! $this->is_order_prop( $field_name ) ) {
+			$custom_field = $this->order->get_meta( $field_name );
+		}
+
+		// If not found, try prefixed with underscore (not when ACF is active).
+		if (
+			empty( $custom_field )
+			&& '_' !== substr( $field_name, 0, 1 )
+			&& ! $this->is_order_prop( "_{$field_name}" )
+			&& ! class_exists( 'ACF' )
+		) {
+			$custom_field = $this->order->get_meta( "_{$field_name}" );
+		}
+
+		// Fallback to order properties.
+		$property = ! empty( $field_name ) ? str_replace( '-', '_', sanitize_title( ltrim( $field_name, '_' ) ) ) : '';
+
+		if ( empty( $custom_field ) && is_callable( array( $this->order, "get_{$property}" ) ) ) {
+			$custom_field = $this->order->{"get_{$property}"}( 'view' );
+		}
+
+		// Fallback to parent for refunds.
+		if ( empty( $custom_field ) && $this->is_refund( $this->order ) ) {
+			$parent_order = $this->get_refund_parent( $this->order );
+
+			if ( $parent_order instanceof \WC_Abstract_Order ) {
+				if ( ! $this->is_order_prop( $field_name ) ) {
+					$custom_field = $parent_order->get_meta( $field_name );
+				}
+
+				// Fallback to parent order properties.
+				if ( empty( $custom_field ) && is_callable( array( $parent_order, "get_{$property}" ) ) ) {
+					$custom_field = $parent_order->{"get_{$property}"}( 'view' );
+				}
+			}
+		}
+
+		return apply_filters(
+			'wpo_wcpdf_billing_custom_field',
+			$custom_field,
+			$this
+		);
+	}
+	
+	/**
+	 * Print a custom field value
+	 * 
+	 * @param string $field_name
+	 * @param string $field_label
+	 * @param bool $display_empty
+	 * @return void
+	 */
+	public function custom_field( string $field_name, string $field_label = '', bool $display_empty = false ): void {
+		$custom_field = $this->get_custom_field( $field_name );
+
+		if ( ! empty( $field_label ) ) {
+			// add a trailing space to the label
+			$field_label .= ' ';
+		}
+
+		if ( ! empty( $custom_field ) || $display_empty ) {
+			$allow_tags = array(
+				'p'    => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+				'span' => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+				'ul'   => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+				'ol'   => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+				'li'   => array(
+					'class' => array(),
+					'style' => array(),
+					'id'    => array(),
+				),
+			);
+
+			if ( is_array( $custom_field ) ) {
+				$custom_field = array_map( function( $field ) use ( $allow_tags ) {
+					return wpo_wcpdf_sanitize_html_content( $field, 'custom_field', $allow_tags );
+				}, $custom_field );
+				echo wp_kses( $field_label . implode( '<br>', $custom_field ), $allow_tags );
+			} else {
+				$custom_field = wpo_wcpdf_sanitize_html_content( $custom_field, 'custom_field', $allow_tags );
+				echo wp_kses( $field_label . nl2br( $custom_field ), $allow_tags );
+			}
+		}
+	}
+	
+	/**
+	 * Check if a key is an order property
+	 *
+	 * @param string $key
+	 * @return bool
+	 */
+	public function is_order_prop( string $key ): bool {
+		// Taken from WC class
+		$order_props = array(
+			// Abstract order props
+			'parent_id',
+			'status',
+			'currency',
+			'version',
+			'prices_include_tax',
+			'date_created',
+			'date_modified',
+			'discount_total',
+			'discount_tax',
+			'shipping_total',
+			'shipping_tax',
+			'cart_tax',
+			'total',
+			'total_tax',
+			// Order props
+			'customer_id',
+			'order_key',
+			'billing_first_name',
+			'billing_last_name',
+			'billing_company',
+			'billing_address_1',
+			'billing_address_2',
+			'billing_city',
+			'billing_state',
+			'billing_postcode',
+			'billing_country',
+			'billing_email',
+			'billing_phone',
+			'shipping_first_name',
+			'shipping_last_name',
+			'shipping_company',
+			'shipping_address_1',
+			'shipping_address_2',
+			'shipping_city',
+			'shipping_state',
+			'shipping_postcode',
+			'shipping_country',
+			'payment_method',
+			'payment_method_title',
+			'transaction_id',
+			'customer_ip_address',
+			'customer_user_agent',
+			'created_via',
+			'customer_note',
+			'date_completed',
+			'date_paid',
+			'cart_hash',
+		);
+
+		if ( version_compare( WOOCOMMERCE_VERSION, '5.6', '>=' ) ) {
+			$order_props[] = 'shipping_phone';
+		}
+
+		return in_array( $key, $order_props , true );
+	}
+
+	/**
+	 * Get a product attribute.
+	 *
+	 * @param string      $attribute_name Attribute name.
+	 * @param \WC_Product $product        Product object.
+	 * @return string|false
+	 */
+	public function get_product_attribute( string $attribute_name, \WC_Product $product ): string|false {
+		$attribute     = false;
+		$attributes    = $product->get_attributes();
+		$attribute_key = wc_attribute_taxonomy_name( $attribute_name );
+
+		if ( array_key_exists( sanitize_title( $attribute_name ), $attributes ) ) {
+			$attribute = $product->get_attribute( $attribute_name );
+		} elseif ( array_key_exists( sanitize_title( $attribute_key ), $attributes ) ) {
+			$attribute = $product->get_attribute( $attribute_key );
+		}
+
+		if ( empty( $attribute ) ) {
+			// Not a text attribute, try attribute taxonomy.
+			$product_terms = wc_get_product_terms( $product->get_id(), $attribute_key, array( 'fields' => 'names' ) );
+
+			if ( ! empty( $product_terms ) && ! is_wp_error( $product_terms ) ) {
+				$attribute = array_shift( $product_terms );
+			}
+		}
+
+		// Fallback to parent product for variations.
+		if ( empty( $attribute ) && $product->is_type( 'variation' ) ) {
+			$parent_product = wc_get_product( $product->get_parent_id() );
+
+			if ( $parent_product instanceof \WC_Product ) {
+				$attribute = $this->get_product_attribute( $attribute_name, $parent_product );
+			}
+		}
+
+		return ! empty( $attribute ) ? $attribute : false;
+	}
+	
+	/**
+	 * Print a product attribute
+	 * 
+	 * @param string $attribute_name
+	 * @param \WC_Product $product
+	 * @return void
+	 */
+	public function product_attribute( string $attribute_name, \WC_Product $product ): void {
+		echo esc_html( $this->get_product_attribute( $attribute_name, $product ) );
+	}
+
+	/**
+	 * Get order notes
+	 * could use $order->get_customer_order_notes(), but that filters out private notes already
+	 *
+	 * @param string $filter 'customer' or 'private'
+	 * @param bool $include_system_notes include system notes
+	 *
+	 * @return array $notes
+	 */
+	public function get_order_notes( string $filter = 'customer', bool $include_system_notes = true ): array {
+		if ( $this->is_refund( $this->order ) ) {
+			$order_id = $this->get_refund_parent_id( $this->order );
+		} else {
+			$order_id = $this->order_id;
+		}
+
+		if ( empty( $order_id ) ) {
+			return array(); // prevent order notes from all orders showing when document is not loaded properly
+		}
+
+		$type  = ( 'private' === $filter ) ? 'internal' : $filter;
+		$notes = wc_get_order_notes( array(
+			'order_id' => $order_id,
+			'type'     => $type, // use 'internal' for admin and system notes, empty for all
+		) );
+
+		if ( ! $include_system_notes ) {
+			foreach ( $notes as $key => $note ) {
+				if ( $note->added_by == 'system' ) {
+					unset( $notes[ $key ] );
+				}
+			}
+		}
+
+		return $notes;
+
+	}
+
+	/**
+	 * Print order notes
+	 *
+	 * @param string $filter 'customer' or 'private'
+	 * @param bool $include_system_notes include system notes
+	 * @return void
+	 */
+	public function order_notes( string $filter = 'customer', bool $include_system_notes = true ): void {
+		$notes = $this->get_order_notes( $filter, $include_system_notes );
+
+		if ( ! empty( $notes ) ) {
+			foreach ( $notes as $note ) {
+				$css_class   = array( 'note', 'note_content' );
+				$css_class[] = $note->customer_note ? 'customer-note' : '';
+				$css_class[] = 'system' === $note->added_by ? 'system-note' : '';
+				$css_class   = apply_filters( 'woocommerce_order_note_class', array_filter( $css_class ), $note );
+				$content     = isset( $note->content ) ? $note->content : $note->comment_content;
+				$content     = apply_filters( 'wpo_wcpdf_order_note', $content, $note );
+				?>
+				<div class="<?php echo esc_attr( implode( ' ', $css_class ) ); ?>">
+					<?php echo wpo_wcpdf_sanitize_html_content( $content, 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				</div>
+				<?php
+			}
+		}
+	}
+
+	/**
+	 * Get the current date
+	 * 
+	 * @return string
+	 */
+	public function get_current_date(): string {
+		return (string) apply_filters(
+			'wpo_wcpdf_date',
+			date_i18n( wcpdf_date_format( $this, 'current_date' ) )
+		);
+	}
+	
+	/**
+	 * Print the current date
+	 * 
+	 * @return void
+	 */
+	public function current_date(): void {
+		echo esc_html( $this->get_current_date() );
+	}
+
+	/**
+	 * Get the payment method
+	 * 
+	 * @return string
+	 */
+	public function get_payment_method(): string {
+		if ( $this->is_refund( $this->order ) ) {
+			$parent_order         = $this->get_refund_parent( $this->order );
+			$payment_method_title = $parent_order->get_payment_method_title();
+		} else {
+			$payment_method_title = $this->order->get_payment_method_title();
+		}
+
+		$payment_method = wpo_wcpdf_dynamic_translate( $payment_method_title, 'woocommerce' );
+
+		return apply_filters( 'wpo_wcpdf_payment_method', $payment_method, $this );
+	}
+	
+	/**
+	 * Print the payment method
+	 * 
+	 * @return void
+	 */
+	public function payment_method(): void {
+		echo esc_html( $this->get_payment_method() );
+	}
+
+	/**
+	 * Get the payment date
+	 * 
+	 * @return string|null
+	 */
+	public function get_payment_date(): ?string {
+		if ( $this->is_refund( $this->order ) ) {
+			$parent_order = $this->get_refund_parent( $this->order );
+			$payment_date = $parent_order->get_date_paid();
+		} else {
+			$payment_date = $this->order->get_date_paid();
+		}
+
+		$payment_date = empty( $payment_date ) ? null : apply_filters( 'wpo_wcpdf_date', date_i18n( wcpdf_date_format( $this, 'order_date_paid' ), $payment_date->getTimestamp() ) );
+
+		$payment_date = apply_filters(
+			'wpo_wcpdf_payment_date',
+			$payment_date,
+			$this
+		);
+
+		return is_string( $payment_date )
+			? $payment_date
+			: null;
+	}
+	
+	/**
+	 * Print the payment date
+	 * 
+	 * @return void
+	 */
+	public function payment_date(): void {
+		echo esc_html( $this->get_payment_date() );
+	}
+
+	/**
+	 * Get the shipping method
+	 * 
+	 * @return string
+	 */
+	public function get_shipping_method(): string {
+		return (string) apply_filters(
+			'wpo_wcpdf_shipping_method',
+			wpo_wcpdf_dynamic_translate( $this->order->get_shipping_method(), 'woocommerce' ),
+			$this
+		);
+	}
+	
+	/**
+	 * Print the shipping method
+	 * 
+	 * @return void
+	 */
+	public function shipping_method(): void {
+		echo esc_html( $this->get_shipping_method() );
+	}
+
+	/**
+	 * Get the order number
+	 * 
+	 * @return string
+	 */
+	public function get_order_number(): string {
+		// try parent first
+		if ( $this->is_refund( $this->order ) ) {
+			$parent_order = $this->get_refund_parent( $this->order );
+			$order_number = $parent_order->get_order_number();
+		} else {
+			$order_number = $this->order->get_order_number();
+		}
+
+		// Trim the hash to have a clean number but still
+		// support any filters that were applied before.
+		$order_number = ltrim($order_number, '#');
+
+		return (string) apply_filters(
+			'wpo_wcpdf_order_number',
+			$order_number,
+			$this
+		);
+	}
+	
+	/**
+	 * Print the order number
+	 * 
+	 * @return void
+	 */
+	public function order_number(): void {
+		echo esc_html( $this->get_order_number() );
+	}
+
+	/**
+	 * Get the order date
+	 * 
+	 * @return string
+	 */
+	public function get_order_date(): string {
+		if ( $this->is_refund( $this->order ) ) {
+			$parent_order = $this->get_refund_parent( $this->order );
+			$order_date   = $parent_order->get_date_created();
+		} else {
+			$order_date   = $this->order->get_date_created();
+		}
+
+		$date       = $order_date->date_i18n( wcpdf_date_format( $this, 'order_date' ) );
+		$mysql_date = $order_date->date( "Y-m-d H:i:s" );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_order_date',
+			$date,
+			$mysql_date,
+			$this
+		);
+	}
+	
+	/**
+	 * Print the order date
+	 * 
+	 * @return void
+	 */
+	public function order_date(): void {
+		echo esc_html( $this->get_order_date() );
+	}
+
+	/**
+	 * Return the order items
+	 *
+	 * @return array $data_list
+	 */
+	public function get_order_items(): array {
+		$items     = $this->order->get_items();
+		$data_list = array();
+
+		if ( sizeof( $items ) > 0 ) {
+			foreach ( $items as $item_id => $item ) {
+				// Array with data for the pdf template
+				$data = array();
+
+				// Set the item_id
+				$data['item_id'] = $item_id;
+
+				// Set the item row class
+				$data['row_class'] = apply_filters( 'wpo_wcpdf_item_row_class', 'item-' . $item_id, $this->get_type(), $this->order, $item_id );
+
+				// Set the id
+				$data['product_id']   = $item['product_id'];
+				$data['variation_id'] = $item['variation_id'];
+
+				// Compatibility: WooCommerce Composite Products uses a workaround for
+				// setting the order before the item name filter, so we run this first
+				if ( class_exists( 'WC_Composite_Products' ) ) {
+					$order_item_class = apply_filters( 'woocommerce_order_item_class', '', $item, $this->order );
+				}
+
+				// Set item name
+				$data['name'] = apply_filters( 'woocommerce_order_item_name', $item['name'], $item, false );
+				$data['name'] = apply_filters( 'wpo_wcpdf_order_item_name', $data['name'], $item, $this->order );
+
+				// Set item quantity
+				$data['quantity'] = $item['qty'];
+
+				// Set the line total (=after discount)
+				$data['line_total']           = $this->format_price( $item['line_total'] );
+				$data['single_line_total']    = $this->format_price( $item['line_total'] / max( 1, abs( $item['qty'] ) ) );
+				$data['line_tax']             = $this->format_price( $item['line_tax'] );
+				$data['single_line_tax']      = $this->format_price( $item['line_tax'] / max( 1, abs( $item['qty'] ) ) );
+
+				$data['tax_rates']            = $this->get_tax_rate( $item, $this->order, false );
+				$data['calculated_tax_rates'] = $this->get_tax_rate( $item, $this->order, true );
+
+				// Set the line subtotal (=before discount)
+				$data['line_subtotal']     = $this->format_price( $item['line_subtotal'] );
+				$data['line_subtotal_tax'] = $this->format_price( $item['line_subtotal_tax'] );
+				$data['ex_price']          = $this->get_formatted_item_price( $item, 'total', 'excl' );
+				$data['price']             = $this->get_formatted_item_price( $item, 'total' );
+				$data['order_price']       = $this->get_formatted_order_item_price( $item );
+
+				// Calculate the single price with the same rules as the formatted line subtotal (!)
+				// = before discount
+				$data['ex_single_price'] = $this->get_formatted_item_price( $item, 'single', 'excl' );
+				$data['single_price']    = $this->get_formatted_item_price( $item, 'single' );
+
+				// Pass complete item array
+				$data['item'] = $item;
+
+				// Get the product to add more info
+				if ( is_callable( array( $item, 'get_product' ) ) ) { // WC4.4+
+					$product = $item->get_product();
+				} elseif ( defined( 'WOOCOMMERCE_VERSION' ) && version_compare( WOOCOMMERCE_VERSION, '4.4', '<' ) ) {
+					$product = $this->order->get_product_from_item( $item );
+				} else {
+					$product = null;
+				}
+
+				// Checking for existence, thanks to MDesigner0
+				if ( ! empty( $product ) ) {
+					// Thumbnail (full img tag)
+					$data['thumbnail'] = $this->get_thumbnail( $product );
+
+					// Set item SKU
+					$data['sku'] = is_callable( array( $product, 'get_sku' ) ) ? $product->get_sku() : '';
+
+					// Set item weight
+					$data['weight'] = is_callable( array( $product, 'get_weight' ) ) ? $product->get_weight() : '';
+
+					// Set item dimensions
+					if ( function_exists( 'wc_format_dimensions' ) && is_callable( array( $product, 'get_dimensions' ) ) ) {
+						$data['dimensions'] = wc_format_dimensions( $product->get_dimensions( false ) );
+					} else {
+						$data['dimensions'] = '';
+					}
+
+					// Pass complete product object
+					$data['product'] = $product;
+
+				} else {
+					$data['product'] = null;
+				}
+
+				// Set item meta
+				$data['meta'] = wpo_ips_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) );
+
+				$data_list[ $item_id ] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order, $this->get_type() );
+			}
+		}
+
+		return (array) apply_filters(
+			'wpo_wcpdf_order_items_data',
+			$data_list,
+			$this->order,
+			$this->get_type()
+		);
+	}
+
+	/**
+	 * Get the tax rates/percentages for an item
+	 * 
+	 * @param  object $item order item
+	 * @param  object $order WC_Order
+	 * @param  bool $force_calculation force calculation of rates rather than retrieving from db
+	 * @return string $tax_rates imploded list of tax rates
+	 */
+	public function get_tax_rate( object $item, object $order, bool $force_calculation = false ): string {
+		$type               = $item->get_type();
+		$tax_data_container = ( 'line_item' === $type ) ? 'line_tax_data' : 'taxes';
+		$tax_data_key       = ( 'line_item' === $type ) ? 'subtotal'      : 'total';
+		$line_total_key     = ( 'line_item' === $type ) ? 'line_total'    : 'total';
+		$line_tax_key       = ( 'shipping'  === $type ) ? 'total_tax'     : 'line_tax';
+
+		$tax_class          = isset( $item['tax_class'] ) ? $item['tax_class'] : '';
+		$line_tax           = (float) $item[ $line_tax_key ];
+		$line_total         = (float) $item[ $line_total_key ];
+		$line_tax_data      = $item[ $tax_data_container ];
+
+		// first try the easy wc2.2+ way, using line_tax_data
+		if ( ! empty( $line_tax_data ) && isset( $line_tax_data[ $tax_data_key ] ) ) {
+			$tax_rates = array();
+
+			$line_taxes = $line_tax_data[ $tax_data_key ];
+			foreach ( $line_taxes as $tax_id => $tax ) {
+				if ( isset( $tax ) && '' !== $tax ) {
+					$tax_rate = $this->get_tax_rate_by_id( $tax_id, $order );
+					if ( $tax_rate !== false && $force_calculation === false ) {
+						$tax_rates[] = $tax_rate . ' %';
+					} else {
+						$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
+					}
+				}
+			}
+
+			// apply decimal setting
+			if ( function_exists( 'wc_get_price_decimal_separator' ) ) {
+				foreach ( $tax_rates as &$tax_rate ) {
+					$tax_rate = ! empty( $tax_rate ) ? str_replace( '.', wc_get_price_decimal_separator(), strval( $tax_rate ) ) : $tax_rate;
+				}
+			}
+
+			return implode( ', ', $tax_rates );
+		}
+
+		if ( $line_tax == 0 ) {
+			return '-'; // no need to determine tax rate...
+		}
+
+		if ( ! apply_filters( 'wpo_wcpdf_calculate_tax_rate', false ) ) {
+			$tax       = new \WC_Tax();
+			$taxes     = $tax->get_rates( $tax_class );
+			$tax_rates = array();
+
+			foreach ( $taxes as $tax ) {
+				$tax_rates[ $tax['label'] ] = round( $tax['rate'], 2 ).' %';
+			}
+
+			if ( empty( $tax_rates ) ) {
+				// one last try: manually calculate
+				$tax_rates[] = $this->calculate_tax_rate( $line_total, $line_tax );
+			}
+
+			return implode( ', ', $tax_rates );
+		}
+
+		return '-';
+	}
+
+	/**
+	 * Calculate the tax rate based on the line total and tax amount
+	 * 
+	 * @param float $price_ex_tax price excluding tax
+	 * @param float $tax tax amount
+	 * @return string tax rate with percentage sign
+	 */
+	public function calculate_tax_rate( float $price_ex_tax, float $tax ): string {
+		$precision = apply_filters( 'wpo_wcpdf_calculate_tax_rate_precision', 1 );
+		
+		if ( 0 != $price_ex_tax ) {
+			$tax_rate = round( ( $tax / $price_ex_tax ) * 100, $precision ) . ' %';
+		} else {
+			$tax_rate = '-';
+		}
+		
+		return $tax_rate;
+	}
+
+	/**
+	 * Returns the percentage rate for a given tax rate ID.
+	 *
+	 * @param int                     $rate_id WooCommerce tax rate ID.
+	 * @param \WC_Abstract_Order|null $order   Optional order.
+	 * @return float|bool Percentage rate, or false if not found.
+	 */
+	public function get_tax_rate_by_id( int $rate_id, ?\WC_Abstract_Order $order = null ): float|bool {
+		global $wpdb;
+
+		// Prefer the rate stored on the order, as this reflects the rate used when the order was created.
+		$order_rates = $this->get_tax_rates_from_order( $order );
+
+		if ( isset( $order_rates[ $rate_id ] ) ) {
+			return (float) $order_rates[ $rate_id ];
+		}
+
+		$rate = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$wpdb->prepare(
+				"SELECT tax_rate FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_id = %d;",
+				$rate_id
+			)
+		);
+
+		return null === $rate
+			? false
+			: (float) $rate;
+	}
+
+	/**
+	 * Get tax rates from the order's tax items.
+	 *
+	 * @param \WC_Abstract_Order|null $order Order object.
+	 * @return array Array of rate_id => rate_percent.
+	 */
+	public function get_tax_rates_from_order( ?\WC_Abstract_Order $order = null ): array {
+		if ( null === $order ) {
+			return array();
+		}
+
+		$tax_rates = array();
+		$tax_items = $order->get_items( array( 'tax' ) );
+
+		if ( empty( $tax_items ) ) {
+			return $tax_rates;
+		}
+
+		foreach ( $tax_items as $tax_item ) {
+			$tax_rates[ $tax_item->get_rate_id() ] = $tax_item->get_rate_percent();
+		}
+
+		return $tax_rates;
+	}
+
+	/**
+	 * Returns a an array with rate_id => tax rate data (array) of all tax rates in woocommerce
+	 * 
+	 * @return array  $tax_rate_ids  keyed by id
+	 */
+	public function get_tax_rate_ids(): array {
+		global $wpdb;
+		$rates = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
+			"SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates"
+		);
+
+		$tax_rate_ids = array();
+		foreach ( $rates as $rate ) {
+			$rate_id = $rate->tax_rate_id;
+			unset( $rate->tax_rate_id );
+			$tax_rate_ids[ $rate_id ] = (array) $rate;
+		}
+
+		return $tax_rate_ids;
+	}
+
+	/**
+	 * Returns the main product image ID
+	 * Adapted from the WC_Product class
+	 * (does not support thumbnail sizes)
+	 *
+	 * @param \WC_Product $product
+	 * @return int|false
+	 */
+	public function get_thumbnail_id( \WC_Product $product ): int|false {
+		$product_id = $product->get_id();
+
+		if ( has_post_thumbnail( $product_id ) ) {
+			$thumbnail_id = get_post_thumbnail_id( $product_id );
+		} elseif ( ( $parent_id = wp_get_post_parent_id( $product_id ) ) && has_post_thumbnail( $parent_id ) ) {
+			$thumbnail_id = get_post_thumbnail_id( $parent_id );
+		} else {
+			$thumbnail_id = false;
+		}
+
+		return $thumbnail_id;
+	}
+
+	/**
+	 * Returns the thumbnail image tag
+	 *
+	 * uses the internal WooCommerce/WP functions and extracts the image url or path
+	 * rather than the thumbnail ID, to simplify the code and make it possible to
+	 * filter for different thumbnail sizes
+	 *
+	 * @param \WC_Product $product
+	 * @return string
+	 */
+	public function get_thumbnail( \WC_Product $product ): string {
+		// Get default WooCommerce img tag (url/http)
+		$thumbnail_size        = 'woocommerce_thumbnail';
+		$size                  = apply_filters( 'wpo_wcpdf_thumbnail_size', $thumbnail_size );
+		$thumbnail_img_tag_url = $product->get_image( $size, array( 'title' => '' ) );
+
+		// Extract the url from img
+		preg_match( '/<img(.*)src(.*)=(.*)"(.*)"/U', $thumbnail_img_tag_url, $thumbnail_url_matches );
+		$thumbnail_url = ! empty( $thumbnail_url_matches ) ? array_pop( $thumbnail_url_matches ) : '';
+
+		// remove http/https from image tag url to avoid mixed origin conflicts
+		$contextless_thumbnail_url = ! empty( $thumbnail_url ) ? ltrim( str_replace( array( 'http://', 'https://' ), '', $thumbnail_url ), '/' ) : $thumbnail_url;
+
+		// convert url to path
+		if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
+			$forwardslash_basepath = ! empty( ABSPATH ) ? str_replace( '\\', '/', ABSPATH ) : '';
+			$site_url              = trailingslashit( get_site_url() );
+		} else {
+			// bedrock e.a
+			$forwardslash_basepath = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( '\\', '/', WP_CONTENT_DIR ) : '';
+			$site_url              = defined( 'WP_CONTENT_URL' ) && ! empty( WP_CONTENT_URL ) ? trailingslashit( WP_CONTENT_URL ) : '';
+		}
+
+		$contextless_site_url  = ! empty( $site_url ) ? str_replace( array( 'http://', 'https://' ), '', $site_url ) : $site_url;
+		$thumbnail_path        = ! empty( $contextless_thumbnail_url ) ? str_replace( $contextless_site_url, trailingslashit( $forwardslash_basepath ), $contextless_thumbnail_url ) : $contextless_site_url;
+		
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+
+		// fallback if thumbnail file doesn't exist
+		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! $file_system_instance->exists( $thumbnail_path ) ) {
+			$thumbnail_id = $this->get_thumbnail_id( $product );
+			if ( $thumbnail_id ) {
+				$thumbnail_path = get_attached_file( $thumbnail_id );
+			}
+		}
+
+		// Thumbnail (full img tag)
+		if ( apply_filters( 'wpo_wcpdf_use_path', true ) && $file_system_instance->exists( $thumbnail_path ) ) {
+			// load img with server path by default
+			$thumbnail = sprintf( '<img width="90" height="90" src="%s" class="attachment-shop_thumbnail wp-post-image">', $thumbnail_path );
+
+		} elseif ( apply_filters( 'wpo_wcpdf_use_path', true ) && ! $file_system_instance->exists( $thumbnail_path ) ) {
+			// should use paths but file not found, replace // with http(s):// for dompdf compatibility
+			if ( is_string( $thumbnail_url ) && substr( $thumbnail_url, 0, 2 ) === "//" ) {
+				$prefix                = is_ssl() ? 'https://' : 'http://';
+				$https_thumbnail_url   = $prefix . ltrim( $thumbnail_url, '/' );
+				$thumbnail_img_tag_url = ! empty( $thumbnail_img_tag_url ) ? str_replace( $thumbnail_url, $https_thumbnail_url, $thumbnail_img_tag_url ) : $thumbnail_img_tag_url;
+			}
+			$thumbnail = $thumbnail_img_tag_url;
+		} else {
+			// load img with http url when filtered
+			$thumbnail = $thumbnail_img_tag_url;
+		}
+
+		/**
+		 * PHP GD library can be installed but 'webp' support could be disabled,
+		 * which turns the function 'imagecreatefromwebp()' inexistent,
+		 * leading to display an error in DOMPDF.
+		 *
+		 * Check 'System configuration' in the Advanced tab for 'webp' support.
+		 */
+		if ( 'webp' === wp_check_filetype( $thumbnail_path )['ext'] && ! function_exists( 'imagecreatefromwebp' ) ) {
+			$thumbnail = '';
+		}
+
+		// die($thumbnail);
+		return $thumbnail;
+	}
+
+	/**
+	 * Return the order totals listing
+	 * 
+	 * @return array $totals
+	 */
+	public function get_woocommerce_totals(): array {
+		// get totals and remove the semicolon
+		$totals = apply_filters( 'wpo_wcpdf_raw_order_totals', $this->order->get_order_item_totals(), $this->order );
+
+		// remove the colon for every label
+		foreach ( $totals as $key => $total ) {
+			$label = $total['label'];
+			$colon = strrpos( $label, ':' );
+
+			if ( ! empty( $colon ) ) {
+				$label = substr_replace( $label, '', $colon, 1 );
+			}
+
+			if ( ! empty( $label ) ) {
+				$totals[ $key ]['label'] = wpo_wcpdf_dynamic_translate( $label, 'woocommerce-pdf-invoices-packing-slips' );
+			}
+			
+			// Local pickup specific
+			if (
+				'shipping' === $key &&
+				\wpo_ips_order_has_local_pickup_method( $this->order ) &&
+				apply_filters( 'wpo_ips_show_pickup_location_details', true, $this )
+			) {
+				$order_shipping          = $this->get_order_shipping();
+				$totals[ $key ]['value'] = sprintf(
+					'%s<p class="pickup-location-details">%s</p>',
+					$order_shipping['value'],
+					$total['value']
+				);
+			}
+		}
+
+		// Fix order_total for refunded orders
+		// not if this is the actual refund!
+		if ( ! $this->is_refund( $this->order ) && apply_filters( 'wpo_wcpdf_remove_refund_totals', true, $this ) ) {
+			$total_refunded = is_callable( array( $this->order, 'get_total_refunded' ) ) ? $this->order->get_total_refunded() : 0;
+			if ( isset($totals['order_total']) && $total_refunded ) {
+				$tax_display = get_option( 'woocommerce_tax_display_cart' );
+				$totals['order_total']['value'] = wc_price( $this->order->get_total(), array( 'currency' => $this->order->get_currency() ) );
+				$tax_string = '';
+
+				// Tax for inclusive prices
+				if ( wc_tax_enabled() && 'incl' == $tax_display ) {
+					$tax_string_array = array();
+					if ( 'itemized' == get_option( 'woocommerce_tax_total_display' ) ) {
+						foreach ( $this->order->get_tax_totals() as $code => $tax ) {
+							$tax_amount         = $tax->formatted_amount;
+							$tax_string_array[] = sprintf( '%s %s', $tax_amount, $tax->label );
+						}
+					} else {
+						$tax_string_array[] = sprintf( '%s %s', wc_price( $this->order->get_total_tax(), array( 'currency' => $this->order->get_currency() ) ), WC()->countries->tax_or_vat() );
+					}
+					if ( ! empty( $tax_string_array ) ) {
+						$tax_string = ' ' . sprintf(
+							/* translators: %s: tax information */
+							__( '(includes %s)', 'woocommerce-pdf-invoices-packing-slips' ),
+							implode( ', ', $tax_string_array )
+						);
+					}
+				}
+
+				$totals['order_total']['value'] .= $tax_string;
+			}
+
+			// remove refund lines (shouldn't be in invoice)
+			foreach ( $totals as $key => $total ) {
+				if ( ! empty( $key ) && false !== strpos( $key, 'refund_' ) ) {
+					unset( $totals[$key] );
+				}
+			}
+
+		}
+
+		return (array) apply_filters(
+			'wpo_wcpdf_woocommerce_totals',
+			$totals,
+			$this->order,
+			$this->get_type()
+		);
+	}
+
+	/**
+	 * Return/show the order subtotal
+	 * 
+	 * @param string $tax set to 'incl' to include tax, same for $discount
+	 * @param string $discount set to 'incl' to include discount, same for $tax
+	 * @return array $subtotal
+	 */
+	public function get_order_subtotal( string $tax = 'excl', string $discount = 'incl' ): array {
+		//$compound = ($discount == 'incl')?true:false;
+		$subtotal = $this->order->get_subtotal_to_display( false, $tax );
+
+		$subtotal = ! empty( $subtotal ) && ( $pos = strpos( $subtotal, ' <small' ) ) ? substr( $subtotal, 0, $pos ) : $subtotal; //removing the 'excluding tax' text
+
+		$subtotal = array (
+			'label' => __( 'Subtotal', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value' => $subtotal,
+		);
+
+		return (array) apply_filters(
+			'wpo_wcpdf_order_subtotal',
+			$subtotal,
+			$tax,
+			$discount,
+			$this
+		);
+	}
+	
+	/**
+	 * Print the order subtotal
+	 * 
+	 * @param string $tax set to 'incl' to include tax, same for $discount
+	 * @param string $discount set to 'incl' to include discount, same for $tax
+	 * @return void
+	 */
+	public function order_subtotal( string $tax = 'excl', string $discount = 'incl' ): void {
+		$subtotal = $this->get_order_subtotal( $tax, $discount );
+		echo esc_html( $subtotal['value'] );
+	}
+
+	/**
+	 * Return/show the order shipping costs
+	 * 
+	 * @param string $tax set to 'incl' to include tax, 'excl' to exclude tax
+	 * @return array $shipping
+	 */
+	public function get_order_shipping( string $tax = 'excl' ): array {
+		$shipping_cost = $this->order->get_shipping_total();
+		$shipping_tax  = $this->order->get_shipping_tax();
+
+		if ($tax == 'excl' ) {
+			$formatted_shipping_cost = $this->format_price( $shipping_cost );
+		} else {
+			$formatted_shipping_cost = $this->format_price( $shipping_cost + $shipping_tax );
+		}
+
+		$shipping = array (
+			'label' => __( 'Shipping', 'woocommerce-pdf-invoices-packing-slips' ),
+			'value' => $formatted_shipping_cost,
+			'tax'   => $this->format_price( $shipping_tax ),
+		);
+
+		return (array) apply_filters(
+			'wpo_wcpdf_order_shipping',
+			$shipping,
+			$tax,
+			$this
+		);
+	}
+	
+	/**
+	 * Print the order shipping costs
+	 * 
+	 * @param string $tax set to 'incl' to include tax, 'excl' to exclude tax
+	 * @return void
+	 */
+	public function order_shipping( string $tax = 'excl' ): void {
+		$shipping = $this->get_order_shipping( $tax );
+		echo esc_html( $shipping['value'] );
+	}
+
+	/**
+	 * Return/show the total discount.
+	 *
+	 * @param string $type Set to 'total' to get the total discount, otherwise the total discount for cart and order discounts combined.
+	 * @param string $tax  Set to 'incl' to include tax, 'excl' to exclude tax.
+	 * @return array|null Discount data, or null when there is no discount.
+	 */
+	public function get_order_discount( string $type = 'total', string $tax = 'incl' ): ?array {
+		if ( 'incl' === $tax ) {
+			switch ( $type ) {
+				case 'total':
+					$discount_value = $this->order->get_total_discount( false );
+					break;
+				default:
+					$discount_value = $this->order->get_total_discount();
+					break;
+			}
+		} else {
+			$discount_value = $this->order->get_total_discount( true );
+		}
+
+		$discount = null;
+
+		if ( round( $discount_value, 3 ) != 0 ) {
+			$discount = array(
+				'label'     => __( 'Discount', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'     => $this->format_price( $discount_value ),
+				'raw_value' => $discount_value,
+			);
+		}
+
+		$discount = apply_filters(
+			'wpo_wcpdf_order_discount',
+			$discount,
+			$type,
+			$tax,
+			$this
+		);
+
+		return is_array( $discount )
+			? $discount
+			: null;
+	}
+	
+	/**
+	 * Print the total discount
+	 * 
+	 * @param string $type set to 'total' to get the total discount, otherwise the total discount for cart and order discounts combined
+	 * @param string $tax set to 'incl' to include tax, 'excl' to exclude tax
+	 * @return void
+	 */
+	public function order_discount( string $type = 'total', string $tax = 'incl' ): void {
+		$discount = $this->get_order_discount( $type, $tax );
+		if ( $discount ) {
+			echo esc_html( $discount['value'] );
+		}
+	}
+
+	/**
+	 * Return the order fees
+	 *
+	 * @param string $tax set to 'incl' to include tax, 'excl' to exclude tax
+	 * @return array
+	 */
+	public function get_order_fees( string $tax = 'excl' ): array {
+		$fees       = array();
+		$order_fees = $this->order->get_fees();
+
+		if ( ! empty( $order_fees ) && is_array( $order_fees ) ) {
+			foreach ( $order_fees as $id => $fee ) {
+				$line_total = (float) $fee->get_total();
+				$line_tax   = (float) $fee->get_total_tax();
+
+				$fee_price = ( 'excl' === $tax )
+					? $this->format_price( $line_total )
+					: $this->format_price( $line_total + $line_tax );
+
+				$fees[ $id ] = array(
+					'label'      => $fee->get_name(),
+					'value'      => $fee_price,
+					'line_total' => $this->format_price( $line_total ),
+					'line_tax'   => $this->format_price( $line_tax ),
+				);
+			}
+		}
+
+		return $fees;
+	}
+
+	/**
+	 * Return the order taxes
+	 * 
+	 * @return array $taxes
+	 */
+	public function get_order_taxes(): array {
+		$tax_rate_ids = $this->get_tax_rate_ids();
+		$order_taxes  = $this->order->get_taxes();
+		$taxes	      = array();
+		
+		if ( ! empty( $order_taxes ) && is_array( $order_taxes ) ) {
+			foreach ( $order_taxes as $key => $tax ) {
+				$taxes[ $key ] = array(
+					'label'               => $tax->get_label(),
+					'value'               => $this->format_price( $tax->get_tax_total() + $tax->get_shipping_tax_total() ),
+					'rate_id'             => $tax->get_rate_id(),
+					'tax_amount'          => $tax->get_tax_total(),
+					'shipping_tax_amount' => $tax->get_shipping_tax_total(),
+					'rate'                => isset( $tax_rate_ids[ $tax->get_rate_id() ] ) ? ( (float) $tax_rate_ids[$tax->get_rate_id()]['tax_rate'] ) . ' %': '',
+				);
+
+			}
+		}
+		
+		return (array) apply_filters(
+			'wpo_wcpdf_order_taxes',
+			$taxes,
+			$this
+		);
+	}
+
+	/**
+	 * Return/show the order grand total
+	 * 
+	 * @param string $tax set to 'incl' to include tax, 'excl' to exclude tax
+	 * @return array $grand_total
+	 */
+	public function get_order_grand_total( string $tax = 'incl' ): array {
+		$total_unformatted = $this->order->get_total();
+
+		if ( 'excl' === $tax ) {
+			$total = $this->format_price( $total_unformatted - $this->order->get_total_tax() );
+			$label = __( 'Total ex. VAT', 'woocommerce-pdf-invoices-packing-slips' );
+		} else {
+			$total = $this->format_price( $total_unformatted );
+			$label = __( 'Total', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
+		$grand_total = array(
+			'label' => $label,
+			'value' => $total,
+		);
+
+		return (array) apply_filters(
+			'wpo_wcpdf_order_grand_total',
+			$grand_total,
+			$tax,
+			$this
+		);
+	}
+	
+	/**
+	 * Print the order grand total
+	 * 
+	 * @param string $tax set to 'incl' to include tax, 'excl' to exclude tax
+	 * @return void
+	 */
+	public function order_grand_total( string $tax = 'incl' ): void {
+		$grand_total = $this->get_order_grand_total( $tax );
+		echo esc_html( $grand_total['value'] );
+	}
+
+	/**
+	 * Get the shipping notes
+	 *
+	 * @return string
+	 */
+	public function get_shipping_notes(): string {
+		if ( $this->is_refund( $this->order ) ) {
+			$shipping_notes = $this->order->get_reason();
+		} else {
+			$shipping_notes = wpautop( wptexturize( $this->order->get_customer_note() ) );
+		}
+
+		// check document specific setting
+		if ( isset( $this->settings['display_customer_notes'] ) && $this->settings['display_customer_notes'] == 0 ) {
+			$shipping_notes = '';
+		}
+
+		if ( apply_filters( 'wpo_wcpdf_shipping_notes_strip_all_tags', false ) ) {
+			$shipping_notes = wp_strip_all_tags( $shipping_notes );
+		}
+
+		return (string) apply_filters(
+			'wpo_wcpdf_shipping_notes',
+			$shipping_notes,
+			$this
+		);
+	}
+
+	/**
+	 * Print the shipping notes
+	 *
+	 * @return void
+	 */
+	public function shipping_notes(): void {
+		$shipping_notes = $this->get_shipping_notes();
+
+		if ( ! empty( $shipping_notes ) ) {
+			echo wpo_wcpdf_sanitize_html_content( $shipping_notes, 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+
+	/**
+	 * Wrapper for wc_price, ensuring currency is always passed
+	 * 
+	 * @param float $price
+	 * @param array $args
+	 * @return string
+	 */
+	public function format_price( float $price, array $args = array() ): string {
+		$args['currency'] = $this->order->get_currency();
+		return wc_price( $price, $args );
+	}
+
+	/**
+	 * Gets price - formatted for display.
+	 *
+	 * @param mixed $item
+	 * @param string $type
+	 * @param string $tax_display
+	 * @return string
+	 */
+	public function get_formatted_item_price( mixed $item, string $type, string $tax_display = '' ): string {
+		if ( ! isset( $item['line_subtotal'] ) || ! isset( $item['line_subtotal_tax'] ) ) {
+			return '';
+		}
+
+		$divide_by = ( 'single' === $type && $item['qty'] != 0 ) ? abs( $item['qty'] ) : 1; //divide by 1 if $type is not 'single' (thus 'total')
+		
+		if ( 'excl' === $tax_display ) {
+			$price = $this->order->get_line_subtotal( $item ) / $divide_by;
+		} else {
+			$price = $this->order->get_line_subtotal( $item, true ) / $divide_by;
+		}
+
+		return $this->format_price( (float) $price );
+	}
+
+	/**
+	 * Gets the order item price formatted for display.
+	 *
+	 * Uses WooCommerce's formatted line subtotal when available, but falls back to
+	 * our own formatter if a third-party callback empties the WooCommerce value.
+	 *
+	 * @param mixed $item Order item.
+	 * @return string
+	 */
+	public function get_formatted_order_item_price( $item ): string {
+		$order_price = is_callable( array( $this->order, 'get_formatted_line_subtotal' ) )
+			? $this->order->get_formatted_line_subtotal( $item )
+			: '';
+
+		if ( '' !== trim( wp_strip_all_tags( (string) $order_price ) ) ) {
+			return (string) $order_price;
+		}
+
+		return $this->get_formatted_item_price(
+			$item,
+			'total',
+			get_option( 'woocommerce_tax_display_cart', 'excl' )
+		);
+	}
+
+	/**
+	 * Get document notes
+	 *
+	 * @return string
+	 */
+	public function get_document_notes(): string {
+		return (string) apply_filters(
+			'wpo_wcpdf_document_notes',
+			$this->get_notes( $this->get_type() ) ?? '',
+			$this
+		);
+	}
+
+	/**
+	 * Display document notes
+	 *
+	 * @return void
+	 */
+	public function document_notes(): void {
+		$document_notes = $this->get_document_notes();
+
+		if ( ! empty( $document_notes ) ) {
+			echo wpo_wcpdf_sanitize_html_content( wpautop( $document_notes ), 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+
+	/**
+	 * Get the document display date label
+	 *
+	 * @return string
+	 */
+	public function document_display_date(): string {
+		$document_display_date = $this->get_display_date( $this->get_type() );
+
+		// If display date data is not available in order meta (for older orders), get the display date information from document settings order meta.
+		if ( empty( $document_display_date ) ) {
+			$document_settings     = $this->settings;
+			$document_display_date = $document_settings['display_date'] ?? 'document_date';
+		}
+
+		// Convert the old `invoice_date` slug to the new `document_date` slug.
+		if ( 'invoice_date' === $document_display_date ) {
+			$document_display_date = 'document_date';
+		}
+
+		return $this->get_display_date_label( $document_display_date );
+	}
+
+	/**
+	 * Get the display date label for a given date string
+	 *
+	 * @param string $date_string
+	 * @return string
+	 */
+	public function get_display_date_label( string $date_string ): string {
+		$date_labels = array(
+			'document_date' => sprintf(
+				/* translators: Document title */
+				__( '%s Date', 'woocommerce-pdf-invoices-packing-slips' ),
+				$this->title
+			),
+			'order_date'    => __( 'Order Date', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+
+		return $date_labels[ $date_string ] ?? '';
+	}
+
+	/**
+	 * Get the invoice number title,
+	 * this allows other documents to use
+	 * the invoice number title. Example: Receipt document
+	 *
+	 * @return string
+	 */
+	public function get_invoice_number_title(): string {
+		$title = __( 'Invoice Number:', 'woocommerce-pdf-invoices-packing-slips' );
+		return apply_filters_deprecated( "wpo_wcpdf_invoice_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
+	}
+
+	/**
+	 * Print the invoice number title,
+	 * this allows other documents to use
+	 * the invoice number title. Example: Receipt document
+	 *
+	 * @return void
+	 */
+	public function invoice_number_title(): void {
+		echo esc_html( $this->get_invoice_number_title() );
+	}
+
+	/**
+	 * Get the title for the refund reason,
+	 * used by the Credit Note document.
+	 * (Later we can move this to the Pro extension.)
+	 *
+	 * @return string
+	 */
+	public function get_refund_reason_title(): string {
+		return (string) apply_filters(
+			'wpo_wcpdf_refund_reason_title',
+			__( 'Reason for refund:', 'woocommerce-pdf-invoices-packing-slips' ),
+			$this
+		);
+	}
+
+	/**
+	 * Display the title for the refund reason,
+	 * used by the Credit Note document.
+	 * (Later we can move this to the Pro extension.)
+	 *
+	 * @return void
+	 */
+	public function refund_reason_title(): void {
+		echo esc_html( $this->get_refund_reason_title() );
+	}
+	
+	/**
+	 * Legacy function (v3.7.2 or inferior)
+	 * Use $this->get_number() instead.
+	 * 
+	 * @return string
+	 */
+	public function get_invoice_number(): string {
+		wcpdf_log_error( 'The method get_invoice_number() is deprecated since version 3.7.3, please use the method get_number() instead.' );
+
+		if ( is_callable( array( $this, 'get_number' ) ) ) {
+			return $this->get_number( 'invoice', null, 'view', true );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Legacy function (v3.7.2 or inferior)
+	 * Use $this->number( 'invoice' ) instead.
+	 * 
+	 * @return void
+	 */
+	public function invoice_number(): void {
+		wcpdf_log_error( 'The method invoice_number() is deprecated since version 3.7.3, please use the method number() instead.' );
+
+		if ( is_callable( array( $this, 'number' ) ) ) {
+			$this->number( 'invoice' );
+		} else {
+			echo '';
+		}
+	}
+
+	/**
+	 * Legacy function (v3.7.2 or inferior)
+	 * Use $this->get_date() instead.
+	 * 
+	 * @return string
+	 */
+	public function get_invoice_date(): string {
+		wcpdf_log_error( 'The method get_invoice_date() is deprecated since version 3.7.3, please use the method get_date() instead.' );
+
+		if ( is_callable( array( $this, 'get_date' ) ) ) {
+			return $this->get_date( 'invoice', null, 'view', true );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Legacy function (v3.7.2 or inferior)
+	 * Use $this->date( 'invoice' ) instead.
+	 * 
+	 * @return void
+	 */
+	public function invoice_date(): void {
+		wcpdf_log_error( 'The method invoice_date() is deprecated since version 3.7.3, please use the method date() instead.' );
+
+		if ( is_callable( array( $this, 'date' ) ) ) {
+			$this->date( 'invoice' );
+		} else {
+			echo '';
+		}
+	}
+
+}
+
+endif; // class_exists

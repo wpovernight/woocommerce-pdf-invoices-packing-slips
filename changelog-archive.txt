@@ -76,7 +76,7 @@
 * Fix: Font sync on plugin update
 
 = 1.5.29 =
-* Translations: Added Croation (Thanks Neven/Spine ICT!), updated French (Thanks Sabra!)
+* Translations: Added Croatian (Thanks Neven/Spine ICT!), updated French (Thanks Sabra!)
 * Tweak: filter shop address before checking if it's empty
 * Dev: added $order to `wpo_wcpdf_template_file` filter
 

@@ -1,0 +1,2811 @@
+<?php
+namespace WPO\IPS\Documents;
+
+use WPO\IPS\Semaphore;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
+if ( ! class_exists( '\\WPO\\IPS\\Documents\\OrderDocument' ) ) :
+
+abstract class OrderDocument {
+
+	public string $type;
+	public string $slug;
+	public string $title;
+	public string $icon;
+	public ?\WC_Abstract_Order $order        = null;
+	public ?int $order_id                    = null;
+	public array $settings;
+	public array $latest_settings;
+	public array $order_settings;
+	public bool $enabled;
+	public array $output_formats             = array();
+
+	
+	protected array $linked_documents        = array();
+	protected array $data                    = array();
+	protected array $resolved_settings_cache = array();
+
+	/**
+	 * Init/load the order object.
+	 *
+	 * @param int|object|null $order Order to init.
+	 */
+	public function __construct( $order = 0 ) {
+		if ( is_numeric( $order ) && $order > 0 ) {
+			$this->order_id = absint( $order );
+			$this->order    = wc_get_order( $this->order_id );
+		} elseif ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) {
+			$this->order_id = $order->get_id();
+			$this->order    = $order;
+		}
+
+		// set properties
+		$this->slug = ! empty( $this->type ) ? str_replace(  '-', '_', $this->type ) : '';
+
+		// output formats
+		$this->output_formats = apply_filters( 'wpo_wcpdf_document_output_formats', array( 'pdf' ), $this );
+		$this->output_formats = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_output_formats", array( $this->output_formats, $this ), '3.8.7', 'wpo_wcpdf_document_output_formats' );
+
+		// load data
+		if ( $this->order ) {
+			$this->read_data( $this->order );
+		}
+
+		// load settings
+		$this->init_settings_data();
+
+		// check enable
+		$this->enabled = $this->get_setting( 'enabled', false );
+	}
+
+	/**
+	 * Get the document title.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
+		return;
+	}
+
+	/**
+	 * Initialize settings data.
+	 *
+	 * @return void
+	 */
+	public function init_settings_data(): void {
+		$this->reset_resolved_settings_cache();
+		
+		// order
+		$this->order_settings  = $this->get_order_settings();
+		// pdf
+		$this->settings        = $this->get_settings();
+		$this->latest_settings = $this->get_settings( true );
+
+		// don't override/save settings on Preview requests
+		if (
+			isset( $_REQUEST['action'] ) &&
+			'wpo_wcpdf_preview' === $_REQUEST['action'] &&
+			isset( $_REQUEST['security'] ) &&
+			wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ), 'wpo_wcpdf_preview' )
+		) {
+			return;
+		}
+
+		// save settings
+		$this->save_settings( $this->maybe_use_latest_settings() );
+	}
+
+	/**
+	 * Get the order settings.
+	 *
+	 * @return array
+	 */
+	public function get_order_settings(): array {
+		if ( empty( $this->order ) ) {
+			return array();
+		}
+
+		$order_settings = $this->order->get_meta( "_wcpdf_{$this->slug}_settings" );
+
+		return is_array( $order_settings ) ? $order_settings : array();
+	}
+	
+	/**
+	 * Get document settings.
+	 *
+	 * @param bool $latest
+	 * @param string $output_format
+	 * @return array
+	 */
+	public function get_settings( bool $latest = false, string $output_format = 'pdf' ): array {
+		$cache_key = sprintf(
+			'%s|%s',
+			$latest ? 'latest' : 'current',
+			(string) $output_format
+		);
+
+		if ( isset( $this->resolved_settings_cache[ $cache_key ] ) ) {
+			return $this->resolved_settings_cache[ $cache_key ];
+		}
+
+		// get most current settings
+		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
+		$common_settings   = $settings_instance->get_common_document_settings();
+		$document_settings = $settings_instance->get_document_settings( $this->get_type(), $output_format );
+		$settings          = (array) $document_settings + (array) $common_settings;
+
+		if ( ! $latest ) {
+			// get historical settings if enabled
+			if ( ! empty( $this->order ) && $this->use_historical_settings() && ! empty( $this->order_settings ) ) {
+				$settings = (array) $this->order_settings + array_intersect_key(
+					(array) $settings,
+					array_flip( $this->get_non_historical_settings() )
+				);
+			}
+		}
+
+		// display date & display number were checkbox settings but now a select setting that could be set but empty - should behave as 'unchecked'
+		if ( array_key_exists( 'display_date', $settings ) && empty( $settings['display_date'] ) ) {
+			unset( $settings['display_date'] );
+		}
+
+		if ( array_key_exists( 'display_number', $settings ) && empty( $settings['display_number'] ) ) {
+			unset( $settings['display_number'] );
+		}
+
+		$this->resolved_settings_cache[ $cache_key ] = $settings;
+
+		return $this->resolved_settings_cache[ $cache_key ];
+	}
+
+	/**
+	 * Save document settings.
+	 *
+	 * @param bool $latest
+	 * @return void
+	 */
+	public function save_settings( bool $latest = false ): void {
+		if ( empty( $this->settings ) || empty( $this->latest_settings ) ) {
+			$this->init_settings_data();
+		}
+
+		$settings = $latest ? $this->latest_settings : $this->settings;
+		$update   = true;
+
+		if ( $this->storing_settings_enabled() && ( empty( $this->order_settings ) || $latest ) && ! empty( $settings ) && ! empty( $this->order ) ) {
+			if ( ! empty( $this->order_settings ) ) {
+				$update = 0 !== strcmp( serialize( (array) $this->order_settings ), serialize( (array) $settings ) );
+			}
+
+			if ( $update ) {
+				// this is either the first time the document is generated, or historical settings are disabled
+				// in both cases, we store the document settings
+				// exclude non historical settings from being saved in order meta
+				$settings_to_store = is_array( $settings ) ? $settings : array();
+				$settings_to_store = array_diff_key(
+					$settings_to_store,
+					array_flip( $this->get_non_historical_settings() )
+				);
+
+				$this->order->update_meta_data(
+					"_wcpdf_{$this->slug}_settings",
+					$this->sanitize_settings_for_storage( $settings_to_store )
+				);
+
+				if ( 'invoice' === $this->slug ) {
+					if ( isset( $settings['display_date'] ) && 'order_date' === $settings['display_date'] ) {
+						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'order_date' );
+					} else {
+						$this->order->update_meta_data( "_wcpdf_{$this->slug}_display_date", 'document_date' );
+					}
+				}
+
+				$this->order->save_meta_data();
+			}
+		}
+	}
+
+	/**
+	 * Initiate and set document date and display_date.
+	 *
+	 * @return void
+	 */
+	public function initiate_date(): void {
+		if ( isset( $this->settings['display_date'] ) && 'order_date' === $this->settings['display_date'] && ! empty( $this->order ) ) {
+			$this->set_date( $this->order->get_date_created() );
+			$this->set_display_date( 'order_date' );
+		} elseif ( empty( $this->get_date() ) ) {
+			$this->set_date( current_time( 'timestamp', true ) );
+			$this->set_display_date( 'document_date' );
+		}
+	}
+
+	/**
+	 * Initiate and set document number.
+	 *
+	 * @param bool $force_new_number
+	 * @return mixed
+	 */
+	public function initiate_number( bool $force_new_number = false ): mixed {
+		$semaphore       = new Semaphore( "initiate_{$this->slug}_number" );
+		$document_number = $force_new_number
+			? null
+			: ( $this->exists() ? $this->get_data( 'number' ) : null );
+		$document_number = apply_filters( 'wpo_wcpdf_initiate_number', $document_number, $this );
+
+		if ( ! empty( $document_number ) ) {
+			return $document_number;
+		}
+
+		if ( $semaphore->lock() ) {
+			$semaphore->log( "Lock acquired for the {$this->slug} number init.", 'info' );
+
+			try {
+				$document_number = $this->get_document_number( true );
+
+				if ( ! is_null( $document_number ) ) {
+					$this->set_number( $document_number );
+				}
+			} catch ( \Exception|\Error $e ) {
+				$semaphore->log( $e, 'critical' );
+			}
+
+			if ( $semaphore->release() ) {
+				$semaphore->log( "Lock released for the {$this->slug} number init.", 'info' );
+			}
+
+		} else {
+			$semaphore->log( "Couldn't get the lock for the {$this->slug} number init.", 'critical' );
+		}
+
+		return $document_number;
+	}
+
+	/**
+	 * Get the document number.
+	 *
+	 * @param bool $generate
+	 * @return mixed
+	 */
+	public function get_document_number( bool $generate = false ): mixed {
+		$document_number = null;
+
+		// If a third-party plugin claims to generate document numbers, trigger this instead
+		if (
+			apply_filters( "woocommerce_{$this->slug}_number_by_plugin", false ) ||
+			apply_filters( "wpo_wcpdf_external_{$this->slug}_number_enabled", false, $this )
+		) {
+			$document_number = apply_filters( "woocommerce_generate_{$this->slug}_number", $document_number, $this->order );  // legacy (backwards compatibility)
+			$document_number = apply_filters( "woocommerce_{$this->slug}_number", $document_number, $this->order->get_id() ); // legacy (backwards compatibility)
+			$document_number = apply_filters( "wpo_wcpdf_external_{$this->slug}_number", $document_number, $this );
+
+		// If the document number is set to be the order number
+		} elseif (
+			isset( $this->settings['display_number'] ) &&
+			'order_number' === $this->settings['display_number'] &&
+			! empty( $this->order )
+		) {
+			$document_number = $this->order->get_order_number();
+		}
+
+		// Document number overridden by plugin or set to order number
+		if ( ! empty( $document_number ) ) {
+			if ( ! is_numeric( $document_number ) && ! ( $document_number instanceof DocumentNumber ) ) {
+				// document number is not numeric, treat as formatted
+				// try to extract meaningful number data
+				$formatted_number = $document_number;
+				$number           = (int) preg_replace( '/\D/', '', $document_number );
+				$document_number  = compact( 'number', 'formatted_number' );
+			}
+
+		// Otherwise, get or generate the document number
+		} else {
+			$number_store = $this->get_sequential_number_store();
+
+			if ( $generate ) {
+				$document_number = $number_store->increment( intval( $this->order_id ), $this->get_date()->date_i18n( 'Y-m-d H:i:s' ) );
+			} else {
+				$document_number = $number_store->get_next();
+			}
+		}
+
+		return $document_number;
+	}
+
+	/**
+	 * Determine if the latest settings should be used.
+	 *
+	 * @return bool
+	 */
+	public function maybe_use_latest_settings(): bool {
+		return ! $this->use_historical_settings();
+	}
+
+	/**
+	 * Determine if historical settings should be used.
+	 *
+	 * @return bool
+	 */
+	public function use_historical_settings(): bool {
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_use_historical_settings',
+			false,
+			$this
+		);
+	}
+
+	/**
+	 * Determine if the document settings should be stored.
+	 *
+	 * @return bool
+	 */
+	public function storing_settings_enabled(): bool {
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_store_settings',
+			false,
+			$this
+		);
+	}
+
+	/**
+	 * Get setting value.
+	 *
+	 * @param string $key
+	 * @param mixed $default
+	 * @param string $output_format
+	 * @return mixed
+	 */
+	public function get_setting( string $key, mixed $default = '', string $output_format = 'pdf' ): mixed {
+		if ( in_array( $output_format, $this->output_formats, true ) ) {
+			$settings        = $this->get_settings( false, $output_format );
+			$latest_settings = $this->get_settings( true, $output_format );
+		} else {
+			$settings        = $this->settings;
+			$latest_settings = $this->latest_settings;
+		}
+
+		$non_historical_settings = $this->get_non_historical_settings();
+
+		if ( in_array( $key, $non_historical_settings, true ) && isset( $latest_settings ) ) {
+			$setting = isset( $latest_settings[ $key ] ) ? $latest_settings[ $key ] : $default;
+		} else {
+			$setting = isset( $settings[ $key ] ) ? $settings[ $key ] : $default;
+		}
+
+		return $setting;
+	}
+
+	/**
+	 * Get the IDs of the emails to which the document should be attached based on settings.
+	 *
+	 * @param string $output_format
+	 * @return array
+	 */
+	public function get_attach_to_email_ids( string $output_format = 'pdf' ): array {
+		$settings = $this->get_settings( false, $output_format );
+
+		return isset( $settings['attach_to_email_ids'] ) ? array_keys( array_filter( $settings['attach_to_email_ids'] ) ) : array();
+	}
+
+	/**
+	 * Get the document type.
+	 *
+	 * @return string
+	 */
+	public function get_type(): string {
+		return $this->type;
+	}
+
+	/**
+	 * Check if the document type is enabled for output.
+	 *
+	 * @param string $output_format
+	 * @return bool
+	 */
+	public function is_enabled( string $output_format = 'pdf' ): bool {
+		$output_format = ( 'xml' === $output_format ) ? 'pdf' : $output_format; // currently not using separated settings for EDI
+		$is_enabled    = $this->get_setting( 'enabled', false, $output_format );
+
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_is_enabled',
+			$is_enabled,
+			$this->type,
+			$output_format
+		);
+	}
+
+	/**
+	 * Get the hook prefix for the document, used for filters and actions.
+	 *
+	 * @return string
+	 */
+	public function get_hook_prefix(): string {
+		return 'wpo_wcpdf_' . $this->slug . '_get_';
+	}
+
+	/**
+	 * Read order document data.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return void
+	 */
+	public function read_data( \WC_Abstract_Order $order ): void {
+		$number = $order->get_meta( "_wcpdf_{$this->slug}_number_data" );
+		// fallback to legacy data for number
+		if ( empty( $number ) ) {
+			$number           = $order->get_meta( "_wcpdf_{$this->slug}_number" );
+			$formatted_number = $order->get_meta( "_wcpdf_formatted_{$this->slug}_number" );
+
+			if ( ! empty( $formatted_number ) ) {
+				$number = compact( 'number', 'formatted_number' );
+			}
+		}
+
+		// pass data to setter functions
+		$this->set_data( array(
+			// always load date before number, because date is used in number formatting
+			'date'             => $order->get_meta( "_wcpdf_{$this->slug}_date" ),
+			'number'           => $number,
+			'notes'            => $order->get_meta( "_wcpdf_{$this->slug}_notes" ),
+			'display_date'	   => $order->get_meta( "_wcpdf_{$this->slug}_display_date" ),
+			'creation_trigger' => $order->get_meta( "_wcpdf_{$this->slug}_creation_trigger" ),
+		), $order );
+
+		return;
+	}
+
+	/**
+	 * Initializes the document.
+	 *
+	 * @return void
+	 */
+	public function init(): void {
+		// save settings
+		$this->save_settings();
+
+		$this->set_date( current_time( 'timestamp', true ) );
+		do_action( 'wpo_wcpdf_init_document', $this );
+	}
+
+	/**
+	 * Save the document data.
+	 *
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function save( ?\WC_Abstract_Order $order = null ): void {
+		$order = empty( $order ) ? $this->order : $order;
+		if ( empty( $order ) ) {
+			return; // nowhere to save to...
+		}
+
+		foreach ( $this->data as $key => $value ) {
+			if ( empty( $value ) ) {
+				$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}" );
+				if ( 'date' === $key ) {
+					$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}_formatted" );
+				} elseif ( 'number' === $key ) {
+					$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}_data" );
+					// deleting the number = deleting the document, so also delete document settings
+					$order->delete_meta_data( "_wcpdf_{$this->slug}_settings" );
+				} elseif ( 'notes' === $key || 'display_date' === $key ) {
+					$order->delete_meta_data( "_wcpdf_{$this->slug}_{$key}" );
+				}
+
+			} else {
+				if ( 'date' === $key ) {
+					// store dates as timestamp and formatted as mysql time
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}", $value->getTimestamp() );
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}_formatted", $value->date( 'Y-m-d H:i:s' ) );
+				} elseif ( 'number' === $key ) {
+					// store both formatted number and number data
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}", $value->formatted_number );
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}_data", $value->to_array() );
+				} elseif ( 'notes' === $key || 'display_date' === $key ) {
+					// store notes
+					$order->update_meta_data( "_wcpdf_{$this->slug}_{$key}", $value );
+				}
+
+			}
+		}
+
+		$order->save_meta_data();
+
+		do_action( 'wpo_wcpdf_save_document', $this, $order );
+	}
+
+	/**
+	 * Delete the document data.
+	 *
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function delete( ?\WC_Abstract_Order $order = null ): void {
+		$order = empty( $order ) ? $this->order : $order;
+		if ( empty( $order ) ) {
+			return; // nothing to delete
+		}
+
+		$data_to_remove = apply_filters( 'wpo_wcpdf_delete_document_data_keys', array(
+			'settings',
+			'date',
+			'date_formatted',
+			'number',
+			'number_data',
+			'notes',
+			'printed',
+			'display_date',
+			'creation_trigger',
+		), $this );
+		foreach ( $data_to_remove as $data_key ) {
+			$order->delete_meta_data( "_wcpdf_{$this->slug}_{$data_key}" );
+		}
+
+		$order->save_meta_data();
+
+		do_action( 'wpo_wcpdf_delete_document', $this, $order );
+	}
+
+	/**
+	 * Regenerate the document data.
+	 *
+	 * @param \WC_Abstract_Order|null $order
+	 * @param array|null $data
+	 * @return void
+	 */
+	public function regenerate( ?\WC_Abstract_Order $order = null, ?array $data = null ): void {
+		$order     = empty( $order ) ? $this->order : $order;
+		$refund_id = false;
+
+		if ( empty( $order ) ) {
+			return;
+		}
+
+		// pass data to setter functions
+		if ( ! empty( $data ) ) {
+			$this->set_data( $data, $order );
+			$this->save();
+		}
+
+		// save settings
+		$this->save_settings( true );
+
+		// if credit note
+		if ( 'credit-note' === $this->get_type() ) {
+			$refund_id = $order->get_id();
+			$order     = wc_get_order( $order->get_parent_id() );
+		}
+
+		// EDI
+		if ( $this->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
+			wpo_ips_edi_save_order_taxes( $order );
+			wpo_ips_edi_maybe_save_order_peppol_data( $order );
+		}
+
+		$note = $refund_id ? sprintf(
+			/* translators: 1. credit note title, 2. refund id */
+			esc_html__( '%1$s (refund #%2$s) was regenerated.', 'woocommerce-pdf-invoices-packing-slips' ),
+			ucfirst( $this->get_title() ),
+			$refund_id
+		) : sprintf(
+			/* translators: 1. document title */
+			esc_html__( '%s was regenerated', 'woocommerce-pdf-invoices-packing-slips' ),
+			ucfirst( $this->get_title() )
+		);
+
+		$note = wp_kses( $note, 'strip' );
+
+		// add note to order
+		$order->add_order_note( $note );
+
+		do_action( 'wpo_wcpdf_regenerate_document', $this );
+	}
+
+	/**
+	 * Check if the document is allowed to be generated based on settings and order status.
+	 *
+	 * @return bool
+	 */
+	public function is_allowed(): bool {
+		$allowed = true;
+		// Check if document is enabled
+		if ( ! $this->is_enabled() ) {
+			$allowed = false;
+		// Check disabled for statuses
+		} elseif ( ! $this->exists() && ! empty( $this->settings['disable_for_statuses'] ) && ! empty( $this->order ) && is_callable( array( $this->order, 'get_status' ) ) ) {
+			$status = $this->order->get_status();
+
+			$disabled_statuses = array_map( function ( $status ) {
+				$status = 'wc-' === substr( $status, 0, 3 ) ? substr( $status, 3 ) : $status;
+				return $status;
+			}, $this->settings['disable_for_statuses'] );
+
+			if ( in_array( $status, $disabled_statuses, true ) ) {
+				$allowed = false;
+			}
+		}
+		return (bool) apply_filters(
+			'wpo_wcpdf_document_is_allowed',
+			$allowed,
+			$this
+		);
+	}
+
+	/**
+	 * Check if document is allowed to be displayed on the My Account page.
+	 *
+	 * @param string $default
+	 * @param string $output_format
+	 * @return bool
+	 */
+	public function is_allowed_in_my_account( string $default = '', string $output_format = 'pdf' ): bool {
+		$allowed = false;
+
+		if ( $this->is_enabled() ) {
+			$button_setting = $this->get_setting( 'my_account_buttons', $default, $output_format );
+
+			switch ( $button_setting ) {
+				case 'available':
+					$allowed = $this->exists();
+					break;
+				case 'always':
+					$allowed = true;
+					break;
+				case 'custom':
+					$allowed_statuses = $this->get_setting( 'my_account_restrict', array(), $output_format );
+					$order_status     = is_callable( array( $this->order, 'get_status' ) )
+						? $this->order->get_status()
+						: false;
+
+					$allowed = ! empty( $allowed_statuses )
+						&& $order_status
+						&& in_array( $order_status, array_keys( $allowed_statuses ), true );
+					break;
+			}
+		}
+
+		return (bool) apply_filters(
+			'wpo_ips_document_is_allowed_in_my_account',
+			$allowed,
+			$default,
+			$output_format,
+			$this
+		);
+	}
+
+	/**
+	 * Check if the document exists.
+	 *
+	 * @return bool
+	 */
+	public function exists(): bool {
+		return ! empty( $this->data['date'] );
+	}
+
+	/**
+	 * Check if the document has been printed.
+	 *
+	 * @return bool
+	 */
+	public function printed(): bool {
+		return WPO_WCPDF()->get_instance( 'main' )->is_document_printed( $this );
+	}
+
+	/**
+	 * Get the document printed data.
+	 *
+	 * @return array
+	 */
+	public function get_printed_data(): array {
+		return WPO_WCPDF()->get_instance( 'main' )->get_document_printed_data( $this );
+	}
+
+	/**
+	 * Get document data value.
+	 *
+	 * @param string $key
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @return mixed
+	 */
+	public function get_data( string $key, string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view' ): mixed {
+		$document_type = empty( $document_type ) ? $this->type : $document_type;
+		$order         = empty( $order ) ? $this->order : $order;
+
+		// redirect get_data call for linked documents
+		if ( $document_type !== $this->type ) {
+			if ( ! isset( $this->linked_documents[ $document_type ] ) ) {
+				// always assume parent for documents linked to credit notes
+				if ( 'credit-note' === $this->type ) {
+					$order = $this->get_refund_parent( $order );
+				}
+				// order is not loaded to avoid overhead - we pass this by reference directly to the read_data method instead
+				$this->linked_documents[ $document_type ] = wcpdf_get_document( $document_type, null );
+				$this->linked_documents[ $document_type ]->read_data( $order );
+			}
+
+			return $this->linked_documents[ $document_type ]->get_data( $key, $document_type );
+		}
+
+		$value = null;
+
+		if ( array_key_exists( $key, $this->data ) ) {
+			$value = $this->data[ $key ];
+
+			if ( 'view' === $context ) {
+				$value = apply_filters( $this->get_hook_prefix() . $key, $value, $this );
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Get the document number.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @param bool $formatted
+	 * @return mixed
+	 */
+	public function get_number( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view', bool $formatted = false ): mixed {
+		$number = $this->get_data( 'number', $document_type, $order, $context );
+
+		if ( $number && $formatted ) {
+			$number = $number->get_formatted();
+		}
+
+		return apply_filters(
+			"wpo_wcpdf_{$this->slug}_number",
+			$number,
+			$document_type,
+			$order,
+			$context,
+			$formatted,
+			$this
+		);
+	}
+
+	/**
+	 * Print the document number.
+	 *
+	 * @param string $document_type
+	 * @return void
+	 */
+	public function number( string $document_type ): void {
+		echo esc_html( $this->get_number( $document_type, null, 'view', true ) );
+	}
+
+	/**
+	 * Get the document date.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @param bool $formatted
+	 * @return mixed
+	 */
+	public function get_date( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view', bool $formatted = false ): mixed {
+		$date = $this->get_data( 'date', $document_type, $order, $context );
+
+		if ( $date && $formatted ) {
+			$date = $date->date_i18n( wcpdf_date_format( $this, 'document_date' ) );
+		}
+
+		return apply_filters(
+			"wpo_wcpdf_{$this->slug}_date",
+			$date,
+			$document_type,
+			$order,
+			$context,
+			$formatted,
+			$this
+		);
+	}
+
+	/**
+	 * Print the document date.
+	 *
+	 * @param string $document_type
+	 * @return void
+	 */
+	public function date( string $document_type ): void {
+		echo esc_html( $this->get_date( $document_type, null, 'view', true ) );
+	}
+
+	/**
+	 * Get the document notes.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @return mixed
+	 */
+	public function get_notes( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ): mixed {
+		return $this->get_data( 'notes', $document_type, $order, $context );
+	}
+
+	/**
+	 * Get the document display date.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @return mixed
+	 */
+	public function get_display_date( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ): mixed {
+		return $this->get_data( 'display_date', $document_type, $order, $context );
+	}
+
+	/**
+	 * Get the document creation trigger.
+	 *
+	 * @param string $document_type
+	 * @param \WC_Abstract_Order|null $order
+	 * @param string $context
+	 * @return mixed
+	 */
+	public function get_creation_trigger( string $document_type = '', ?\WC_Abstract_Order $order = null, string $context = 'view'  ): mixed {
+		return $this->get_data( 'creation_trigger', $document_type, $order, $context );
+	}
+
+	/**
+	 * Get the document title
+	 *
+	 * @return string
+	 */
+	public function get_title(): string {
+		return $this->get_title_for( 'document' );
+	}
+
+	/**
+	 * Print the document number title
+	 *
+	 * @return void
+	 */
+	public function title(): void {
+		echo esc_html( $this->get_title() );
+	}
+
+	/**
+	 * Get the document number title
+	 *
+	 * @return string
+	 */
+	public function get_number_title(): string {
+		return $this->get_title_for( 'document_number' );
+	}
+
+	/**
+	 * Print the document number title
+	 *
+	 * @return void
+	 */
+	public function number_title(): void {
+		echo esc_html( $this->get_number_title() );
+	}
+
+	/**
+	 * Get the document date title
+	 *
+	 * @return string
+	 */
+	public function get_date_title(): string {
+		return $this->get_title_for( 'document_date' );
+	}
+
+	/**
+	 * Print the document date title
+	 *
+	 * @return void
+	 */
+	public function date_title(): void {
+		echo esc_html( $this->get_date_title() );
+	}
+
+	/**
+	 * Get the document due date title
+	 *
+	 * @return string
+	 */
+	public function get_due_date_title(): string {
+		return $this->get_title_for( 'document_due_date' );
+	}
+
+	/**
+	 * Print the document due date title
+	 *
+	 * @return void
+	 */
+	public function due_date_title(): void {
+		echo esc_html( $this->get_due_date_title() );
+	}
+
+	/**
+	 * Get the billing address title
+	 *
+	 * @return string
+	 */
+	public function get_billing_address_title(): string {
+		return $this->get_title_for( 'billing_address' );
+	}
+
+	/**
+	 * Print the billing address title
+	 *
+	 * @return void
+	 */
+	public function billing_address_title(): void {
+		echo esc_html( $this->get_billing_address_title() );
+	}
+
+	/**
+	 * Get the shipping address title
+	 *
+	 * @return string
+	 */
+	public function get_shipping_address_title(): string {
+		return $this->get_title_for( 'shipping_address' );
+	}
+
+	/**
+	 * Print the shipping address title
+	 *
+	 * @return void
+	 */
+	public function shipping_address_title(): void {
+		echo esc_html( $this->get_shipping_address_title() );
+	}
+
+	/**
+	 * Get the order number title
+	 *
+	 * @return string
+	 */
+	public function get_order_number_title(): string {
+		return $this->get_title_for( 'order_number' );
+	}
+
+	/**
+	 * Print the order number title
+	 *
+	 * @return void
+	 */
+	public function order_number_title(): void {
+		echo esc_html( $this->get_order_number_title() );
+	}
+
+	/**
+	 * Get the order date title
+	 *
+	 * @return string
+	 */
+	public function get_order_date_title(): string {
+		return $this->get_title_for( 'order_date' );
+	}
+
+	/**
+	 * Print the order date title
+	 *
+	 * @return void
+	 */
+	public function order_date_title(): void {
+		echo esc_html( $this->get_order_date_title() );
+	}
+
+	/**
+	 * Get the payment method title
+	 *
+	 * @return string
+	 */
+	public function get_payment_method_title(): string {
+		return $this->get_title_for( 'payment_method' );
+	}
+
+	/**
+	 * Print the payment method title
+	 *
+	 * @return void
+	 */
+	public function payment_method_title(): void {
+		echo esc_html( $this->get_payment_method_title() );
+	}
+
+	/**
+	 * Get the payment date title
+	 *
+	 * @return string
+	 */
+	public function get_payment_date_title(): string {
+		return $this->get_title_for( 'payment_date' );
+	}
+
+	/**
+	 * Print the payment date title
+	 *
+	 * @return void
+	 */
+	public function payment_date_title(): void {
+		echo esc_html( $this->get_payment_date_title() );
+	}
+
+	/**
+	 * Get the shipping method title
+	 *
+	 * @return string
+	 */
+	public function get_shipping_method_title(): string {
+		return $this->get_title_for( 'shipping_method' );
+	}
+
+	/**
+	 * Print the shipping method title
+	 *
+	 * @return void
+	 */
+	public function shipping_method_title(): void {
+		echo esc_html( $this->get_shipping_method_title() );
+	}
+
+	/**
+	 * Get the SKU title
+	 *
+	 * @return string
+	 */
+	public function get_sku_title(): string {
+		return $this->get_title_for( 'sku' );
+	}
+
+	/**
+	 * Print the SKU title
+	 *
+	 * @return void
+	 */
+	public function sku_title(): void {
+		echo esc_html( $this->get_sku_title() );
+	}
+
+	/**
+	 * Get the weight title
+	 *
+	 * @return string
+	 */
+	public function get_weight_title(): string {
+		return $this->get_title_for( 'weight' );
+	}
+
+	/**
+	 * Print the weight title
+	 *
+	 * @return void
+	 */
+	public function weight_title(): void {
+		echo esc_html( $this->get_weight_title() );
+	}
+
+	/**
+	 * Get the notes title
+	 *
+	 * @return string
+	 */
+	public function get_notes_title(): string {
+		return $this->get_title_for( 'notes' );
+	}
+
+	/**
+	 * Print the notes title
+	 *
+	 * @return void
+	 */
+	public function notes_title(): void {
+		echo esc_html( $this->get_notes_title() );
+	}
+
+	/**
+	 * Get the customer notes title
+	 *
+	 * @return string
+	 */
+	public function get_customer_notes_title(): string {
+		return $this->get_title_for( 'customer_notes' );
+	}
+
+	/**
+	 * Print the customer notes title
+	 *
+	 * @return void
+	 */
+	public function customer_notes_title(): void {
+		echo esc_html( $this->get_customer_notes_title() );
+	}
+
+	/**
+	 * Get the title for a specific slug
+	 *
+	 * @param string $slug
+	 * @return string
+	 */
+	public function get_title_for( string $slug ): string {
+		switch ( $slug ) {
+			case 'document':
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $this->title, $this ), '3.8.7', 'wpo_wcpdf_document_title' );
+				break;
+			case 'document_number':
+				$title = sprintf(
+					/* translators: %s: document name */
+					__( '%s Number:', 'woocommerce-pdf-invoices-packing-slips' ),
+					$this->title
+				);
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_number_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_number_title' );
+				break;
+			case 'document_date':
+				$title = sprintf(
+					/* translators: %s: document name */
+					__( '%s Date:', 'woocommerce-pdf-invoices-packing-slips' ),
+					$this->title
+				);
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_date_title' );
+				break;
+			case 'document_due_date':
+				$title = __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_due_date_title", array( $title, $this ), '3.8.7', 'wpo_wcpdf_document_due_date_title' );
+				break;
+			case 'billing_address':
+				$title = __( 'Billing Address:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'shipping_address':
+				$title = __( 'Shipping Address:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'order_number':
+				$title = __( 'Order Number:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'order_date':
+				$title = __( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'payment_method':
+				$title = __( 'Payment Method:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'payment_date':
+				$title = __( 'Payment Date:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'shipping_method':
+				$title = __( 'Shipping Method:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'sku':
+				$title = __( 'SKU:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'weight':
+				$title = __( 'Weight:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'notes':
+				$title = __( 'Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'customer_notes':
+				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			default:
+				$title = '';
+				break;
+		}
+
+		$title = apply_filters( 'wpo_wcpdf_title_for', $title, $slug, $this ); // used by Pro to translate strings
+
+		return (string) apply_filters(
+			"wpo_wcpdf_{$slug}_title",
+			$title,
+			$this
+		);
+	}
+
+	/**
+	 * Prints the due date.
+	 *
+	 * @return void
+	 */
+	public function due_date(): void {
+		$due_date_timestamp = $this->get_due_date();
+		$due_date           = apply_filters( "wpo_wcpdf_{$this->slug}_formatted_due_date", date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ), $due_date_timestamp, $this );
+		echo esc_html( $due_date );
+	}
+
+	/**
+	 * Get the language attributes for the document.
+	 *
+	 * @return string
+	 */
+	public function get_language_attributes(): string {
+		$language_attributes = apply_filters( 'wpo_wcpdf_document_language_attributes', get_language_attributes(), $this );
+		$language_attributes = apply_filters_deprecated( 'wpo_wcpdf_html_language_attributes', array( $language_attributes, $this->get_type(), $this ), '3.9.1', 'wpo_wcpdf_document_language_attributes' );
+		return $language_attributes ?? '';
+	}
+
+	/**
+	 * Print the language attributes for the document.
+	 *
+	 * @return void
+	 */
+	public function language_attributes(): void {
+		echo esc_html( $this->get_language_attributes() );
+	}
+
+	/**
+	 * Get the body class for the document.
+	 *
+	 * @return string
+	 */
+	public function get_body_class(): string {
+		$body_class = apply_filters( 'wpo_wcpdf_document_body_class', $this->get_type(), $this );
+		return apply_filters_deprecated( 'wpo_wcpdf_body_class', array( $body_class, $this ), '3.9.1', 'wpo_wcpdf_document_body_class' );
+	}
+
+	/**
+	 * Print the body class for the document.
+	 *
+	 * @return void
+	 */
+	public function body_class(): void {
+		echo esc_html( $this->get_body_class() );
+	}
+
+	/**
+	 * Set document data value.
+	 *
+	 * @param array $data
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_data( array $data, ?\WC_Abstract_Order $order ): void {
+		$order = empty( $order ) ? $this->order : $order;
+
+		foreach ( $data as $key => $value ) {
+			$setter = "set_$key";
+
+			if ( is_callable( array( $this, $setter ) ) ) {
+				$this->$setter( $value, $order );
+			} else {
+				$this->data[ $key ] = $value;
+			}
+		}
+	}
+
+	/**
+	 * Set the document date.
+	 *
+	 * @param mixed $value
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_date( mixed $value, ?\WC_Abstract_Order $order = null ): void {
+		$order = empty( $order ) ? $this->order : $order;
+		try {
+			if ( empty( $value ) ) {
+				$this->data['date'] = null;
+				return;
+			}
+
+			if ( is_a( $value, 'WC_DateTime' ) ) {
+				$datetime = $value;
+			} elseif ( is_numeric( $value ) ) {
+				// Timestamps are handled as UTC timestamps in all cases.
+				$datetime = new \WC_DateTime( "@{$value}", new \DateTimeZone( 'UTC' ) );
+			} else {
+				// Strings are defined in local WP timezone. Convert to UTC.
+				if ( 1 === preg_match( '/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(Z|((-|\+)\d{2}:\d{2}))$/', $value, $date_bits ) ) {
+					$offset    = ! empty( $date_bits[7] ) ? iso8601_timezone_to_offset( $date_bits[7] ) : wc_timezone_offset();
+					$timestamp = gmmktime( $date_bits[4], $date_bits[5], $date_bits[6], $date_bits[2], $date_bits[3], $date_bits[1] ) - $offset;
+				} else {
+					$timestamp = wc_string_to_timestamp( get_gmt_from_date( gmdate( 'Y-m-d H:i:s', wc_string_to_timestamp( $value ) ) ) );
+				}
+				$datetime  = new \WC_DateTime( "@{$timestamp}", new \DateTimeZone( 'UTC' ) );
+			}
+
+			// Set local timezone or offset.
+			if ( get_option( 'timezone_string' ) ) {
+				$datetime->setTimezone( new \DateTimeZone( wc_timezone_string() ) );
+			} else {
+				$datetime->set_utc_offset( wc_timezone_offset() );
+			}
+
+			$this->data['date'] = $datetime;
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		} catch ( \Error $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		}
+
+	}
+
+	/**
+	 * Set the document number.
+	 *
+	 * @param mixed $value
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_number( mixed $value, ?\WC_Abstract_Order $order = null ): void {
+		$order = empty( $order ) ? $this->order : $order;
+
+		// Ignore incorrectly stored serialized meta and only handle expected value types.
+		if ( is_string( $value ) && is_serialized( $value ) ) {
+			wcpdf_log_error( "Unexpected serialized string found for document number meta. Ignoring value. Meta value: {$value}" );
+			$value = null;
+		}
+
+		if ( is_array( $value ) ) {
+			$filtered_value = array_filter( $value );
+		}
+
+		if ( empty( $value ) || ( is_array( $value ) && empty( $filtered_value ) ) ) {
+			$document_number = null;
+		} elseif ( $value instanceof DocumentNumber ) {
+			// WCPDF 2.0 number data
+			$document_number = $value;
+		} elseif ( is_array( $value ) ) {
+			// WCPDF 2.0 number data as array
+			$document_number = new DocumentNumber( $value, $this->get_number_settings(), $this, $order );
+		} else {
+			// plain number
+			$document_number = new DocumentNumber( $value, $this->get_number_settings(), $this, $order );
+		}
+
+		$this->data['number'] = $document_number;
+	}
+
+	/**
+	 * Set the document notes.
+	 *
+	 * @param mixed $value
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_notes( mixed $value, ?\WC_Abstract_Order $order = null ): void {
+		$order = empty( $order ) ? $this->order : $order;
+
+		try {
+			if ( empty( $value ) ) {
+				$this->data['notes'] = null;
+				return;
+			}
+
+			$this->data['notes'] = $value;
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		} catch ( \Error $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Set the document display date.
+	 *
+	 * @param mixed $value
+	 * @param \WC_Abstract_Order|null $order
+	 * @return void
+	 */
+	public function set_display_date( mixed $value, ?\WC_Abstract_Order $order = null ): void {
+		$order = empty( $order ) ? $this->order : $order;
+
+		try {
+			if ( empty( $value ) ) {
+				$this->data['display_date'] = null;
+				return;
+			}
+
+			$this->data['display_date'] = $value;
+		} catch ( \Exception $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		} catch ( \Error $e ) {
+			wcpdf_log_error( $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Get the document number settings.
+	 *
+	 * @return array
+	 */
+	public function get_number_settings(): array {
+		if ( empty( $this->settings ) ) {
+			$settings        = $this->get_settings( true ); // we always want the latest settings
+			$number_settings = isset( $settings['number_format'] ) ? $settings['number_format'] : array();
+		} else {
+			$number_settings = $this->get_setting( 'number_format', array() );
+		}
+
+		return (array) apply_filters(
+			'wpo_wcpdf_document_number_settings',
+			$number_settings,
+			$this
+		);
+	}
+
+	/**
+	 * Output template styles
+	 * 
+	 * @return void
+	 */
+	public function template_styles(): void {
+		$css_file_path = apply_filters( 'wpo_wcpdf_template_styles_file', $this->locate_template_file( 'style.css' ) );
+		$css           = '';
+
+		if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $css_file_path ) ) {
+			ob_start();
+			include $css_file_path;
+			$css = ob_get_clean();
+		}
+
+		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
+
+		echo esc_textarea( $css );
+	}
+
+	/**
+	 * Output custom template styles
+	 *
+	 * @return void
+	 */
+	public function template_custom_styles(): void {
+		ob_start();
+
+		do_action( 'wpo_wcpdf_custom_styles', $this->get_type(), $this );
+
+		$css = apply_filters( 'wpo_wcpdf_template_custom_styles', ob_get_clean(), $this );
+
+		echo esc_html( $css );
+	}
+
+	/**
+	 * Check if header logo is set
+	 *
+	 * @return bool
+	 */
+	public function has_header_logo(): bool {
+		return ! empty( $this->settings['header_logo'] );
+	}
+
+	/**
+	 * Return logo id
+	 *
+	 * @return int
+	 */
+	public function get_header_logo_id(): int {
+		$header_logo_id = ! empty( $this->settings['header_logo'] ) ? $this->get_settings_text( 'header_logo', 0, false ) : 0;
+		$header_logo_id = apply_filters( 'wpo_wcpdf_header_logo_id', $header_logo_id, $this );
+
+		return $header_logo_id && is_numeric( $header_logo_id ) ? absint( $header_logo_id ) : 0;
+	}
+
+	/**
+	 * Return logo height
+	 *
+	 * @return string|null
+	 */
+	public function get_header_logo_height(): ?string {
+		$logo_height = ! empty( $this->settings['header_logo_height'] )
+			? str_replace( ' ', '', $this->settings['header_logo_height'] )
+			: null;
+		
+		$logo_height = apply_filters(
+			'wpo_wcpdf_header_logo_height',
+			$logo_height,
+			$this
+		);
+
+		return is_string( $logo_height )
+			? $logo_height
+			: null;
+	}
+
+	/**
+	 * Show logo HTML
+	 *
+	 * @return void
+	 */
+	public function header_logo(): void {
+		$attachment_id = $this->get_header_logo_id();
+
+		if ( $attachment_id > 0 ) {
+			$company         = $this->get_shop_name();
+			$attachment_src  = wp_get_attachment_image_url( $attachment_id, 'full' );
+			$attachment_file = get_attached_file( $attachment_id );
+			$attachment_path = $attachment_file ? wp_normalize_path( realpath( $attachment_file ) ) : '';
+
+			$use_path = apply_filters( 'wpo_wcpdf_use_path', true );
+
+			$src = ( $use_path && ! empty( $attachment_path ) ) ? $attachment_path : $attachment_src;
+
+			if ( empty( $src ) ) {
+				wcpdf_log_error( 'Header logo file not found.', 'critical' );
+				return;
+			}
+
+			// fix URLs using path
+			if ( ! $use_path && false !== strpos( $src, 'http' ) && false !== strpos( $src, WP_CONTENT_DIR ) ) {
+				$path = preg_replace( '/^https?:\/\//', '', $src ); // removes http(s)://
+				$src  = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $path ); // replaces path with URL
+			}
+
+			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
+				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
+				return;
+			}
+
+			$img_src     = isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['embed_images'] )
+				? wpo_wcpdf_get_image_src_in_base64( $src )
+				: $src;
+
+			$img_element = sprintf(
+				'<img src="%1$s" alt="%2$s"/>',
+				wpo_wcpdf_escape_url_path_or_base64( $img_src ),
+				esc_attr( $company )
+			);
+
+			$img_element = apply_filters( 'wpo_wcpdf_header_logo_img_element', $img_element, $attachment_id, $this );
+
+			echo $img_element; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		}
+	}
+
+	/**
+	 * Return settings text with optional autop and wptexturize
+	 *
+	 * @param string $settings_key
+	 * @param string|false $default
+	 * @param bool $autop
+	 * @return string
+	 */
+	public function get_settings_text( string $settings_key, string|false $default = false, bool $autop = true ): string {
+		$setting = $this->get_setting( $settings_key, $default );
+		// check for 'default' key existence
+		if ( ! empty( $setting ) && is_array( $setting ) && array_key_exists( 'default', $setting ) ) {
+			$text = $setting['default'];
+		// fallback to first array element if default is not present
+		} elseif( ! empty( $setting ) && is_array( $setting ) ) {
+			$text = reset( $setting );
+		} else {
+			$text = $setting;
+		}
+
+		// fallback to default
+		if ( empty( $text ) ) {
+			$text = $default;
+		}
+
+		// clean up
+		$text = wptexturize( trim( $text ) );
+
+		// replacements
+		if ( $autop === true ) {
+			$text = wpautop( $text );
+		}
+
+		// legacy filters
+		if ( in_array( $settings_key, array( 'shop_name', 'footer', 'extra_1', 'extra_2', 'extra_3' ), true ) ) {
+			$text = apply_filters_deprecated(
+				"wpo_wcpdf_{$settings_key}",
+				array( $text, $this ),
+				'4.5.0',
+				"wpo_wcpdf_{$settings_key}_settings_text"
+			);
+		} elseif ( 'shop_address' === $settings_key ) {
+			$text = apply_filters_deprecated(
+				'wpo_wcpdf_shop_address_settings_text',
+				array( $text, $this ),
+				'4.6.0',
+				'wpo_wcpdf_get_shop_address'
+			);
+		}
+
+		return (string) apply_filters(
+			"wpo_wcpdf_{$settings_key}_settings_text",
+			$text,
+			$this
+		);
+	}
+
+	/**
+	 * Return/Show custom company name or default to blog name
+	 * 
+	 * @return string
+	 */
+	public function get_shop_name(): string {
+		$default = get_bloginfo( 'name' );
+		return $this->get_settings_text( 'shop_name', $default, false );
+	}
+	
+	/**
+	 * Print shop name
+	 *
+	 * @return void
+	 */
+	public function shop_name(): void {
+		echo esc_html( $this->get_shop_name() );
+	}
+
+	/**
+	 * Return/Show company VAT number
+	 * 
+	 * @return string
+	 */
+	public function get_shop_vat_number(): string {
+		return $this->get_settings_text( 'vat_number', '', false );
+	}
+	
+	/**
+	 * Print company VAT number
+	 *
+	 * @return void
+	 */
+	public function shop_vat_number(): void {
+		echo esc_html( $this->get_shop_vat_number() );
+	}
+
+	/**
+	 * Return/Show company COC number
+	 * 
+	 * @return string
+	 */
+	public function get_shop_coc_number(): string {
+		return $this->get_settings_text( 'coc_number', '', false );
+	}
+	
+	/**
+	 * Print company COC number
+	 *
+	 * @return void
+	 */
+	public function shop_coc_number(): void {
+		echo esc_html( $this->get_shop_coc_number() );
+	}
+
+	/**
+	 * Return/Show shop/company address line 1 if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address_line_1(): string {
+		return $this->get_settings_text( 'shop_address_line_1' );
+	}
+	
+	/**
+	 * Print shop/company address line 1
+	 *
+	 * @return void
+	 */
+	public function shop_address_line_1(): void {
+		echo esc_html( $this->get_shop_address_line_1() );
+	}
+
+	/**
+	 * Return/Show shop/company address line 2 if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address_line_2(): string {
+		return $this->get_settings_text( 'shop_address_line_2' );
+	}
+	
+	/**
+	 * Print shop/company address line 2
+	 *
+	 * @return void
+	 */
+	public function shop_address_line_2(): void {
+		echo esc_html( $this->get_shop_address_line_2() );
+	}
+
+	/**
+	 * Return/Show shop/company address country if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address_country(): string {
+		return wpo_wcpdf_get_country_name_from_code( $this->get_shop_address_country_code() );
+	}
+	
+	/**
+	 * Print shop/company address country
+	 *
+	 * @return void
+	 */
+	public function shop_address_country(): void {
+		echo esc_html( $this->get_shop_address_country() );
+	}
+
+	/**
+	 * Return/Show shop/company address country code if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address_country_code(): string {
+		return $this->get_settings_text( 'shop_address_country', '', false );
+	}
+	
+	/**
+	 * Print shop/company address country code
+	 *
+	 * @return void
+	 */
+	public function shop_address_country_code(): void {
+		echo esc_html( $this->get_shop_address_country_code() );
+	}
+
+	/**
+	 * Return/Show shop/company address state if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address_state(): string {
+		return $this->get_settings_text( 'shop_address_state' );
+	}
+	
+	/**
+	 * Print shop/company address state
+	 *
+	 * @return void
+	 */
+	public function shop_address_state(): void {
+		echo esc_html( $this->get_shop_address_state() );
+	}
+
+	/**
+	 * Return/Show shop/company address city if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address_city(): string {
+		return $this->get_settings_text( 'shop_address_city' );
+	}
+	
+	/**
+	 * Print shop/company address city
+	 *
+	 * @return void
+	 */
+	public function shop_address_city(): void {
+		echo esc_html( $this->get_shop_address_city() );
+	}
+
+	/**
+	 * Return/Show shop/company address postcode if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address_postcode(): string {
+		return $this->get_settings_text( 'shop_address_postcode' );
+	}
+	
+	/**
+	 * Print shop/company address postcode
+	 *
+	 * @return void
+	 */
+	public function shop_address_postcode(): void {
+		echo esc_html( $this->get_shop_address_postcode() );
+	}
+
+	/**
+	 * Return/Show shop/company address additional info if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address_additional(): string {
+		return $this->get_settings_text( 'shop_address_additional' );
+	}
+	
+	/**
+	 * Print shop/company address additional info
+	 *
+	 * @return void
+	 */
+	public function shop_address_additional(): void {
+		echo wp_kses_post( $this->get_shop_address_additional() );
+	}
+
+	/**
+	 * Return/Show shop/company address if provided
+	 * 
+	 * @return string
+	 */
+	public function get_shop_address(): string {
+		// Preserve legacy shop address, if it exists, when historical settings are enabled
+		$address = $this->get_settings_text( 'shop_address' );
+		if ( $this->use_historical_settings() && ! empty( $address ) ) {
+			return $address;
+		}
+
+		// Otherwise, build the address from individual fields
+		$address = array(
+			'address_1'    => $this->get_settings_text( 'shop_address_line_1', '', false ),
+			'address_2'    => $this->get_settings_text( 'shop_address_line_2', '', false ),
+			'city'         => $this->get_settings_text( 'shop_address_city', '', false ),
+			'postcode'     => $this->get_settings_text( 'shop_address_postcode', '', false ),
+			'state_code'   => $this->get_settings_text( 'shop_address_state', '', false ),
+			'country_code' => $this->get_settings_text( 'shop_address_country', '', false ),
+			'additional'   => $this->get_settings_text( 'shop_address_additional', '', false ),
+		);
+
+		return (string) apply_filters(
+			'wpo_wcpdf_get_shop_address',
+			wpo_wcpdf_format_address( $address ),
+			$address,
+			$this
+		);
+	}
+	
+	/**
+	 * Print shop/company address
+	 *
+	 * @return void
+	 */
+	public function shop_address(): void {
+		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
+	}
+
+	/**
+	 * Return/Show shop/company phone number if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_phone_number(): string {
+		return $this->get_settings_text( 'shop_phone_number', '', false );
+	}
+	
+	/**
+	 * Print shop/company phone number
+	 *
+	 * @return void
+	 */
+	public function shop_phone_number(): void {
+		echo esc_html( $this->get_shop_phone_number() );
+	}
+
+	/**
+	 * Return/Show shop/company email address if provided.
+	 * 
+	 * @return string
+	 */
+	public function get_shop_email_address(): string {
+		return $this->get_settings_text( 'shop_email_address', '', false );
+	}
+	
+	/**
+	 * Print shop/company email address
+	 *
+	 * @return void
+	 */
+	public function shop_email_address(): void {
+		echo esc_html( $this->get_shop_email_address() );
+	}
+
+	/**
+	 * Return/Show shop/company footer imprint, copyright etc.
+	 * 
+	 * @return string
+	 */
+	public function get_footer(): string {
+		ob_start();
+		do_action( 'wpo_wcpdf_before_footer', $this->get_type(), $this->order );
+		echo $this->get_settings_text( 'footer' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		do_action( 'wpo_wcpdf_after_footer', $this->get_type(), $this->order );
+		return ob_get_clean();
+	}
+	
+	/**
+	 * Print shop/company footer imprint, copyright etc.
+	 *
+	 * @return void
+	 */
+	public function footer(): void {
+		echo wp_kses_post( $this->get_footer() );
+	}
+
+	/**
+	 * Return/Show Extra field 1
+	 * 
+	 * @return string
+	 */
+	public function get_extra_1(): string {
+		return $this->get_settings_text( 'extra_1' );
+
+	}
+	
+	/**
+	 * Print Extra field 1
+	 *
+	 * @return void
+	 */
+	public function extra_1(): void {
+		echo wp_kses_post( $this->get_extra_1() );
+	}
+
+	/**
+	 * Return/Show Extra field 2
+	 * 
+	 * @return string
+	 */
+	public function get_extra_2(): string {
+		return $this->get_settings_text( 'extra_2' );
+	}
+	
+	/**
+	 * Print Extra field 2
+	 *
+	 * @return void
+	 */
+	public function extra_2(): void {
+		echo wp_kses_post( $this->get_extra_2() );
+	}
+
+	/**
+	 * Return/Show Extra field 3
+	 * 
+	 * @return string
+	 */
+	public function get_extra_3(): string {
+		return $this->get_settings_text( 'extra_3' );
+	}
+	
+	/**
+	 * Print Extra field 3
+	 *
+	 * @return void
+	 */
+	public function extra_3(): void {
+		echo wp_kses_post( $this->get_extra_3() );
+	}
+
+	/**
+	 * Get the PDF file contents.
+	 *
+	 * @return string|null
+	 */
+	public function get_pdf(): ?string {
+		// maybe we need to reinstall fonts first?
+		WPO_WCPDF()->get_instance( 'main' )->maybe_reinstall_fonts();
+
+		$pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this );
+
+		if ( $pdf_file ) {
+			$pdf = WPO_WCPDF()->get_instance( 'file_system' )->get_contents( $pdf_file );
+		} else {
+			$pdf = null;
+		}
+
+		$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this );
+
+		if ( ! empty( $pdf ) ) {
+			return $pdf;
+		}
+
+		do_action( 'wpo_wcpdf_before_pdf', $this->get_type(), $this );
+
+		// temporarily apply filters that need to be removed again after the pdf is generated
+		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array(), $this );
+		\wpo_ips_add_filters( $pdf_filters );
+
+		$pdf_settings = array(
+			'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+			'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+			'font_subsetting'   => $this->get_setting( 'font_subsetting', false ),
+		);
+		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
+		$pdf          = $pdf_maker->output();
+
+		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
+
+		// remove temporary filters
+		\wpo_ips_remove_filters( $pdf_filters );
+
+		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
+
+		$pdf = apply_filters(
+			'wpo_wcpdf_get_pdf',
+			$pdf,
+			$this
+		);
+
+		return is_string( $pdf )
+			? $pdf
+			: null;
+	}
+	
+	/**
+	 * Get the PDF file contents for preview.
+	 *
+	 * @return string|null
+	 */
+	public function preview_pdf(): ?string {
+		// maybe we need to reinstall fonts first?
+		WPO_WCPDF()->get_instance( 'main' )->maybe_reinstall_fonts();
+
+		// get last settings
+		$this->settings = ! empty( $this->latest_settings ) ? $this->latest_settings : $this->get_settings( true );
+
+		$pdf_settings = array(
+			'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+			'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+			'font_subsetting'   => $this->get_setting( 'font_subsetting', false ),
+		);
+		$pdf_maker = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
+		$pdf       = $pdf_maker->output();
+
+		return $pdf;
+	}
+
+	/**
+	 * Get the HTML content for the document.
+	 *
+	 * @param array $args
+	 * @return string
+	 */
+	public function get_html( array $args = array() ): string {
+		\WPO_WCPDF()->get_instance( 'main' )->load_template_functions();
+
+		// temporarily apply filters that need to be removed again after the html is generated
+		$html_filters = apply_filters( 'wpo_wcpdf_html_filters', array(), $this );
+		\wpo_ips_add_filters( $html_filters );
+
+		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
+
+		$default_args = array (
+			'wrap_html_content' => true,
+		);
+		$args = $args + $default_args;
+
+		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ), array(
+				'order'    => $this->order,
+				'order_id' => $this->order_id,
+			)
+		);
+
+		if ( $args['wrap_html_content'] ) {
+			$html = $this->wrap_html_content( $html );
+		}
+
+		// clean up special characters
+		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
+			$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
+		}
+
+		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
+
+		// remove temporary filters
+		\wpo_ips_remove_filters( $html_filters );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_get_html',
+			$html,
+			$this
+		);
+	}
+
+	/**
+	 * Output the PDF file to the browser.
+	 *
+	 * @param string $output_mode
+	 * @return never
+	 */
+	public function output_pdf( string $output_mode = 'download' ): never {
+		$pdf = $this->get_pdf();
+		wcpdf_pdf_headers( $this->get_filename(), $output_mode, $pdf );
+		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit();
+	}
+
+	/**
+	 * Output the HTML document.
+	 * 
+	 * @return void
+	 */
+	public function output_html(): void {
+		echo $this->get_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/**
+	 * Output the XML document for preview.
+	 *
+	 * @return string
+	 */
+	public function preview_xml(): string {
+		// get last settings
+		$this->settings = $this->get_settings( true );
+
+		return $this->output_xml( true );
+	}
+
+	/**
+	 * Output the XML document to the browser or return contents if $contents_only is true.
+	 *
+	 * @param bool $contents_only
+	 * @return string
+	 */
+	public function output_xml( bool $contents_only = false ): string {
+		$document = $contents_only ? $this : wcpdf_get_document( $this->get_type(), $this->order, true );
+
+		if ( ! $document ) {
+			wcpdf_log_error( 'Error generating order document for UBL!', 'error' );
+			exit();
+		}
+
+		$filename_or_contents = wpo_ips_edi_write_file( $document, false, $contents_only );
+
+		if ( ! $filename_or_contents ) {
+			wcpdf_log_error( 'Error writing UBL file!', 'error' );
+			exit();
+		}
+
+		if ( $contents_only ) {
+			return $filename_or_contents;
+		}
+
+		$quoted = sprintf( '"%s"', addcslashes( basename( $filename_or_contents ), '"\\' ) );
+		$size   = filesize( $filename_or_contents );
+
+		wpo_ips_edi_file_headers( $quoted, $size );
+
+		// Disable output compression.
+		@ini_set( 'zlib.output_compression', 'Off' ); // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged
+
+		// Clear all output buffers to prevent stray bytes/newlines before the XML declaration.
+		while ( ob_get_level() ) {
+			ob_end_clean();
+		}
+		
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+
+		if ( $file_system_instance->exists( $filename_or_contents ) ) {
+			$sent = $file_system_instance->output_file( $filename_or_contents );
+			if ( false === $sent ) {
+				wcpdf_log_error( sprintf( 'Could not output XML file (%s)', $filename_or_contents ), 'critical' );
+			}
+
+			wp_delete_file( $filename_or_contents );
+		}
+
+		exit();
+	}
+
+	/**
+	 * Wrap the HTML content in a full HTML document structure.
+	 *
+	 * @param string $content
+	 * @return string
+	 */
+	public function wrap_html_content( string $content ): string {
+		$html = $this->render_template( $this->locate_template_file( "html-document-wrapper.php" ), array(
+				'content' => apply_filters( 'wpo_wcpdf_html_content', $content ),
+			)
+		);
+		return $html;
+	}
+
+	/**
+	 * Get the filename for the document.
+	 *
+	 * @param string $context
+	 * @param array $args
+	 * @return string
+	 */
+	public function get_filename( string $context = 'download', array $args = array() ): string {
+		$order_count = isset( $args['order_ids'] )
+			? count( $args['order_ids'] )
+			: 1;
+
+		$name = $this->get_type();
+
+		if ( is_callable( array( $this->order, 'get_type' ) ) && 'shop_order_refund' === $this->order->get_type() ) {
+			$number = $this->order_id;
+		} else {
+			$number = is_callable( array( $this->order, 'get_order_number' ) ) ? $this->order->get_order_number() : '';
+		}
+
+		if ( $order_count === 1 ) {
+			$suffix = $number;
+		} else {
+			$suffix = date_i18n( 'Y-m-d' ); // 2024-12-31
+		}
+
+		// get filename
+		$output_format = ! empty( $args['output'] ) ? esc_attr( $args['output'] ) : 'pdf';
+		$filename      = $name . '-' . $suffix . wcpdf_get_document_output_format_extension( $output_format );
+
+		// Filter filename
+		$order_ids = isset( $args['order_ids'] ) ? $args['order_ids'] : array( $this->order_id );
+		$filename  = apply_filters( 'wpo_wcpdf_filename', $filename, $this->get_type(), $order_ids, $context, $args );
+
+		// sanitize filename (after filters to prevent human errors)!
+		return sanitize_file_name( $filename );
+	}
+
+	/**
+	 * Get the template path for the document.
+	 *
+	 * @return string
+	 */
+	public function get_template_path(): string {
+		return WPO_WCPDF()->get_instance( 'settings' )->get_template_path();
+	}
+
+	/**
+	 * Locate the template file for the document, checking for custom templates in the theme first and falling back to the plugin templates.
+	 *
+	 * @param string $file
+	 * @return string
+	 */
+	public function locate_template_file( string $file ): string {
+		if ( empty( $file ) ) {
+			$file = $this->type . '.php';
+		}
+
+		$path                 = $this->get_template_path();
+		$file_path            = "{$path}/{$file}";
+		$fallback_file_path   = WPO_WCPDF()->plugin_path() . '/templates/Simple/' . $file;
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+
+		if ( ! $file_system_instance->exists( $file_path ) && $file_system_instance->exists( $fallback_file_path ) ) {
+			$file_path = $fallback_file_path;
+		}
+
+		$file_path = apply_filters( 'wpo_wcpdf_template_file', $file_path, $this->type, $this->order );
+
+		return $file_path;
+	}
+
+	/**
+	 * Render the template file with the given arguments and return the output.
+	 *
+	 * @param string $file
+	 * @param array $args
+	 * @return string
+	 */
+	public function render_template( string $file, array $args = array() ): string {
+		do_action( 'wpo_wcpdf_process_template', $this->get_type(), $this );
+
+		if ( ! empty( $args ) && is_array( $args ) ) {
+			extract( $args );
+		}
+
+		ob_start();
+		if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $file ) ) {
+			include( $file );
+		}
+		return ob_get_clean();
+	}
+
+	/**
+	 * Get all emails registered in WooCommerce
+	 * 
+	 * @return array
+	 */
+	public function get_wc_emails(): array {
+		// only run this in the context of the settings page or setup wizard
+		// prevents WPML language mixups
+		$request = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( empty( $request['page'] ) || ! in_array( $request['page'], array( 'wpo-wcpdf-setup', 'wpo_wcpdf_options_page' ), true ) ) {
+			return array();
+		}
+
+		// get emails from WooCommerce
+		if ( function_exists( 'WC' ) ) {
+			$mailer = WC()->mailer();
+		} else {
+			global $woocommerce;
+
+			if ( empty( $woocommerce ) ) { // bail if WooCommerce not active
+				return (array) apply_filters(
+					'wpo_wcpdf_wc_emails',
+					array()
+				);
+			}
+
+			$mailer = $woocommerce->mailer();
+		}
+
+		$wc_emails = $mailer->get_emails();
+
+		$non_order_emails = array(
+			'customer_reset_password',
+			'customer_new_account'
+		);
+
+		$emails = array();
+
+		foreach ( $wc_emails as $class => $email ) {
+			if ( ! is_object( $email ) ) {
+				continue;
+			}
+
+			if ( ! in_array( $email->id, $non_order_emails ) ) {
+				switch ( $email->id ) {
+					case 'new_order':
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						break;
+					case 'customer_invoice':
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Manual email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						break;
+					case 'cancelled_order':
+					case 'failed_order':
+						$emails[ $email->id ] = sprintf( '%s (%s)', $email->title, __( 'Admin email', 'woocommerce-pdf-invoices-packing-slips' ) );
+						break;
+					default:
+						$emails[ $email->id ] = $email->title;
+						break;
+				}
+			}
+		}
+
+		return (array) apply_filters(
+			'wpo_wcpdf_wc_emails',
+			$emails
+		);
+	}
+
+	/**
+	 * Get list of WooCommerce statuses
+	 *
+	 * @return array
+	 */
+	public function get_wc_order_status_list(): array {
+		$order_statuses = array();
+		$statuses       = function_exists('wc_get_order_statuses') ? wc_get_order_statuses() : array();
+
+		foreach ( $statuses as $status_slug => $status ) {
+			$status_slug   = 'wc-' === substr( $status_slug, 0, 3 ) ? substr( $status_slug, 3 ) : $status_slug;
+			$order_statuses[$status_slug] = $status;
+		}
+
+		return $order_statuses;
+	}
+
+	/**
+	 * Get the Sequential Number Store class that handles invoice number generation/consumption
+	 *
+	 * @return SequentialNumberStore
+	 */
+	public function get_sequential_number_store(): SequentialNumberStore {
+		$reset_number_yearly = isset( $this->settings['reset_number_yearly'] ) ? true : false;
+		$method              = WPO_WCPDF()->get_instance( 'settings' )->get_sequential_number_store_method();
+		$now                 = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) ); // for settings callback
+
+		// reset: on
+		if ( $reset_number_yearly ) {
+			if ( ! ( $date = $this->get_date() ) ) {
+				$date = $now;
+			}
+
+			// for yearly reset debugging only
+			if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
+				$date = new \WC_DateTime( '1st January Next Year' );
+			}
+
+			$store_name   = $this->get_sequential_number_store_name( $date, $method, $reset_number_yearly );
+			$number_store = new SequentialNumberStore( $store_name, $method );
+
+			if ( $number_store->is_new ) {
+				$number_store->set_next( apply_filters( 'wpo_wcpdf_reset_number_yearly_start', 1, $this ) );
+			}
+		// reset: off
+		} else {
+			$store_name   = $this->get_sequential_number_store_name( $now, $method, $reset_number_yearly );
+			$number_store = new SequentialNumberStore( $store_name, $method );
+		}
+
+		return $number_store;
+	}
+
+	/**
+	 * Get the name of the Sequential Number Store, based on the date ('now' or 'document date')
+	 * and whether the number should be reset yearly. When the number is reset yearly, numbered
+	 * stores are used for non-current years, adding the year as the suffix
+	 *
+	 * @param \WC_DateTime $date
+	 * @param string $method
+	 * @param bool $reset_number_yearly
+	 * @return string $number_store_name
+	 */
+	public function get_sequential_number_store_name( \WC_DateTime $date, string $method, bool $reset_number_yearly ): string {
+		$store_base_name    = $this->order ? apply_filters( 'wpo_wcpdf_document_sequential_number_store', "{$this->slug}_number", $this ) : "{$this->slug}_number";
+		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
+		$current_store_year = $this->get_number_store_year( $default_table_name );
+		$requested_year     = intval( $date->date_i18n( 'Y' ) );
+
+		// if we don't reset the number yearly, the store name is always the same
+		if ( ! $reset_number_yearly ) {
+			$number_store_name = $store_base_name;
+		} else {
+			// if the current store year doesn't match the year requested, check if we need to retire the store
+			// (meaning that we have entered a new year)
+			if( $requested_year !== $current_store_year ) {
+				$current_store_year = $this->maybe_retire_number_store( $date, $store_base_name, $method );
+			}
+
+			// If it's a non-current year (future or past), append the year to the store name, otherwise use default
+			if( $requested_year !== $current_store_year ) {
+				$number_store_name = "{$store_base_name}_{$requested_year}";
+			} else {
+				$number_store_name = $store_base_name;
+			}
+		}
+
+		return (string) apply_filters(
+			"wpo_wcpdf_{$this->slug}_number_store_name",
+			$number_store_name,
+			$store_base_name,
+			$date,
+			$method,
+			$this
+		);
+	}
+
+	/**
+	 * Get the default table name of the Sequential Number Store
+	 * 
+	 * @param  string $store_base_name
+	 * @param  string $method
+	 * @return string $table_name
+	 */
+	public function get_number_store_table_default_name( string $store_base_name, string $method ): string {
+		global $wpdb;
+
+		return (string) apply_filters(
+			"wpo_wcpdf_number_store_table_name",
+			"{$wpdb->prefix}wcpdf_{$store_base_name}",
+			$store_base_name,
+			$method
+		);
+	}
+
+	/**
+	 * Takes care of the rotation of database tables for the number store, used when 'reset yearly' is enabled:
+	 *
+	 * The table name for the current year is _always_ "{$wpdb->prefix}wcpdf_{$store_base_name}", e.g. wp_wcpdf_invoice_number
+	 *
+	 * when a year lapses, the existing table ('last year') is 'retired' by renaming it with the year appended,
+	 * e.g. wp_wcpdf_invoice_number_2021 (when the current/new year is 2022). If there was a table for the new year,
+	 * this will be renamed to the default store name (e.g. wp_wcdpdf_invoice_number)
+	 *
+	 * returns requested year if any error occurs, so that the current store table will be used
+	 *
+	 * @param \WC_DateTime $date date used to determine the year for which the store is requested (usually document date or 'now')
+	 * @param string $store_base_name base name of the store (e.g. 'invoice_number')
+	 * @param string $method method of the store (e.g. 'meta' or 'table')
+	 * @return int $year year of the current number store
+	 */
+	public function maybe_retire_number_store( \WC_DateTime $date, string $store_base_name, string $method ): int {
+		global $wpdb;
+
+		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
+		$default_table_name = $this->get_number_store_table_default_name( $store_base_name, $method );
+		$now                = new \WC_DateTime( 'now', new \DateTimeZone( 'UTC' ) );
+
+		// for yearly reset debugging only
+		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
+			$now = new \WC_DateTime( '1st January Next Year' );
+		}
+
+		$current_year       = intval( $now->date_i18n( 'Y' ) );
+		$current_store_year = intval( $this->get_number_store_year( $default_table_name ) );
+		$requested_year     = intval( $date->date_i18n( 'Y' ) );
+
+		// nothing to retire if requested year matches current store year or if current store year is not in the past
+		if (
+			empty( $current_store_year )              ||
+			$requested_year === $current_store_year   ||
+			! ( $current_store_year < $current_year )
+		) {
+			return $current_store_year;
+		}
+
+		// current store year is in the past: rename table so that we can replace it with the current year
+		$retired_table_name = "{$default_table_name}_{$current_store_year}";
+		$retired_table_safe = wpo_wcpdf_sanitize_identifier( $retired_table_name );
+
+		// Detect if retired table already exists
+		$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $retired_table_safe );
+
+		$retired_exists = $wpdb->get_var( $query ) === $retired_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( $retired_exists ) {
+			$drop_query = wpo_wcpdf_prepare_identifier_query(
+				"DROP TABLE IF EXISTS %i",
+				array( $retired_table_name )
+			);
+
+			$table_removed = $wpdb->query( $drop_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+			if ( ! $table_removed ) {
+				wcpdf_log_error( sprintf(
+					'An error occurred while trying to remove the duplicate number store %s: %s',
+					$retired_table_safe,
+					$wpdb->last_error
+				) );
+				return $requested_year;
+			}
+		}
+
+		// Sanitize for legacy usage
+		$default_table_safe = wpo_wcpdf_sanitize_identifier( $default_table_name );
+
+		// Detect if current default table exists
+		$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $default_table_safe );
+
+		$default_exists = $wpdb->get_var( $check_query ) === $default_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( $default_exists ) {
+			$rename_query = wpo_wcpdf_prepare_identifier_query(
+				"ALTER TABLE %i RENAME TO %i",
+				array( $default_table_name, $retired_table_name )
+			);
+
+			$table_renamed = $wpdb->query( $rename_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+			if ( ! $table_renamed ) {
+				wcpdf_log_error( sprintf(
+					'An error occurred while trying to rename the number store from %s to %s: %s',
+					$default_table_safe,
+					$retired_table_safe,
+					$wpdb->last_error
+				) );
+				return $requested_year;
+			}
+		}
+
+		$current_year_table_name = "{$default_table_name}_{$current_year}";
+		$current_year_table_safe = wpo_wcpdf_sanitize_identifier( $current_year_table_name );
+
+		// Check if current year table already exists
+		$check_query = $wpdb->prepare( "SHOW TABLES LIKE %s", $current_year_table_safe );
+
+		$current_year_exists = $wpdb->get_var( $check_query ) === $current_year_table_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( $current_year_exists ) {
+			$rename_query = wpo_wcpdf_prepare_identifier_query(
+				"ALTER TABLE %i RENAME TO %i",
+				array( $current_year_table_name, $default_table_name )
+			);
+
+			$table_renamed = $wpdb->query( $rename_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+			if ( ! $table_renamed ) {
+				wcpdf_log_error( sprintf(
+					'An error occurred while trying to rename the number store from %s to %s: %s',
+					$current_year_table_safe,
+					$default_table_safe,
+					$wpdb->last_error
+				) );
+				return $requested_year;
+			}
+		}
+
+		if ( $was_showing_errors ) {
+			$wpdb->show_errors();
+		}
+
+		// current store year has been updated to current year, returning this means no year suffix has to be used
+		return $current_year;
+	}
+
+	/**
+	 * Gets the year from the last row of a number store table.
+	 *
+	 * @param  string $table_name
+	 * @return int Year (4-digit)
+	 */
+	public function get_number_store_year( string $table_name ): int {
+		global $wpdb;
+
+		$was_showing_errors = $wpdb->hide_errors(); // if we encounter errors, we'll log them instead
+		$current_year       = date_i18n( 'Y' );
+
+		// for yearly reset debugging only
+		if ( apply_filters( 'wpo_wcpdf_enable_yearly_reset_debug', false ) ) {
+			$next_year    = new \WC_DateTime( '1st January Next Year' );
+			$current_year = intval( $next_year->date_i18n( 'Y' ) );
+		}
+
+		$table_name_safe = wpo_wcpdf_sanitize_identifier( $table_name );
+
+		// Check if table exists
+		$query = $wpdb->prepare( "SHOW TABLES LIKE %s", $table_name_safe );
+
+		$table_exists = $wpdb->get_var( $query ) === $table_name_safe; // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+		if ( $table_exists ) {
+			// Get year from the last row
+			$year_query = wpo_wcpdf_prepare_identifier_query(
+				"SELECT YEAR(date) FROM %i ORDER BY id DESC LIMIT 1",
+				array( $table_name )
+			);
+
+			$year = $wpdb->get_var( $year_query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+
+			if ( ! $year ) {
+				$year = $current_year;
+				// if we don't get a result, this could either mean there's an error,
+				// OR that the first number simply has not been created yet (=no rows)
+				// we only log when there's an actual error
+				if ( ! empty( $wpdb->last_error ) ) {
+					wcpdf_log_error( sprintf(
+						'An error occurred while trying to get the current year from the %s table: %s',
+						$table_name_safe,
+						$wpdb->last_error
+					) );
+				}
+			}
+		} else {
+			$year = $current_year;
+		}
+
+		if ( $was_showing_errors ) {
+			$wpdb->show_errors();
+		}
+
+		return intval( $year );
+	}
+
+	/**
+	 * Returns the due date timestamp.
+	 *
+	 * @return int
+	 */
+	public function get_due_date(): int {
+		$due_date      = $this->get_setting( 'due_date' );
+		$due_date_days = absint( $this->get_setting( 'due_date_days' ) );
+
+		if ( empty( $this->order ) || empty( $due_date ) || $due_date_days < 0 ) {
+			return 0;
+		}
+
+		return $this->calculate_due_date( $due_date_days );
+	}
+
+	/**
+	 * Calculate the due date.
+	 *
+	 * @param int $due_date_days
+	 * @return int Due date timestamp.
+	 */
+	public function calculate_due_date( int $due_date_days ): int {
+		$due_date_days = apply_filters_deprecated(
+			'wpo_wcpdf_due_date_days',
+			array( $due_date_days, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date_days'
+		);
+		$due_date_days = apply_filters( 'wpo_wcpdf_document_due_date_days', $due_date_days, $this );
+
+		if ( ! is_numeric( $due_date_days ) || intval( $due_date_days ) < 0 ) {
+			return 0;
+		}
+
+		$document_creation_date = $this->get_date( $this->get_type(), $this->order ) ?? new \WC_DateTime( 'now', new \DateTimeZone( wc_timezone_string() ) );
+		$base_date              = apply_filters_deprecated(
+			'wpo_wcpdf_due_date_base_date',
+			array( $document_creation_date, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date_base_date'
+		);
+		$base_date              = apply_filters( 'wpo_wcpdf_document_due_date_base_date', $base_date, $this );
+		$due_date_datetime      = clone $base_date;
+		$due_date_datetime      = $due_date_datetime->modify( "+$due_date_days days" );
+
+		$due_date = apply_filters_deprecated(
+			'wpo_wcpdf_due_date',
+			array( $due_date_datetime->getTimestamp() ?? 0, $this->get_type(), $this ),
+			'3.8.7',
+			'wpo_wcpdf_document_due_date'
+		);
+
+		return (int) apply_filters(
+			'wpo_wcpdf_document_due_date',
+			$due_date ?? 0,
+			$this
+		);
+	}
+
+	/**
+	 * Check if due date should be shown
+	 *
+	 * @return bool
+	 */
+	public function show_due_date(): bool {
+		return $this->get_due_date() > 0;
+	}
+	
+	/**
+	 * Get non historical settings keys.
+	 *
+	 * @return array
+	 */
+	private function get_non_historical_settings(): array {
+		return (array) apply_filters(
+			'wpo_wcpdf_non_historical_settings',
+			array(
+				'enabled',
+				'attach_to_email_ids',
+				'disable_for_statuses',
+				'number_format', // this is stored in the number data already!
+				'my_account_buttons',
+				'my_account_restrict',
+				'invoice_number_column',
+				'invoice_date_column',
+				'paper_size',
+				'font_subsetting',
+			),
+			$this
+		);
+	}
+	
+	/**
+	 * Reset the resolved settings cache.
+	 *
+	 * @return void
+	 */
+	protected function reset_resolved_settings_cache(): void {
+		$this->resolved_settings_cache = array();
+	}
+
+	/**
+	 * Add filters.
+	 *
+	 * @param array $filters
+	 * @return array
+	 */
+	protected function add_filters( array $filters ): array {
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_add_filters' );
+		return wpo_ips_add_filters( $filters );
+	}
+
+	/**
+	 * Remove filters.
+	 *
+	 * @param array $filters
+	 * @return array
+	 */
+	protected function remove_filters( array $filters ): array {
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_remove_filters' );
+		return wpo_ips_remove_filters( $filters );
+	}
+
+	/**
+	 * Normalize filter arguments.
+	 *
+	 * @param array $filter
+	 * @return array
+	 */
+	protected function normalize_filter_args( array $filter ): array {
+		\wcpdf_deprecated_function( __FUNCTION__, '5.0.0', 'wpo_ips_normalize_filter_args' );
+		return wpo_ips_normalize_filter_args( $filter );
+	}
+
+	/**
+	 * Recursively sanitize settings for storage by removing any objects or resources, which cannot be stored in the database.
+	 *
+	 * @param array $settings
+	 * @return array
+	 */
+	protected function sanitize_settings_for_storage( array $settings ): array {
+		foreach ( $settings as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$settings[ $key ] = $this->sanitize_settings_for_storage( $value );
+				continue;
+			}
+
+			if ( is_object( $value ) || is_resource( $value ) ) {
+				unset( $settings[ $key ] );
+			}
+		}
+
+		return $settings;
+	}
+
+}
+
+endif; // class_exists

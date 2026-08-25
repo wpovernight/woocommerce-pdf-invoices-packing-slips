@@ -1,9 +1,11 @@
 jQuery( function( $ ) {
 
 	$( '#debug-tools .tool' ).on( 'click', 'input[type="submit"]', function( e ) {
+		let $form = $( this ).closest( 'form' );
+		let tool  = $form.find( 'input[name="debug_tool"]' ).val();
+
 		e.preventDefault();
-		let $form    = $( this ).closest( 'form' );
-		let tool     = $form.find( 'input[name="debug_tool"]' ).val();
+
 		let formData = new FormData( $form[0] );
 		formData.append( 'action', 'wpo_wcpdf_debug_tools' );
 		formData.append( 'nonce', wpo_wcpdf_debug.nonce );
@@ -32,16 +34,21 @@ jQuery( function( $ ) {
 				cache:       false,
 				processData: false,
 				contentType: false,
-				success ( response ) {
+				success( response ) {
+					if ( response && response.success === false && response.data && response.data.message ) {
+						alert( response.data.message );
+						$form.closest( '.tool' ).unblock();
+						return;
+					}
+
 					process_form_response( tool, response, $form );
+					$form.closest( '.tool' ).unblock();
 				},
-				error ( xhr, error, status ) {
-					//console.log( error, status );
+				error( xhr ) {
+					$form.closest( '.tool' ).unblock();
 				}
 			} );
 		}
-
-		$form.closest( '.tool' ).unblock();
 	} );
 
 	function process_form_response( tool, response, $form ) {
@@ -69,6 +76,7 @@ jQuery( function( $ ) {
 			default:
 				if ( response.success && response.data.message ) {
 					$notice.addClass( 'notice-success' );
+					$form.find( '> .notice-warning' ).remove();
 				} else if ( ! response.success && response.data.message ) {
 					$notice.addClass( 'notice-error' );
 				}
@@ -77,6 +85,42 @@ jQuery( function( $ ) {
 				break;
 		}
 	}
+	
+	// plugin report confirm when including sensitive data or outputting html
+	$( '#debug-tools .tool.plugin-report' ).on( 'click', 'a.button', function( e ) {
+		let $button            = $( this );
+		let $tool              = $button.closest( '.tool' );
+		let $include_sensitive = $tool.find( '#wpo_ips_include_sensitive' );
+		let $output_html       = $tool.find( '#wpo_ips_output_html' );
+		let base_href          = $button.data( 'base-href' );
+
+		if ( ! base_href ) {
+			base_href = $button.attr( 'href' );
+			$button.data( 'base-href', base_href );
+		}
+
+		let href = base_href;
+
+		if ( $include_sensitive.length && true === $include_sensitive.prop( 'checked' ) ) {
+			if ( ! window.confirm( wpo_wcpdf_debug.confirm_plugin_report_sensitive ) ) {
+				e.preventDefault();
+				return false;
+			}
+
+			href += ( href.indexOf( '?' ) === -1 ) ? '?' : '&';
+			href += 'include_sensitive=1';
+		}
+
+		if ( $output_html.length && true === $output_html.prop( 'checked' ) ) {
+			href += ( href.indexOf( '?' ) === -1 ) ? '?' : '&';
+			href += 'output_html=1';
+			$button.attr( 'target', '_blank' );
+		} else {
+			$button.removeAttr( 'target' );
+		}
+
+		$button.attr( 'href', href );
+	} );
 
 	// toggle custom redirect page
 	$( "[name='wpo_wcpdf_settings_debug[document_access_denied_redirect_page]']" ).on( 'change', function( event ) {
@@ -107,7 +151,7 @@ jQuery( function( $ ) {
 	} );
 
 	// datepicker
-	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
+	$( '#renumber-date-from, #renumber-date-to, #delete-date-from, #delete-date-to, #fetch-numbers-data-date-from, #fetch-numbers-data-date-to' ).datepicker( { dateFormat: 'yy-mm-dd' } );
 
 	// danger zone tools
 	$( document.body ).on( 'click', '#debug-tools .number-tools-btn', function( event ) {
@@ -217,5 +261,62 @@ jQuery( function( $ ) {
 			}
 		} );
 	}
-
+	
+	// fetch/delete number table data
+	$( '#wpo-wcpdf-settings' ).on( 'click', '#fetch-numbers-data, #delete-numbers-data', function( e ) {
+		e.preventDefault();
+		
+		let $button    = $( this );
+		let table_name = $button.data( 'table_name' );
+		let operation  = $button.data( 'operation' );
+		let from       = $button.closest( '.number-table-data-info' ).find( '#fetch-numbers-data-date-from' ).val();
+		let to         = $button.closest( '.number-table-data-info' ).find( '#fetch-numbers-data-date-to' ).val();
+		let order      = get_number_table_url_query_string( 'order' );
+		let orderby    = get_number_table_url_query_string( 'orderby' );
+		
+		// block ui
+		$button.closest( '.wcpdf_advanced_numbers_choose_table' ).block( {
+			message: null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 0.6
+			}
+		} );
+		
+		$.ajax( {
+			url: wpo_wcpdf_debug.ajaxurl,
+			data: {
+				action:     'wpo_wcpdf_numbers_data',
+				nonce:      wpo_wcpdf_debug.nonce,
+				table_name: table_name,
+				operation:  operation,
+				order:      order,
+				orderby:    orderby,
+				from:       from,
+				to:         to,
+			},
+			type: 'POST',
+			success: function( response ) {
+				if ( response.success ) {
+					window.location.replace( response.data );
+				} else {
+					location.reload();
+				}
+			},
+			error: function( xhr, ajaxOptions, thrownError ) {
+				alert( xhr.status + ':'+ thrownError );
+				
+				$button.closest( '.wcpdf_advanced_numbers_choose_table' ).unblock();
+			}
+		} );
+		
+	} );
+	
+	function get_number_table_url_query_string( key ) {
+		let url_string = window.location.href;
+		let url        = new URL( url_string );
+		
+		return url.searchParams.get( key );
+	}
+	
 } );

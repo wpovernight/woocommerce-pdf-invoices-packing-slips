@@ -1,0 +1,372 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "landingPage": "/wp-admin/admin.php?page=wpo-wcpdf-setup",
+    "preferredVersions": {
+        "php": "8.1",
+        "wp": "latest"
+    },
+    "features": {
+        "networking": true
+    },
+    "steps": [
+        {
+            "step": "login",
+            "username": "admin"
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "wordpress.org/plugins",
+                "slug": "woocommerce"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installPlugin",
+            "pluginData": {
+                "resource": "wordpress.org/plugins",
+                "slug": "woocommerce-pdf-invoices-packing-slips"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "installTheme",
+            "themeData": {
+                "resource": "wordpress.org/themes",
+                "slug": "storefront"
+            },
+            "options": {
+                "activate": true
+            }
+        },
+        {
+            "step": "setSiteOptions",
+            "options": {
+                "blogname": "My WooCommerce Store",
+                "woocommerce_store_city": "Amsterdam",
+                "woocommerce_store_address": "Keizersgracht 99999",
+                "woocommerce_store_postcode": "1017 EG",
+                "woocommerce_default_country": "NL",
+                "woocommerce_onboarding_profile": {
+                    "skipped": true
+                },
+                "woocommerce_currency": "EUR",
+                "woocommerce_weight_unit": "kg",
+                "woocommerce_dimension_unit": "cm",
+                "woocommerce_allow_tracking": "no",
+                "woocommerce_cheque_settings": {
+                    "enabled": "yes"
+                },
+                "woocommerce_cod_settings": {
+                    "enabled": "yes"
+                },
+                "woocommerce_bacs_settings": {
+                    "enabled": "yes"
+                },
+                "woocommerce_calc_taxes": "yes",
+                "woocommerce_enable_coupons": "yes",
+                "woocommerce_enable_reviews": "yes",
+                "woocommerce_enable_review_rating": "yes",
+                "woocommerce_manage_stock": "yes",
+                "woocommerce_notify_low_stock": "yes",
+                "woocommerce_notify_no_stock": "yes",
+                "woocommerce_stock_email_recipient": "admin@example.com",
+                "woocommerce_notify_low_stock_amount": 2,
+                "woocommerce_notify_no_stock_amount": 0,
+                "woocommerce_enable_guest_checkout": "yes",
+                "woocommerce_enable_checkout_login_reminder": "yes",
+                "woocommerce_enable_signup_and_login_from_checkout": "yes",
+                "woocommerce_enable_myaccount_registration": "yes",
+                "woocommerce_registration_generate_username": "yes",
+                "woocommerce_registration_generate_password": "yes",
+                "wpo_wcpdf_dismiss_unstable_option_announcement": "yes",
+                "wpo_wcpdf_dismiss_shop_address_notice": true,
+                "wpo_wcpdf_install_notice_dismissed": true
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_wc_tax_rate_classes` (`tax_rate_class_id`, `name`, `slug`) VALUES ('1', 'Reduced rate', 'reduced-rate');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_wc_tax_rate_classes` (`tax_rate_class_id`, `name`, `slug`) VALUES ('2', 'Zero rate', 'zero-rate');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('1', 'AT', '', '20.0000', 'VAT (20%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('2', 'BE', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('3', 'BG', '', '20.0000', 'VAT (20%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('4', 'CY', '', '19.0000', 'VAT (19%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('5', 'CZ', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('6', 'DK', '', '25.0000', 'VAT (25%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('7', 'DE', '', '19.0000', 'VAT (19%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('8', 'EE', '', '24.0000', 'VAT (24%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('9', 'GR', '', '24.0000', 'VAT (24%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('10', 'ES', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('11', 'FI', '', '25.5000', 'VAT (25.5%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('12', 'FR', '', '20.0000', 'VAT (20%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('13', 'HR', '', '25.0000', 'VAT (25%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('14', 'IT', '', '22.0000', 'VAT (22%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('15', 'LV', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('16', 'LT', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('17', 'LU', '', '17.0000', 'VAT (17%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('18', 'HU', '', '27.0000', 'VAT (27%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('19', 'IE', '', '23.0000', 'VAT (23%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('20', 'MT', '', '18.0000', 'VAT (18%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('21', 'NL', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('22', 'PL', '', '23.0000', 'VAT (23%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('23', 'PT', '', '23.0000', 'VAT (23%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('24', 'RO', '', '21.0000', 'VAT (21%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('25', 'SI', '', '22.0000', 'VAT (22%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('26', 'SK', '', '23.0000', 'VAT (23%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('27', 'SE', '', '25.0000', 'VAT (25%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_tax_rates` (`tax_rate_id`, `tax_rate_country`, `tax_rate_state`, `tax_rate`, `tax_rate_name`, `tax_rate_priority`, `tax_rate_compound`, `tax_rate_shipping`, `tax_rate_order`, `tax_rate_class`) VALUES ('28', 'MC', '', '20.0000', 'VAT (20%)', '1', '0', '1', '0', '');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_shipping_zones` (`zone_id`, `zone_name`, `zone_order`) VALUES ('1', 'Europe', '0');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_shipping_zone_locations` (`location_id`, `zone_id`, `location_code`, `location_type`) VALUES ('1', '1', 'EU', 'continent');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_woocommerce_shipping_zone_methods` (`zone_id`, `instance_id`, `method_id`, `method_order`, `is_enabled`) VALUES ('1', '1', 'flat_rate', '1', '1');"
+            }
+        },
+        {
+            "step": "runSql",
+            "sql": {
+                "resource": "literal",
+                "name": "schema.sql",
+                "contents": "replace into `wp_options` (`option_id`, `option_name`, `option_value`, `autoload`) VALUES ('561', 'woocommerce_flat_rate_1_settings', 'a:3:{s:5:\\\"title\\\";s:9:\\\"Flat rate\\\";s:10:\\\"tax_status\\\";s:7:\\\"taxable\\\";s:4:\\\"cost\\\";s:2:\\\"20\\\";}', 'on');"
+            }
+        },
+        {
+            "step": "runPHP",
+            "code": "<?php\n// This script creates sample WooCommerce products without requiring WXR import\n// It runs after WooCommerce is activated and ready\n\n// Load WordPress\nrequire_once '/wordpress/wp-load.php';\n\n// Wait for WooCommerce to be fully loaded\nif ( ! class_exists( 'WC_Product' ) ) {\n\t// Try to load WooCommerce manually if not already loaded\n\t$wc_plugin_file = '/wordpress/wp-content/plugins/woocommerce/woocommerce.php';\n\tif ( file_exists( $wc_plugin_file ) ) {\n\t\trequire_once $wc_plugin_file;\n\t}\n}\n\n// Double-check WooCommerce is active\nif ( ! class_exists( 'WC_Product' ) ) {\n\techo 'WooCommerce is not active. Skipping product creation.';\n\texit(0);\n}\n\n// Load required WordPress functions for media handling\nrequire_once( ABSPATH . 'wp-admin/includes/media.php' );\nrequire_once( ABSPATH . 'wp-admin/includes/file.php' );\nrequire_once( ABSPATH . 'wp-admin/includes/image.php' );\n\n// Helper function to download and attach image to product\nfunction attach_product_thumbnail( $image_url, $product_id, $filename = '' ) {\n\tif ( empty( $image_url ) ) {\n\t\treturn false;\n\t}\n\n\t// Download the image\n\t$tmp = download_url( $image_url );\n\tif ( is_wp_error( $tmp ) ) {\n\t\treturn false;\n\t}\n\n\t// Set up file array\n\t$file_array = array(\n\t\t'name'     => $filename ?: basename( $image_url ),\n\t\t'tmp_name' => $tmp,\n\t);\n\n\t// If filename doesn't have an extension, add one based on mime type\n\tif ( ! preg_match( '/\\\\.(jpg|jpeg|png|gif|webp)$/i', $file_array['name'] ) ) {\n\t\t$file_array['name'] = $file_array['name'] . '.jpg';\n\t}\n\n\t// Upload the image and attach it to the product\n\t$attachment_id = media_handle_sideload( $file_array, $product_id );\n\n\t// Clean up temp file\n\t@unlink( $tmp );\n\n\tif ( is_wp_error( $attachment_id ) ) {\n\t\treturn false;\n\t}\n\n\t// Set as product thumbnail\n\tset_post_thumbnail( $product_id, $attachment_id );\n\n\treturn $attachment_id;\n}\n\n$sample_products = array(\n\tarray(\n\t\t'name'              => 'V-Neck T-Shirt',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a variable product.',\n\t\t'regular_price'     => '19',\n\t\t'sale_price'        => '15',\n\t\t'sku'               => 'woo-vneck-tee',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Tshirts' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/vneck-tee-2.jpg',\n\t\t'image_name'        => 'vneck-tee-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Hoodie',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a variable product.',\n\t\t'regular_price'     => '26',\n\t\t'sale_price'        => '',\n\t\t'sku'               => 'woo-hoodie',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Hoodies' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/hoodie-2.jpg',\n\t\t'image_name'        => 'hoodie-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'T-Shirt',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '18',\n\t\t'sale_price'        => '',\n\t\t'sku'               => 'woo-tshirt',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Tshirts' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/tshirt-2.jpg',\n\t\t'image_name'        => 'tshirt-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Beanie',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '20',\n\t\t'sale_price'        => '18',\n\t\t'sku'               => 'woo-beanie',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Accessories' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/beanie-2.jpg',\n\t\t'image_name'        => 'beanie-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Belt',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '65',\n\t\t'sale_price'        => '55',\n\t\t'sku'               => 'woo-belt',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Accessories' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/belt-2.jpg',\n\t\t'image_name'        => 'belt-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Cap',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '18',\n\t\t'sale_price'        => '16',\n\t\t'sku'               => 'woo-cap',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Accessories' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/cap-2.jpg',\n\t\t'image_name'        => 'cap-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Sunglasses',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '90',\n\t\t'sale_price'        => '',\n\t\t'sku'               => 'woo-sunglasses',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Accessories' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/sunglasses-2.jpg',\n\t\t'image_name'        => 'sunglasses-2.jpg'\n\t),\n\tarray(\n\t\t'name'              => 'Polo',\n\t\t'description'       => 'Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.',\n\t\t'short_description' => 'This is a simple product.',\n\t\t'regular_price'     => '20',\n\t\t'sale_price'        => '',\n\t\t'sku'               => 'woo-polo',\n\t\t'stock_status'      => 'instock',\n\t\t'categories'        => array( 'Clothing', 'Tshirts' ),\n\t\t'image_url'         => 'https://woocommercecore.mystagingwebsite.com/wp-content/uploads/2017/12/polo-2.jpg',\n\t\t'image_name'        => 'polo-2.jpg'\n\t)\n);\n\n$default_categories = array(\n\t'Clothing'    => 'Apparel and fashion items',\n\t'Tshirts'     => 'T-shirt products',\n\t'Hoodies'     => 'Hooded sweatshirts',\n\t'Accessories' => 'Accessories such as caps, belts, sunglasses'\n);\n\nforeach ( $default_categories as $name => $description ) {\n\tif ( ! term_exists( $name, 'product_cat' ) ) {\n\t\twp_insert_term(\n\t\t\t$name,\n\t\t\t'product_cat',\n\t\t\tarray(\n\t\t\t\t'description' => $description,\n\t\t\t)\n\t\t);\n\t}\n}\n\n$created_count   = 0;\n$failed_count    = 0;\n$images_attached = 0;\n\nforeach ( $sample_products as $product_data ) {\n\ttry {\n\t\t// Create product\n\t\t$product = new WC_Product_Simple();\n\n\t\t$product->set_name( $product_data['name'] );\n\t\t$product->set_description( $product_data['description'] );\n\t\t$product->set_short_description( $product_data['short_description'] );\n\t\t$product->set_regular_price( $product_data['regular_price'] );\n\n\t\tif ( ! empty( $product_data['sale_price'] ) ) {\n\t\t\t$product->set_sale_price( $product_data['sale_price'] );\n\t\t}\n\n\t\t$product->set_sku( $product_data['sku'] );\n\t\t$product->set_stock_status( $product_data['stock_status'] );\n\t\t$product->set_manage_stock( false );\n\t\t$product->set_status( 'publish' );\n\n\t\t// Set categories\n\t\t$category_ids = array();\n\t\tforeach ( $product_data['categories'] as $category_name ) {\n\t\t\t$term = get_term_by( 'name', $category_name, 'product_cat' );\n\t\t\tif ( ! $term ) {\n\t\t\t\t$term_data = wp_insert_term( $category_name, 'product_cat' );\n\t\t\t\tif ( ! is_wp_error( $term_data ) ) {\n\t\t\t\t\t$category_ids[] = $term_data['term_id'];\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\t$category_ids[] = $term->term_id;\n\t\t\t}\n\t\t}\n\t\t$product->set_category_ids( $category_ids );\n\n\t\t// Save product first to get ID\n\t\t$product_id = $product->save();\n\n\t\tif ( $product_id ) {\n\t\t\t$created_count++;\n\n\t\t\t// Download and attach the image\n\t\t\tif ( ! empty( $product_data['image_url'] ) ) {\n\t\t\t\t$attachment_id = attach_product_thumbnail(\n\t\t\t\t\t$product_data['image_url'],\n\t\t\t\t\t$product_id,\n\t\t\t\t\t$product_data['image_name']\n\t\t\t\t);\n\n\t\t\t\tif ( $attachment_id ) {\n\t\t\t\t\t$images_attached++;\n\n\t\t\t\t\t// Also set it as the product image in WooCommerce\n\t\t\t\t\t$product = wc_get_product( $product_id );\n\t\t\t\t\t$product->set_image_id( $attachment_id );\n\t\t\t\t\t$product->save();\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t} catch ( Exception $e ) {\n\t\t$failed_count++;\n\t\terror_log( 'Failed to create product: ' . $e->getMessage() );\n\t}\n}\n\necho \"Sample product import completed. Created $created_count products with $images_attached images attached.\";\n\nif ( $failed_count > 0 ) {\n\techo \" Failed to create $failed_count products.\";\n}\n\n// Flush rewrite rules to ensure product permalinks work\nflush_rewrite_rules();\n?>"
+        },
+        {
+            "step": "runPHP",
+            "code": "<?php\nrequire_once '/wordpress/wp-load.php';\nif(!function_exists('wc_create_order')){return;}\n$product_ids=[];\nforeach(['woo-beanie','woo-tshirt'] as $sku){\n$pid=wc_get_product_id_by_sku($sku);\nif($pid){$product_ids[]=$pid;}\n}\nif(empty($product_ids)){return;}\n$order=wc_create_order();\nif(!$order){return;}\n$order->set_customer_id(1);\n$address=['first_name'=>'John','last_name'=>'Doe','company'=>'ACME Inc.','email'=>'demo_customer@example.com','phone'=>'+31 20 123 4567','address_1'=>'Damrak 123','address_2'=>'','city'=>'Amsterdam','state'=>'','postcode'=>'1012 ZJ','country'=>'NL'];\n$order->set_address($address,'billing');\n$order->set_address($address,'shipping');\nforeach($product_ids as $i=>$pid){\n$qty=$i?2:1;\n$order->add_product(wc_get_product($pid),$qty);\n}\n$zones=WC_Shipping_Zones::get_zones();\nforeach($zones as $zone){\nforeach($zone['shipping_methods'] as $method){\nif('flat_rate'===$method->id&&'yes'===$method->enabled){\n$rate=new WC_Shipping_Rate($method->get_rate_id(),$method->get_title(),(float)$method->get_option('cost',0),[],'flat_rate');\n$order->add_shipping($rate);\nbreak 2;\n}\n}\n}\n$order->set_payment_method('bacs');\n$order->calculate_totals();\n$order->update_status('completed','Demo order created by script.');"
+        }
+    ]
+}
