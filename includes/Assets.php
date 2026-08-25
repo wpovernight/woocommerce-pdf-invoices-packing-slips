@@ -11,30 +11,41 @@ if ( ! class_exists( '\\WPO\\IPS\\Assets' ) ) :
 
 class Assets {
 
-	protected static $_instance = null;
-
-	public static function instance() {
+	protected static ?self $_instance = null;
+	
+	/**
+	 * Singleton instance accessor.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
-	public function __construct()	{
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'backend_scripts_styles' ) );
 		add_filter( 'script_loader_tag', array( $this, 'edi_prism_add_data_manual_attr' ), 10, 3 );
 	}
 
 	/**
 	 * Load styles & scripts
+	 * 
+	 * @param string $hook
+	 * @return void
 	 */
-	public function backend_scripts_styles( $hook ) {
+	public function backend_scripts_styles( string $hook ): void {
 		$suffix        = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$pdfjs_version = '4.3.136';
 
 		global $wp_version;
 
-		if ( WPO_WCPDF()->admin->is_order_page() ) {
+		if ( \wpo_ips_is_order_page() ) {
 
 			// STYLES
 			if ( ! wp_style_is( 'thickbox', 'enqueue' ) ) {
@@ -47,25 +58,6 @@ class Assets {
 				array(),
 				WPO_WCPDF_VERSION
 			);
-
-			if ( version_compare( $wp_version, '5.3', '<' ) ) {
-				// WC2.1 - WC3.2 (MP6) is used: bigger buttons
-				// also applied to WC3.3+ but without affect due to .column-order_actions class being deprecated in 3.3+
-				wp_enqueue_style(
-					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc38' . $suffix . '.css',
-					array(),
-					WPO_WCPDF_VERSION
-				);
-			} elseif ( version_compare( $wp_version, '5.3', '>=' ) ) {
-				// WP5.3 or newer is used: realign img inside buttons
-				wp_enqueue_style(
-					'wpo-wcpdf-order-styles-buttons',
-					WPO_WCPDF()->plugin_url() . '/assets/css/order-styles-buttons-wc39' . $suffix . '.css',
-					array(),
-					WPO_WCPDF_VERSION
-				);
-			}
 
 			// SCRIPTS
 			wp_enqueue_script(
@@ -194,7 +186,7 @@ class Assets {
 					'ajaxurl'                   => admin_url( 'admin-ajax.php' ),
 					'search_index'              => $search_index,
 					'nonce'                     => wp_create_nonce( 'wpo_wcpdf_admin_nonce' ),
-					'template_paths'            => WPO_WCPDF()->settings->get_installed_templates(),
+					'template_paths'            => WPO_WCPDF()->get_instance( 'settings' )->get_installed_templates(),
 					'pdfjs_worker'              => WPO_WCPDF()->plugin_url() . '/assets/js/pdf_js/pdf.worker.min.js?ver=' . $pdfjs_version, // taken from https://cdnjs.com/libraries/pdf.js
 					'preview_excluded_settings' => apply_filters( 'wpo_wcpdf_preview_excluded_settings', array(
 						// general
@@ -250,7 +242,7 @@ class Assets {
 					),
 					'xml_document_types'        => array_values( array_map(
 						fn( $document ) => $document->get_type(),
-						WPO_WCPDF()->documents->get_documents( 'enabled', 'xml' )
+						\WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled', 'xml' )
 					) ),
 				)
 			);
@@ -313,7 +305,7 @@ class Assets {
 						'forbidden'                       => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'confirm_plugin_report_sensitive' => __( 'The report may contain sensitive data such as license keys and log contents. Are you sure you want to include this information?', 'woocommerce-pdf-invoices-packing-slips' ),
 						'danger_zone'                     => array(
-							'enabled' => isset( WPO_WCPDF()->settings->debug_settings['enable_danger_zone_tools'] ) ? true : false,
+							'enabled' => isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_danger_zone_tools'] ) ? true : false,
 							'message' => sprintf(
 								/* translators: 1. open anchor tag, 2. close anchor tag */
 								__( '<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -361,7 +353,7 @@ class Assets {
 
 		if (
 			$hook === 'woocommerce_page_wc-admin' &&
-			WPO_WCPDF()->order_util->is_wc_admin_page()
+			WPO_WCPDF()->get_instance( 'order_util' )->is_wc_admin_page()
 		) {
 			wp_enqueue_script(
 				'wpo-wcpdf-analytics-order',
@@ -386,7 +378,6 @@ class Assets {
 	 * Build the search index for the current settings tab.
 	 *
 	 * @param string $tab
-	 *
 	 * @return array
 	 */
 	private function get_settings_search_index( string $tab ): array {
@@ -415,7 +406,7 @@ class Assets {
 			return array();
 		}
 
-		return WPO_WCPDF()->settings->get_search_index( $page );
+		return WPO_WCPDF()->get_instance( 'settings' )->get_search_index( $page );
 	}
 
 	/**
