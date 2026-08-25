@@ -20,30 +20,31 @@ class ApplicableHeaderTradeDeliveryHandler extends AbstractCiiHandler {
 		$order         = $this->document->order;
 		$delivery_date = apply_filters( 'wpo_ips_edi_cii_delivery_date', null, $order, $this );
 
-		if ( empty( $delivery_date ) ) {
-			return $data;
-		}
-
-		$date_format_code = $this->get_date_format_code();
-		$php_date_format  = $this->get_php_date_format_from_code( $date_format_code );
-		$delivery_date    = $this->normalize_date( $delivery_date, $php_date_format );
-
-		if ( ! $this->validate_date_format( $delivery_date, $date_format_code ) ) {
-			wpo_ips_edi_log(
-				sprintf(
-					'CII ApplicableHeaderTradeDelivery: Invalid delivery date format for %s in order %d.',
-					$delivery_date,
-					$order->get_id()
-				),
-				'error'
-			);
-			return $data;
-		}
-
 		$delivery_node = array(
 			'name'  => 'ram:ApplicableHeaderTradeDelivery',
-			'value' => array(
-				array(
+			'value' => array(),
+		);
+
+		if ( ! empty( $delivery_date ) ) {
+			$date_format_code = $this->get_date_format_code();
+			$php_date_format  = $this->get_php_date_format_from_code( $date_format_code );
+			$delivery_date    = $this->normalize_date( $delivery_date, $php_date_format );
+
+			if ( ! $this->validate_date_format( $delivery_date, $date_format_code ) ) {
+				wpo_ips_edi_log(
+					sprintf(
+						'CII ApplicableHeaderTradeDelivery: Invalid delivery date format for %s in order %d.',
+						$delivery_date,
+						$order->get_id()
+					),
+					'error'
+				);
+
+				$delivery_date = null;
+			}
+
+			if ( ! empty( $delivery_date ) ) {
+				$delivery_node['value'][] = array(
 					'name'  => 'ram:ActualDeliverySupplyChainEvent',
 					'value' => array(
 						array(
@@ -57,11 +58,17 @@ class ApplicableHeaderTradeDeliveryHandler extends AbstractCiiHandler {
 							),
 						),
 					),
-				),
-			),
-		);
+				);
+			}
+		}
 
-		$data[] = apply_filters( 'wpo_ips_edi_cii_applicable_header_trade_delivery', $delivery_node, $data, $options, $this );
+		$data[] = apply_filters(
+			'wpo_ips_edi_cii_applicable_header_trade_delivery',
+			$delivery_node,
+			$data,
+			$options,
+			$this
+		);
 
 		return $data;
 	}
