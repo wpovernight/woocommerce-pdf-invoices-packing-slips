@@ -46,7 +46,15 @@ class ApplicableHeaderTradeSettlementHandler extends BaseApplicableHeaderTradeSe
 			'value' => wpo_ips_edi_sanitize_string( $currency ),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_invoice_currency_code', $invoice_currency_code, $this );
+		$invoice_currency_code = apply_filters(
+			'wpo_ips_edi_cii_invoice_currency_code',
+			$invoice_currency_code,
+			$this
+		);
+
+		return is_array( $invoice_currency_code )
+			? $invoice_currency_code
+			: null;
 	}
 
 }

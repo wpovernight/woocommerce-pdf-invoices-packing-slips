@@ -87,6 +87,7 @@ return array(
     'WPO\\IPS\\Main' => $baseDir . '/includes/Main.php',
     'WPO\\IPS\\Makers\\EDIMaker' => $baseDir . '/includes/Makers/EDIMaker.php',
     'WPO\\IPS\\Makers\\PDFMaker' => $baseDir . '/includes/Makers/PDFMaker.php',
+    'WPO\\IPS\\Notices' => $baseDir . '/includes/Notices.php',
     'WPO\\IPS\\Semaphore' => $baseDir . '/includes/Semaphore.php',
     'WPO\\IPS\\Settings' => $baseDir . '/includes/Settings.php',
     'WPO\\IPS\\Settings\\SettingsCallbacks' => $baseDir . '/includes/Settings/SettingsCallbacks.php',
