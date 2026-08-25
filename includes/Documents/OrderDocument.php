@@ -14,6 +14,7 @@ abstract class OrderDocument {
 	public string $type;
 	public string $slug;
 	public string $title;
+	public string $plural_title              = '';
 	public string $icon;
 	public ?\WC_Abstract_Order $order        = null;
 	public ?int $order_id                    = null;
@@ -864,12 +865,30 @@ abstract class OrderDocument {
 	}
 
 	/**
-	 * Print the document number title
+	 * Print the document title
 	 *
 	 * @return void
 	 */
 	public function title(): void {
 		echo esc_html( $this->get_title() );
+	}
+
+	/**
+	 * Get the plural document title.
+	 *
+	 * @return string
+	 */
+	public function get_plural_title(): string {
+		return $this->get_title_for( 'document_plural' );
+	}
+
+	/**
+	 * Print the plural document title.
+	 *
+	 * @return void
+	 */
+	public function plural_title(): void {
+		echo esc_html( $this->get_plural_title() );
 	}
 
 	/**
@@ -1134,6 +1153,11 @@ abstract class OrderDocument {
 		switch ( $slug ) {
 			case 'document':
 				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $this->title, $this ), '3.8.7', 'wpo_wcpdf_document_title' );
+				break;
+			case 'document_plural':
+				$title = ! empty( $this->plural_title )
+					? $this->plural_title
+					: $this->get_title();
 				break;
 			case 'document_number':
 				$title = sprintf(

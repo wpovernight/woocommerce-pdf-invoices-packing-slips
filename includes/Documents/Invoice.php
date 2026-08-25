@@ -16,9 +16,10 @@ class Invoice extends OrderDocumentMethods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type  = 'invoice';
-		$this->title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
+		$this->type         = 'invoice';
+		$this->title        = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->plural_title = __( 'Invoices', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/invoice.svg";
 
 		// call parent constructor
 		parent::__construct( $order );
@@ -73,6 +74,22 @@ class Invoice extends OrderDocumentMethods {
 
 		return (string) apply_filters(
 			'wpo_wcpdf_document_title',
+			$title,
+			$this
+		);
+	}
+
+	/**
+	 * Get the plural document title.
+	 *
+	 * @return string
+	 */
+	public function get_plural_title(): string {
+		// Override/not using $this->plural_title to allow for language switching.
+		$title = __( 'Invoices', 'woocommerce-pdf-invoices-packing-slips' );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_document_plural_title',
 			$title,
 			$this
 		);
