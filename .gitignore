@@ -1,5 +1,0 @@
-/vendor/*
-!/vendor/composer/
-!/vendor/strauss/
-!/vendor/symfony/
-!/vendor/autoload.php
