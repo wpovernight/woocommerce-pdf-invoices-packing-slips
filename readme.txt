@@ -2,10 +2,10 @@
 Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, mohamadntr
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
-Requires at least: 4.4
+Requires at least: 5.3
 Tested up to: 7.0
-Requires PHP: 7.4
-Stable tag: 5.15.2
+Requires PHP: 8.1
+Stable tag: 6.0.0-beta.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -54,7 +54,7 @@ In addition to a number of default settings (including a custom header/logo) and
 
 = Minimum Requirements =
 
-* WooCommerce 3.3 or later
+* WooCommerce 4.0 or later
 * WordPress 4.4 or later
 
 = Automatic installation =
@@ -109,6 +109,25 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.16.1 (2026-08-21) =
+- Fix: Add seller identification for category O invoices in EDI
+- Fix: Selector for checked checkboxes in order script
+- Fix: Disabled Composer runtime platform check
+- Translations: Updated translation template (POT)
+
+= 5.16.0 (2026-08-17) =
+- New: Add logging for automatic Peppol Endpoint ID derivation
+- New: Add version 6 upgrade readiness notice
+- New: Update DOMPDF to version 3.1.6
+- New: Include settings sections in search results, making related options easier to find
+- Fix: Peppol Endpoint derivation with EU VAT for WooCommerce
+- Fix: CII seller party generation when VAT number is missing
+- Fix: EDI VAT identifiers for category O invoices
+- Fix: EDI line totals for high-quantity items
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 11.0
+- Tested: Tested up WordPress 7.1
 
 = 5.15.2 (2026-07-13) =
 - Fix: UBL Supplier `PartyLegalEntity` to omit empty values

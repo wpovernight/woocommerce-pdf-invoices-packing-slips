@@ -56,9 +56,8 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			return null;
 		}
 
-		if ( empty( $vat_number ) ) {
-			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty. Please check your shop settings.', 'error' );
-			return null;
+		if ( empty( $vat_number ) && empty( $coc_number ) ) {
+			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Both seller VAT number and company registration number are empty.', 'error' );
 		}
 
 		$postcode       = (string) ( $seller['postcode']     ?? '' );
@@ -107,7 +106,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 						),
 					),
 
-					array(
+					! empty( $vat_number ) && ! $this->has_tax_category( 'O' ) ? array(
 						'name'  => 'ram:SpecifiedTaxRegistration',
 						'value' => array(
 							array(
@@ -118,12 +117,20 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 								),
 							),
 						),
-					),
+					) : null,
 				),
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_seller_trade_party', $seller_trade_party, $this );
+		$seller_trade_party = apply_filters(
+			'wpo_ips_edi_cii_seller_trade_party',
+			$seller_trade_party,
+			$this
+		);
+
+		return is_array( $seller_trade_party )
+			? $seller_trade_party
+			: null;
 	}
 	
 	/**
@@ -231,7 +238,15 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			);
 		}
 
-		return apply_filters( 'wpo_ips_edi_cii_buyer_trade_party', $buyer_trade_party, $this );
+		$buyer_trade_party = apply_filters(
+			'wpo_ips_edi_cii_buyer_trade_party',
+			$buyer_trade_party,
+			$this
+		);
+
+		return is_array( $buyer_trade_party )
+			? $buyer_trade_party
+			: null;
 	}
 	
 	/**
@@ -257,7 +272,15 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		return apply_filters( 'wpo_ips_edi_cii_contract_referenced_document', $contract_document, $this );
+		$contract_document = apply_filters(
+			'wpo_ips_edi_cii_contract_referenced_document',
+			$contract_document,
+			$this
+		);
+
+		return is_array( $contract_document )
+			? $contract_document
+			: null;
 	}
 
 }
