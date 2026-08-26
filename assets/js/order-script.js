@@ -17,7 +17,7 @@ jQuery( function( $ ) {
 				xml_output    = true;
 			}
 
-			$( 'tbody th.check-column input[type="checkbox"]:checked' ).each(
+			$( 'tbody .check-column input[type="checkbox"]:checked' ).each(
 				function() {
 					checked.push( $( this ).val() );
 				}
