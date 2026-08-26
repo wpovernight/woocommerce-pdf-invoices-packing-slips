@@ -2199,14 +2199,20 @@ abstract class OrderDocument {
 	 * Wrap the HTML content in a full HTML document structure.
 	 *
 	 * @param string $content
+	 * @param bool   $is_bulk
 	 * @return string
 	 */
-	public function wrap_html_content( string $content ): string {
-		$html = $this->render_template( $this->locate_template_file( "html-document-wrapper.php" ), array(
-				'content' => apply_filters( 'wpo_wcpdf_html_content', $content ),
+	public function wrap_html_content( string $content, bool $is_bulk = false ): string {
+		return $this->render_template(
+			$this->locate_template_file( 'html-document-wrapper.php' ),
+			array(
+				'content' => apply_filters(
+					'wpo_wcpdf_html_content',
+					$content
+				),
+				'is_bulk' => $is_bulk,
 			)
 		);
-		return $html;
 	}
 
 	/**
