@@ -1415,18 +1415,18 @@ function wpo_ips_edi_get_registration_number_mappings( string $country = '', str
 /**
  * Get the company registration number scheme.
  *
- * When automatic selection is enabled, the scheme is determined from
- * the shop country configured in General Settings.
+ * Falls back to the default scheme for the shop country when no scheme
+ * has been explicitly configured.
  *
  * @return string
  */
 function wpo_ips_edi_get_registration_number_scheme(): string {
 	$scheme = trim( (string) wpo_ips_edi_get_settings( 'registration_number_scheme' ) );
 
-	if ( '' === $scheme || 'auto' === $scheme ) {
-		$general_settings = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
-		$shop_country     = (string) $general_settings->get_setting( 'shop_address_country' );
-		$scheme           = wpo_ips_edi_get_registration_number_mappings( $shop_country, 'scheme' );
+	if ( empty( $scheme ) ) {
+		$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
+		$shop_country              = (string) $general_settings_instance->get_setting( 'shop_address_country' );
+		$scheme                    = wpo_ips_edi_get_registration_number_mappings( $shop_country, 'scheme' );
 	}
 
 	$icd = \WPO\IPS\EDI\Standards\EN16931::get_icd();

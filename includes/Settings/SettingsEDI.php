@@ -446,14 +446,14 @@ class SettingsEDI {
 		// Supplier Registration Number scheme
 		$settings_fields[] = array(
 			'type'     => 'setting',
-			'id'       => 'supplier_registration_number_scheme',
+			'id'       => 'registration_number_scheme',
 			'title'    => '',
 			'callback' => 'select',
 			'section'  => $section,
 			'args'     => array(
 				'title'            => __( 'Supplier Registration Number Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'      => $option_name,
-				'id'               => 'supplier_registration_number_scheme',
+				'id'               => 'registration_number_scheme',
 				'default'          => $default_registration_scheme,
 				'default_if_empty' => true,
 				'options'          => ( function () {
