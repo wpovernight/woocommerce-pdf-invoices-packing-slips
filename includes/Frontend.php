@@ -43,32 +43,6 @@ class Frontend {
 			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
 		}
-
-		// Optional Checkout field (General Settings).
-		if ( wpo_ips_is_checkout_request() && $this->checkout_field_is_enabled() ) {
-			// Blocks/store-api hooks
-			$this->checkout_field_display_checkout_block_field();
-			$this->checkout_field_set_checkout_block_field_value();
-
-			add_action( 'woocommerce_set_additional_field_value', array( $this, 'checkout_field_save_checkout_block_field' ), 10, 4 );
-			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'checkout_field_remove_order_checkout_block_field_meta' ), 10, 1 );
-
-			// Classic checkout hooks
-			add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_display_classic_checkout_field' ), 10, 1 );
-			add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
-			add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
-			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
-
-			add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
-
-			// My Account (Account details).
-			if ( $this->checkout_field_is_my_account_enabled() ) {
-				add_action( 'woocommerce_edit_account_form', array( $this, 'account_details_display_checkout_field' ), 20 );
-				add_filter( 'woocommerce_save_account_details_errors', array( $this, 'account_details_validate_checkout_field' ), 20, 2 );
-				add_action( 'woocommerce_save_account_details', array( $this, 'account_details_save_checkout_field' ), 20, 1 );
-			}
-
-		}
 	}
 
 	/**
@@ -363,6 +337,7 @@ class Frontend {
 
 		return is_user_logged_in() && current_user_can( 'view_order', $order->get_id() );
 	}
+
 }
 
 endif; // class_exists

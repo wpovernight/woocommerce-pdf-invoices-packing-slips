@@ -280,6 +280,7 @@ class WPO_WCPDF {
 				'peppol'              => Peppol::class,
 				'notices'             => Notices::class,
 				'setup_wizard'        => SetupWizard::class,
+				'checkout_field'      => CheckoutField::class,
 			),
 			$this
 		);
