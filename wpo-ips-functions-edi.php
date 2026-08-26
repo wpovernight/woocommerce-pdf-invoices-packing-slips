@@ -1413,6 +1413,35 @@ function wpo_ips_edi_get_registration_number_mappings( string $country = '', str
 }
 
 /**
+ * Get the company registration number scheme.
+ *
+ * When automatic selection is enabled, the scheme is determined from
+ * the shop country configured in General Settings.
+ *
+ * @return string
+ */
+function wpo_ips_edi_get_registration_number_scheme(): string {
+	$scheme = trim( (string) wpo_ips_edi_get_settings( 'registration_number_scheme' ) );
+
+	if ( '' === $scheme || 'auto' === $scheme ) {
+		$general_settings = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
+		$shop_country     = (string) $general_settings->get_setting( 'shop_address_country' );
+		$scheme           = wpo_ips_edi_get_registration_number_mappings( $shop_country, 'scheme' );
+	}
+
+	$icd = \WPO\IPS\EDI\Standards\EN16931::get_icd();
+
+	if ( ! isset( $icd[ $scheme ] ) ) {
+		$scheme = '';
+	}
+
+	return (string) apply_filters(
+		'wpo_ips_edi_registration_number_scheme',
+		$scheme
+	);
+}
+
+/**
  * Get supplier identifiers data for EDI.
  *
  * @return array
