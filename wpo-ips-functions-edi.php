@@ -1336,6 +1336,79 @@ function wpo_ips_edi_format_registration_number( string $registration_number, st
 }
 
 /**
+ * Get the company registration number mappings.
+ *
+ * Optionally returns the mapping for a specific country or a specific
+ * mapping value such as the scheme or label.
+ *
+ * @param string $country Country code in ISO 3166-1 alpha-2 format.
+ * @param string $key     Optional mapping key, e.g. 'scheme' or 'label'.
+ * @return array|string
+ */
+function wpo_ips_edi_get_registration_number_mappings( string $country = '', string $key = '' ): array|string {
+	$mappings = array(
+		'BE' => array(
+			'scheme' => '0208',
+			'label'  => __( 'Enterprise number', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'EE' => array(
+			'scheme' => '0191',
+			'label'  => __( 'Company Code', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'FI' => array(
+			'scheme' => '0212',
+			'label'  => __( 'Organization Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'FR' => array(
+			'scheme' => '0002',
+			'label'  => __( 'SIREN', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'IT' => array(
+			'scheme' => '0210',
+			'label'  => __( 'Codice Fiscale', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'LT' => array(
+			'scheme' => '0200',
+			'label'  => __( 'Legal entity code', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'LV' => array(
+			'scheme' => '0218',
+			'label'  => __( 'Unified registration number', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'NL' => array(
+			'scheme' => '0106',
+			'label'  => __( 'KVK number', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'NO' => array(
+			'scheme' => '0192',
+			'label'  => __( 'Organisasjonsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+		'SE' => array(
+			'scheme' => '0007',
+			'label'  => __( 'Organisationsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
+		),
+	);
+
+	$mappings = (array) apply_filters(
+		'wpo_ips_edi_registration_number_mappings',
+		$mappings
+	);
+
+	if ( empty( $country ) ) {
+		return $mappings;
+	}
+
+	$country = strtoupper( trim( $country ) );
+	$mapping = $mappings[ $country ] ?? array();
+
+	if ( empty( $key ) ) {
+		return $mapping;
+	}
+
+	return (string) ( $mapping[ $key ] ?? '' );
+}
+
+/**
  * Get supplier identifiers data for EDI.
  *
  * @return array
@@ -1344,8 +1417,9 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
 	$language                  = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 	
-	$supplier_country = $general_settings_instance->get_setting( 'shop_address_country', $language );
-	$supplier_vat     = $general_settings_instance->get_setting( 'vat_number', $language );
+	$supplier_country          = $general_settings_instance->get_setting( 'shop_address_country', $language );
+	$supplier_vat              = $general_settings_instance->get_setting( 'vat_number', $language );
+	$registration_number_label = wpo_ips_edi_get_registration_number_mappings( $supplier_country, 'label' );
 
 	if ( ! empty( $supplier_vat ) ) {
 		$supplier_vat = wpo_ips_edi_format_vat_number(
@@ -1397,7 +1471,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 			'required' => true,
 		),
 		'coc_number' => array(
-			'label'    => __( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ),
+			'label'    => $registration_number_label,
 			'value'    => $general_settings_instance->get_setting( 'coc_number', $language ),
 			'required' => false,
 		),
