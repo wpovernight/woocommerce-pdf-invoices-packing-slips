@@ -1394,7 +1394,7 @@ function wpo_ips_edi_get_registration_number_mappings( string $country = '', str
 		$mappings
 	);
 
-	if ( empty( $country ) ) {
+	if ( empty( $country ) && empty( $key ) ) {
 		return $mappings;
 	}
 
