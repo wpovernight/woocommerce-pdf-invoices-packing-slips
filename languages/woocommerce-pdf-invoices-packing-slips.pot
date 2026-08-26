@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-beta.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-beta.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-25T11:34:48+00:00\n"
+"POT-Creation-Date: 2026-08-25T15:43:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -3090,7 +3090,7 @@ msgid "%s Date:"
 msgstr ""
 
 #: includes/Documents/OrderDocument.php:1155
-#: includes/Main.php:2187
+#: includes/Main.php:2191
 msgid "Due Date:"
 msgstr ""
 
@@ -3386,7 +3386,7 @@ msgid "Order %s Saved"
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Main.php:2301
+#: includes/Main.php:2305
 #, php-format
 msgid "View %s (PDF)"
 msgstr ""
