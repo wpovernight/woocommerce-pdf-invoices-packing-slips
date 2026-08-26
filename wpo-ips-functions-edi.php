@@ -1405,6 +1405,10 @@ function wpo_ips_edi_get_registration_number_mappings( string $country = '', str
 		return $mapping;
 	}
 
+	if ( 'label' === $key ) {
+		return (string) ( $mapping['label'] ?? __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' ) );
+	}
+
 	return (string) ( $mapping[ $key ] ?? '' );
 }
 
