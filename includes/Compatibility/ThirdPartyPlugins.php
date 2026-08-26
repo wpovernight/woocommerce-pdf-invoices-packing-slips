@@ -436,7 +436,7 @@ class ThirdPartyPlugins {
 	}
 
 	/**
-	 * Register hooks for Smart Reminder Email Plugin
+	 * Register hooks for Smart Reminder Email Plugin.
 	 *
 	 * @return void
 	 */
@@ -445,7 +445,7 @@ class ThirdPartyPlugins {
 		add_action( 'init', array( $this, 'handle_payment_reminder_emails' ) );
 
 		// Handle invoice creation trigger.
-		add_filter( 'wpo_wcsre_after_status_options', array( $this, 'add_invoice_creation_trigger' ) );
+		add_filter( 'wpo_wcsre_after_status_options', array( $this, 'add_invoice_creation_trigger_to_reminder_email' ) );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'schedule_payment_reminder_email_on_invoice_creation' ), 10, 2 );
 	}
 
@@ -650,7 +650,7 @@ class ThirdPartyPlugins {
 	 * @return void
 	 */
 	private function register_payment_reminder_email_templates(): void {
-		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
+		$invoice_settings = WPO_WCPDF()->get_instance( 'settings' )->get_document_settings( 'invoice', 'pdf' );
 		$due_date_days    = $invoice_settings['due_date_days'] ?? 14; // Default to two weeks.
 
 		// Register payment reminder email for admin.
@@ -709,7 +709,7 @@ class ThirdPartyPlugins {
 	 * @return void
 	 */
 	private function create_payment_reminder_emails(): void {
-		$invoice_settings = WPO_WCPDF()->settings->get_document_settings( 'invoice' );
+		$invoice_settings = WPO_WCPDF()->get_instance( 'settings' )->get_document_settings( 'invoice', 'pdf' );
 
 		// Only proceed if the due date is defined and valid.
 		if (
@@ -797,7 +797,7 @@ class ThirdPartyPlugins {
 	 *
 	 * @return mixed
 	 */
-	function add_invoice_creation_trigger( $after_status_options ) {
+	function add_invoice_creation_trigger_to_reminder_email( $after_status_options ): mixed {
 		$after_status_options['invoice-creation'] = __( 'Invoice creation', 'woocommerce-pdf-invoices-packing-slips' );
 
 		return $after_status_options;
@@ -811,7 +811,7 @@ class ThirdPartyPlugins {
 	 *
 	 * @return void
 	 */
-	function schedule_payment_reminder_email_on_invoice_creation( object $document, \WC_Abstract_Order $order ) {
+	function schedule_payment_reminder_email_on_invoice_creation( object $document, \WC_Abstract_Order $order ): void {
 		if ( $this->is_smart_reminder_email_supported() ) {
 			$order_status = $order->get_status();
 			WPO_WCSRE()->functions->check_email_schedule( $order, $order_status, $order_status, 'invoice-creation' );
