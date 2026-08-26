@@ -213,43 +213,6 @@ class SettingsEDI {
 			$settings_fields = array_merge( $settings_fields, $settings_format );
 		}
 
-		// Shop Registration Number scheme
-		$settings_fields[] = array(
-			'type'     => 'setting',
-			'id'       => 'registration_number_scheme',
-			'title'    => '',
-			'callback' => 'select',
-			'section'  => $section,
-			'args'     => array(
-				'title'            => __( 'Company Registration Number Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'option_name'      => $option_name,
-				'id'               => 'registration_number_scheme',
-				'default'          => $default_registration_scheme,
-				'default_if_empty' => true,
-				'options'          => ( function () {
-					$options = array(
-						'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
-					);
-
-					foreach ( EN16931::get_icd() as $code => $label ) {
-						$options[ $code ] = "[$code] $label";
-					}
-
-					return $options;
-				} )(),
-				'description'      => sprintf(
-					'%1$s<br>%2$s',
-					sprintf(
-						/* translators: %1$s: registration number label, %2$s: registration number */
-						__( 'This scheme identifies the supplier %1$s in electronic documents. Current value: %2$s', 'woocommerce-pdf-invoices-packing-slips' ),
-						esc_html( $registration_number_label ),
-						! empty( $registration_number ) ? '<code>' . esc_html( $registration_number ) . '</code>' : esc_html__( 'Not set', 'woocommerce-pdf-invoices-packing-slips' )
-					),
-					__( 'The default scheme is selected based on the Shop Country in General Settings. You can select a different scheme if needed.', 'woocommerce-pdf-invoices-packing-slips' )
-				),
-			),
-		);
-
 		// Peppol specific field
 		$settings_fields[] = array(
 			'type'     => 'setting',
@@ -476,6 +439,43 @@ class SettingsEDI {
 					'data-show_for_option_name'   => $option_name . '[peppol_automatic_endpoint_id_derivation]',
 					'data-show_for_option_values' => wp_json_encode( array( '1' ) ),
 					'data-keep_current_value'     => true,
+				),
+			),
+		);
+
+		// Supplier Registration Number scheme
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'supplier_registration_number_scheme',
+			'title'    => '',
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'title'            => __( 'Supplier Registration Number Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name'      => $option_name,
+				'id'               => 'supplier_registration_number_scheme',
+				'default'          => $default_registration_scheme,
+				'default_if_empty' => true,
+				'options'          => ( function () {
+					$options = array(
+						'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+					);
+
+					foreach ( EN16931::get_icd() as $code => $label ) {
+						$options[ $code ] = "[$code] $label";
+					}
+
+					return $options;
+				} )(),
+				'description'      => sprintf(
+					'%1$s<br>%2$s',
+					sprintf(
+						/* translators: %1$s: registration number label, %2$s: registration number */
+						__( 'This scheme identifies the supplier %1$s in electronic documents. Current value: %2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+						esc_html( $registration_number_label ),
+						! empty( $registration_number ) ? '<code>' . esc_html( $registration_number ) . '</code>' : esc_html__( 'Not set', 'woocommerce-pdf-invoices-packing-slips' )
+					),
+					__( 'The default scheme is selected based on the Shop Country in General Settings. You can select a different scheme if needed.', 'woocommerce-pdf-invoices-packing-slips' )
 				),
 			),
 		);
