@@ -129,7 +129,7 @@ class SettingsEDI {
 		$shop_country                = (string) $general_settings_instance->get_setting( 'shop_address_country' );
 		$registration_number         = (string) $general_settings_instance->get_setting( 'coc_number' );
 		$registration_number_label   = \wpo_ips_edi_get_registration_number_mappings( $shop_country, 'label' );
-		$default_registration_scheme = \wpo_ips_edi_get_registration_number_mappings( $shop_country, 'scheme' );
+		$default_registration_scheme = \wpo_ips_edi_get_registration_number_mappings( $shop_country, 'icd' );
 
 		$settings_fields = array(
 			array(
