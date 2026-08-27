@@ -453,6 +453,7 @@ class SettingsEDI {
 				'id'               => 'registration_number_scheme',
 				'default'          => $default_registration_scheme,
 				'default_if_empty' => true,
+				'disabled'         => empty( $registration_number ),
 				'options'          => ( function () {
 					$options = array(
 						'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
