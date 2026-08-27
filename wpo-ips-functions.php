@@ -56,7 +56,7 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 			? $document
 			: false;
 	};
-	
+
 	if ( ! empty( $order ) ) {
 		if ( ! is_object( $order ) && ! is_array( $order ) && is_numeric( $order ) ) {
 			$order = array( absint( $order ) ); // convert single order id to array.
@@ -976,7 +976,7 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 	// Local path file check
 	} else {
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
-		
+
 		if ( $file_system_instance->is_readable( $path ) ) {
 			return true;
 		} else {
@@ -1243,15 +1243,13 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_eu_vat',        // WooCommerce Eu Vat & B2B (WCEV)
 		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
-	
-	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
 
-	if ( ! empty( $frontend_instance ) && is_callable( array( $frontend_instance, 'checkout_field_is_vat_number' ) ) ) {
-		$checkout_field_is_vat_number = $frontend_instance->checkout_field_is_vat_number();
+	/** @var \WPO\IPS\CheckoutField $checkout_field_instance */
+	$checkout_field_instance = WPO_WCPDF()->get_instance( 'checkout_field' );
 
-		if ( $checkout_field_is_vat_number ) {
-			array_unshift( $vat_meta_keys, '_wpo_ips_checkout_field' );
-		}
+	// Maybe add General Checkout Field key
+	if ( ! is_null( $checkout_field_instance ) && $checkout_field_instance->is_vat_number() ) {
+		array_unshift( $vat_meta_keys, $checkout_field_instance::ORDER_META_KEY );
 	}
 
 	$vat_number = null;
@@ -2317,7 +2315,7 @@ function wpo_ips_register_additional_checkout_field( array $options ): void {
 	if ( ! defined( 'WC_VERSION' ) || version_compare( WC_VERSION, '8.9.0', '<' ) ) {
 		return;
 	}
-	
+
 	if ( ! function_exists( 'woocommerce_register_additional_checkout_field' ) && defined( 'WC_PLUGIN_FILE' ) ) {
 		$file = dirname( WC_PLUGIN_FILE ) . '/src/Blocks/Domain/Services/functions.php';
 		if ( WPO_WCPDF()->get_instance( 'file_system' )->is_readable( $file ) ) {
