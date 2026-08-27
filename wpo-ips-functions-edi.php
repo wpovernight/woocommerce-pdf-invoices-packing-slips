@@ -967,9 +967,12 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 /**
  * Get identifier mappings by country.
  *
- * @return array
+ * @param string $country Optional country code in ISO 3166-1 alpha-2 format.
+ * @param string $type    Optional identifier type, e.g. 'vat_number' or 'registration_number'.
+ * @param string $key     Optional mapping key, e.g. 'eas', 'icd' or 'label'.
+ * @return array|string
  */
-function wpo_ips_edi_get_identifier_mappings(): array {
+function wpo_ips_edi_get_identifier_mappings( string $country = '', string $type = '', string $key = '' ): array|string {
 	$mappings = array(
 		'AT' => array(
 			'name'     => 'Austria',
@@ -1441,10 +1444,37 @@ function wpo_ips_edi_get_identifier_mappings(): array {
 		),
 	);
 
-	return (array) apply_filters(
+	$mappings = (array) apply_filters(
 		'wpo_ips_edi_identifier_mappings',
-		$mappings
+		$mappings,
+		$country,
+		$type,
+		$key
 	);
+
+	if ( empty( $country ) ) {
+		return $mappings;
+	}
+
+	$country_mapping = $mappings[ strtoupper( trim( $country ) ) ] ?? array();
+
+	if ( empty( $type ) ) {
+		return $country_mapping;
+	}
+
+	$identifier_mappings = $country_mapping['mappings'][ $type ] ?? array();
+
+	if ( empty( $key ) ) {
+		return $identifier_mappings;
+	}
+
+	$value = $identifier_mappings[0][ $key ] ?? '';
+
+	if ( empty( $value ) && 'registration_number' === $type && 'label' === $key ) {
+		$value = __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' );
+	}
+
+	return (string) $value;
 }
 
 /**
