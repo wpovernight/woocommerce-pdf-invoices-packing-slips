@@ -160,6 +160,20 @@ class Notices {
 			},
 			admin_url( 'admin.php?page=wpo_wcpdf_options_page' )
 		);
+
+		// This notice is also shown on the order pages, so we stay where we are instead of redirecting
+		// to the settings page. We store the dismissed signature rather than deleting the error, because
+		// the error is re-detected on every page load for as long as the offending callback is active.
+		self::handle_notice_action(
+			'wpo_wcpdf_hide_discarded_document_notice',
+			'hide_discarded_document_notice_nonce',
+			function (): void {
+				$error = get_option( 'wpo_wcpdf_discarded_document_error' );
+
+				update_option( 'wpo_wcpdf_hide_discarded_document_notice', is_array( $error ) ? ( $error['signature'] ?? '' ) : '', false );
+			},
+			remove_query_arg( array( 'wpo_wcpdf_hide_discarded_document_notice', '_wpnonce' ) )
+		);
 	}
 
 	/**
@@ -187,6 +201,7 @@ class Notices {
 			array( array( $this, 'mailpoet_mta_detected_notice' ), true ),
 			array( array( $this, 'rtl_detected_notice' ), true ),
 			array( array( $this, 'no_dir_notice' ), true ),
+			array( array( $this, 'discarded_document_notice' ), $is_settings_page || \wpo_ips_is_order_page() ),
 		);
 
 		foreach ( $notices as $notice ) {
@@ -727,6 +742,67 @@ class Notices {
 		}
 	}
 	
+	/**
+	 * Warn about documents that were discarded by a callback hooked to one of our document filters.
+	 *
+	 * @return void
+	 * @see wpo_ips_log_discarded_document()
+	 */
+	public function discarded_document_notice(): void {
+		$error = get_option( 'wpo_wcpdf_discarded_document_error' );
+
+		if ( ! is_array( $error ) || empty( $error['hook'] ) || ! $this->settings->user_can_manage_settings() ) {
+			return;
+		}
+
+		if ( ! empty( $error['signature'] ) && get_option( 'wpo_wcpdf_hide_discarded_document_notice' ) === $error['signature'] ) {
+			return;
+		}
+
+		$order_ids   = ! empty( $error['order_ids'] ) ? '#' . implode( ', #', (array) $error['order_ids'] ) : '';
+		$callbacks   = ! empty( $error['callbacks'] ) ? (array) $error['callbacks'] : array();
+		$dismiss_url = wp_nonce_url( add_query_arg( 'wpo_wcpdf_hide_discarded_document_notice', 'true' ), 'hide_discarded_document_notice_nonce' );
+
+		ob_start();
+		?>
+		<div class="notice notice-warning">
+			<p>
+				<?php
+					echo wp_kses_post( sprintf(
+						/* translators: 1. document type, 2. filter name, 3. returned value type, 4. order numbers */
+						__( '<strong>PDF Invoices &amp; Packing Slips</strong>: a %1$s document could not be created or loaded because a callback hooked to the %2$s filter returned %3$s instead of the document object. %4$s', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>' . esc_html( $error['document_type'] ?? '' ) . '</code>',
+						'<code>' . esc_html( $error['hook'] ) . '</code>',
+						'<code>' . esc_html( $error['returned_type'] ?? '' ) . '</code>',
+						$order_ids ? sprintf(
+							/* translators: %s: order numbers */
+							__( 'Last detected for order(s) %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+							'<strong>' . esc_html( $order_ids ) . '</strong>'
+						) : ''
+					) );
+				?>
+			</p>
+			<p>
+				<?php
+					echo wp_kses_post( sprintf(
+						/* translators: %s: return false code snippet */
+						__( 'This is usually caused by a code snippet or third-party plugin that is missing a return statement. Make sure the callback returns the unmodified document object when it has nothing to change, %s only skips the document deliberately.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<code>return false;</code>'
+					) );
+				?>
+				<?php if ( ! empty( $callbacks ) ) : ?>
+					<br><?php esc_html_e( 'Callbacks hooked to this filter:', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+					<?php foreach ( $callbacks as $callback ) : ?>
+						<br><code><?php echo esc_html( $callback ); ?></code>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</p>
+			<p><a href="<?php echo esc_url( $dismiss_url ); ?>"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
+		</div>
+		<?php
+		echo wp_kses_post( ob_get_clean() );
+	}
+
 	/**
 	 * Display admin notice for incomplete shop address.
 	 *

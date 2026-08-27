@@ -44,7 +44,7 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 	$documents_instance = WPO_WCPDF()->get_instance( 'documents' );
 
 	$filtered_document = static function( object|false $document, string $document_type, mixed $order, bool $init ): object|false {
-		$document = apply_filters(
+		$filtered = apply_filters(
 			'wcpdf_get_document',
 			$document,
 			$document_type,
@@ -52,9 +52,17 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 			$init
 		);
 
-		return is_object( $document )
-			? $document
-			: false;
+		if ( is_object( $filtered ) ) {
+			return $filtered;
+		}
+
+		// An explicit false means a callback deliberately skipped the document, anything else
+		// (usually a missing return statement) discards it, so warn instead of failing silently.
+		if ( false !== $filtered && is_object( $document ) ) {
+			wpo_ips_log_discarded_document( 'wcpdf_get_document', $document_type, $order, $filtered );
+		}
+
+		return false;
 	};
 	
 	if ( ! empty( $order ) ) {
@@ -126,6 +134,109 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 	}
 
 	return $filtered_document( $document, $document_type, $order, $init );
+}
+
+/**
+ * Log a document object that was discarded by a callback hooked to one of our document filters,
+ * and store it so it can be surfaced in the admin.
+ *
+ * @param string $hook_name      Filter that discarded the document.
+ * @param string $document_type
+ * @param mixed  $order          Order object, order ID, array of order IDs or null passed to the filter.
+ * @param mixed  $returned_value Value the filter returned instead of the document object.
+ * @return void
+ */
+function wpo_ips_log_discarded_document( string $hook_name, string $document_type, mixed $order, mixed $returned_value ): void {
+	static $logged = array();
+	$key = "{$hook_name}|{$document_type}";
+
+	if ( isset( $logged[ $key ] ) ) {
+		return;
+	}
+
+	$logged[ $key ] = true;
+
+	if ( is_object( $order ) ) {
+		$order_ids = is_callable( array( $order, 'get_id' ) ) ? array( $order->get_id() ) : array();
+	} else {
+		$order_ids = array_filter( array_map( 'absint', (array) $order ) );
+	}
+
+	$callbacks = wpo_ips_get_hooked_callback_names( $hook_name );
+	$error     = array(
+		'hook'          => $hook_name,
+		'document_type' => $document_type,
+		'order_ids'     => $order_ids,
+		'returned_type' => strtoupper( gettype( $returned_value ) ),
+		'callbacks'     => $callbacks,
+		// Identifies the problem itself, so dismissing the notice survives the next occurrence but a
+		// different filter or a different set of callbacks surfaces it again. Order and document type
+		// are deliberately excluded: one misbehaving snippet should only have to be dismissed once.
+		'signature'     => md5( $hook_name . '|' . implode( '|', $callbacks ) ),
+	);
+
+	wcpdf_log_error(
+		sprintf(
+			'A \'%1$s\' document%2$s could not be created or loaded because a callback hooked to the \'%3$s\' filter returned %4$s instead of the document object. This is usually a code snippet or third-party plugin missing a return statement: return the unmodified document object when there is nothing to change (returning false deliberately skips the document). Callbacks hooked to \'%3$s\': %5$s',
+			$document_type,
+			! empty( $order_ids ) ? ' for order(s) #' . implode( ', #', $order_ids ) : '',
+			$hook_name,
+			$error['returned_type'],
+			! empty( $callbacks ) ? implode( ', ', $callbacks ) : 'none found'
+		),
+		'warning'
+	);
+
+	// Stored for the admin notice, update_option() bails on its own when nothing changed.
+	update_option( 'wpo_wcpdf_discarded_document_error', $error, false );
+}
+
+/**
+ * Get the names of the callbacks currently hooked to a filter or action, including the file and
+ * line they were defined in, to point to the plugin, theme or code snippet behind a misbehaving hook.
+ *
+ * @param string $hook_name
+ * @return array
+ */
+function wpo_ips_get_hooked_callback_names( string $hook_name ): array {
+	global $wp_filter;
+
+	if ( ! isset( $wp_filter[ $hook_name ] ) || ! ( $wp_filter[ $hook_name ] instanceof \WP_Hook ) ) {
+		return array();
+	}
+
+	$names = array();
+
+	foreach ( $wp_filter[ $hook_name ]->callbacks as $priority => $callbacks ) {
+		foreach ( $callbacks as $callback ) {
+			$function = $callback['function'] ?? null;
+
+			if ( ! is_callable( $function, true, $name ) ) {
+				continue;
+			}
+
+			$source = '';
+
+			try {
+				$reflection = new \ReflectionFunction( \Closure::fromCallable( $function ) );
+				$file       = $reflection->getFileName(); // false for internal functions.
+
+				if ( ! empty( $file ) ) {
+					$source = sprintf(
+						' (%s:%d)',
+						str_replace( wp_normalize_path( ABSPATH ), '', wp_normalize_path( $file ) ),
+						$reflection->getStartLine()
+					);
+				}
+			} catch ( \Throwable $e ) {
+				$source = '';
+			}
+
+			$names[] = sprintf( '%s%s [priority %s]', $name, $source, $priority );
+		}
+	}
+
+	return $names;
 }
 
 /**
