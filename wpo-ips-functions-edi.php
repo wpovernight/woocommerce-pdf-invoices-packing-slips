@@ -1450,11 +1450,13 @@ function wpo_ips_edi_get_identifier_mappings( string $country = '', string $type
 		$key
 	);
 
-	if ( empty( $country ) ) {
+	if ( empty( $country ) && empty( $type ) && empty( $key ) ) {
 		return $mappings;
 	}
 
-	$country_mapping = $mappings[ strtoupper( trim( $country ) ) ] ?? array();
+	$country_mapping = ! empty( $country )
+		? $mappings[ strtoupper( trim( $country ) ) ] ?? array()
+		: array();
 
 	if ( empty( $type ) ) {
 		return $country_mapping;
