@@ -1448,85 +1448,6 @@ function wpo_ips_edi_get_identifier_mappings(): array {
 }
 
 /**
- * Get PEPPOL VAT number mappings.
- *
- * @return array
- */
-function wpo_ips_edi_get_peppol_vat_mappings(): array {
-	$identifier_mappings = wpo_ips_edi_get_identifier_mappings();
-	$mappings            = array();
-
-	foreach ( $identifier_mappings as $country => $country_mapping ) {
-		$vat_number_mappings = $country_mapping['mappings']['vat_number'] ?? array();
-
-		if ( empty( $vat_number_mappings ) ) {
-			continue;
-		}
-
-		$mappings[ $country ] = array(
-			'name'     => $country_mapping['name'] ?? '',
-			'mappings' => $vat_number_mappings,
-		);
-	}
-
-	return (array) apply_filters(
-		'wpo_ips_edi_peppol_vat_mappings',
-		$mappings
-	);
-}
-
-/**
- * Get the company registration number mappings.
- *
- * Optionally returns the preferred mapping for a specific country or
- * a specific mapping value such as the ICD or label.
- *
- * @param string $country Country code in ISO 3166-1 alpha-2 format.
- * @param string $key     Optional mapping key, e.g. 'icd' or 'label'.
- * @return array|string
- */
-function wpo_ips_edi_get_registration_number_mappings( string $country = '', string $key = '' ): array|string {
-	$identifier_mappings = wpo_ips_edi_get_identifier_mappings();
-	$mappings            = array();
-
-	foreach ( $identifier_mappings as $country_code => $country_mapping ) {
-		$registration_number_mappings = $country_mapping['mappings']['registration_number'] ?? array();
-
-		if ( empty( $registration_number_mappings ) ) {
-			continue;
-		}
-
-		$mapping = $registration_number_mappings[0] ?? array();
-
-		if ( ! empty( $mapping ) ) {
-			$mappings[ $country_code ] = $mapping;
-		}
-	}
-
-	$mappings = (array) apply_filters(
-		'wpo_ips_edi_registration_number_mappings',
-		$mappings
-	);
-
-	if ( empty( $country ) && empty( $key ) ) {
-		return $mappings;
-	}
-
-	$country = strtoupper( trim( $country ) );
-	$mapping = $mappings[ $country ] ?? array();
-
-	if ( empty( $key ) ) {
-		return $mapping;
-	}
-
-	if ( 'label' === $key ) {
-		return (string) ( $mapping['label'] ?? __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' ) );
-	}
-
-	return (string) ( $mapping[ $key ] ?? '' );
-}
-
-/**
  * Format a company registration number for EDI output.
  *
  * This intentionally avoids digits-only normalization because some countries use
@@ -1548,35 +1469,6 @@ function wpo_ips_edi_format_registration_number( string $registration_number, st
 		$registration_number,
 		$country,
 		$raw_registration_number
-	);
-}
-
-/**
- * Get the company registration number scheme.
- *
- * Falls back to the default scheme for the shop country when no scheme
- * has been explicitly configured.
- *
- * @return string
- */
-function wpo_ips_edi_get_registration_number_scheme(): string {
-	$scheme = trim( (string) wpo_ips_edi_get_settings( 'registration_number_scheme' ) );
-
-	if ( empty( $scheme ) ) {
-		$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
-		$shop_country              = (string) $general_settings_instance->get_setting( 'shop_address_country' );
-		$scheme                    = wpo_ips_edi_get_registration_number_mappings( $shop_country, 'icd' );
-	}
-
-	$icd = \WPO\IPS\EDI\Standards\EN16931::get_icd();
-
-	if ( ! isset( $icd[ $scheme ] ) ) {
-		$scheme = '';
-	}
-
-	return (string) apply_filters(
-		'wpo_ips_edi_registration_number_scheme',
-		$scheme
 	);
 }
 
