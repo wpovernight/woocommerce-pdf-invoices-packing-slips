@@ -47,10 +47,9 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			'country_code' => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_address_country' ) ),
 		), $this );
 
-		$name                       = wpo_ips_edi_sanitize_string( (string) ( $seller['name'] ?? '' ) );
-		$vat_number                 = (string) ( $seller['vat_number'] ?? '' );
-		$coc_number                 = (string) ( $seller['coc_number'] ?? '' );
-		$registration_number_scheme = wpo_ips_edi_get_registration_number_scheme();
+		$name       = wpo_ips_edi_sanitize_string( (string) ( $seller['name'] ?? '' ) );
+		$vat_number = (string) ( $seller['vat_number'] ?? '' );
+		$coc_number = (string) ( $seller['coc_number'] ?? '' );
 
 		if ( empty( $name ) ) {
 			wpo_ips_edi_log( 'CII ApplicableHeaderTradeAgreementHandler: Seller name is empty. Please check your shop settings.', 'error' );
@@ -65,6 +64,16 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$address_line_1 = (string) ( $seller['address_line'] ?? '' );
 		$address_city   = (string) ( $seller['city']         ?? '' );
 		$country_code   = (string) ( $seller['country_code'] ?? '' );
+
+		$registration_number_scheme = trim( (string) wpo_ips_edi_get_settings( 'registration_number_scheme' ) );
+
+		if ( empty( $registration_number_scheme ) ) {
+			$registration_number_scheme = (string) wpo_ips_edi_get_identifier_mappings(
+				$country_code,
+				'registration_number',
+				'icd'
+			);
+		}
 
 		$registration_number_id = array(
 			'name'  => 'ram:ID',

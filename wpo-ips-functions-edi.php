@@ -886,16 +886,14 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 		return array();
 	}
 
-	$mappings = wpo_ips_edi_get_peppol_vat_mappings();
+	$configs = wpo_ips_edi_get_identifier_mappings(
+		$billing_country,
+		'vat_number'
+	);
 
-	if ( empty( $mappings[ $billing_country ] ) ) {
+	if ( empty( $configs ) || ! is_array( $configs ) ) {
 		return array();
 	}
-
-	$cfg     = $mappings[ $billing_country ];
-	$configs = ! empty( $cfg['mappings'] ) && is_array( $cfg['mappings'] )
-		? $cfg['mappings']
-		: array( $cfg );
 
 	$candidates = array();
 
@@ -1513,7 +1511,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	
 	$supplier_country          = $general_settings_instance->get_setting( 'shop_address_country', $language );
 	$supplier_vat              = $general_settings_instance->get_setting( 'vat_number', $language );
-	$registration_number_label = wpo_ips_edi_get_registration_number_mappings( $supplier_country, 'label' );
+	$registration_number_label = wpo_ips_edi_get_identifier_mappings( (string) $supplier_country, 'registration_number', 'label' );
 
 	if ( ! empty( $supplier_vat ) ) {
 		$supplier_vat = wpo_ips_edi_format_vat_number(

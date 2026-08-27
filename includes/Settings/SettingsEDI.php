@@ -128,8 +128,8 @@ class SettingsEDI {
 		$general_settings_instance   = \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
 		$shop_country                = (string) $general_settings_instance->get_setting( 'shop_address_country' );
 		$registration_number         = (string) $general_settings_instance->get_setting( 'coc_number' );
-		$registration_number_label   = \wpo_ips_edi_get_registration_number_mappings( $shop_country, 'label' );
-		$default_registration_scheme = \wpo_ips_edi_get_registration_number_mappings( $shop_country, 'icd' );
+		$registration_number_label   = \wpo_ips_edi_get_identifier_mappings( $shop_country, 'registration_number', 'label' );
+		$default_registration_scheme = \wpo_ips_edi_get_identifier_mappings( $shop_country, 'registration_number', 'icd' );
 
 		$settings_fields = array(
 			array(
@@ -380,7 +380,7 @@ class SettingsEDI {
 			),
 		);
 
-		$mappings  = wpo_ips_edi_get_peppol_vat_mappings();
+		$mappings  = wpo_ips_edi_get_identifier_mappings();
 		$countries = array();
 
 		if ( is_array( $mappings ) ) {
@@ -389,11 +389,8 @@ class SettingsEDI {
 					continue;
 				}
 
-				$country_mappings = ! empty( $data['mappings'] ) && is_array( $data['mappings'] )
-					? $data['mappings']
-					: array( $data );
-
-				$eas_codes = array();
+				$country_mappings = $data['mappings']['vat_number'] ?? array();
+				$eas_codes        = array();
 
 				foreach ( $country_mappings as $mapping ) {
 					if ( ! is_array( $mapping ) || empty( $mapping['eas'] ) ) {
