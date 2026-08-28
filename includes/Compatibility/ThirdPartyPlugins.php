@@ -641,7 +641,7 @@ class ThirdPartyPlugins {
 	 * @return bool
 	 */
 	private function is_smart_reminder_email_supported(): bool {
-		return function_exists( 'WPO_WCSRE' ) && version_compare( \WPO_WCSRE()->version, '2.8.1-beta-1', '>=' ); // ToDo: update version when stable release is out.
+		return function_exists( 'WPO_WCSRE' ) && version_compare( \WPO_WCSRE()->version, '2.14.0', '>=' );
 	}
 
 	/**
