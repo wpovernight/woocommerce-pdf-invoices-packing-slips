@@ -654,43 +654,18 @@ class ThirdPartyPlugins {
 		$due_date_days    = $invoice_settings['due_date_days'] ?? 14; // Default to two weeks.
 
 		// Register payment reminder email for admin.
-		$admin_content      = sprintf(
-		/* translators: Order number */
-			__( 'This is to inform you that the payment for Order #%s is still pending beyond the due date.' ), '{order_number}'
+		$admin_content      = apply_filters(
+			'wpo_ips_payment_reminder_admin_email_content',
+			$this->get_payment_reminder_email_content( 'admin' )
 		);
-		$admin_content      = apply_filters( 'wpo_ips_payment_reminder_admin_email_content', $admin_content );
 		$admin_trigger_days = apply_filters( 'wpo_ips_payment_reminder_admin_email_trigger_days', array( $due_date_days + 7 ) ); // Default to one week after the due date.
 		$this->register_payment_reminder_email_template( $admin_content, true, $admin_trigger_days );
 
 		// Register payment reminder email for customer.
-		$greeting = sprintf(
-		/* translators: 1: First name, 2: Last name */
-			__( 'Dear %1$s %2$s,', 'woocommerce-pdf-invoices-packing-slips' ),
-			'{billing_first_name}',
-			'{billing_last_name}'
+		$customer_content = apply_filters(
+			'wpo_ips_payment_reminder_customer_email_content',
+			$this->get_payment_reminder_email_content( 'customer' )
 		);
-
-		$message_body = sprintf(
-		/* translators: %s: Order number */
-			__( 'This is a gentle reminder that payment for your order #%s is still pending.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'{order_number}'
-		);
-
-		$payment_link = '<a href="{payment_url}">' . __( 'Pay the order', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>';
-		$call_to_action = sprintf(
-		/* translators: %s: Payment link */
-			__( 'To complete the payment, please use the following link: %s', 'woocommerce-pdf-invoices-packing-slips' ),
-			$payment_link
-		);
-
-		$reminder = __( 'We kindly ask that you process the payment at your earliest convenience.', 'woocommerce-pdf-invoices-packing-slips' );
-		$closing  = __( 'Best regards', 'woocommerce-pdf-invoices-packing-slips' );
-
-		$customer_content = implode(
-			'<br><br>',
-			array( $greeting, $message_body, $call_to_action, $reminder, $closing )
-		);
-		$customer_content = apply_filters( 'wpo_ips_payment_reminder_customer_email_content', $customer_content );
 
 		$customer_trigger_days = apply_filters(
 			'wpo_ips_payment_reminder_customer_email_trigger_days',
@@ -701,6 +676,35 @@ class ThirdPartyPlugins {
 			)
 		);
 		$this->register_payment_reminder_email_template( $customer_content, false, $customer_trigger_days );
+	}
+
+	/**
+	 * Get the content for a payment reminder email from its template partial.
+	 *
+	 * @param string $type Reminder email type: 'admin' or 'customer'.
+	 *
+	 * @return string
+	 */
+	private function get_payment_reminder_email_content( string $type ): string {
+		if ( ! in_array( $type, array( 'admin', 'customer' ), true ) ) {
+			wcpdf_log_error( "Invalid payment reminder email type: {$type}" );
+			return '';
+		}
+
+		$file = apply_filters(
+			'wpo_ips_payment_reminder_email_file_path',
+			WPO_WCPDF()->plugin_path() . "/templates/emails/payment-reminder-{$type}.php",
+			$type
+		);
+
+		if ( ! WPO_WCPDF()->get_instance( 'file_system' )->exists( $file ) ) {
+			wcpdf_log_error( "Payment reminder email template not found: {$file}" );
+			return '';
+		}
+
+		ob_start();
+		include $file;
+		return trim( ob_get_clean() );
 	}
 
 	/**
