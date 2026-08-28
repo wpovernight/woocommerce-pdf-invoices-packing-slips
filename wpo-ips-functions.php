@@ -137,8 +137,7 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 }
 
 /**
- * Log a document object that was discarded by a callback hooked to one of our document filters,
- * and store it so it can be surfaced in the admin.
+ * Log a document object that was discarded by a callback hooked to one of our document filters.
  *
  * @param string $hook_name      Filter that discarded the document.
  * @param string $document_type
@@ -148,6 +147,8 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
  */
 function wpo_ips_log_discarded_document( string $hook_name, string $document_type, mixed $order, mixed $returned_value ): void {
 	static $logged = array();
+
+	// Only warn once per hook/document type per request, bulk actions would otherwise flood the log.
 	$key = "{$hook_name}|{$document_type}";
 
 	if ( isset( $logged[ $key ] ) ) {
@@ -163,17 +164,6 @@ function wpo_ips_log_discarded_document( string $hook_name, string $document_typ
 	}
 
 	$callbacks = wpo_ips_get_hooked_callback_names( $hook_name );
-	$error     = array(
-		'hook'          => $hook_name,
-		'document_type' => $document_type,
-		'order_ids'     => $order_ids,
-		'returned_type' => strtoupper( gettype( $returned_value ) ),
-		'callbacks'     => $callbacks,
-		// Identifies the problem itself, so dismissing the notice survives the next occurrence but a
-		// different filter or a different set of callbacks surfaces it again. Order and document type
-		// are deliberately excluded: one misbehaving snippet should only have to be dismissed once.
-		'signature'     => md5( $hook_name . '|' . implode( '|', $callbacks ) ),
-	);
 
 	wcpdf_log_error(
 		sprintf(
@@ -181,14 +171,11 @@ function wpo_ips_log_discarded_document( string $hook_name, string $document_typ
 			$document_type,
 			! empty( $order_ids ) ? ' for order(s) #' . implode( ', #', $order_ids ) : '',
 			$hook_name,
-			$error['returned_type'],
+			strtoupper( gettype( $returned_value ) ),
 			! empty( $callbacks ) ? implode( ', ', $callbacks ) : 'none found'
 		),
 		'warning'
 	);
-
-	// Stored for the admin notice, update_option() bails on its own when nothing changed.
-	update_option( 'wpo_wcpdf_discarded_document_error', $error, false );
 }
 
 /**
