@@ -641,7 +641,32 @@ class Main {
 			);
 		}
 
-		$order_ids  = array_map( 'absint', (array) $_POST['order_ids'] );
+		$order_ids = array_map( 'absint', (array) wp_unslash( $_POST['order_ids'] ) );
+
+		// Check the user privileges
+		$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( 'credit-note' );
+
+		if ( ! $full_permission ) {
+			foreach ( $order_ids as $order_id ) {
+				if ( ! current_user_can( 'view_order', $order_id ) ) {
+					wp_send_json_error(
+						array(
+							'message' => __( 'You do not have permission to access one or more of these orders.', 'woocommerce-pdf-invoices-packing-slips' ),
+						),
+						403
+					);
+				}
+			}
+		}
+
+		if ( empty( $order_ids ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'No orders were provided.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
 		$refund_ids = \wpo_ips_get_refund_ids( $order_ids );
 
 		if ( empty( $refund_ids ) ) {
