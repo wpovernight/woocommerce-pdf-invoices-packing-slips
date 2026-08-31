@@ -66,8 +66,10 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 
 			wcpdf_log_error(
 				sprintf(
-					'The \'%1$s\' document could not be created or loaded: a callback hooked to the \'wcpdf_get_document\' filter returned %2$s instead of the document object. This is usually a code snippet or third-party plugin missing a return statement (return the unmodified document object when there is nothing to change, returning false deliberately skips the document).',
+					/* translators: 1: document type, 2: filter name, 3: returned value type */
+					__( 'The \'%1$s\' document was discarded because a callback hooked to the \'%2$s\' filter returned %3$s instead of the document object.', 'woocommerce-pdf-invoices-packing-slips' ),
 					$document_type,
+					'wcpdf_get_document',
 					strtoupper( gettype( $filtered ) )
 				),
 				'warning'
