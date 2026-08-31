@@ -68,17 +68,19 @@ class SettingsGeneral {
 	public function init_settings(): void {
 		$page = $option_group = $option_name = $this->option_name;
 
-		$template_base_path     = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
-		$theme_template_path    = get_stylesheet_directory() . '/' . $template_base_path;
-		$wp_content_dir         = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
-		$theme_template_path    = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
-		$plugin_template_path   = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
-		$requires_pro           = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
-		$states                 = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
-		$missing_template_files = $this->get_missing_template_files();
-		$has_vat_plugin_active  = \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active();
-		$vat_plugin_notice      = '';
-		$settings_instance      = \WPO_WCPDF()->get_instance( 'settings' );
+		$template_base_path                = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
+		$theme_template_path               = get_stylesheet_directory() . '/' . $template_base_path;
+		$wp_content_dir                    = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
+		$theme_template_path               = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
+		$plugin_template_path              = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
+		$requires_pro                      = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
+		$shop_country                      = $this->get_setting( 'shop_address_country' );
+		$states                            = \wpo_wcpdf_get_country_states( $shop_country );
+		$company_registration_number_label = \wpo_ips_edi_get_identifier_mappings( $shop_country, 'registration_number', 'label' );
+		$missing_template_files            = $this->get_missing_template_files();
+		$has_vat_plugin_active             = \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active();
+		$vat_plugin_notice                 = '';
+		$settings_instance                 = \WPO_WCPDF()->get_instance( 'settings' );
 
 		if ( $has_vat_plugin_active ) {
 			$vat_plugin_notice = '<div class="notice notice-info inline notice-wpo"><p>'
@@ -284,7 +286,11 @@ class SettingsGeneral {
 			array(
 				'type'     => 'setting',
 				'id'       => 'coc_number',
-				'title'    => __( 'Shop Chamber of Commerce Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => sprintf(
+					/* translators: %s: company registration number label */
+					__( 'Shop %s', 'woocommerce-pdf-invoices-packing-slips' ),
+					$company_registration_number_label
+				),
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(

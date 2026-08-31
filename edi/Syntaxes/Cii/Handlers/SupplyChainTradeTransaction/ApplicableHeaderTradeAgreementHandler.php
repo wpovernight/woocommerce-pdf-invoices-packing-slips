@@ -65,6 +65,27 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$address_city   = (string) ( $seller['city']         ?? '' );
 		$country_code   = (string) ( $seller['country_code'] ?? '' );
 
+		$registration_number_scheme = trim( (string) wpo_ips_edi_get_settings( 'registration_number_scheme' ) );
+
+		if ( empty( $registration_number_scheme ) ) {
+			$registration_number_scheme = (string) wpo_ips_edi_get_identifier_mappings(
+				$country_code,
+				'registration_number',
+				'icd'
+			);
+		}
+
+		$registration_number_id = array(
+			'name'  => 'ram:ID',
+			'value' => $coc_number,
+		);
+
+		if ( ! empty( $registration_number_scheme ) ) {
+			$registration_number_id['attributes'] = array(
+				'schemeID' => $registration_number_scheme,
+			);
+		}
+
 		$seller_trade_party = array(
 			'name'  => 'ram:SellerTradeParty',
 			'value' => array_filter(
@@ -77,10 +98,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					! empty( $coc_number ) ? array(
 						'name'  => 'ram:SpecifiedLegalOrganization',
 						'value' => array(
-							array(
-								'name'  => 'ram:ID',
-								'value' => $coc_number,
-							),
+							$registration_number_id,
 						),
 					) : null,
 

@@ -886,16 +886,14 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 		return array();
 	}
 
-	$mappings = wpo_ips_edi_get_peppol_vat_mappings();
+	$configs = wpo_ips_edi_get_identifier_mappings(
+		$billing_country,
+		'vat_number'
+	);
 
-	if ( empty( $mappings[ $billing_country ] ) ) {
+	if ( empty( $configs ) || ! is_array( $configs ) ) {
 		return array();
 	}
-
-	$cfg     = $mappings[ $billing_country ];
-	$configs = ! empty( $cfg['mappings'] ) && is_array( $cfg['mappings'] )
-		? $cfg['mappings']
-		: array( $cfg );
 
 	$candidates = array();
 
@@ -965,349 +963,518 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 }
 
 /**
- * Get PEPPOL VAT number mappings.
+ * Get identifier mappings by country.
  *
- * @return array
+ * @param string $country Optional country code in ISO 3166-1 alpha-2 format.
+ * @param string $type    Optional identifier type, e.g. 'vat_number' or 'registration_number'.
+ * @param string $key     Optional mapping key, e.g. 'eas', 'icd' or 'label'.
+ * @return array|string
  */
-function wpo_ips_edi_get_peppol_vat_mappings(): array {
+function wpo_ips_edi_get_identifier_mappings( string $country = '', string $type = '', string $key = '' ): array|string {
 	$mappings = array(
 		'AT' => array(
 			'name'     => 'Austria',
 			'mappings' => array(
-				array(
-					'eas'            => '9914',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
+				'vat_number' => array(
+					array(
+						'eas'            => '9914',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 11,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'BE' => array(
 			'name'     => 'Belgium',
 			'mappings' => array(
-				array(
-					'eas'            => '0208',
-					'strip_prefixes' => array( 'BE' ),
-					'keep_pattern'   => '/\d+/',
-					'length'         => 10,
+				'vat_number' => array(
+					array(
+						'eas'            => '0208',
+						'strip_prefixes' => array( 'BE' ),
+						'keep_pattern'   => '/\d+/',
+						'length'         => 10,
+					),
+					array(
+						'eas'            => '9925',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 12,
+					),
 				),
-				array(
-					'eas'            => '9925',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 12,
+				'registration_number' => array(
+					array(
+						'icd'   => '0208',
+						'label' => __( 'Enterprise number', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'BG' => array(
 			'name'     => 'Bulgaria',
 			'mappings' => array(
-				array(
-					'eas'            => '9926',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 11, 12 ),
+				'vat_number' => array(
+					array(
+						'eas'            => '9926',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => array( 11, 12 ),
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'CY' => array(
 			'name'     => 'Cyprus',
 			'mappings' => array(
-				array(
-					'eas'            => '9928',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
+				'vat_number' => array(
+					array(
+						'eas'            => '9928',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 11,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'CZ' => array(
 			'name'     => 'Czech Republic',
 			'mappings' => array(
-				array(
-					'eas'            => '9929',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 10, 11, 12 ),
+				'vat_number' => array(
+					array(
+						'eas'            => '9929',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => array( 10, 11, 12 ),
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'DE' => array(
 			'name'     => 'Germany',
 			'mappings' => array(
-				array(
-					'eas'            => '9930',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
+				'vat_number' => array(
+					array(
+						'eas'            => '9930',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 11,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'DK' => array(
 			'name'     => 'Denmark',
 			'mappings' => array(
-				array(
-					'eas'            => '0184',
-					'strip_prefixes' => array( 'DK' ),
-					'keep_pattern'   => '/\d+/',
-					'length'         => 8,
+				'vat_number' => array(
+					array(
+						'eas'            => '0184',
+						'strip_prefixes' => array( 'DK' ),
+						'keep_pattern'   => '/\d+/',
+						'length'         => 8,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'EE' => array(
 			'name'     => 'Estonia',
 			'mappings' => array(
-				array(
-					'eas'            => '9931',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
+				'vat_number' => array(
+					array(
+						'eas'            => '9931',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 11,
+					),
+				),
+				'registration_number' => array(
+					array(
+						'icd'   => '0191',
+						'label' => __( 'Company Code', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'ES' => array(
 			'name'     => 'Spain',
 			'mappings' => array(
-				array(
-					'eas'            => '9920',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
+				'vat_number' => array(
+					array(
+						'eas'            => '9920',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 11,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'FI' => array(
 			'name'     => 'Finland',
 			'mappings' => array(
-				array(
-					'eas'            => '0213',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
+				'vat_number' => array(
+					array(
+						'eas'            => '0213',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 10,
+					),
+				),
+				'registration_number' => array(
+					array(
+						'icd'   => '0212',
+						'label' => __( 'Organization Identifier', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'FR' => array(
 			'name'     => 'France',
 			'mappings' => array(
-				array(
-					'eas'            => '0002',
-					'strip_prefixes' => array( 'FR' ),
-					'keep_pattern'   => '/\d{9}$/',
-					'length'         => 9,
+				'vat_number' => array(
+					array(
+						'eas'            => '0002',
+						'strip_prefixes' => array( 'FR' ),
+						'keep_pattern'   => '/\d{9}$/',
+						'length'         => 9,
+					),
+					array(
+						'eas'            => '9957',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 13,
+					),
 				),
-				array(
-					'eas'            => '9957',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 13,
+				'registration_number' => array(
+					array(
+						'icd'   => '0002',
+						'label' => __( 'SIREN', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'GB' => array(
 			'name'     => 'United Kingdom',
 			'mappings' => array(
-				array(
-					'eas'            => '9932',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 11, 14 ),
+				'vat_number' => array(
+					array(
+						'eas'            => '9932',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => array( 11, 14 ),
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'GR' => array(
 			'name'     => 'Greece',
 			'mappings' => array(
-				array(
-					'eas'            => '9933',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
+				'vat_number' => array(
+					array(
+						'eas'            => '9933',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 11,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'HR' => array(
 			'name'     => 'Croatia',
 			'mappings' => array(
-				array(
-					'eas'            => '9934',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 13,
+				'vat_number' => array(
+					array(
+						'eas'            => '9934',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 13,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'HU' => array(
 			'name'     => 'Hungary',
 			'mappings' => array(
-				array(
-					'eas'            => '9910',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
+				'vat_number' => array(
+					array(
+						'eas'            => '9910',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 10,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'IE' => array(
 			'name'     => 'Ireland',
 			'mappings' => array(
-				array(
-					'eas'            => '9935',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 10, 11 ),
+				'vat_number' => array(
+					array(
+						'eas'            => '9935',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => array( 10, 11 ),
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'IT' => array(
 			'name'     => 'Italy',
 			'mappings' => array(
-				array(
-					'eas'            => '0211',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 13,
+				'vat_number' => array(
+					array(
+						'eas'            => '0211',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 13,
+					),
+				),
+				'registration_number' => array(
+					array(
+						'icd'   => '0210',
+						'label' => __( 'Codice Fiscale', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'LT' => array(
 			'name'     => 'Lithuania',
 			'mappings' => array(
-				array(
-					'eas'            => '9937',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 11, 14 ),
+				'vat_number' => array(
+					array(
+						'eas'            => '9937',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => array( 11, 14 ),
+					),
+				),
+				'registration_number' => array(
+					array(
+						'icd'   => '0200',
+						'label' => __( 'Legal entity code', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'LU' => array(
 			'name'     => 'Luxembourg',
 			'mappings' => array(
-				array(
-					'eas'            => '9938',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
+				'vat_number' => array(
+					array(
+						'eas'            => '9938',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 10,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'LV' => array(
 			'name'     => 'Latvia',
 			'mappings' => array(
-				array(
-					'eas'            => '9939',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 13,
+				'vat_number' => array(
+					array(
+						'eas'            => '9939',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 13,
+					),
+				),
+				'registration_number' => array(
+					array(
+						'icd'   => '0218',
+						'label' => __( 'Unified registration number', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'MT' => array(
 			'name'     => 'Malta',
 			'mappings' => array(
-				array(
-					'eas'            => '9943',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
+				'vat_number' => array(
+					array(
+						'eas'            => '9943',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 10,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'NL' => array(
 			'name'     => 'Netherlands',
 			'mappings' => array(
-				array(
-					'eas'            => '9944',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 14,
+				'vat_number' => array(
+					array(
+						'eas'            => '9944',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 14,
+					),
+				),
+				'registration_number' => array(
+					array(
+						'icd'   => '0106',
+						'label' => __( 'KVK number', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'NO' => array(
 			'name'     => 'Norway',
 			'mappings' => array(
-				array(
-					'eas'            => '0192',
-					'strip_prefixes' => array( 'NO' ),
-					'keep_pattern'   => '/\d+/',
-					'length'         => 9,
+				'vat_number' => array(
+					array(
+						'eas'            => '0192',
+						'strip_prefixes' => array( 'NO' ),
+						'keep_pattern'   => '/\d+/',
+						'length'         => 9,
+					),
+				),
+				'registration_number' => array(
+					array(
+						'icd'   => '0192',
+						'label' => __( 'Organisasjonsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'PL' => array(
 			'name'     => 'Poland',
 			'mappings' => array(
-				array(
-					'eas'            => '9945',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 12,
+				'vat_number' => array(
+					array(
+						'eas'            => '9945',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 12,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'PT' => array(
 			'name'     => 'Portugal',
 			'mappings' => array(
-				array(
-					'eas'            => '9946',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
+				'vat_number' => array(
+					array(
+						'eas'            => '9946',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 11,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'RO' => array(
 			'name'     => 'Romania',
 			'mappings' => array(
-				array(
-					'eas'            => '9947',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => range( 4, 12 ),
+				'vat_number' => array(
+					array(
+						'eas'            => '9947',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => range( 4, 12 ),
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'SE' => array(
 			'name'     => 'Sweden',
 			'mappings' => array(
-				array(
-					'eas'            => '0007',
-					'strip_prefixes' => array( 'SE' ),
-					'keep_pattern'   => '/^\d{10}/',
-					'length'         => 10,
+				'vat_number' => array(
+					array(
+						'eas'            => '0007',
+						'strip_prefixes' => array( 'SE' ),
+						'keep_pattern'   => '/^\d{10}/',
+						'length'         => 10,
+					),
+				),
+				'registration_number' => array(
+					array(
+						'icd'   => '0007',
+						'label' => __( 'Organisationsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				),
 			),
 		),
 		'SI' => array(
 			'name'     => 'Slovenia',
 			'mappings' => array(
-				array(
-					'eas'            => '9949',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
+				'vat_number' => array(
+					array(
+						'eas'            => '9949',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 10,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 		'SK' => array(
 			'name'     => 'Slovakia',
 			'mappings' => array(
-				array(
-					'eas'            => '9950',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 12,
+				'vat_number' => array(
+					array(
+						'eas'            => '9950',
+						'strip_prefixes' => array(),
+						'keep_pattern'   => '/[A-Z0-9]+/',
+						'length'         => 12,
+					),
 				),
+				'registration_number' => array(),
 			),
 		),
 	);
 
-	return (array) apply_filters(
-		'wpo_ips_edi_peppol_vat_mappings',
-		$mappings
+	$mappings = (array) apply_filters(
+		'wpo_ips_edi_identifier_mappings',
+		$mappings,
+		$country,
+		$type,
+		$key
 	);
+
+	if ( empty( $country ) && empty( $type ) && empty( $key ) ) {
+		return $mappings;
+	}
+
+	$country_mapping = ! empty( $country )
+		? $mappings[ strtoupper( trim( $country ) ) ] ?? array()
+		: array();
+
+	if ( empty( $type ) ) {
+		return $country_mapping;
+	}
+
+	$identifier_mappings = $country_mapping['mappings'][ $type ] ?? array();
+
+	if ( empty( $key ) ) {
+		return $identifier_mappings;
+	}
+
+	$value = $identifier_mappings[0][ $key ] ?? '';
+
+	if ( empty( $value ) && 'registration_number' === $type && 'label' === $key ) {
+		$value = __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' );
+	}
+
+	return (string) $value;
 }
 
 /**
@@ -1344,8 +1511,9 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
 	$language                  = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 	
-	$supplier_country = $general_settings_instance->get_setting( 'shop_address_country', $language );
-	$supplier_vat     = $general_settings_instance->get_setting( 'vat_number', $language );
+	$supplier_country          = $general_settings_instance->get_setting( 'shop_address_country', $language );
+	$supplier_vat              = $general_settings_instance->get_setting( 'vat_number', $language );
+	$registration_number_label = wpo_ips_edi_get_identifier_mappings( (string) $supplier_country, 'registration_number', 'label' );
 
 	if ( ! empty( $supplier_vat ) ) {
 		$supplier_vat = wpo_ips_edi_format_vat_number(
@@ -1397,7 +1565,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 			'required' => true,
 		),
 		'coc_number' => array(
-			'label'    => __( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ),
+			'label'    => $registration_number_label,
 			'value'    => $general_settings_instance->get_setting( 'coc_number', $language ),
 			'required' => false,
 		),
