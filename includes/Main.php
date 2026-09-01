@@ -3,6 +3,7 @@ namespace WPO\IPS;
 
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
 use WPO\IPS\Documents\OrderDocument;
+use WPO\IPS\Documents\SummaryDocument;
 use WPO\IPS\Vendor\Dompdf\Dompdf;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -228,11 +229,11 @@ class Main {
 	/**
 	 * Get the document PDF attachment path, write the file if it doesn't exist and return the path
 	 *
-	 * @param OrderDocument $document
+	 * @param OrderDocument|SummaryDocument $document
 	 * @param string        $tmp_path
 	 * @return string|false
 	 */
-	public function get_document_pdf_attachment( OrderDocument $document, string $tmp_path ) {
+	public function get_document_pdf_attachment( OrderDocument|SummaryDocument $document, string $tmp_path ) {
 		$filename             = $document->get_filename();
 		$pdf_path             = $tmp_path . $filename;
 		$document_type        = $document->get_type();

@@ -266,12 +266,12 @@ function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $
 /**
  * Get the document file
  *
- * @param  \WPO\IPS\Documents\OrderDocument $document
+ * @param  \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\SummaryDocument $document
  * @param  string $output_format
  * @param  string $error_handling
  * @return string|false
  */
-function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument $document, string $output_format = 'pdf', string $error_handling = 'exception' ): string|false {
+function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\SummaryDocument $document, string $output_format = 'pdf', string $error_handling = 'exception' ): string|false {
 	$default_output_format = 'pdf';
 
 	if ( empty( $output_format ) ) {
