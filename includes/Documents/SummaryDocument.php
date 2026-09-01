@@ -16,7 +16,6 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents\\SummaryDocument' ) ) :
 		public array $settings           = array();
 		public array $common_settings    = array();
 		public array $output_formats     = array();
-		public ?object $wrapper_document = null;
 
 		/**
 		 * Constructor.
@@ -92,12 +91,6 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents\\SummaryDocument' ) ) :
 		 */
 		public function get_date_title(): string {
 			$title = __( 'Summary date', 'woocommerce-pdf-invoices-packing-slips' );
-			$title = apply_filters_deprecated(
-				"wpo_wcpdf_{$this->slug}_date_title",
-				array( $title, $this ),
-				'2.15.11',
-				'wpo_wcpdf_document_date_title'
-			);
 
 			return apply_filters( 'wpo_wcpdf_document_date_title', $title, $this );
 		}
@@ -134,7 +127,22 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents\\SummaryDocument' ) ) :
 		 * @return string|null
 		 */
 		public function get_pdf(): ?string {
+			// Maybe we need to reinstall fonts first.
 			WPO_WCPDF()->get_instance( 'main' )->maybe_reinstall_fonts();
+
+			$pdf_file = apply_filters( 'wpo_wcpdf_load_pdf_file_path', null, $this );
+
+			if ( $pdf_file ) {
+				$pdf = WPO_WCPDF()->get_instance( 'file_system' )->get_contents( $pdf_file );
+			} else {
+				$pdf = null;
+			}
+
+			$pdf = apply_filters( 'wpo_wcpdf_pdf_data', $pdf, $this );
+
+			if ( ! empty( $pdf ) ) {
+				return $pdf;
+			}
 
 			do_action( 'wpo_wcpdf_before_pdf', $this->get_type(), $this );
 
@@ -159,7 +167,7 @@ if ( ! class_exists( '\\WPO\\IPS\\Documents\\SummaryDocument' ) ) :
 			);
 
 			$pdf_maker = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
-			$pdf       = apply_filters( 'wpo_wcpdf_pdf_data', $pdf_maker->output(), $this );
+			$pdf       = $pdf_maker->output();
 
 			do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
 
