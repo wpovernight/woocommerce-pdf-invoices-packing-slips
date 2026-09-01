@@ -61,6 +61,7 @@ class ComposerStaticInit799089b7d5c8c7fc7a692559c75d6491
         'WPO\\IPS\\Documents\\OrderDocumentMethods' => __DIR__ . '/../..' . '/includes/Documents/OrderDocumentMethods.php',
         'WPO\\IPS\\Documents\\PackingSlip' => __DIR__ . '/../..' . '/includes/Documents/PackingSlip.php',
         'WPO\\IPS\\Documents\\SequentialNumberStore' => __DIR__ . '/../..' . '/includes/Documents/SequentialNumberStore.php',
+        'WPO\\IPS\\Documents\\SummaryDocument' => __DIR__ . '/../..' . '/includes/Documents/SummaryDocument.php',
         'WPO\\IPS\\EDI\\Abstracts\\AbstractCollection' => __DIR__ . '/../..' . '/edi/Abstracts/AbstractCollection.php',
         'WPO\\IPS\\EDI\\Abstracts\\AbstractHandler' => __DIR__ . '/../..' . '/edi/Abstracts/AbstractHandler.php',
         'WPO\\IPS\\EDI\\Abstracts\\AbstractStandard' => __DIR__ . '/../..' . '/edi/Abstracts/AbstractStandard.php',

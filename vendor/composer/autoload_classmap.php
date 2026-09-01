@@ -23,6 +23,7 @@ return array(
     'WPO\\IPS\\Documents\\OrderDocumentMethods' => $baseDir . '/includes/Documents/OrderDocumentMethods.php',
     'WPO\\IPS\\Documents\\PackingSlip' => $baseDir . '/includes/Documents/PackingSlip.php',
     'WPO\\IPS\\Documents\\SequentialNumberStore' => $baseDir . '/includes/Documents/SequentialNumberStore.php',
+    'WPO\\IPS\\Documents\\SummaryDocument' => $baseDir . '/includes/Documents/SummaryDocument.php',
     'WPO\\IPS\\EDI\\Abstracts\\AbstractCollection' => $baseDir . '/edi/Abstracts/AbstractCollection.php',
     'WPO\\IPS\\EDI\\Abstracts\\AbstractHandler' => $baseDir . '/edi/Abstracts/AbstractHandler.php',
     'WPO\\IPS\\EDI\\Abstracts\\AbstractStandard' => $baseDir . '/edi/Abstracts/AbstractStandard.php',
