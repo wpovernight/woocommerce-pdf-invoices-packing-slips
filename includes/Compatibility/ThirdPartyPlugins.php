@@ -679,6 +679,31 @@ class ThirdPartyPlugins {
 	}
 
 	/**
+	 * Get the template title for a payment reminder email.
+	 *
+	 * @param bool $to_admin
+	 *
+	 * @return string
+	 */
+	private function get_payment_reminder_email_title( bool $to_admin ): string {
+		return $to_admin
+			? __( 'Admin Payment Reminder', 'woocommerce-pdf-invoices-packing-slips' )
+			: __( 'Customer Payment Reminder', 'woocommerce-pdf-invoices-packing-slips' );
+	}
+
+	/**
+	 * Get the Smart Reminder Email template keys for the payment reminder emails.
+	 *
+	 * @return array
+	 */
+	public function get_payment_reminder_email_template_keys(): array {
+		return array(
+			'admin'    => sanitize_title( $this->get_payment_reminder_email_title( true ) ),
+			'customer' => sanitize_title( $this->get_payment_reminder_email_title( false ) ),
+		);
+	}
+
+	/**
 	 * Get the content for a payment reminder email from its template partial.
 	 *
 	 * @param string $type Reminder email type: 'admin' or 'customer'.
@@ -726,8 +751,10 @@ class ThirdPartyPlugins {
 
 		// Create emails only if they haven't been generated before.
 		if ( ! get_option( 'wpo_ips_payment_reminder_emails_generated', false ) ) {
-			WPO_WCSRE()->email_templates->create_email( 'admin_payment_reminder' );
-			WPO_WCSRE()->email_templates->create_email( 'customer_payment_reminder' );
+			foreach ( $this->get_payment_reminder_email_template_keys() as $template_key ) {
+				WPO_WCSRE()->email_templates->create_email( $template_key );
+			}
+
 			update_option( 'wpo_ips_payment_reminder_emails_generated', true );
 		}
 	}
@@ -753,9 +780,7 @@ class ThirdPartyPlugins {
 		}
 
 		// Prepare post data.
-		$post_title = $to_admin
-			? __( 'Admin Payment Reminder', 'woocommerce-pdf-invoices-packing-slips' )
-			: __( 'Customer Payment Reminder', 'woocommerce-pdf-invoices-packing-slips' );
+		$post_title = $this->get_payment_reminder_email_title( $to_admin );
 		$post_data  = array(
 			'post_title'   => $post_title,
 			'post_content' => $content,

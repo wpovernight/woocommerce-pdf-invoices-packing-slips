@@ -16,12 +16,9 @@ span.wpo-info {
 }
 
 a.button.wpo-button {
-	padding: 0.6em 1.3em;
 	margin: 0 1em 1em 0;
 	background: #f6f7f7;
 	border-radius: 6px;
-	font-size: 1em;
-	line-height: 1.5;
 }
 
 .wcpdf-extensions-ad,
