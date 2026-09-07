@@ -43,8 +43,11 @@ function wcpdf_filter_order_ids( array $order_ids, string $document_type ): arra
 function wcpdf_get_document( string $document_type, mixed $order, bool $init = false ): object|false {
 	$documents_instance = WPO_WCPDF()->get_instance( 'documents' );
 
-	$filtered_document = static function( object|false $document, string $document_type, mixed $order, bool $init ): object|false {
-		$document = apply_filters(
+	// Only warn once per document type per request, the order list table loads a document for every row.
+	static $logged = array();
+
+	$filtered_document = static function( object|false $document, string $document_type, mixed $order, bool $init ) use ( &$logged ): object|false {
+		$filtered = apply_filters(
 			'wcpdf_get_document',
 			$document,
 			$document_type,
@@ -52,9 +55,28 @@ function wcpdf_get_document( string $document_type, mixed $order, bool $init = f
 			$init
 		);
 
-		return is_object( $document )
-			? $document
-			: false;
+		if ( is_object( $filtered ) ) {
+			return $filtered;
+		}
+
+		// An explicit false means a callback deliberately skipped the document, anything else
+		// (usually a missing return statement) discards it, so warn instead of failing silently.
+		if ( false !== $filtered && is_object( $document ) && ! isset( $logged[ $document_type ] ) ) {
+			$logged[ $document_type ] = true;
+
+			wcpdf_log_error(
+				sprintf(
+					/* translators: 1: document type, 2: filter name, 3: returned value type */
+					__( 'The \'%1$s\' document was discarded because a callback hooked to the \'%2$s\' filter returned %3$s instead of the document object.', 'woocommerce-pdf-invoices-packing-slips' ),
+					$document_type,
+					'wcpdf_get_document',
+					strtoupper( gettype( $filtered ) )
+				),
+				'warning'
+			);
+		}
+
+		return false;
 	};
 	
 	if ( ! empty( $order ) ) {
