@@ -207,6 +207,35 @@ class SettingsEDI {
 			$settings_fields = array_merge( $settings_fields, $settings_format );
 		}
 
+		// France CIUS specific field.
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'fr_cadre_de_facturation',
+			'title'    => '',
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'title'             => __( 'French invoicing context', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name'       => $option_name,
+				'id'                => 'fr_cadre_de_facturation',
+				'options'           => apply_filters(
+					'wpo_ips_edi_fr_cadre_de_facturation_options',
+					array(
+						''   => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+						'B1' => __( 'Standard invoice for goods (B1)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'S1' => __( 'Standard invoice for services (S1)', 'woocommerce-pdf-invoices-packing-slips' ),
+						'M1' => __( 'Standard invoice for mixed operations (M1)', 'woocommerce-pdf-invoices-packing-slips' ),
+					)
+				),
+				'description'       => __( 'Select the French invoicing context for the document.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => wp_json_encode( array( 'frcius-ubl' ) ),
+					'data-keep_current_value'     => true,
+				),
+			),
+		);
+
 		// Peppol specific field
 		$settings_fields[] = array(
 			'type'     => 'setting',

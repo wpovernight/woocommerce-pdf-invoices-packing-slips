@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCius\Handlers;
+namespace WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCiusUbl\Handlers;
 
 use WPO\IPS\EDI\Syntaxes\Ubl\Abstracts\AbstractUblHandler;
 

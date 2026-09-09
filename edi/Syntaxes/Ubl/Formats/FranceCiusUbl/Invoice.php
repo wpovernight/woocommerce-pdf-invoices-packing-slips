@@ -1,6 +1,6 @@
 <?php
 
-namespace WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCius;
+namespace WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCiusUbl;
 
 use WPO\IPS\EDI\Syntaxes\Ubl\Formats\Ubl2p1\Invoice as UblInvoice;
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Invoice extends UblInvoice {
 
-	public string $slug = 'france-cius-ubl-invoice';
+	public string $slug = 'frcius-ubl-invoice';
 	public string $name = 'France CIUS UBL Invoice';
 
 	/**
@@ -24,7 +24,7 @@ class Invoice extends UblInvoice {
 		$profile_id = array(
 			'profile_id' => array(
 				'enabled' => true,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCius\Handlers\ProfileIdHandler::class,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCiusUbl\Handlers\ProfileIdHandler::class,
 			),
 		);
 
