@@ -631,7 +631,6 @@ class ThirdPartyPlugins {
 	public function handle_payment_reminder_emails(): void {
 		if ( $this->is_smart_reminder_email_supported() ) {
 			$this->register_payment_reminder_email_templates();
-			$this->create_payment_reminder_emails();
 		}
 	}
 
