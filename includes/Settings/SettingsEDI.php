@@ -238,14 +238,15 @@ class SettingsEDI {
 			$settings_fields[] = array(
 				'type'     => 'setting',
 				'id'       => $id,
-				'title'    => sprintf(
-					'%s (%s)',
-					$notice['label'],
-					$code
-				),
+				'title'    => '',
 				'callback' => 'text_input',
 				'section'  => $section,
 				'args'     => array(
+					'title'             => sprintf(
+						'%s (%s)',
+						$notice['label'],
+						$code
+					),
 					'option_name'       => $option_name,
 					'id'                => $id,
 					'description'       => $notice['description'],
