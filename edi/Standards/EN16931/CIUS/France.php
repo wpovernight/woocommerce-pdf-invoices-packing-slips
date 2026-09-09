@@ -51,15 +51,24 @@ class France extends EN16931 {
 	}
 
 	/**
-	 * Get the mandatory invoice note subject codes.
+	 * Get the mandatory legal notes required.
 	 *
 	 * @return array
 	 */
-	public static function get_mandatory_note_subject_codes(): array {
+	public static function get_mandatory_legal_notes(): array {
 		return array(
-			'PMD' => __( 'Late payment penalties', 'woocommerce-pdf-invoices-packing-slips' ),
-			'PMT' => __( 'Fixed recovery fee', 'woocommerce-pdf-invoices-packing-slips' ),
-			'AAB' => __( 'Early payment discount', 'woocommerce-pdf-invoices-packing-slips' ),
+			'PMD' => array(
+				'label'       => __( 'Late payment penalties', 'woocommerce-pdf-invoices-packing-slips' ),
+				'description' => __( 'Enter the terms and penalties applicable in case of late payment.', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'PMT' => array(
+				'label'       => __( 'Recovery fee', 'woocommerce-pdf-invoices-packing-slips' ),
+				'description' => __( 'Enter the statement concerning the fixed recovery fee for late payment.', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
+			'AAB' => array(
+				'label'       => __( 'Early payment discount', 'woocommerce-pdf-invoices-packing-slips' ),
+				'description' => __( 'Enter the early payment discount conditions, or state that no discount applies.', 'woocommerce-pdf-invoices-packing-slips' ),
+			),
 		);
 	}
 

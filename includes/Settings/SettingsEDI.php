@@ -231,6 +231,33 @@ class SettingsEDI {
 			),
 		);
 
+		// France CIUS mandatory legal notices.
+		foreach ( France::get_mandatory_legal_notes() as $code => $notice ) {
+			$id = 'fr_note_' . strtolower( $code );
+
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => $id,
+				'title'    => sprintf(
+					'%s (%s)',
+					$notice['label'],
+					$code
+				),
+				'callback' => 'text_input',
+				'section'  => $section,
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => $id,
+					'description'       => $notice['description'],
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[ubl_format]',
+						'data-show_for_option_values' => wp_json_encode( array( 'frcius-ubl' ) ),
+						'data-keep_current_value'     => true,
+					),
+				),
+			);
+		}
+
 		// Peppol specific field
 		$settings_fields[] = array(
 			'type'     => 'setting',
