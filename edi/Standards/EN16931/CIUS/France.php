@@ -31,4 +31,23 @@ class France extends EN16931 {
 		return $extra + $defaults;
 	}
 
+	/**
+	 * Get the allowed VAT category codes.
+	 *
+	 * @return array
+	 */
+	public static function get_5305(): array {
+		$codes   = parent::get_5305();
+		$allowed = array( 'S', 'E', 'AE', 'K', 'G', 'O', 'Z' );
+		$result  = array();
+
+		foreach ( $allowed as $code ) {
+			if ( isset( $codes[ $code ] ) ) {
+				$result[ $code ] = $codes[ $code ];
+			}
+		}
+
+		return $result;
+	}
+
 }
