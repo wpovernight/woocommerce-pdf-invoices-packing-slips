@@ -18,9 +18,16 @@ class ProfileIdHandler extends AbstractUblHandler {
 	 * @return array
 	 */
 	public function handle( array $data, array $options = array() ): array {
+		$value = trim( (string) wpo_ips_edi_get_settings( 'fr_cadre_de_facturation' ) );
+
+		if ( empty( $value ) ) {
+			wpo_ips_edi_log( 'UBL/France CIUS ProfileID: French invoicing context is missing.', 'error' );
+			return $data;
+		}
+
 		$profile_id = array(
 			'name'  => 'cbc:ProfileID',
-			'value' => 'B1',
+			'value' => $value,
 		);
 
 		$data[] = apply_filters( 'wpo_ips_edi_ubl_profile_id', $profile_id, $data, $options, $this );
