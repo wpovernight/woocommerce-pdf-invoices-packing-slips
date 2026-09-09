@@ -2,6 +2,7 @@
 namespace WPO\IPS\Settings;
 
 use WPO\IPS\EDI\Standards\EN16931;
+use WPO\IPS\EDI\Standards\EN16931\CIUS\France;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -218,15 +219,9 @@ class SettingsEDI {
 				'title'             => __( 'French invoicing context', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'       => $option_name,
 				'id'                => 'fr_cadre_de_facturation',
-				'options'           => apply_filters(
-					'wpo_ips_edi_fr_cadre_de_facturation_options',
-					array(
-						''   => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
-						'B1' => __( 'Standard invoice for goods (B1)', 'woocommerce-pdf-invoices-packing-slips' ),
-						'S1' => __( 'Standard invoice for services (S1)', 'woocommerce-pdf-invoices-packing-slips' ),
-						'M1' => __( 'Standard invoice for mixed operations (M1)', 'woocommerce-pdf-invoices-packing-slips' ),
-					)
-				),
+				'options'           => array(
+					'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+				) + France::get_cadre_de_facturation(),
 				'description'       => __( 'Select the French invoicing context for the document.', 'woocommerce-pdf-invoices-packing-slips' ),
 				'custom_attributes' => array(
 					'data-show_for_option_name'   => $option_name . '[ubl_format]',
