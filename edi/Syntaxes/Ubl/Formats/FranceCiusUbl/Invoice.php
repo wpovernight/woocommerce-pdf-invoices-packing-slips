@@ -21,6 +21,13 @@ class Invoice extends UblInvoice {
 	public function get_structure(): array {
 		$structure = parent::get_structure();
 
+		if ( isset( $structure['note'] ) ) {
+			$structure['note'] = array(
+				'enabled' => true,
+				'handler' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCiusUbl\Handlers\NoteHandler::class,
+			);
+		}
+
 		$profile_id = array(
 			'profile_id' => array(
 				'enabled' => true,
