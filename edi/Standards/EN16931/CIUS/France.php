@@ -50,4 +50,17 @@ class France extends EN16931 {
 		return $result;
 	}
 
+	/**
+	 * Get the mandatory invoice note subject codes.
+	 *
+	 * @return array
+	 */
+	public static function get_mandatory_note_subject_codes(): array {
+		return array(
+			'PMD' => __( 'Late payment penalties', 'woocommerce-pdf-invoices-packing-slips' ),
+			'PMT' => __( 'Fixed recovery fee', 'woocommerce-pdf-invoices-packing-slips' ),
+			'AAB' => __( 'Early payment discount', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+	}
+
 }
