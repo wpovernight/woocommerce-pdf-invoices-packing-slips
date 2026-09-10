@@ -839,6 +839,33 @@ function wpo_ips_edi_get_order_customer_vat_number( \WC_Order $order ): ?string 
 }
 
 /**
+ * Get the formatted customer company registration number for EDI output.
+ *
+ * @param \WC_Order $order Order object.
+ * @return string|null
+ */
+function wpo_ips_edi_get_order_customer_registration_number( \WC_Order $order ): ?string {
+	$registration_number = wpo_wcpdf_get_order_customer_registration_number( $order );
+
+	if ( ! empty( $registration_number ) ) {
+		$registration_number = wpo_ips_edi_format_registration_number(
+			(string) $registration_number,
+			$order->get_billing_country()
+		);
+	}
+
+	$registration_number = apply_filters(
+		'wpo_ips_edi_order_customer_registration_number',
+		! empty( $registration_number ) ? $registration_number : null,
+		$order
+	);
+
+	return is_string( $registration_number )
+		? $registration_number
+		: null;
+}
+
+/**
  * Build PEPPOL endpoint ID candidates from VAT number.
  *
  * @param string $billing_country The billing country code (ISO 3166-1 alpha-2).

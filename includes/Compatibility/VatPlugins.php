@@ -176,12 +176,27 @@ class VatPlugins {
 
 	/**
 	 * Get the form selector for the detected VAT plugin, based on context.
-	 * 
+	 *
 	 * @param string $context Context of the form selector, either 'block' or 'classic'.
 	 * @return string
 	 */
 	public function get_form_selector( string $context = 'block' ): string {
 		$info = $this->detect();
+
+		// When no third-party VAT plugin is active, only use our generic
+		// checkout field as a VAT source if it is configured as such.
+		if ( empty( $info['active'] ) ) {
+			$frontend = \WPO_WCPDF()->get_instance( 'frontend' );
+
+			if (
+				empty( $frontend ) ||
+				! is_callable( array( $frontend, 'checkout_field_is_vat_number' ) ) ||
+				! $frontend->checkout_field_is_vat_number()
+			) {
+				return '';
+			}
+		}
+
 		return ( 'block' === $context )
 			? (string) $info['block_form_selector']
 			: (string) $info['classic_form_selector'];

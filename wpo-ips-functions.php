@@ -1283,6 +1283,60 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 }
 
 /**
+ * Retrieve the customer company registration number from order meta.
+ *
+ * @param \WC_Abstract_Order $order
+ * @return string|null
+ */
+function wpo_wcpdf_get_order_customer_registration_number( \WC_Abstract_Order $order ): ?string {
+	$registration_number_meta_keys = (array) apply_filters(
+		'wpo_wcpdf_order_customer_registration_number_meta_keys',
+		array(),
+		$order
+	);
+
+	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
+
+	if (
+		! empty( $frontend_instance ) &&
+		is_callable( array( $frontend_instance, 'checkout_field_is_registration_number' ) ) &&
+		$frontend_instance->checkout_field_is_registration_number()
+	) {
+		array_unshift( $registration_number_meta_keys, '_wpo_ips_checkout_field' );
+	}
+
+	$registration_number = null;
+	$meta_key            = null;
+
+	foreach ( $registration_number_meta_keys as $candidate_meta_key ) {
+		$meta_value = $order->get_meta( $candidate_meta_key, true );
+
+		if ( ! is_scalar( $meta_value ) ) {
+			continue;
+		}
+
+		$meta_value = trim( (string) $meta_value );
+
+		if ( '' !== $meta_value ) {
+			$registration_number = $meta_value;
+			$meta_key            = $candidate_meta_key;
+			break;
+		}
+	}
+
+	$registration_number = apply_filters(
+		'wpo_wcpdf_order_customer_registration_number',
+		$registration_number,
+		$order,
+		$meta_key
+	);
+
+	return is_string( $registration_number )
+		? $registration_number
+		: null;
+}
+
+/**
  * Prepare an identifier query for use with $wpdb->prepare().
  *
  * @param string $query
@@ -2326,6 +2380,33 @@ function wpo_ips_register_additional_checkout_field( array $options ): void {
 	}
 
 	woocommerce_register_additional_checkout_field( $options );
+}
+
+/**
+ * Get the default label for the optional checkout field.
+ *
+ * @param string $type    Checkout field type.
+ * @param string $country Country code in ISO 3166-1 alpha-2 format.
+ * @return string
+ */
+function wpo_wcpdf_get_checkout_field_default_label( string $type = 'custom', string $country = '' ): string {
+	switch ( $type ) {
+		case 'vat_number':
+			return __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' );
+
+		case 'registration_number':
+			$label = function_exists( 'wpo_ips_edi_get_identifier_mappings' )
+				? wpo_ips_edi_get_identifier_mappings( $country, 'registration_number', 'label' )
+				: '';
+
+			return ! empty( $label )
+				? (string) $label
+				: __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' );
+
+		case 'custom':
+		default:
+			return __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
+	}
 }
 
 /**

@@ -754,15 +754,37 @@ class Frontend {
 	}
 
 	/**
+	 * Get the configured checkout field type.
+	 *
+	 * @return string One of: custom, vat_number, registration_number.
+	 */
+	public function checkout_field_get_type(): string {
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$type             = sanitize_key( (string) ( $general_settings['checkout_field_type'] ?? '' ) );
+
+		$allowed = array(
+			'custom',
+			'vat_number',
+			'registration_number',
+		);
+
+		if ( in_array( $type, $allowed, true ) ) {
+			return $type;
+		}
+
+		// Backward compatibility with the old checkbox setting.
+		return ! empty( $general_settings['checkout_field_as_vat_number'] )
+			? 'vat_number'
+			: 'custom';
+	}
+
+	/**
 	 * Check if the checkout field should be treated as a VAT number.
 	 *
 	 * @return bool
 	 */
 	public function checkout_field_is_vat_number(): bool {
-		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-		$enabled          = ! empty( $general_settings['checkout_field_as_vat_number'] );
-
-		if ( ! $enabled ) {
+		if ( 'vat_number' !== $this->checkout_field_get_type() ) {
 			return false;
 		}
 
@@ -775,13 +797,34 @@ class Frontend {
 	}
 
 	/**
+	 * Check if the checkout field should be treated as a company registration number.
+	 *
+	 * @return bool
+	 */
+	public function checkout_field_is_registration_number(): bool {
+		return 'registration_number' === $this->checkout_field_get_type();
+	}
+
+	/**
 	 * Check if the checkout field is enabled in settings.
 	 *
 	 * @return bool
 	 */
 	private function checkout_field_is_enabled(): bool {
 		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-		return ! empty( $general_settings['checkout_field_enable'] ?? '' );
+
+		if ( empty( $general_settings['checkout_field_enable'] ?? '' ) ) {
+			return false;
+		}
+
+		if (
+			'vat_number' === $this->checkout_field_get_type() &&
+			\WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active()
+		) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -804,12 +847,14 @@ class Frontend {
 	 * @return string
 	 */
 	private function checkout_field_get_label(): string {
-		$default          = __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
 		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-		$label            = trim( $general_settings['checkout_field_label'] ?? '' );
+		$label            = trim( (string) ( $general_settings['checkout_field_label'] ?? '' ) );
 
 		if ( '' === $label ) {
-			$label = $default;
+			$label = wpo_wcpdf_get_checkout_field_default_label(
+				$this->checkout_field_get_type(),
+				(string) ( $general_settings['shop_address_country'] ?? '' )
+			);
 		}
 
 		return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );

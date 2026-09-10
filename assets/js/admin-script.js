@@ -1,5 +1,18 @@
 jQuery( function( $ ) {
 
+	$( '#checkout_field_type' ).on( 'change', function() {
+		const $field = $( this );
+		const $label = $( '#checkout_field_label' );
+
+		const labels = {
+			custom:              $field.data( 'custom-label' ),
+			vat_number:          $field.data( 'vat-label' ),
+			registration_number: $field.data( 'registration-label' ),
+		};
+
+		$label.attr( 'placeholder', labels[ $field.val() ] || labels.custom );
+	} ).trigger( 'change' );
+
 	$( '.wcpdf-extensions .more' ).hide();
 
 	$( '.wcpdf-extensions > li' ).on( 'click', function( event ) {
