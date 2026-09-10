@@ -2823,6 +2823,14 @@ function wpo_ips_is_document_download_request(): bool {
  * @return bool
  */
 function wpo_ips_is_checkout_request(): bool {
+	if (
+		isset( $_GET['wc-ajax'] ) &&
+		is_scalar( $_GET['wc-ajax'] ) &&
+		'checkout' === sanitize_key( wp_unslash( (string) $_GET['wc-ajax'] ) )
+	) {
+		return true;
+	}
+
 	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
 		return false;
 	}
