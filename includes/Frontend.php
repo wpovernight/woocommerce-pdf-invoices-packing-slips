@@ -847,13 +847,16 @@ class Frontend {
 	 * @return string
 	 */
 	private function checkout_field_get_label(): string {
-		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-		$label            = trim( (string) ( $general_settings['checkout_field_label'] ?? '' ) );
+		$general_settings = \WPO_WCPDF()
+			->get_instance( 'settings' )
+			->get_instance( 'general' );
+
+		$label = $general_settings->get_setting( 'checkout_field_label' );
 
 		if ( '' === $label ) {
 			$label = wpo_wcpdf_get_checkout_field_default_label(
 				$this->checkout_field_get_type(),
-				(string) ( $general_settings['shop_address_country'] ?? '' )
+				$general_settings->get_setting( 'shop_address_country' )
 			);
 		}
 
