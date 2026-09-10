@@ -317,7 +317,7 @@ class Admin {
 				}
 
 				$show_date = $invoice_date->date_i18n(
-					apply_filters( 'woocommerce_admin_order_date_format', __( 'M j, Y', 'woocommerce' ) )
+					wcpdf_date_format( null, 'invoice_date_column' )
 				);
 
 				printf(
