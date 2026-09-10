@@ -49,6 +49,7 @@ $deprecated_hooks = array(
 	'wpo_wc_ubl_orderTaxData'                           => array( 'wpo_ips_edi_ubl_order_tax_data',                    '5.0.0' ),
 	'wpo_wc_ubl_handle_TaxTotal'                        => array( 'wpo_ips_edi_ubl_tax_total',                         '5.0.0' ),
 	'wpo_wc_ubl_handle_UBLVersionID'                    => array( 'wpo_ips_edi_ubl_version_id',                        '5.0.0' ),
+	'wpo_ips_edi_peppol_vat_mappings'                   => array( 'wpo_ips_edi_identifier_mappings',                   '6.0.0' ),
 );
 
 
