@@ -186,9 +186,9 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		);
 
 		// Legal Organization (if company)
-		if ( ! empty( $billing_company ) ) {
+		if ( ! empty( $billing_company ) || ! empty( $registration_number ) ) {
 			$legal_organization = array();
-			
+
 			if ( ! empty( $registration_number ) ) {
 				$registration_number_id = array(
 					'name'  => 'ram:ID',

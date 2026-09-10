@@ -751,6 +751,31 @@ class Install {
 			}
 		}
 
+		// 6.0.0 update: clear the legacy default checkout field label.
+		if ( version_compare( $installed_version, '6.0.0', '<' ) ) {
+			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+
+			if (
+				is_array( $general_settings ) &&
+				! array_key_exists( 'checkout_field_type', $general_settings )
+			) {
+				$checkout_field_label = isset( $general_settings['checkout_field_label'] )
+					? trim( (string) $general_settings['checkout_field_label'] )
+					: '';
+
+				$legacy_default_labels = array(
+					'Customer identification',
+					__( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' ),
+				);
+
+				if ( in_array( $checkout_field_label, $legacy_default_labels, true ) ) {
+					$general_settings['checkout_field_label'] = '';
+
+					update_option( 'wpo_wcpdf_settings_general', $general_settings );
+				}
+			}
+		}
+
 		// Maybe reinstall fonts
 		$main_instance->maybe_reinstall_fonts( true );
 	}

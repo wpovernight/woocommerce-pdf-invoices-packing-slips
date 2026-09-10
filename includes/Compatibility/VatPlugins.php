@@ -185,16 +185,8 @@ class VatPlugins {
 
 		// When no third-party VAT plugin is active, only use our generic
 		// checkout field as a VAT source if it is configured as such.
-		if ( empty( $info['active'] ) ) {
-			$frontend = \WPO_WCPDF()->get_instance( 'frontend' );
-
-			if (
-				empty( $frontend ) ||
-				! is_callable( array( $frontend, 'checkout_field_is_vat_number' ) ) ||
-				! $frontend->checkout_field_is_vat_number()
-			) {
-				return '';
-			}
+		if ( empty( $info['active'] ) && 'vat_number' !== \wpo_ips_get_checkout_field_type() ) {
+			return '';
 		}
 
 		return ( 'block' === $context )
