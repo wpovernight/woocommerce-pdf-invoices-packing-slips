@@ -2309,20 +2309,7 @@ class Admin {
 							}
 						?>
 					</tbody>
-					<?php if ( isset( $identifiers_data['vat_number'] ) ) : ?>
-						<?php
-							$value    = $identifiers_data['vat_number']['value'];
-							$required = $identifiers_data['vat_number']['required'];
-							$display  = $value ?: sprintf(
-								'<span class="%s">%s</span>',
-								$required
-									? 'missing'
-									: 'optional',
-								$required
-									? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
-									: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
-							);
-						?>
+					<?php if ( isset( $identifiers_data['vat_number'] ) || isset( $identifiers_data['registration_number'] ) ) : ?>
 						<tfoot>
 							<?php foreach ( array( 'vat_number', 'registration_number' ) as $identifier_key ) : ?>
 								<?php
