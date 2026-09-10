@@ -1674,15 +1674,9 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		),
 	);
 
-	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
-
-	if (
-		! empty( $frontend_instance ) &&
-		is_callable( array( $frontend_instance, 'checkout_field_is_registration_number' ) ) &&
-		$frontend_instance->checkout_field_is_registration_number()
-	) {
+	if ( 'registration_number' === wpo_ips_get_checkout_field_type() ) {
 		$data['registration_number'] = array(
-			'label'    => $frontend_instance->checkout_field_get_label(),
+			'label'    => wpo_ips_get_checkout_field_label(),
 			'value'    => wpo_ips_edi_get_order_customer_registration_number( $order ),
 			'required' => false,
 		);

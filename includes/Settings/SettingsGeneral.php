@@ -90,7 +90,7 @@ class SettingsGeneral {
 				: 'custom';
 		}
 
-		$checkout_field_default_label = wpo_wcpdf_get_checkout_field_default_label(
+		$checkout_field_default_label = \wpo_ips_get_checkout_field_default_label(
 			$checkout_field_type,
 			$shop_country
 		);

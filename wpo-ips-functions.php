@@ -1317,13 +1317,7 @@ function wpo_wcpdf_get_order_customer_registration_number( \WC_Abstract_Order $o
 		$order
 	);
 
-	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
-
-	if (
-		! empty( $frontend_instance ) &&
-		is_callable( array( $frontend_instance, 'checkout_field_is_registration_number' ) ) &&
-		$frontend_instance->checkout_field_is_registration_number()
-	) {
+	if ( 'registration_number' === wpo_ips_get_checkout_field_type() ) {
 		array_unshift( $registration_number_meta_keys, '_wpo_ips_checkout_field' );
 	}
 
@@ -2405,13 +2399,61 @@ function wpo_ips_register_additional_checkout_field( array $options ): void {
 }
 
 /**
+ * Get the configured checkout field type.
+ *
+ * @return string One of: custom, vat_number, registration_number.
+ */
+function wpo_ips_get_checkout_field_type(): string {
+	$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+	$general_settings = is_array( $general_settings ) ? $general_settings : array();
+	$type             = sanitize_key( (string) ( $general_settings['checkout_field_type'] ?? '' ) );
+
+	$allowed = array(
+		'custom',
+		'vat_number',
+		'registration_number',
+	);
+
+	if ( in_array( $type, $allowed, true ) ) {
+		return $type;
+	}
+
+	// Backward compatibility with the old checkbox setting.
+	return ! empty( $general_settings['checkout_field_as_vat_number'] )
+		? 'vat_number'
+		: 'custom';
+}
+
+/**
+ * Get the resolved checkout field label.
+ *
+ * @return string
+ */
+function wpo_ips_get_checkout_field_label(): string {
+	$general_settings = WPO_WCPDF()
+		->get_instance( 'settings' )
+		->get_instance( 'general' );
+
+	$label = (string) $general_settings->get_setting( 'checkout_field_label' );
+
+	if ( '' === $label ) {
+		$label = wpo_ips_get_checkout_field_default_label(
+			wpo_ips_get_checkout_field_type(),
+			(string) $general_settings->get_setting( 'shop_address_country' )
+		);
+	}
+
+	return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
+}
+
+/**
  * Get the default label for the optional checkout field.
  *
  * @param string $type    Checkout field type.
  * @param string $country Country code in ISO 3166-1 alpha-2 format.
  * @return string
  */
-function wpo_wcpdf_get_checkout_field_default_label( string $type = 'custom', string $country = '' ): string {
+function wpo_ips_get_checkout_field_default_label( string $type = 'custom', string $country = '' ): string {
 	switch ( $type ) {
 		case 'vat_number':
 			return __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' );

@@ -362,7 +362,7 @@ class Frontend {
 
 		$args = array(
 			'id'                => $field_id,
-			'label'             => $this->checkout_field_get_label(),
+			'label'             => \wpo_ips_get_checkout_field_label(),
 			'location'          => 'order',
 			'type'              => 'text',
 			'sanitize_callback' => static function ( $val ) {
@@ -501,7 +501,7 @@ class Frontend {
 
 		$args = array(
 			'type'     => 'text',
-			'label'    => $this->checkout_field_get_label(),
+			'label'    => \wpo_ips_get_checkout_field_label(),
 			'required' => false,
 			'class'    => array( 'form-row-wide' ),
 		);
@@ -638,7 +638,7 @@ class Frontend {
 			return;
 		}
 
-		$label = $this->checkout_field_get_label();
+		$label = \wpo_ips_get_checkout_field_label();
 
 		echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
 	}
@@ -662,7 +662,7 @@ class Frontend {
 		$value = (string) get_user_meta( $user_id, $key, true );
 		$value = (string) apply_filters( 'wpo_ips_checkout_field_default_value', $value, $value, 'my-account', null );
 
-		$label       = $this->checkout_field_get_label();
+		$label       = \wpo_ips_get_checkout_field_label();
 		$description = '';
 
 		if ( $this->checkout_field_is_vat_number() ) {
@@ -753,37 +753,12 @@ class Frontend {
 	}
 
 	/**
-	 * Get the configured checkout field type.
-	 *
-	 * @return string One of: custom, vat_number, registration_number.
-	 */
-	public function checkout_field_get_type(): string {
-		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-		$type             = sanitize_key( (string) ( $general_settings['checkout_field_type'] ?? '' ) );
-
-		$allowed = array(
-			'custom',
-			'vat_number',
-			'registration_number',
-		);
-
-		if ( in_array( $type, $allowed, true ) ) {
-			return $type;
-		}
-
-		// Backward compatibility with the old checkbox setting.
-		return ! empty( $general_settings['checkout_field_as_vat_number'] )
-			? 'vat_number'
-			: 'custom';
-	}
-
-	/**
 	 * Check if the checkout field should be treated as a VAT number.
 	 *
 	 * @return bool
 	 */
 	public function checkout_field_is_vat_number(): bool {
-		if ( 'vat_number' !== $this->checkout_field_get_type() ) {
+		if ( 'vat_number' !== \wpo_ips_get_checkout_field_type() ) {
 			return false;
 		}
 
@@ -793,37 +768,6 @@ class Frontend {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Check if the checkout field should be treated as a company registration number.
-	 *
-	 * @return bool
-	 */
-	public function checkout_field_is_registration_number(): bool {
-		return 'registration_number' === $this->checkout_field_get_type();
-	}
-
-	/**
-	 * Get the checkout field label from settings.
-	 *
-	 * @return string
-	 */
-	public function checkout_field_get_label(): string {
-		$general_settings = \WPO_WCPDF()
-			->get_instance( 'settings' )
-			->get_instance( 'general' );
-
-		$label = $general_settings->get_setting( 'checkout_field_label' );
-
-		if ( '' === $label ) {
-			$label = wpo_wcpdf_get_checkout_field_default_label(
-				$this->checkout_field_get_type(),
-				$general_settings->get_setting( 'shop_address_country' )
-			);
-		}
-
-		return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
 	}
 
 	/**
@@ -839,7 +783,7 @@ class Frontend {
 		}
 
 		if (
-			'vat_number' === $this->checkout_field_get_type() &&
+			'vat_number' === \wpo_ips_get_checkout_field_type() &&
 			\WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active()
 		) {
 			return false;
