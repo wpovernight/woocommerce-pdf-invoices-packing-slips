@@ -1674,6 +1674,20 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		),
 	);
 
+	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
+
+	if (
+		! empty( $frontend_instance ) &&
+		is_callable( array( $frontend_instance, 'checkout_field_is_registration_number' ) ) &&
+		$frontend_instance->checkout_field_is_registration_number()
+	) {
+		$data['registration_number'] = array(
+			'label'    => $frontend_instance->checkout_field_get_label(),
+			'value'    => wpo_ips_edi_get_order_customer_registration_number( $order ),
+			'required' => false,
+		);
+	}
+
 	if ( wpo_ips_edi_peppol_is_available() ) {
 		$user_id         = $order->get_customer_id();
 		$endpoint_id     = $order->get_meta( '_peppol_endpoint_id' );

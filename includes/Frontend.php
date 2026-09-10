@@ -805,6 +805,28 @@ class Frontend {
 	}
 
 	/**
+	 * Get the checkout field label from settings.
+	 *
+	 * @return string
+	 */
+	public function checkout_field_get_label(): string {
+		$general_settings = \WPO_WCPDF()
+			->get_instance( 'settings' )
+			->get_instance( 'general' );
+
+		$label = $general_settings->get_setting( 'checkout_field_label' );
+
+		if ( '' === $label ) {
+			$label = wpo_wcpdf_get_checkout_field_default_label(
+				$this->checkout_field_get_type(),
+				$general_settings->get_setting( 'shop_address_country' )
+			);
+		}
+
+		return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
+	}
+
+	/**
 	 * Check if the checkout field is enabled in settings.
 	 *
 	 * @return bool
@@ -838,28 +860,6 @@ class Frontend {
 
 		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 		return ! empty( $general_settings['checkout_field_enable_my_account'] ?? '' );
-	}
-
-	/**
-	 * Get the checkout field label from settings.
-	 *
-	 * @return string
-	 */
-	private function checkout_field_get_label(): string {
-		$general_settings = \WPO_WCPDF()
-			->get_instance( 'settings' )
-			->get_instance( 'general' );
-
-		$label = $general_settings->get_setting( 'checkout_field_label' );
-
-		if ( '' === $label ) {
-			$label = wpo_wcpdf_get_checkout_field_default_label(
-				$this->checkout_field_get_type(),
-				$general_settings->get_setting( 'shop_address_country' )
-			);
-		}
-
-		return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
 	}
 
 	/**

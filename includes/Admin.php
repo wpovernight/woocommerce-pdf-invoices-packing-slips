@@ -2265,7 +2265,7 @@ class Admin {
 					<tbody style="display:none;">
 						<?php
 							foreach ( $identifiers_data as $key => $identifier ) {
-								if ( 'vat_number' === $key ) {
+								if ( in_array( $key, array( 'vat_number', 'registration_number' ), true ) ) {
 									continue;
 								}
 
@@ -2308,17 +2308,41 @@ class Admin {
 							);
 						?>
 						<tfoot>
-							<tr>
-							<?php if ( 'full' === wpo_ips_edi_peppol_identifier_input_mode() ) : ?>
-								<td><?php echo esc_html( $identifiers_data['vat_number']['label'] ); ?></td>
-							<?php endif; ?>
-								<td>
-									<?php echo wp_kses_post( $display ); ?>
-									<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
-										<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
+							<?php foreach ( array( 'vat_number', 'registration_number' ) as $identifier_key ) : ?>
+								<?php
+									if ( ! isset( $identifiers_data[ $identifier_key ] ) ) {
+										continue;
+									}
+
+									$identifier = $identifiers_data[ $identifier_key ];
+									$value      = $identifier['value'];
+									$required   = $identifier['required'];
+									$display    = $value ?: sprintf(
+										'<span class="%s">%s</span>',
+										$required
+											? 'missing'
+											: 'optional',
+										$required
+											? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+											: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+									);
+								?>
+								<tr>
+									<?php if ( 'full' === wpo_ips_edi_peppol_identifier_input_mode() ) : ?>
+										<td><?php echo esc_html( $identifier['label'] ); ?></td>
 									<?php endif; ?>
-								</td>
-							</tr>
+									<td>
+										<?php echo wp_kses_post( $display ); ?>
+
+										<?php if ( 'vat_number' === $identifier_key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
+											<br>
+											<small class="notice-warning" style="color:#996800;">
+												<?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+											</small>
+										<?php endif; ?>
+									</td>
+								</tr>
+							<?php endforeach; ?>
 						</tfoot>
 					<?php endif; ?>
 				</table>
