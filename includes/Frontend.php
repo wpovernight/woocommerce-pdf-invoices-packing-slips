@@ -58,8 +58,6 @@ class Frontend {
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
 			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
-
-			add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
 		}
 
 		// My Account (Account details).
@@ -617,30 +615,6 @@ class Frontend {
 				update_user_meta( $customer_id, 'wpo_ips_checkout_field', $val );
 			}
 		}
-	}
-
-	/**
-	 * Display the optional checkout field under the Billing address in wp-admin.
-	 *
-	 * @param \WC_Order $order
-	 * @return void
-	 */
-	public function checkout_field_display_admin_billing( \WC_Order $order ): void {
-		// If your setting disables the field, don't show it.
-		if ( ! $this->checkout_field_is_enabled() ) {
-			return;
-		}
-
-		$value = (string) $order->get_meta( '_wpo_ips_checkout_field', true );
-		$value = trim( $value );
-
-		if ( '' === $value ) {
-			return;
-		}
-
-		$label = \wpo_ips_get_checkout_field_label();
-
-		echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
 	}
 
 	/**

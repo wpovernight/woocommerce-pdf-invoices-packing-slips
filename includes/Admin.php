@@ -65,6 +65,7 @@ class Admin {
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'send_emails' ), 60, 2 );
 		add_filter( 'woocommerce_hpos_admin_search_filters', array( $this, 'hpos_admin_search_filters' ) );
 		add_filter( 'woocommerce_shop_order_list_table_prepare_items_query_args', array( $this, 'invoice_number_query_args' ) );
+		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
 		
 		// IPS
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
@@ -2185,6 +2186,25 @@ class Admin {
 		}
 
 		return $order_query_args;
+	}
+
+	/**
+	 * Display the optional checkout field under the Billing address in wp-admin.
+	 *
+	 * @param \WC_Order $order
+	 * @return void
+	 */
+	public function checkout_field_display_admin_billing( \WC_Order $order ): void {
+		$value = (string) $order->get_meta( '_wpo_ips_checkout_field', true );
+		$value = trim( $value );
+
+		if ( '' === $value ) {
+			return;
+		}
+
+		$label = \wpo_ips_get_checkout_field_label();
+
+		echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
 	}
 
 	/**
