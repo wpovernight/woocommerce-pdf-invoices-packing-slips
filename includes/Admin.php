@@ -692,8 +692,8 @@ class Admin {
 			'</p></div>';
 		}
 
-		// Peppol specific
-		echo $this->get_order_meta_box_peppol_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// Customer identifiers
+		echo $this->get_order_meta_box_customer_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		if ( ! empty( $meta_box_actions ) ) :
 		?>
@@ -2232,16 +2232,12 @@ class Admin {
 	}
 
 	/**
-	 * Get Peppol identifiers to display for the order
+	 * Get customer identifiers to display for the order.
 	 *
 	 * @param \WC_Order $order
 	 * @return void
 	 */
-	private function get_order_meta_box_peppol_identifiers( \WC_Order $order ): void {
-		if ( ! wpo_ips_edi_peppol_is_available() ) {
-			return;
-		}
-
+	private function get_order_meta_box_customer_identifiers( \WC_Order $order ): void {
 		$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
 		$peppol_identifiers = array();
 
