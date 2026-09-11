@@ -1305,6 +1305,54 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 }
 
 /**
+ * Retrieve the customer company registration number from order meta.
+ *
+ * @param \WC_Abstract_Order $order
+ * @return string|null
+ */
+function wpo_wcpdf_get_order_customer_registration_number( \WC_Abstract_Order $order ): ?string {
+	$registration_number_meta_keys = (array) apply_filters(
+		'wpo_wcpdf_order_customer_registration_number_meta_keys',
+		array(),
+		$order
+	);
+
+	if ( 'registration_number' === wpo_ips_get_checkout_field_type() ) {
+		array_unshift( $registration_number_meta_keys, '_wpo_ips_checkout_field' );
+	}
+
+	$registration_number = null;
+	$meta_key            = null;
+
+	foreach ( $registration_number_meta_keys as $candidate_meta_key ) {
+		$meta_value = $order->get_meta( $candidate_meta_key, true );
+
+		if ( ! is_scalar( $meta_value ) ) {
+			continue;
+		}
+
+		$meta_value = trim( (string) $meta_value );
+
+		if ( '' !== $meta_value ) {
+			$registration_number = $meta_value;
+			$meta_key            = $candidate_meta_key;
+			break;
+		}
+	}
+
+	$registration_number = apply_filters(
+		'wpo_wcpdf_order_customer_registration_number',
+		$registration_number,
+		$order,
+		$meta_key
+	);
+
+	return is_string( $registration_number )
+		? $registration_number
+		: null;
+}
+
+/**
  * Prepare an identifier query for use with $wpdb->prepare().
  *
  * @param string $query
@@ -2351,6 +2399,81 @@ function wpo_ips_register_additional_checkout_field( array $options ): void {
 }
 
 /**
+ * Get the configured checkout field type.
+ *
+ * @return string One of: custom, vat_number, registration_number.
+ */
+function wpo_ips_get_checkout_field_type(): string {
+	$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+	$general_settings = is_array( $general_settings ) ? $general_settings : array();
+	$type             = sanitize_key( (string) ( $general_settings['checkout_field_type'] ?? '' ) );
+
+	$allowed = array(
+		'custom',
+		'vat_number',
+		'registration_number',
+	);
+
+	if ( in_array( $type, $allowed, true ) ) {
+		return $type;
+	}
+
+	// Backward compatibility with the old checkbox setting.
+	return ! empty( $general_settings['checkout_field_as_vat_number'] )
+		? 'vat_number'
+		: 'custom';
+}
+
+/**
+ * Get the resolved checkout field label.
+ *
+ * @return string
+ */
+function wpo_ips_get_checkout_field_label(): string {
+	$general_settings = WPO_WCPDF()
+		->get_instance( 'settings' )
+		->get_instance( 'general' );
+
+	$label = (string) $general_settings->get_setting( 'checkout_field_label' );
+
+	if ( '' === $label ) {
+		$label = wpo_ips_get_checkout_field_default_label(
+			wpo_ips_get_checkout_field_type(),
+			(string) $general_settings->get_setting( 'shop_address_country' )
+		);
+	}
+
+	return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
+}
+
+/**
+ * Get the default label for the optional checkout field.
+ *
+ * @param string $type    Checkout field type.
+ * @param string $country Country code in ISO 3166-1 alpha-2 format.
+ * @return string
+ */
+function wpo_ips_get_checkout_field_default_label( string $type = 'custom', string $country = '' ): string {
+	switch ( $type ) {
+		case 'vat_number':
+			return __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' );
+
+		case 'registration_number':
+			$label = function_exists( 'wpo_ips_edi_get_identifier_mappings' )
+				? wpo_ips_edi_get_identifier_mappings( $country, 'registration_number', 'label' )
+				: '';
+
+			return ! empty( $label )
+				? (string) $label
+				: __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' );
+
+		case 'custom':
+		default:
+			return __( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' );
+	}
+}
+
+/**
  * Get WooCommerce payment method options.
  *
  * @return array
@@ -2764,6 +2887,14 @@ function wpo_ips_is_document_download_request(): bool {
  * @return bool
  */
 function wpo_ips_is_checkout_request(): bool {
+	if (
+		isset( $_GET['wc-ajax'] ) &&
+		is_scalar( $_GET['wc-ajax'] ) &&
+		'checkout' === sanitize_key( wp_unslash( (string) $_GET['wc-ajax'] ) )
+	) {
+		return true;
+	}
+
 	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
 		return false;
 	}

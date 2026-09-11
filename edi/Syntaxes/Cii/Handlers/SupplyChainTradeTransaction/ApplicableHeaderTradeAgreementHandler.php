@@ -65,6 +65,27 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$address_city   = (string) ( $seller['city']         ?? '' );
 		$country_code   = (string) ( $seller['country_code'] ?? '' );
 
+		$registration_number_scheme = trim( (string) wpo_ips_edi_get_settings( 'registration_number_scheme' ) );
+
+		if ( empty( $registration_number_scheme ) ) {
+			$registration_number_scheme = (string) wpo_ips_edi_get_identifier_mappings(
+				$country_code,
+				'registration_number',
+				'icd'
+			);
+		}
+
+		$registration_number_id = array(
+			'name'  => 'ram:ID',
+			'value' => $coc_number,
+		);
+
+		if ( ! empty( $registration_number_scheme ) ) {
+			$registration_number_id['attributes'] = array(
+				'schemeID' => $registration_number_scheme,
+			);
+		}
+
 		$seller_trade_party = array(
 			'name'  => 'ram:SellerTradeParty',
 			'value' => array_filter(
@@ -77,10 +98,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 					! empty( $coc_number ) ? array(
 						'name'  => 'ram:SpecifiedLegalOrganization',
 						'value' => array(
-							array(
-								'name'  => 'ram:ID',
-								'value' => $coc_number,
-							),
+							$registration_number_id,
 						),
 					) : null,
 
@@ -143,6 +161,14 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$customer_party_name = $order ? $order->get_formatted_billing_full_name() : '';
 		$billing_company     = $order ? $order->get_billing_company() : '';
 		$vat_number          = \wpo_ips_edi_get_order_customer_vat_number( $order );
+		$registration_number = \wpo_ips_edi_get_order_customer_registration_number( $order );
+		$country_code        = (string) $order->get_billing_country();
+
+		$registration_number_scheme = (string) \wpo_ips_edi_get_identifier_mappings(
+			$country_code,
+			'registration_number',
+			'icd'
+		);
 
 		if ( ! empty( $billing_company ) ) {
 			$customer_party_name = $billing_company;
@@ -160,22 +186,22 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		);
 
 		// Legal Organization (if company)
-		if ( ! empty( $billing_company ) ) {
+		if ( ! empty( $billing_company ) || ! empty( $registration_number ) ) {
 			$legal_organization = array();
-			
-			if ( ! empty( $vat_number ) ) {
-				$legal_organization[] = array(
+
+			if ( ! empty( $registration_number ) ) {
+				$registration_number_id = array(
 					'name'  => 'ram:ID',
-					'value' => $vat_number,
+					'value' => wpo_ips_edi_sanitize_string( $registration_number ),
 				);
-			} else {
-				wpo_ips_edi_log(
-					sprintf(
-						'CII ApplicableHeaderTradeAgreementHandler: VAT number is empty for buyer in order %d.',
-						$order->get_id()
-					),
-					'error'
-				);
+
+				if ( ! empty( $registration_number_scheme ) ) {
+					$registration_number_id['attributes'] = array(
+						'schemeID' => $registration_number_scheme,
+					);
+				}
+
+				$legal_organization[] = $registration_number_id;
 			}
 
 			$legal_organization[] = array(

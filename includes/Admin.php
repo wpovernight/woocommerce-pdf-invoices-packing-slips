@@ -65,6 +65,7 @@ class Admin {
 		add_action( 'woocommerce_process_shop_order_meta', array( $this, 'send_emails' ), 60, 2 );
 		add_filter( 'woocommerce_hpos_admin_search_filters', array( $this, 'hpos_admin_search_filters' ) );
 		add_filter( 'woocommerce_shop_order_list_table_prepare_items_query_args', array( $this, 'invoice_number_query_args' ) );
+		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
 		
 		// IPS
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
@@ -692,8 +693,8 @@ class Admin {
 			'</p></div>';
 		}
 
-		// Peppol specific
-		echo $this->get_order_meta_box_peppol_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// Customer identifiers
+		echo $this->get_order_meta_box_customer_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 		if ( ! empty( $meta_box_actions ) ) :
 		?>
@@ -2188,6 +2189,25 @@ class Admin {
 	}
 
 	/**
+	 * Display the optional checkout field under the Billing address in wp-admin.
+	 *
+	 * @param \WC_Order $order
+	 * @return void
+	 */
+	public function checkout_field_display_admin_billing( \WC_Order $order ): void {
+		$value = (string) $order->get_meta( '_wpo_ips_checkout_field', true );
+		$value = trim( $value );
+
+		if ( '' === $value ) {
+			return;
+		}
+
+		$label = \wpo_ips_get_checkout_field_label();
+
+		echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
+	}
+
+	/**
 	 * Get XML document action for order meta box
 	 *
 	 * @param string             $document_type
@@ -2232,16 +2252,12 @@ class Admin {
 	}
 
 	/**
-	 * Get Peppol identifiers to display for the order
+	 * Get customer identifiers to display for the order.
 	 *
 	 * @param \WC_Order $order
 	 * @return void
 	 */
-	private function get_order_meta_box_peppol_identifiers( \WC_Order $order ): void {
-		if ( ! wpo_ips_edi_peppol_is_available() ) {
-			return;
-		}
-
+	private function get_order_meta_box_customer_identifiers( \WC_Order $order ): void {
 		$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
 		$peppol_identifiers = array();
 
@@ -2265,7 +2281,7 @@ class Admin {
 					<tbody style="display:none;">
 						<?php
 							foreach ( $identifiers_data as $key => $identifier ) {
-								if ( 'vat_number' === $key ) {
+								if ( in_array( $key, array( 'vat_number', 'registration_number' ), true ) ) {
 									continue;
 								}
 
@@ -2293,32 +2309,43 @@ class Admin {
 							}
 						?>
 					</tbody>
-					<?php if ( isset( $identifiers_data['vat_number'] ) ) : ?>
-						<?php
-							$value    = $identifiers_data['vat_number']['value'];
-							$required = $identifiers_data['vat_number']['required'];
-							$display  = $value ?: sprintf(
-								'<span class="%s">%s</span>',
-								$required
-									? 'missing'
-									: 'optional',
-								$required
-									? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
-									: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
-							);
-						?>
+					<?php if ( isset( $identifiers_data['vat_number'] ) || isset( $identifiers_data['registration_number'] ) ) : ?>
 						<tfoot>
-							<tr>
-							<?php if ( 'full' === wpo_ips_edi_peppol_identifier_input_mode() ) : ?>
-								<td><?php echo esc_html( $identifiers_data['vat_number']['label'] ); ?></td>
-							<?php endif; ?>
-								<td>
-									<?php echo wp_kses_post( $display ); ?>
-									<?php if ( 'vat_number' === $key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
-										<br><small class="notice-warning" style="color:#996800;"><?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?></small>
+							<?php foreach ( array( 'vat_number', 'registration_number' ) as $identifier_key ) : ?>
+								<?php
+									if ( ! isset( $identifiers_data[ $identifier_key ] ) ) {
+										continue;
+									}
+
+									$identifier = $identifiers_data[ $identifier_key ];
+									$value      = $identifier['value'];
+									$required   = $identifier['required'];
+									$display    = $value ?: sprintf(
+										'<span class="%s">%s</span>',
+										$required
+											? 'missing'
+											: 'optional',
+										$required
+											? esc_html__( 'Missing', 'woocommerce-pdf-invoices-packing-slips' )
+											: esc_html__( 'Optional', 'woocommerce-pdf-invoices-packing-slips' )
+									);
+								?>
+								<tr>
+									<?php if ( 'full' === wpo_ips_edi_peppol_identifier_input_mode() ) : ?>
+										<td><?php echo esc_html( $identifier['label'] ); ?></td>
 									<?php endif; ?>
-								</td>
-							</tr>
+									<td>
+										<?php echo wp_kses_post( $display ); ?>
+
+										<?php if ( 'vat_number' === $identifier_key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
+											<br>
+											<small class="notice-warning" style="color:#996800;">
+												<?php esc_html_e( 'VAT number is missing the country prefix', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+											</small>
+										<?php endif; ?>
+									</td>
+								</tr>
+							<?php endforeach; ?>
 						</tfoot>
 					<?php endif; ?>
 				</table>
