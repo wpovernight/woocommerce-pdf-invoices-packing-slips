@@ -21,6 +21,10 @@ class Invoice extends UblInvoice {
 	public function get_structure(): array {
 		$structure = parent::get_structure();
 
+		if ( isset( $structure['tax_total'] ) ) {
+			$structure['tax_total']['handler'] = \WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCiusUbl\Handlers\TaxTotalHandler::class;
+		}
+
 		if ( isset( $structure['note'] ) ) {
 			$structure['note'] = array(
 				'enabled' => true,
