@@ -21,6 +21,10 @@ class Invoice extends UblInvoice {
 	public function get_structure(): array {
 		$structure = parent::get_structure();
 
+		if ( isset( $structure['accounting_supplier_party'] ) ) {
+			$structure['accounting_supplier_party']['handler'] = \WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCiusUbl\Handlers\AccountingSupplierPartyHandler::class;
+		}
+
 		if ( isset( $structure['accounting_customer_party'] ) ) {
 			$structure['accounting_customer_party']['handler'] = \WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCiusUbl\Handlers\AccountingCustomerPartyHandler::class;
 		}
