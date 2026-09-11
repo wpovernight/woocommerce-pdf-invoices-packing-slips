@@ -38,8 +38,8 @@ class Frontend {
 			add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
 		}
 
-		// Account
-		if ( wpo_ips_is_account_page() ) {
+		// Order actions.
+		if ( wpo_ips_is_account_page() || wpo_ips_is_order_received_page() ) {
 			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
 		}
@@ -109,18 +109,37 @@ class Frontend {
 				? $invoice->get_title()
 				: $document_title;
 
-			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
+			$endpoint_instance = \WPO_WCPDF()->get_instance( 'endpoint' );
 
-			$actions[ $document_type ] = array(
-				'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'my-account' => 'true' ) ),
-				'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice ),
+			$document_url = $endpoint_instance->get_document_link(
+				$order,
+				$document_type,
+				array( 'my-account' => 'true' )
 			);
 
-			if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
-				$actions[ $document_type . '_xml' ] = array(
-					'url'  => $endpoint_instance->get_document_link( $order, $document_type, array( 'output' => 'xml', 'my-account' => 'true' ) ),
-					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),
+			if ( $document_url ) {
+				$actions[ $document_type ] = array(
+					'url'  => $document_url,
+					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice ),
 				);
+			}
+
+			if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
+				$xml_url = $endpoint_instance->get_document_link(
+					$order,
+					$document_type,
+					array(
+						'output'     => 'xml',
+						'my-account' => 'true',
+					)
+				);
+
+				if ( $xml_url ) {
+					$actions[ $document_type . '_xml' ] = array(
+						'url'  => $xml_url,
+						'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),
+					);
+				}
 			}
 		}
 
