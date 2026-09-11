@@ -594,6 +594,13 @@ function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ):
 							'invoice' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\PeppolBis3p0\Invoice::class,
 						),
 					),
+					'frcius-ubl' => array(
+						'name'      => 'France CIUS UBL',
+						'hybrid'    => false,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Ubl\Formats\FranceCiusUbl\Invoice::class,
+						),
+					),
 				),
 			),
 			'cii' => array(

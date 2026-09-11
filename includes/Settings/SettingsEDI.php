@@ -2,6 +2,7 @@
 namespace WPO\IPS\Settings;
 
 use WPO\IPS\EDI\Standards\EN16931;
+use WPO\IPS\EDI\Standards\EN16931\CIUS\France;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -205,6 +206,57 @@ class SettingsEDI {
 
 		if ( ! empty( $settings_format ) ) {
 			$settings_fields = array_merge( $settings_fields, $settings_format );
+		}
+
+		// France CIUS specific field.
+		$settings_fields[] = array(
+			'type'     => 'setting',
+			'id'       => 'fr_cadre_de_facturation',
+			'title'    => '',
+			'callback' => 'select',
+			'section'  => $section,
+			'args'     => array(
+				'title'             => __( 'French invoicing context', 'woocommerce-pdf-invoices-packing-slips' ),
+				'option_name'       => $option_name,
+				'id'                => 'fr_cadre_de_facturation',
+				'options'           => array(
+					'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+				) + France::get_cadre_de_facturation(),
+				'description'       => __( 'Select the French invoicing context for the document.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'custom_attributes' => array(
+					'data-show_for_option_name'   => $option_name . '[ubl_format]',
+					'data-show_for_option_values' => wp_json_encode( array( 'frcius-ubl' ) ),
+					'data-keep_current_value'     => true,
+				),
+			),
+		);
+
+		// France CIUS mandatory legal notices.
+		foreach ( France::get_mandatory_legal_notes() as $code => $notice ) {
+			$id = 'fr_note_' . strtolower( $code );
+
+			$settings_fields[] = array(
+				'type'     => 'setting',
+				'id'       => $id,
+				'title'    => '',
+				'callback' => 'text_input',
+				'section'  => $section,
+				'args'     => array(
+					'title'             => sprintf(
+						'%s (%s)',
+						$notice['label'],
+						$code
+					),
+					'option_name'       => $option_name,
+					'id'                => $id,
+					'description'       => $notice['description'],
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[ubl_format]',
+						'data-show_for_option_values' => wp_json_encode( array( 'frcius-ubl' ) ),
+						'data-keep_current_value'     => true,
+					),
+				),
+			);
 		}
 
 		// Peppol specific field
