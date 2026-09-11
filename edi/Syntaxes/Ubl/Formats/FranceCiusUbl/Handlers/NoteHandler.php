@@ -39,7 +39,7 @@ class NoteHandler extends AbstractUblHandler {
 				continue;
 			}
 
-			$data[] = array(
+			$note = array(
 				'name'  => 'cbc:Note',
 				'value' => sprintf(
 					'#%s#%s',
@@ -47,9 +47,16 @@ class NoteHandler extends AbstractUblHandler {
 					wpo_ips_edi_sanitize_string( $value )
 				),
 			);
+
+			$data[] = apply_filters(
+				'wpo_ips_edi_ubl_note',
+				$note,
+				$data,
+				$options,
+				$this
+			);
 		}
 
-		$data[] = apply_filters( 'wpo_ips_edi_ubl_note', $note, $data, $options, $this );
 		return $data;
 	}
 
