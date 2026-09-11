@@ -751,25 +751,36 @@ class Install {
 			}
 		}
 
-		// 6.0.0 update: clear the legacy default checkout field label.
+		// 6.0.0 update: migrate the optional checkout field settings.
 		if ( version_compare( $installed_version, '6.0.0', '<' ) ) {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 
-			if (
-				is_array( $general_settings ) &&
-				! array_key_exists( 'checkout_field_type', $general_settings )
-			) {
-				$checkout_field_label = isset( $general_settings['checkout_field_label'] )
-					? trim( (string) $general_settings['checkout_field_label'] )
-					: '';
+			if ( is_array( $general_settings ) ) {
+				$is_legacy_checkout_field = ! array_key_exists( 'checkout_field_type', $general_settings );
 
-				$legacy_default_labels = array(
-					'Customer identification',
-					__( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' ),
-				);
+				if ( $is_legacy_checkout_field ) {
+					$settings_changed = false;
 
-				if ( in_array( $checkout_field_label, $legacy_default_labels, true ) ) {
-					$general_settings['checkout_field_label'] = '';
+					// Migrate the old VAT number checkbox to the new field type.
+					$general_settings['checkout_field_type'] = ! empty( $general_settings['checkout_field_as_vat_number'] )
+						? 'vat_number'
+						: 'custom';
+
+					$settings_changed = true;
+
+					// Clear the legacy default label so the new type-specific default can be used.
+					$checkout_field_label = isset( $general_settings['checkout_field_label'] )
+						? trim( (string) $general_settings['checkout_field_label'] )
+						: '';
+
+					$legacy_default_labels = array(
+						'Customer identification',
+						__( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' ),
+					);
+
+					if ( in_array( $checkout_field_label, $legacy_default_labels, true ) ) {
+						$general_settings['checkout_field_label'] = '';
+					}
 
 					update_option( 'wpo_wcpdf_settings_general', $general_settings );
 				}
