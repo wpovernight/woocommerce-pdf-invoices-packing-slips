@@ -13,6 +13,19 @@ jQuery( function( $ ) {
 		$label.attr( 'placeholder', labels[ $field.val() ] || labels.custom );
 	} ).trigger( 'change' );
 
+	$( '#shop_address_country' ).on( 'change', function() {
+		const $field = $( '#checkout_field_type' );
+		const labels = $field.data( 'registration-labels' );
+		if ( ! labels ) {
+			return;
+		}
+
+		const countryLabels = labels[ $( this ).val() ] || labels[ '' ];
+		$( '#coc_number' ).closest( 'tr' ).children( 'th' ).text( countryLabels.shop );
+		$field.data( 'registration-label', countryLabels.label );
+		$field.triggerHandler( 'change' );
+	} ).triggerHandler( 'change' );
+
 	$( '.wcpdf-extensions .more' ).hide();
 
 	$( '.wcpdf-extensions > li' ).on( 'click', function( event ) {

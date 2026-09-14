@@ -88,6 +88,16 @@ class SettingsGeneral {
 			$shop_country
 		);
 
+		$registration_labels = array();
+		foreach ( array_merge( array( '' ), array_keys( \WC()->countries->get_countries() ) ) as $country_code ) {
+			$label = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'registration_number', $country_code );
+			$registration_labels[ $country_code ] = array(
+				'label' => $label,
+				/* translators: %s: company registration number label */
+				'shop'  => sprintf( __( 'Shop %s', 'woocommerce-pdf-invoices-packing-slips' ), $label ),
+			);
+		}
+
 		if ( $has_vat_plugin_active ) {
 			$vat_plugin_notice = '<div class="notice notice-info inline notice-wpo"><p>'
 				. esc_html__( 'A VAT plugin is currently active. When the field type is set to VAT number, this checkout field will not be displayed to avoid conflicts and duplicate VAT fields. Other field types remain available.', 'woocommerce-pdf-invoices-packing-slips' )
@@ -594,9 +604,10 @@ class SettingsGeneral {
 						'registration_number' => __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 					'custom_attributes' => array(
-						'data-custom-label'       => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'custom', $shop_country ),
-						'data-vat-label'          => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'vat_number', $shop_country ),
-						'data-registration-label' => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'registration_number', $shop_country ),
+						'data-registration-labels' => wp_json_encode( $registration_labels ),
+						'data-custom-label'        => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'custom', $shop_country ),
+						'data-vat-label'           => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'vat_number', $shop_country ),
+						'data-registration-label'  => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'registration_number', $shop_country ),
 					),
 					'description' => __( 'Choose how the checkout field should be interpreted. This allows the same field to be used for custom customer identification, VAT numbers, or company registration numbers.', 'woocommerce-pdf-invoices-packing-slips' ) . $vat_plugin_notice,
 				),
