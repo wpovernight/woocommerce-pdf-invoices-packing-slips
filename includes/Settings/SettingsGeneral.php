@@ -81,14 +81,7 @@ class SettingsGeneral {
 		$has_vat_plugin_active             = \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active();
 		$vat_plugin_notice                 = '';
 		$settings_instance                 = \WPO_WCPDF()->get_instance( 'settings' );
-
-		$checkout_field_type = $this->get_setting( 'checkout_field_type' );
-
-		if ( empty( $checkout_field_type ) ) {
-			$checkout_field_type = ! empty( $this->get_setting( 'checkout_field_as_vat_number' ) )
-				? 'vat_number'
-				: 'custom';
-		}
+		$checkout_field_type               = $this->get_setting( 'checkout_field_type' );
 
 		$checkout_field_default_label = \wpo_ips_get_checkout_field_default_label(
 			$checkout_field_type,
@@ -592,12 +585,10 @@ class SettingsGeneral {
 				'callback' => 'select',
 				'section'  => 'general_settings',
 				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'checkout_field_type',
-					'default'     => ! empty( $this->get_setting( 'checkout_field_as_vat_number' ) )
-						? 'vat_number'
-						: 'custom',
-					'options'     => array(
+					'option_name'       => $option_name,
+					'id'                => 'checkout_field_type',
+					'default'           => 'vat_number',
+					'options'           => array(
 						'custom'              => __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ),
 						'vat_number'          => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
 						'registration_number' => __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' ),

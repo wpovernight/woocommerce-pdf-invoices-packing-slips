@@ -759,14 +759,10 @@ class Install {
 				$is_legacy_checkout_field = ! array_key_exists( 'checkout_field_type', $general_settings );
 
 				if ( $is_legacy_checkout_field ) {
-					$settings_changed = false;
-
 					// Migrate the old VAT number checkbox to the new field type.
 					$general_settings['checkout_field_type'] = ! empty( $general_settings['checkout_field_as_vat_number'] )
 						? 'vat_number'
 						: 'custom';
-
-					$settings_changed = true;
 
 					// Clear the legacy default label so the new type-specific default can be used.
 					$checkout_field_label = isset( $general_settings['checkout_field_label'] )

@@ -2404,24 +2404,21 @@ function wpo_ips_register_additional_checkout_field( array $options ): void {
  * @return string One of: custom, vat_number, registration_number.
  */
 function wpo_ips_get_checkout_field_type(): string {
-	$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-	$general_settings = is_array( $general_settings ) ? $general_settings : array();
-	$type             = sanitize_key( (string) ( $general_settings['checkout_field_type'] ?? '' ) );
+	$general_settings = WPO_WCPDF()
+		->get_instance( 'settings' )
+		->get_instance( 'general' );
 
-	$allowed = array(
+	$type = sanitize_key( (string) $general_settings->get_setting( 'checkout_field_type' ) );
+
+	$allowed_types = array(
 		'custom',
 		'vat_number',
 		'registration_number',
 	);
 
-	if ( in_array( $type, $allowed, true ) ) {
-		return $type;
-	}
-
-	// Backward compatibility with the old checkbox setting.
-	return ! empty( $general_settings['checkout_field_as_vat_number'] )
-		? 'vat_number'
-		: 'custom';
+	return in_array( $type, $allowed_types, true )
+		? $type
+		: 'vat_number';
 }
 
 /**
