@@ -45,7 +45,7 @@ class Frontend {
 		}
 
 		// Optional Checkout field (General Settings).
-		if ( wpo_ips_is_checkout_request() && $this->checkout_field_is_enabled() ) {
+		if ( wpo_ips_is_checkout_request() && \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			// Blocks/store-api hooks
 			$this->checkout_field_display_checkout_block_field();
 			$this->checkout_field_set_checkout_block_field_value();
@@ -61,7 +61,7 @@ class Frontend {
 		}
 
 		// My Account (Account details).
-		if ( $this->checkout_field_is_my_account_enabled() ) {
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_my_account_enabled() ) {
 			add_action( 'woocommerce_edit_account_form', array( $this, 'account_details_display_checkout_field' ), 20 );
 			add_filter( 'woocommerce_save_account_details_errors', array( $this, 'account_details_validate_checkout_field' ), 20, 2 );
 			add_action( 'woocommerce_save_account_details', array( $this, 'account_details_save_checkout_field' ), 20, 1 );
@@ -352,15 +352,15 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_display_checkout_block_field(): void {
-		if ( ! $this->checkout_field_is_enabled() ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			return;
 		}
 
-		$field_id = 'wpo-ips/checkout-field';
+		$field_id = CheckoutField::BLOCK_FIELD_ID;
 
 		$args = array(
 			'id'                => $field_id,
-			'label'             => \wpo_ips_get_checkout_field_label(),
+			'label'             => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label(),
 			'location'          => 'order',
 			'type'              => 'text',
 			'sanitize_callback' => static function ( $val ) {
@@ -371,7 +371,7 @@ class Frontend {
 				$val = (string) $val;
 
 				// If not treated as VAT, keep the existing flexible hook.
-				if ( ! $this->checkout_field_is_vat_number() ) {
+				if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number() ) {
 					$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
 					return ( $result instanceof \WP_Error ) ? $result : true;
 				}
@@ -392,7 +392,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_set_checkout_block_field_value(): void {
-		$field_id = 'wpo-ips/checkout-field';
+		$field_id = CheckoutField::BLOCK_FIELD_ID;
 
 		add_filter(
 			"woocommerce_get_default_value_for_{$field_id}",
@@ -407,7 +407,7 @@ class Frontend {
 					return (string) $value;
 				}
 
-				$stored = (string) get_user_meta( $user_id, 'wpo_ips_checkout_field', true );
+				$stored = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id );
 
 				return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, $group, $wc_object );
 			},
@@ -426,11 +426,11 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_save_checkout_block_field( string $key, mixed $value, string $group, object $wc_object ): void {
-		if ( ! $this->checkout_field_is_enabled() ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			return;
 		}
 
-		$field_id = 'wpo-ips/checkout-field';
+		$field_id = CheckoutField::BLOCK_FIELD_ID;
 
 		if ( $key !== $field_id ) {
 			return;
@@ -443,25 +443,12 @@ class Frontend {
 		$val = sanitize_text_field( (string) wp_unslash( $value ) );
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
-		// Save on order.
-		$order_meta_key = '_wpo_ips_checkout_field';
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$checkout_field->save_order_value( $wc_object, $val );
 
-		if ( '' === trim( $val ) ) {
-			$wc_object->delete_meta_data( $order_meta_key );
-		} else {
-			$wc_object->update_meta_data( $order_meta_key, $val );
-		}
-
-		$wc_object->save_meta_data();
-
-		// Save on customer (if available).
-		$customer_id = is_callable( array( $wc_object, 'get_customer_id' ) ) ? absint( $wc_object->get_customer_id() ) : 0;
+		$customer_id = $wc_object->get_customer_id();
 		if ( $customer_id > 0 ) {
-			if ( '' === trim( $val ) ) {
-				delete_user_meta( $customer_id, 'wpo_ips_checkout_field' );
-			} else {
-				update_user_meta( $customer_id, 'wpo_ips_checkout_field', $val );
-			}
+			$checkout_field->save_user_value( $customer_id, $val );
 		}
 	}
 
@@ -472,7 +459,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_remove_order_checkout_block_field_meta( \WC_Abstract_Order $order ): void {
-		$field_id = 'wpo-ips/checkout-field';
+		$field_id = CheckoutField::BLOCK_FIELD_ID;
 
 		$order->delete_meta_data( '_wc_other/' . $field_id );
 		$order->save_meta_data();
@@ -489,17 +476,17 @@ class Frontend {
 			$fields = array();
 		}
 
-		if ( ! $this->checkout_field_is_enabled() ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			return $fields;
 		}
 
 		$fields['order'] = $fields['order'] ?? array();
 
-		$key = 'wpo_ips_checkout_field';
+		$key = CheckoutField::CLASSIC_FIELD_KEY;
 
 		$args = array(
 			'type'     => 'text',
-			'label'    => \wpo_ips_get_checkout_field_label(),
+			'label'    => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label(),
 			'required' => false,
 			'class'    => array( 'form-row-wide' ),
 		);
@@ -517,7 +504,7 @@ class Frontend {
 	 * @return mixed
 	 */
 	public function checkout_field_set_classic_checkout_field_value( $value, string $input ) {
-		if ( 'wpo_ips_checkout_field' !== $input ) {
+		if ( CheckoutField::CLASSIC_FIELD_KEY !== $input ) {
 			return $value;
 		}
 
@@ -526,7 +513,7 @@ class Frontend {
 			return $value;
 		}
 
-		$stored = (string) get_user_meta( $user_id, 'wpo_ips_checkout_field', true );
+		$stored = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id );
 
 		return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, 'classic', null );
 	}
@@ -539,7 +526,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_validate_classic_checkout_field_value( $data, $errors ): void {
-		if ( ! $this->checkout_field_is_enabled() || ! $errors instanceof \WP_Error ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() || ! $errors instanceof \WP_Error ) {
 			return;
 		}
 
@@ -547,7 +534,7 @@ class Frontend {
 			return;
 		}
 
-		$key = 'wpo_ips_checkout_field';
+		$key = CheckoutField::CLASSIC_FIELD_KEY;
 		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
 		$val = sanitize_text_field( $raw );
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
@@ -556,7 +543,7 @@ class Frontend {
 			return;
 		}
 
-		if ( $this->checkout_field_is_vat_number() ) {
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number() ) {
 			$result = $this->checkout_field_validate_vat_number_value( $val );
 
 			if ( $result instanceof \WP_Error ) {
@@ -582,7 +569,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_save_classic_checkout_field( int $order_id, array $data ): void {
-		if ( ! $this->checkout_field_is_enabled() ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			return;
 		}
 
@@ -591,29 +578,18 @@ class Frontend {
 			return;
 		}
 
-		$key            = 'wpo_ips_checkout_field';
-		$order_meta_key = '_wpo_ips_checkout_field';
+		$key = CheckoutField::CLASSIC_FIELD_KEY;
 
 		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
 		$val = sanitize_text_field( $raw );
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
-		// Order meta
-		if ( '' === trim( $val ) ) {
-			$order->delete_meta_data( $order_meta_key );
-		} else {
-			$order->update_meta_data( $order_meta_key, $val );
-		}
-		$order->save_meta_data();
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$checkout_field->save_order_value( $order, $val );
 
-		// Customer meta (if available)
-		$customer_id = is_callable( array( $order, 'get_customer_id' ) ) ? absint( $order->get_customer_id() ) : 0;
+		$customer_id = $order->get_customer_id();
 		if ( $customer_id > 0 ) {
-			if ( '' === trim( $val ) ) {
-				delete_user_meta( $customer_id, 'wpo_ips_checkout_field' );
-			} else {
-				update_user_meta( $customer_id, 'wpo_ips_checkout_field', $val );
-			}
+			$checkout_field->save_user_value( $customer_id, $val );
 		}
 	}
 
@@ -623,7 +599,7 @@ class Frontend {
 	 * @return void
 	 */
 	public function account_details_display_checkout_field(): void {
-		if ( ! $this->checkout_field_is_my_account_enabled() ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_my_account_enabled() ) {
 			return;
 		}
 
@@ -632,14 +608,14 @@ class Frontend {
 			return;
 		}
 
-		$key   = 'wpo_ips_checkout_field';
-		$value = (string) get_user_meta( $user_id, $key, true );
+		$key   = CheckoutField::CLASSIC_FIELD_KEY;
+		$value = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id );
 		$value = (string) apply_filters( 'wpo_ips_checkout_field_default_value', $value, $value, 'my-account', null );
 
-		$label       = \wpo_ips_get_checkout_field_label();
+		$label       = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label();
 		$description = '';
 
-		if ( $this->checkout_field_is_vat_number() ) {
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number() ) {
 			$description = __( 'Please include the country prefix (for example NL123456789).', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
@@ -660,11 +636,11 @@ class Frontend {
 	 * @return \WP_Error
 	 */
 	public function account_details_validate_checkout_field( \WP_Error $errors, \WP_User $user ): \WP_Error {
-		if ( ! $this->checkout_field_is_my_account_enabled() ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_my_account_enabled() ) {
 			return $errors;
 		}
 
-		$key = 'wpo_ips_checkout_field';
+		$key = CheckoutField::CLASSIC_FIELD_KEY;
 
 		// Field is optional: if missing, don't block save.
 		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -679,7 +655,7 @@ class Frontend {
 		}
 
 		// VAT mode.
-		if ( $this->checkout_field_is_vat_number() ) {
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number() ) {
 			$result = $this->checkout_field_validate_vat_number_value( $val );
 
 			if ( $result instanceof \WP_Error ) {
@@ -705,11 +681,11 @@ class Frontend {
 	 * @return void
 	 */
 	public function account_details_save_checkout_field( int $user_id ): void {
-		if ( ! $this->checkout_field_is_my_account_enabled() ) {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_my_account_enabled() ) {
 			return;
 		}
 
-		$key = 'wpo_ips_checkout_field';
+		$key = CheckoutField::CLASSIC_FIELD_KEY;
 
 		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			// If the field isn't present in the form submission, do nothing.
@@ -719,66 +695,11 @@ class Frontend {
 		$val = (string) sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
-		if ( '' === trim( $val ) ) {
-			delete_user_meta( $user_id, $key );
-		} else {
-			update_user_meta( $user_id, $key, $val );
-		}
+		\WPO_WCPDF()->get_instance( 'checkout_field' )->save_user_value( $user_id, $val );
 	}
 
-	/**
-	 * Check if the checkout field should be treated as a VAT number.
-	 *
-	 * @return bool
-	 */
-	public function checkout_field_is_vat_number(): bool {
-		if ( 'vat_number' !== \wpo_ips_get_checkout_field_type() ) {
-			return false;
-		}
 
-		// Prevent conflicts with VAT plugins.
-		if ( \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active() ) {
-			return false;
-		}
 
-		return true;
-	}
-
-	/**
-	 * Check if the checkout field is enabled in settings.
-	 *
-	 * @return bool
-	 */
-	private function checkout_field_is_enabled(): bool {
-		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-
-		if ( empty( $general_settings['checkout_field_enable'] ?? '' ) ) {
-			return false;
-		}
-
-		if (
-			'vat_number' === \wpo_ips_get_checkout_field_type() &&
-			\WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active()
-		) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Check if the My Account field is enabled in settings.
-	 *
-	 * @return bool
-	 */
-	private function checkout_field_is_my_account_enabled(): bool {
-		if ( ! $this->checkout_field_is_enabled() ) {
-			return false;
-		}
-
-		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-		return ! empty( $general_settings['checkout_field_enable_my_account'] ?? '' );
-	}
 
 	/**
 	 * Validate the checkout field value when treated as a VAT number.

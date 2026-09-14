@@ -1266,17 +1266,13 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
 	
-	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
+	$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+	$vat_number     = $checkout_field->get_order_value( $order, \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER );
+	$meta_key       = null;
 
-	if ( ! empty( $frontend_instance ) && is_callable( array( $frontend_instance, 'checkout_field_is_vat_number' ) ) ) {
-		$checkout_field_is_vat_number = $frontend_instance->checkout_field_is_vat_number();
-
-		if ( $checkout_field_is_vat_number ) {
-			array_unshift( $vat_meta_keys, '_wpo_ips_checkout_field' );
-		}
+	if ( null !== $vat_number ) {
+		array_unshift( $vat_meta_keys, $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER ) );
 	}
-
-	$vat_number = null;
 
 	foreach ( $vat_meta_keys as $meta_key ) {
 		$meta_value = $order->get_meta( $meta_key );
@@ -1317,12 +1313,13 @@ function wpo_wcpdf_get_order_customer_registration_number( \WC_Abstract_Order $o
 		$order
 	);
 
-	if ( 'registration_number' === wpo_ips_get_checkout_field_type() ) {
-		array_unshift( $registration_number_meta_keys, '_wpo_ips_checkout_field' );
-	}
-
-	$registration_number = null;
+	$checkout_field      = \WPO_WCPDF()->get_instance( 'checkout_field' );
+	$registration_number = $checkout_field->get_order_value( $order, \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER );
 	$meta_key            = null;
+
+	if ( null !== $registration_number ) {
+		array_unshift( $registration_number_meta_keys, $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER ) );
+	}
 
 	foreach ( $registration_number_meta_keys as $candidate_meta_key ) {
 		$meta_value = $order->get_meta( $candidate_meta_key, true );

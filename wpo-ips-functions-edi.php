@@ -1674,10 +1674,15 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		),
 	);
 
-	if ( 'registration_number' === wpo_ips_get_checkout_field_type() ) {
+	$checkout_field      = \WPO_WCPDF()->get_instance( 'checkout_field' );
+	$registration_number = wpo_ips_edi_get_order_customer_registration_number( $order );
+
+	if ( null !== $registration_number || $checkout_field->is_type( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER ) ) {
 		$data['registration_number'] = array(
-			'label'    => wpo_ips_get_checkout_field_label(),
-			'value'    => wpo_ips_edi_get_order_customer_registration_number( $order ),
+			'label'    => $checkout_field->is_type( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER )
+				? $checkout_field->get_label()
+				: $checkout_field->get_default_label( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER, $order->get_billing_country() ),
+			'value'    => $registration_number,
 			'required' => false,
 		);
 	}

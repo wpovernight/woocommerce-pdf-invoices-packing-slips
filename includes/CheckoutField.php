@@ -204,7 +204,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 				$order->update_meta_data( $meta_key, $value );
 			}
 
-			if ( $this->is_type( $type ) ) {
+			if ( $type === $this->get_legacy_type() ) {
 				$order->delete_meta_data( self::LEGACY_ORDER_META_KEY );
 			}
 
@@ -260,7 +260,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 				update_user_meta( $user_id, $meta_key, $value );
 			}
 
-			if ( $this->is_type( $type ) ) {
+			if ( $type === $this->get_legacy_type() ) {
 				delete_user_meta( $user_id, self::LEGACY_USER_META_KEY );
 			}
 		}
@@ -324,6 +324,25 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
+		 * Get the original type of untyped values, independently of the current field.
+		 *
+		 * @return string
+		 */
+		private function get_legacy_type(): string {
+			$type = get_option( 'wpo_ips_checkout_field_legacy_type', false );
+
+			if ( false === $type ) {
+				$settings = get_option( 'wpo_wcpdf_settings_general', array() );
+				$type     = ! empty( $settings['checkout_field_as_vat_number'] )
+					? self::TYPE_VAT_NUMBER
+					: self::TYPE_CUSTOM;
+				add_option( 'wpo_ips_checkout_field_legacy_type', $type );
+			}
+
+			return $this->normalize_type( (string) $type );
+		}
+
+		/**
 		 * Normalize a field type.
 		 *
 		 * @param string $type Field type.
@@ -345,9 +364,8 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return string|null
 		 */
 		private function get_legacy_order_value( \WC_Abstract_Order $order, string $type ): ?string {
-			// The legacy field can only be safely interpreted as the currently
-			// configured field type.
-			if ( ! $this->is_type( $type ) ) {
+			// Legacy values retain their original type when the checkout setting changes.
+			if ( $type !== $this->get_legacy_type() ) {
 				return null;
 			}
 
@@ -380,7 +398,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return string|null
 		 */
 		private function get_legacy_user_value( int $user_id, string $type ): ?string {
-			if ( ! $this->is_type( $type ) ) {
+			if ( $type !== $this->get_legacy_type() ) {
 				return null;
 			}
 

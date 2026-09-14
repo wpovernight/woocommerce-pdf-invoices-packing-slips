@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS\Compatibility;
 
+use WPO\IPS\CheckoutField;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -189,7 +191,7 @@ class VatPlugins {
 
 		if (
 			empty( $info['active'] ) &&
-			! $checkout_field->is_type( CheckoutField::TYPE_VAT_NUMBER )
+			( ! $checkout_field->is_enabled() || ! $checkout_field->is_type( CheckoutField::TYPE_VAT_NUMBER ) )
 		) {
 			return '';
 		}

@@ -2195,16 +2195,20 @@ class Admin {
 	 * @return void
 	 */
 	public function checkout_field_display_admin_billing( \WC_Order $order ): void {
-		$value = (string) $order->get_meta( '_wpo_ips_checkout_field', true );
-		$value = trim( $value );
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
 
-		if ( '' === $value ) {
-			return;
+		foreach ( $checkout_field->get_types() as $type ) {
+			$value = $checkout_field->get_order_value( $order, $type );
+			if ( null === $value ) {
+				continue;
+			}
+
+			$label = $checkout_field->is_type( $type )
+				? $checkout_field->get_label()
+				: $checkout_field->get_default_label( $type, $order->get_billing_country() );
+
+			echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
 		}
-
-		$label = \wpo_ips_get_checkout_field_label();
-
-		echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';
 	}
 
 	/**
