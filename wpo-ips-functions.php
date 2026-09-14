@@ -2418,7 +2418,7 @@ function wpo_ips_get_checkout_field_type(): string {
 
 	return in_array( $type, $allowed_types, true )
 		? $type
-		: 'vat_number';
+		: 'custom';
 }
 
 /**
