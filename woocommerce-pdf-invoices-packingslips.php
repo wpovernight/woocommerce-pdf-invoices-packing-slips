@@ -35,6 +35,7 @@ use WPO\IPS\FontSynchronizer;
 use WPO\IPS\EDI\Peppol;
 use WPO\IPS\Notices;
 use WPO\IPS\SetupWizard;
+use WPO\IPS\CheckoutField;
 
 if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
@@ -63,6 +64,7 @@ class WPO_WCPDF {
 	public ?Peppol $peppol                         = null;
 	public ?Notices $notices                       = null;
 	public ?SetupWizard $setup_wizard              = null;
+	public ?CheckoutField $checkout_field          = null;
 
 	protected ?bool $dependencies_ready            = null;
 	protected ?bool $woocommerce_activated         = null;
@@ -266,6 +268,7 @@ class WPO_WCPDF {
 				'peppol'              => Peppol::class,
 				'notices'             => Notices::class,
 				'setup_wizard'        => SetupWizard::class,
+				'checkout_field'      => CheckoutField::class,
 			),
 			$this
 		);
