@@ -96,11 +96,29 @@ class ThirdPartyPlugins {
 			}
 		}
 
+		$legacy_format = in_array( current_filter(), array( 'wcs_renewal_order_meta', 'wcs_resubscribe_order_meta' ), true );
+		$set_meta = static function ( string $key, $value ) use ( &$meta, $legacy_format ): void {
+			if ( ! $legacy_format ) {
+				$meta[ $key ] = $value;
+				return;
+			}
+
+			foreach ( $meta as &$entry ) {
+				if ( is_array( $entry ) && ( $entry['meta_key'] ?? null ) === $key ) {
+					$entry['meta_value'] = $value;
+					return;
+				}
+			}
+			unset( $entry );
+
+			$meta[] = array( 'meta_key' => $key, 'meta_value' => $value );
+		};
+
 		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
 		foreach ( $checkout_field->get_types() as $type ) {
 			$value = $checkout_field->get_order_value( $from_order, $type );
 			if ( null !== $value ) {
-				$meta[ $checkout_field->get_order_meta_key( $type ) ] = $value;
+				$set_meta( $checkout_field->get_order_meta_key( $type ), $value );
 			}
 		}
 
@@ -117,7 +135,7 @@ class ThirdPartyPlugins {
 				continue;
 			}
 
-			$meta[ $key ] = $value;
+			$set_meta( $key, $value );
 		}
 
 		return $meta;

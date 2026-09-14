@@ -1469,6 +1469,42 @@ function wpo_ips_edi_get_identifier_mappings( string $country = '', string $type
 		),
 	);
 
+	// Adapt the legacy VAT-only filter before applying the new identifier filter.
+	if ( has_filter( 'wpo_ips_edi_peppol_vat_mappings' ) ) {
+		$legacy_mappings = array();
+		foreach ( $mappings as $country_code => $country_data ) {
+			$legacy_mappings[ $country_code ] = array(
+				'name'     => $country_data['name'],
+				'mappings' => $country_data['mappings']['vat_number'],
+			);
+		}
+
+		$legacy_mappings = (array) apply_filters_deprecated(
+			'wpo_ips_edi_peppol_vat_mappings',
+			array( $legacy_mappings ),
+			'6.0.0',
+			'wpo_ips_edi_identifier_mappings'
+		);
+
+		// A removed country must no longer provide VAT endpoint candidates.
+		foreach ( $mappings as $country_code => &$country_data ) {
+			if ( ! isset( $legacy_mappings[ $country_code ] ) ) {
+				$country_data['mappings']['vat_number'] = array();
+			}
+		}
+		unset( $country_data );
+
+		foreach ( $legacy_mappings as $country_code => $country_data ) {
+			if ( ! is_array( $country_data ) ) {
+				continue;
+			}
+			$mappings[ $country_code ]['name'] = $country_data['name'] ?? $country_code;
+			$mappings[ $country_code ]['mappings']['vat_number'] = isset( $country_data['mappings'] ) && is_array( $country_data['mappings'] )
+				? $country_data['mappings']
+				: array( $country_data );
+		}
+	}
+
 	$mappings = (array) apply_filters(
 		'wpo_ips_edi_identifier_mappings',
 		$mappings,

@@ -60,9 +60,16 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
 
-			return $this->normalize_type(
-				(string) $general_settings->get_setting( 'checkout_field_type' )
-			);
+			$type = (string) $general_settings->get_setting( 'checkout_field_type' );
+
+			// Checkout can run before the admin request that upgrades the settings.
+			if ( '' === $type ) {
+				$type = $general_settings->get_setting( 'checkout_field_as_vat_number' )
+					? self::TYPE_VAT_NUMBER
+					: self::TYPE_CUSTOM;
+			}
+
+			return $this->normalize_type( $type );
 		}
 
 		/**
