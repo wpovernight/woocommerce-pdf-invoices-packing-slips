@@ -185,7 +185,7 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 			),
 		);
 
-		// Legal Organization (if company)
+		// Legal Organization (if company or registration number)
 		if ( ! empty( $billing_company ) || ! empty( $registration_number ) ) {
 			$legal_organization = array();
 
@@ -204,10 +204,12 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 				$legal_organization[] = $registration_number_id;
 			}
 
-			$legal_organization[] = array(
-				'name'  => 'ram:TradingBusinessName',
-				'value' => wpo_ips_edi_sanitize_string( $billing_company ),
-			);
+			if ( ! empty( $billing_company ) ) {
+				$legal_organization[] = array(
+					'name'  => 'ram:TradingBusinessName',
+					'value' => wpo_ips_edi_sanitize_string( $billing_company ),
+				);
+			}
 
 			$buyer_trade_party['value'][] = array(
 				'name'  => 'ram:SpecifiedLegalOrganization',
