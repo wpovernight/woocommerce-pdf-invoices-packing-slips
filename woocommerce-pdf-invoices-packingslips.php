@@ -226,6 +226,11 @@ class WPO_WCPDF {
 			$this->get_instance( 'frontend' );
 		}
 
+		// REST_REQUEST is not defined yet during normal init. Register fields before Store API routes.
+		add_action( 'rest_api_init', function () {
+			$this->get_instance( 'frontend' );
+		}, 5 );
+
 		// Peppol only when enabled and relevant
 		if (
 			function_exists( 'wpo_ips_edi_peppol_is_available' ) &&

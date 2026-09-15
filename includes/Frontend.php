@@ -45,7 +45,7 @@ class Frontend {
 		}
 
 		// Optional Checkout field (General Settings).
-		if ( wpo_ips_is_checkout_request() && \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			// Blocks/store-api hooks
 			$this->checkout_field_display_checkout_block_field();
 			$this->checkout_field_set_checkout_block_field_value();
@@ -53,6 +53,12 @@ class Frontend {
 			add_action( 'woocommerce_set_additional_field_value', array( $this, 'checkout_field_save_checkout_block_field' ), 10, 4 );
 			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'checkout_field_remove_order_checkout_block_field_meta' ), 10, 1 );
 
+			add_action( 'woocommerce_customer_loaded', array( $this, 'checkout_field_remove_customer_checkout_block_field_meta' ) );
+			add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'checkout_field_remove_session_checkout_block_field_meta' ) );
+			$this->checkout_field_remove_session_checkout_block_field_meta();
+		}
+
+		if ( wpo_ips_is_checkout_request() && \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			// Classic checkout hooks
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_display_classic_checkout_field' ), 10, 1 );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
@@ -399,7 +405,8 @@ class Frontend {
 			static function ( $value, string $group, \WC_Data $wc_object ) {
 				// Our field is in 'order' location, so group is typically 'other'.
 				if ( ! $wc_object instanceof \WC_Customer ) {
-					return (string) $value;
+					// Preserve null for draft orders so Store API can fall back to customer defaults.
+					return $value;
 				}
 
 				$user_id = $wc_object->get_id();
@@ -463,6 +470,39 @@ class Frontend {
 
 		$order->delete_meta_data( '_wc_other/' . $field_id );
 		$order->save_meta_data();
+
+		if ( is_callable( array( $order, 'get_customer_id' ) ) && $order->get_customer_id() ) {
+			delete_user_meta( $order->get_customer_id(), '_wc_other/' . $field_id );
+		}
+		$this->checkout_field_remove_session_checkout_block_field_meta();
+	}
+
+	/**
+	 * Remove WooCommerce's untyped customer copy so typed defaults remain authoritative.
+	 *
+	 * @param \WC_Customer $customer Customer object.
+	 * @return void
+	 */
+	public function checkout_field_remove_customer_checkout_block_field_meta( \WC_Customer $customer ): void {
+		// Guests have no persistent typed customer values; keep their checkout session data.
+		if ( ! $customer->get_id() ) {
+			return;
+		}
+
+		$meta_key = '_wc_other/' . CheckoutField::BLOCK_FIELD_ID;
+		$customer->delete_meta_data( $meta_key );
+		delete_user_meta( $customer->get_id(), $meta_key );
+	}
+
+	/**
+	 * Clear the native copy after session metadata has been loaded as well.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_remove_session_checkout_block_field_meta(): void {
+		if ( \WC()->customer instanceof \WC_Customer ) {
+			$this->checkout_field_remove_customer_checkout_block_field_meta( \WC()->customer );
+		}
 	}
 
 	/**
