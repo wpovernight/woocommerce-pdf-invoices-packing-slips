@@ -902,6 +902,22 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	text-decoration: none;
 }
 
+#wpo-wcpdf-settings.edi .form-table label:has( + select.wpo-wcpdf-enhanced-select ) {
+	display: block;
+}
+
+#wpo-wcpdf-settings.edi .form-table td:has( select.wpo-wcpdf-enhanced-select ) {
+	min-width: 0;
+}
+
+#wpo-wcpdf-settings.edi select.wpo-wcpdf-enhanced-select + .select2-container {
+	display: block;
+	width: 100% !important;
+	min-width: 0 !important;
+	max-width: 100%;
+	margin: 0;
+}
+
 #wpo-wcpdf-settings.edi table.form-table > tbody > tr.edi-multiple label {
 	display: block;
 	margin-bottom: 0.3125em;

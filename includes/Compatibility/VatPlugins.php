@@ -1,6 +1,8 @@
 <?php
 namespace WPO\IPS\Compatibility;
 
+use WPO\IPS\CheckoutField;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -176,12 +178,24 @@ class VatPlugins {
 
 	/**
 	 * Get the form selector for the detected VAT plugin, based on context.
-	 * 
+	 *
 	 * @param string $context Context of the form selector, either 'block' or 'classic'.
 	 * @return string
 	 */
 	public function get_form_selector( string $context = 'block' ): string {
 		$info = $this->detect();
+
+		// When no third-party VAT plugin is active, only use our generic
+		// checkout field as a VAT source if it is configured as such.
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+
+		if (
+			empty( $info['active'] ) &&
+			( ! $checkout_field->is_enabled() || ! $checkout_field->is_type( CheckoutField::TYPE_VAT_NUMBER ) )
+		) {
+			return '';
+		}
+
 		return ( 'block' === $context )
 			? (string) $info['block_form_selector']
 			: (string) $info['classic_form_selector'];

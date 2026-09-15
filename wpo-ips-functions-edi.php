@@ -839,6 +839,33 @@ function wpo_ips_edi_get_order_customer_vat_number( \WC_Order $order ): ?string 
 }
 
 /**
+ * Get the formatted customer company registration number for EDI output.
+ *
+ * @param \WC_Order $order Order object.
+ * @return string|null
+ */
+function wpo_ips_edi_get_order_customer_registration_number( \WC_Order $order ): ?string {
+	$registration_number = wpo_wcpdf_get_order_customer_registration_number( $order );
+
+	if ( ! empty( $registration_number ) ) {
+		$registration_number = wpo_ips_edi_format_registration_number(
+			(string) $registration_number,
+			$order->get_billing_country()
+		);
+	}
+
+	$registration_number = apply_filters(
+		'wpo_ips_edi_order_customer_registration_number',
+		! empty( $registration_number ) ? $registration_number : null,
+		$order
+	);
+
+	return is_string( $registration_number )
+		? $registration_number
+		: null;
+}
+
+/**
  * Build PEPPOL endpoint ID candidates from VAT number.
  *
  * @param string $billing_country The billing country code (ISO 3166-1 alpha-2).
@@ -886,16 +913,14 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 		return array();
 	}
 
-	$mappings = wpo_ips_edi_get_peppol_vat_mappings();
+	$configs = wpo_ips_edi_get_identifier_mappings(
+		$billing_country,
+		'vat_number'
+	);
 
-	if ( empty( $mappings[ $billing_country ] ) ) {
+	if ( empty( $configs ) || ! is_array( $configs ) ) {
 		return array();
 	}
-
-	$cfg     = $mappings[ $billing_country ];
-	$configs = ! empty( $cfg['mappings'] ) && is_array( $cfg['mappings'] )
-		? $cfg['mappings']
-		: array( $cfg );
 
 	$candidates = array();
 
@@ -965,349 +990,15 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 }
 
 /**
- * Get PEPPOL VAT number mappings.
+ * Get identifier mappings by country.
  *
- * @return array
+ * @param string $country Optional country code in ISO 3166-1 alpha-2 format.
+ * @param string $type    Optional identifier type, e.g. 'vat_number' or 'registration_number'.
+ * @param string $key     Optional mapping key, e.g. 'eas', 'icd' or 'label'.
+ * @return array|string
  */
-function wpo_ips_edi_get_peppol_vat_mappings(): array {
-	$mappings = array(
-		'AT' => array(
-			'name'     => 'Austria',
-			'mappings' => array(
-				array(
-					'eas'            => '9914',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
-				),
-			),
-		),
-		'BE' => array(
-			'name'     => 'Belgium',
-			'mappings' => array(
-				array(
-					'eas'            => '0208',
-					'strip_prefixes' => array( 'BE' ),
-					'keep_pattern'   => '/\d+/',
-					'length'         => 10,
-				),
-				array(
-					'eas'            => '9925',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 12,
-				),
-			),
-		),
-		'BG' => array(
-			'name'     => 'Bulgaria',
-			'mappings' => array(
-				array(
-					'eas'            => '9926',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 11, 12 ),
-				),
-			),
-		),
-		'CY' => array(
-			'name'     => 'Cyprus',
-			'mappings' => array(
-				array(
-					'eas'            => '9928',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
-				),
-			),
-		),
-		'CZ' => array(
-			'name'     => 'Czech Republic',
-			'mappings' => array(
-				array(
-					'eas'            => '9929',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 10, 11, 12 ),
-				),
-			),
-		),
-		'DE' => array(
-			'name'     => 'Germany',
-			'mappings' => array(
-				array(
-					'eas'            => '9930',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
-				),
-			),
-		),
-		'DK' => array(
-			'name'     => 'Denmark',
-			'mappings' => array(
-				array(
-					'eas'            => '0184',
-					'strip_prefixes' => array( 'DK' ),
-					'keep_pattern'   => '/\d+/',
-					'length'         => 8,
-				),
-			),
-		),
-		'EE' => array(
-			'name'     => 'Estonia',
-			'mappings' => array(
-				array(
-					'eas'            => '9931',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
-				),
-			),
-		),
-		'ES' => array(
-			'name'     => 'Spain',
-			'mappings' => array(
-				array(
-					'eas'            => '9920',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
-				),
-			),
-		),
-		'FI' => array(
-			'name'     => 'Finland',
-			'mappings' => array(
-				array(
-					'eas'            => '0213',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
-				),
-			),
-		),
-		'FR' => array(
-			'name'     => 'France',
-			'mappings' => array(
-				array(
-					'eas'            => '0002',
-					'strip_prefixes' => array( 'FR' ),
-					'keep_pattern'   => '/\d{9}$/',
-					'length'         => 9,
-				),
-				array(
-					'eas'            => '9957',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 13,
-				),
-			),
-		),
-		'GB' => array(
-			'name'     => 'United Kingdom',
-			'mappings' => array(
-				array(
-					'eas'            => '9932',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 11, 14 ),
-				),
-			),
-		),
-		'GR' => array(
-			'name'     => 'Greece',
-			'mappings' => array(
-				array(
-					'eas'            => '9933',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
-				),
-			),
-		),
-		'HR' => array(
-			'name'     => 'Croatia',
-			'mappings' => array(
-				array(
-					'eas'            => '9934',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 13,
-				),
-			),
-		),
-		'HU' => array(
-			'name'     => 'Hungary',
-			'mappings' => array(
-				array(
-					'eas'            => '9910',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
-				),
-			),
-		),
-		'IE' => array(
-			'name'     => 'Ireland',
-			'mappings' => array(
-				array(
-					'eas'            => '9935',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 10, 11 ),
-				),
-			),
-		),
-		'IT' => array(
-			'name'     => 'Italy',
-			'mappings' => array(
-				array(
-					'eas'            => '0211',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 13,
-				),
-			),
-		),
-		'LT' => array(
-			'name'     => 'Lithuania',
-			'mappings' => array(
-				array(
-					'eas'            => '9937',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => array( 11, 14 ),
-				),
-			),
-		),
-		'LU' => array(
-			'name'     => 'Luxembourg',
-			'mappings' => array(
-				array(
-					'eas'            => '9938',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
-				),
-			),
-		),
-		'LV' => array(
-			'name'     => 'Latvia',
-			'mappings' => array(
-				array(
-					'eas'            => '9939',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 13,
-				),
-			),
-		),
-		'MT' => array(
-			'name'     => 'Malta',
-			'mappings' => array(
-				array(
-					'eas'            => '9943',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
-				),
-			),
-		),
-		'NL' => array(
-			'name'     => 'Netherlands',
-			'mappings' => array(
-				array(
-					'eas'            => '9944',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 14,
-				),
-			),
-		),
-		'NO' => array(
-			'name'     => 'Norway',
-			'mappings' => array(
-				array(
-					'eas'            => '0192',
-					'strip_prefixes' => array( 'NO' ),
-					'keep_pattern'   => '/\d+/',
-					'length'         => 9,
-				),
-			),
-		),
-		'PL' => array(
-			'name'     => 'Poland',
-			'mappings' => array(
-				array(
-					'eas'            => '9945',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 12,
-				),
-			),
-		),
-		'PT' => array(
-			'name'     => 'Portugal',
-			'mappings' => array(
-				array(
-					'eas'            => '9946',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 11,
-				),
-			),
-		),
-		'RO' => array(
-			'name'     => 'Romania',
-			'mappings' => array(
-				array(
-					'eas'            => '9947',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => range( 4, 12 ),
-				),
-			),
-		),
-		'SE' => array(
-			'name'     => 'Sweden',
-			'mappings' => array(
-				array(
-					'eas'            => '0007',
-					'strip_prefixes' => array( 'SE' ),
-					'keep_pattern'   => '/^\d{10}/',
-					'length'         => 10,
-				),
-			),
-		),
-		'SI' => array(
-			'name'     => 'Slovenia',
-			'mappings' => array(
-				array(
-					'eas'            => '9949',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 10,
-				),
-			),
-		),
-		'SK' => array(
-			'name'     => 'Slovakia',
-			'mappings' => array(
-				array(
-					'eas'            => '9950',
-					'strip_prefixes' => array(),
-					'keep_pattern'   => '/[A-Z0-9]+/',
-					'length'         => 12,
-				),
-			),
-		),
-	);
-
-	return (array) apply_filters(
-		'wpo_ips_edi_peppol_vat_mappings',
-		$mappings
-	);
+function wpo_ips_edi_get_identifier_mappings( string $country = '', string $type = '', string $key = '' ): array|string {
+	return \WPO\IPS\EDI\IdentifierMappings::get( $country, $type, $key );
 }
 
 /**
@@ -1344,8 +1035,9 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
 	$language                  = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 	
-	$supplier_country = $general_settings_instance->get_setting( 'shop_address_country', $language );
-	$supplier_vat     = $general_settings_instance->get_setting( 'vat_number', $language );
+	$supplier_country          = $general_settings_instance->get_setting( 'shop_address_country', $language );
+	$supplier_vat              = $general_settings_instance->get_setting( 'vat_number', $language );
+	$registration_number_label = wpo_ips_edi_get_identifier_mappings( (string) $supplier_country, 'registration_number', 'label' );
 
 	if ( ! empty( $supplier_vat ) ) {
 		$supplier_vat = wpo_ips_edi_format_vat_number(
@@ -1397,7 +1089,7 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
 			'required' => true,
 		),
 		'coc_number' => array(
-			'label'    => __( 'Registration number', 'woocommerce-pdf-invoices-packing-slips' ),
+			'label'    => $registration_number_label,
 			'value'    => $general_settings_instance->get_setting( 'coc_number', $language ),
 			'required' => false,
 		),
@@ -1470,7 +1162,7 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 		'vat_number' => array(
 			'label'    => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
 			'value'    => wpo_ips_edi_get_order_customer_vat_number( $order ),
-			'required' => true,
+			'required' => wpo_ips_edi_peppol_is_available(),
 		),
 		'email' => array(
 			'label'    => __( 'Email', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -1478,6 +1170,19 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 			'required' => true,
 		),
 	);
+
+	$checkout_field      = \WPO_WCPDF()->get_instance( 'checkout_field' );
+	$registration_number = wpo_ips_edi_get_order_customer_registration_number( $order );
+
+	if ( null !== $registration_number || $checkout_field->is_type( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER ) ) {
+		$data['registration_number'] = array(
+			'label'    => $checkout_field->is_type( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER )
+				? $checkout_field->get_label()
+				: $checkout_field->get_default_label( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER, $order->get_billing_country() ),
+			'value'    => $registration_number,
+			'required' => false,
+		);
+	}
 
 	if ( wpo_ips_edi_peppol_is_available() ) {
 		$user_id         = $order->get_customer_id();
