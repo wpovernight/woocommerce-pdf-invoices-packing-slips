@@ -254,6 +254,8 @@ class SettingsEDI {
 				'title'             => __( 'Peppol Endpoint Scheme (EAS)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'       => $option_name,
 				'id'                => 'peppol_endpoint_eas',
+				'enhanced_select'   => true,
+				'show_empty_option' => true,
 				'options'           => ( function () {
 					$options = array( '' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...' );
 					foreach ( EN16931::get_eas() as $code => $label ) {
@@ -272,9 +274,11 @@ class SettingsEDI {
 					)
 				),
 				'custom_attributes' => array(
-					'data-show_for_option_name'   => $option_name . '[ubl_format]',
-					'data-show_for_option_values' => json_encode( array( 'peppol-bis-3p0' ) ),
-					'data-keep_current_value'     => true,
+					'data-minimum-results-for-search' => 0,
+					'data-minimum-input-length'       => 0,
+					'data-show_for_option_name'       => $option_name . '[ubl_format]',
+					'data-show_for_option_values'     => json_encode( array( 'peppol-bis-3p0' ) ),
+					'data-keep_current_value'         => true,
 				),
 			),
 		);
@@ -452,6 +456,12 @@ class SettingsEDI {
 				'title'            => __( 'Supplier Registration Number Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'      => $option_name,
 				'id'               => 'registration_number_scheme',
+				'enhanced_select'   => true,
+				'show_empty_option' => true,
+				'custom_attributes' => array(
+					'data-minimum-results-for-search' => 0,
+					'data-minimum-input-length'       => 0,
+				),
 				'default'          => '',
 				'disabled'         => empty( $registration_number ),
 				'options'          => ( function () use ( $default_registration_scheme, $registration_number_label ) {
@@ -476,7 +486,7 @@ class SettingsEDI {
 					'%1$s<br>%2$s',
 					sprintf(
 						/* translators: %1$s: registration number label, %2$s: registration number */
-						__( 'This scheme identifies the supplier %1$s in electronic documents. Current value: %2$s', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'This scheme identifies the supplier %1$s in electronic documents. %1$s: %2$s', 'woocommerce-pdf-invoices-packing-slips' ),
 						esc_html( $registration_number_label ),
 						! empty( $registration_number ) ? '<code>' . esc_html( $registration_number ) . '</code>' : esc_html__( 'Not set', 'woocommerce-pdf-invoices-packing-slips' )
 					),

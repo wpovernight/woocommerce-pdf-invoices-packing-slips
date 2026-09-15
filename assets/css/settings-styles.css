@@ -902,6 +902,25 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	text-decoration: none;
 }
 
+#wpo-wcpdf-settings.edi .form-table label[for="peppol_endpoint_eas"],
+#wpo-wcpdf-settings.edi .form-table label[for="registration_number_scheme"] {
+	display: block;
+}
+
+#wpo-wcpdf-settings.edi .form-table td:has( > #peppol_endpoint_eas ),
+#wpo-wcpdf-settings.edi .form-table td:has( > #registration_number_scheme ) {
+	min-width: 0;
+}
+
+#wpo-wcpdf-settings.edi #peppol_endpoint_eas + .select2-container,
+#wpo-wcpdf-settings.edi #registration_number_scheme + .select2-container {
+	display: block;
+	width: 100% !important;
+	min-width: 0 !important;
+	max-width: 100%;
+	margin: 0;
+}
+
 #wpo-wcpdf-settings.edi table.form-table > tbody > tr.edi-multiple label {
 	display: block;
 	margin-bottom: 0.3125em;
