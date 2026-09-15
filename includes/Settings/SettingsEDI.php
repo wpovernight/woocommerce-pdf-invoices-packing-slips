@@ -44,6 +44,7 @@ class SettingsEDI {
 		
 		// WP
 		add_filter( 'pre_update_option_wpo_ips_edi_settings', array( $this, 'preserve_peppol_settings' ), 10, 3 );
+		add_filter( 'pre_update_option_wpo_ips_edi_settings', array( $this, 'preserve_registration_number_scheme' ), 10, 2 );
 		
 		// IPS
 		add_action( 'wpo_wcpdf_settings_output_edi', array( $this, 'output_settings' ), 10, 2 );
@@ -451,12 +452,18 @@ class SettingsEDI {
 				'title'            => __( 'Supplier Registration Number Scheme (ICD)', 'woocommerce-pdf-invoices-packing-slips' ),
 				'option_name'      => $option_name,
 				'id'               => 'registration_number_scheme',
-				'default'          => $default_registration_scheme,
-				'default_if_empty' => true,
+				'default'          => '',
 				'disabled'         => empty( $registration_number ),
-				'options'          => ( function () {
+				'options'          => ( function () use ( $default_registration_scheme, $registration_number_label ) {
 					$options = array(
-						'' => __( 'Select', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
+						'' => '' !== $default_registration_scheme
+							? sprintf(
+								/* translators: %1$s: ICD scheme code, %2$s: registration number label */
+								__( 'Automatic ([%1$s] %2$s)', 'woocommerce-pdf-invoices-packing-slips' ),
+								$default_registration_scheme,
+								$registration_number_label
+							)
+							: __( 'Automatic (no scheme)', 'woocommerce-pdf-invoices-packing-slips' ),
 					);
 
 					foreach ( EN16931::get_icd() as $code => $label ) {
@@ -473,7 +480,7 @@ class SettingsEDI {
 						esc_html( $registration_number_label ),
 						! empty( $registration_number ) ? '<code>' . esc_html( $registration_number ) . '</code>' : esc_html__( 'Not set', 'woocommerce-pdf-invoices-packing-slips' )
 					),
-					__( 'The default scheme is selected based on the Shop Country in General Settings. You can select a different scheme if needed.', 'woocommerce-pdf-invoices-packing-slips' )
+					__( 'Automatic uses the current Shop Country in General Settings. Select a specific scheme to override it, including after the Shop Country changes.', 'woocommerce-pdf-invoices-packing-slips' )
 				),
 			),
 		);
@@ -686,6 +693,29 @@ class SettingsEDI {
 					$new[ $key ] = preg_replace( '/^[^:]+:/', '', trim( $val ) );
 				}
 			}
+		}
+
+		return $new;
+	}
+
+	/**
+	 * Preserve a saved scheme when the disabled selector is omitted from the form.
+	 * An explicitly submitted empty value selects Automatic.
+	 *
+	 * @param mixed $value     New settings.
+	 * @param mixed $old_value Previous settings.
+	 * @return array
+	 */
+	public function preserve_registration_number_scheme( $value, $old_value ): array {
+		$new = is_array( $value ) ? $value : array();
+		$old = is_array( $old_value ) ? $old_value : array();
+
+		if (
+			! array_key_exists( 'registration_number_scheme', $new ) &&
+			array_key_exists( 'registration_number_scheme', $old ) &&
+			empty( \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' )->get_setting( 'coc_number' ) )
+		) {
+			$new['registration_number_scheme'] = $old['registration_number_scheme'];
 		}
 
 		return $new;
