@@ -951,6 +951,12 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin: 1em 0;
 }
 
+/* Select2 appends dropdowns to the body; keep them below the WordPress admin bar. */
+body.woocommerce_page_wpo_wcpdf_options_page .select2-drop,
+body.woocommerce_page_wpo_wcpdf_options_page .select2-dropdown {
+	z-index: 9990 !important;
+}
+
 button.button-wpo.button,
 .button.button-wpo.button-primary {
 	height: 36px !important;
