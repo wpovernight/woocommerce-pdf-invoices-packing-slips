@@ -723,6 +723,10 @@ jQuery( function( $ ) {
 		previewSearchTimeout = setTimeout( function() { previewOrderSearch( $elem ) }, duration );
 	} );
 
+	function decodeHtmlEntities( str ) {
+		return $( '<textarea />' ).html( str ).text();
+	}
+
 	// Preview order search
 	function previewOrderSearch( $elem ) {
 		let $div   = $elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
@@ -766,13 +770,13 @@ jQuery( function( $ ) {
 
 							$result.append(
 								document.createTextNode(
-									' - ' + item.billing_first_name + ' ' + item.billing_last_name
+									' - ' + decodeHtmlEntities( item.billing_first_name ) + ' ' + decodeHtmlEntities( item.billing_last_name )
 								)
 							);
 
 							if ( item.billing_company.length > 0 ) {
 								$result.append(
-									document.createTextNode( ', ' + item.billing_company )
+									document.createTextNode( ', ' + decodeHtmlEntities( item.billing_company ) )
 								);
 							}
 
