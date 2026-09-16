@@ -460,19 +460,30 @@ class Frontend {
 	}
 
 	/**
-	 * Remove optional checkout field from order meta after checkout.
+	 * Persist the customer checkout field and remove WooCommerce's untyped copies.
 	 *
 	 * @param \WC_Abstract_Order $order
 	 * @return void
 	 */
 	public function checkout_field_remove_order_checkout_block_field_meta( \WC_Abstract_Order $order ): void {
-		$field_id = CheckoutField::BLOCK_FIELD_ID;
+		$field_id    = CheckoutField::BLOCK_FIELD_ID;
+		$customer_id = is_callable( array( $order, 'get_customer_id' ) ) ? $order->get_customer_id() : 0;
+
+		if ( $customer_id > 0 ) {
+			// Accounts created during checkout are only linked after the field is saved on the order.
+			$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+			$value          = $checkout_field->get_order_value( $order );
+
+			if ( null !== $value ) {
+				$checkout_field->save_user_value( $customer_id, $value );
+			}
+		}
 
 		$order->delete_meta_data( '_wc_other/' . $field_id );
 		$order->save_meta_data();
 
-		if ( is_callable( array( $order, 'get_customer_id' ) ) && $order->get_customer_id() ) {
-			delete_user_meta( $order->get_customer_id(), '_wc_other/' . $field_id );
+		if ( $customer_id > 0 ) {
+			delete_user_meta( $customer_id, '_wc_other/' . $field_id );
 		}
 		$this->checkout_field_remove_session_checkout_block_field_meta();
 	}
