@@ -47,6 +47,7 @@ class Frontend {
 
 		// Optional Checkout field (General Settings).
 		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+			add_action( 'wp_enqueue_scripts', array( $this, 'checkout_field_enqueue_label_script' ) );
 			// Blocks/store-api hooks
 			$this->checkout_field_display_checkout_block_field();
 			$this->checkout_field_set_checkout_block_field_value();
@@ -354,6 +355,43 @@ class Frontend {
 	 */
 	public function prevent_storing_document_settings(): bool {
 		return false;
+	}
+
+	/**
+	 * Update default registration labels when the checkout billing country changes.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_enqueue_label_script(): void {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$general        = \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
+
+		if (
+			! wpo_ips_is_checkout_request() ||
+			! $checkout_field->is_enabled() ||
+			! $checkout_field->is_type( CheckoutField::TYPE_REGISTRATION_NUMBER ) ||
+			'' !== trim( $general->get_setting( 'checkout_field_label' ) )
+		) {
+			return;
+		}
+
+		$labels = array();
+		foreach ( array_merge( array( '' ), array_keys( \WC()->countries->get_countries() ) ) as $country ) {
+			$labels[ $country ] = $checkout_field->get_label( $country );
+		}
+
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		wp_enqueue_script(
+			'wpo-ips-checkout-field-label',
+			\WPO_WCPDF()->plugin_url() . '/assets/js/checkout-field-label' . $suffix . '.js',
+			array( 'jquery', 'wp-data' ),
+			WPO_WCPDF_VERSION,
+			true
+		);
+		wp_localize_script( 'wpo-ips-checkout-field-label', 'wpoIpsCheckoutFieldLabel', array(
+			'labels'       => $labels,
+			'initialLabel' => $checkout_field->get_label(),
+		) );
 	}
 
 	/**
