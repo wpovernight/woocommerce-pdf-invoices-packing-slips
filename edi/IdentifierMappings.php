@@ -18,7 +18,12 @@ class IdentifierMappings {
 	 * @return array|string
 	 */
 	public static function get( string $country = '', string $type = '', string $key = '' ): array|string {
-		$mappings = array(
+		static $base_mappings = array();
+
+		$locale = get_locale();
+
+		// Cache only the base data per locale; filters still run on every lookup.
+		$mappings = $base_mappings[ $locale ] ??= array(
 			'AT' => array(
 				'name'     => 'Austria',
 				'mappings' => array(
