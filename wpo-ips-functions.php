@@ -1268,7 +1268,6 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 	
 	$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
 	$vat_number     = $checkout_field->get_order_value( $order, \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER );
-	$meta_key       = null;
 
 	if ( null !== $vat_number ) {
 		array_unshift( $vat_meta_keys, $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER ) );
