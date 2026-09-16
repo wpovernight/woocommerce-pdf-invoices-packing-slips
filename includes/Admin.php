@@ -694,7 +694,7 @@ class Admin {
 		}
 
 		// Customer identifiers
-		echo $this->get_order_meta_box_customer_identifiers( $order ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		$this->get_order_meta_box_customer_identifiers( $order );
 
 		if ( ! empty( $meta_box_actions ) ) :
 		?>
