@@ -10,6 +10,7 @@ if ( ! class_exists( '\\WPO\\IPS\\Frontend' ) ) :
 class Frontend {
 
 	protected static ?self $_instance = null;
+	private bool $checkout_field_rest_cleanup = false;
 
 	/**
 	 * Get the singleton instance of this class.
@@ -56,6 +57,9 @@ class Frontend {
 			add_action( 'woocommerce_customer_loaded', array( $this, 'checkout_field_remove_customer_checkout_block_field_meta' ) );
 			add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'checkout_field_remove_session_checkout_block_field_meta' ) );
 			$this->checkout_field_remove_session_checkout_block_field_meta();
+
+			add_filter( 'rest_request_before_callbacks', array( $this, 'checkout_field_enable_rest_cleanup' ), 10, 3 );
+			add_filter( 'rest_request_after_callbacks', array( $this, 'checkout_field_disable_rest_cleanup' ) );
 		}
 
 		if ( wpo_ips_is_checkout_request() && \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
@@ -489,20 +493,61 @@ class Frontend {
 	}
 
 	/**
+	 * Enable customer metadata cleanup for Store API checkout callbacks.
+	 *
+	 * @param mixed            $response REST response.
+	 * @param array            $handler  Route handler.
+	 * @param \WP_REST_Request $request  REST request.
+	 * @return mixed
+	 */
+	public function checkout_field_enable_rest_cleanup( mixed $response, array $handler, \WP_REST_Request $request ): mixed {
+		// Inspect the dispatched route so this also works for Store API batch requests.
+		$this->checkout_field_rest_cleanup = (bool) preg_match( '#^/wc/store/v[0-9]+/checkout(?:/|$)#', $request->get_route() );
+
+		if ( $this->checkout_field_rest_cleanup ) {
+			$this->checkout_field_remove_session_checkout_block_field_meta();
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Disable customer metadata cleanup after the REST callbacks finish.
+	 *
+	 * @param mixed $response REST response.
+	 * @return mixed
+	 */
+	public function checkout_field_disable_rest_cleanup( mixed $response ): mixed {
+		$this->checkout_field_rest_cleanup = false;
+
+		return $response;
+	}
+
+	/**
 	 * Remove WooCommerce's untyped customer copy so typed defaults remain authoritative.
 	 *
 	 * @param \WC_Customer $customer Customer object.
 	 * @return void
 	 */
 	public function checkout_field_remove_customer_checkout_block_field_meta( \WC_Customer $customer ): void {
+		if ( ! $this->checkout_field_rest_cleanup && ! wpo_ips_is_checkout_request() ) {
+			return;
+		}
+
 		// Guests have no persistent typed customer values; keep their checkout session data.
 		if ( ! $customer->get_id() ) {
 			return;
 		}
 
 		$meta_key = '_wc_other/' . CheckoutField::BLOCK_FIELD_ID;
+		if ( ! $customer->meta_exists( $meta_key ) ) {
+			return;
+		}
+
 		$customer->delete_meta_data( $meta_key );
-		delete_user_meta( $customer->get_id(), $meta_key );
+		if ( metadata_exists( 'user', $customer->get_id(), $meta_key ) ) {
+			delete_user_meta( $customer->get_id(), $meta_key );
+		}
 	}
 
 	/**
