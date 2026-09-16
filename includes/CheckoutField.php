@@ -373,7 +373,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get and migrate the legacy order checkout field value.
+		 * Get the legacy order checkout field value.
 		 *
 		 * @param \WC_Abstract_Order $order Order object.
 		 * @param string             $type  Field type.
@@ -396,18 +396,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 				return null;
 			}
 
-			$order->update_meta_data(
-				$this->get_order_meta_key( $type ),
-				$value
-			);
-			$order->delete_meta_data( self::LEGACY_ORDER_META_KEY );
-			$order->save_meta_data();
-
 			return $value;
 		}
 
 		/**
-		 * Get and migrate the legacy user checkout field value.
+		 * Get the legacy user checkout field value.
 		 *
 		 * @param int    $user_id User ID.
 		 * @param string $type    Field type.
@@ -429,13 +422,6 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 			if ( '' === $value ) {
 				return null;
 			}
-
-			update_user_meta(
-				$user_id,
-				$this->get_user_meta_key( $type ),
-				$value
-			);
-			delete_user_meta( $user_id, self::LEGACY_USER_META_KEY );
 
 			return $value;
 		}
