@@ -1268,22 +1268,29 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 	
 	$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
 	$vat_number     = $checkout_field->get_order_value( $order, \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER );
+	$meta_key       = null;
 
 	if ( null !== $vat_number ) {
-		array_unshift( $vat_meta_keys, $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER ) );
-	}
+		$meta_key = $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER );
 
-	foreach ( $vat_meta_keys as $meta_key ) {
-		$meta_value = $order->get_meta( $meta_key );
-
-		// Handle multidimensional VAT data (e.g., Aelia EU VAT Assistant)
-		if ( '_eu_vat_evidence' === $meta_key && is_array( $meta_value ) ) {
-			$meta_value = $meta_value['exemption']['vat_number'] ?? '';
+		// A read-only legacy fallback does not populate the typed metadata key.
+		if ( '' === trim( (string) $order->get_meta( $meta_key ) ) ) {
+			$meta_key = \WPO\IPS\CheckoutField::LEGACY_ORDER_META_KEY;
 		}
+	} else {
+		foreach ( $vat_meta_keys as $candidate_meta_key ) {
+			$meta_value = $order->get_meta( $candidate_meta_key );
 
-		if ( $meta_value ) {
-			$vat_number = $meta_value;
-			break;
+			// Handle multidimensional VAT data (e.g., Aelia EU VAT Assistant)
+			if ( '_eu_vat_evidence' === $candidate_meta_key && is_array( $meta_value ) ) {
+				$meta_value = $meta_value['exemption']['vat_number'] ?? '';
+			}
+
+			if ( $meta_value ) {
+				$vat_number = $meta_value;
+				$meta_key   = $candidate_meta_key;
+				break;
+			}
 		}
 	}
 
@@ -1291,7 +1298,7 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'wpo_wcpdf_order_customer_vat_number',
 		$vat_number,
 		$order,
-		$meta_key ?? null
+		$meta_key
 	);
 
 	return is_string( $vat_number )

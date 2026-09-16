@@ -16,7 +16,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		private const ORDER_META_PREFIX       = '_wpo_ips_checkout_field_';
 		private const USER_META_PREFIX        = 'wpo_ips_checkout_field_';
 
-		private const LEGACY_ORDER_META_KEY   = '_wpo_ips_checkout_field';
+		public const LEGACY_ORDER_META_KEY    = '_wpo_ips_checkout_field';
 		private const LEGACY_USER_META_KEY    = 'wpo_ips_checkout_field';
 
 		public const CLASSIC_FIELD_KEY        = 'wpo_ips_checkout_field';
