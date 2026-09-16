@@ -758,12 +758,33 @@ jQuery( function( $ ) {
 						$div.show();
 					} else {
 						$.each( response.data, function( i, item ) {
-							let firstLine = '<a data-order_id="'+i+'"><span class="order-number">#'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
+							const $result = $( '<a>' ).attr( 'data-order_id', i );
+
+							$result.append(
+								$( '<span>' ).addClass( 'order-number' ).text( '#' + item.order_number )
+							);
+
+							$result.append(
+								document.createTextNode(
+									' - ' + item.billing_first_name + ' ' + item.billing_last_name
+								)
+							);
+
 							if ( item.billing_company.length > 0 ) {
-								firstLine = firstLine+', '+item.billing_company;
+								$result.append(
+									document.createTextNode( ', ' + item.billing_company )
+								);
 							}
-							let secondLine = '<br><span class="date">'+item.date_created+'</span><span class="total">'+item.total+'</span></a>';
-							$div.append( firstLine+secondLine );
+
+							$result.append( '<br>' );
+							$result.append(
+								$( '<span>' ).addClass( 'date' ).html( item.date_created )
+							);
+							$result.append(
+								$( '<span>' ).addClass( 'total' ).html( item.total )
+							);
+
+							$div.append( $result );
 							$div.show();
 						} );
 					}
