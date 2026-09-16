@@ -485,7 +485,7 @@ class Frontend {
 			return;
 		}
 
-		if ( ! ( $wc_object instanceof \WC_Order ) ) {
+		if ( ! ( $wc_object instanceof \WC_Order ) && ! ( $wc_object instanceof \WC_Customer ) ) {
 			return;
 		}
 
@@ -493,9 +493,15 @@ class Frontend {
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
 		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
-		$checkout_field->save_order_value( $wc_object, $val );
 
-		$customer_id = $wc_object->get_customer_id();
+		if ( $wc_object instanceof \WC_Order ) {
+			$checkout_field->save_order_value( $wc_object, $val );
+			$customer_id = $wc_object->get_customer_id();
+		} else {
+			// Store API updates can save only the customer/session before an order exists.
+			$customer_id = $wc_object->get_id();
+		}
+
 		if ( $customer_id > 0 ) {
 			$checkout_field->save_user_value( $customer_id, $val );
 		}
