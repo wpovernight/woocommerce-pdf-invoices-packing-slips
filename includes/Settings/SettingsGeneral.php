@@ -598,11 +598,7 @@ class SettingsGeneral {
 					'option_name'       => $option_name,
 					'id'                => 'checkout_field_type',
 					'default'           => 'custom',
-					'options'           => array(
-						'custom'              => __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ),
-						'vat_number'          => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
-						'registration_number' => __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' ),
-					),
+					'options'           => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_type_options(),
 					'custom_attributes' => array(
 						'data-registration-labels' => wp_json_encode( $registration_labels ),
 						'data-custom-label'        => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'custom', $shop_country ),

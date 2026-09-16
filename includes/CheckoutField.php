@@ -43,10 +43,19 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return array
 		 */
 		public function get_types(): array {
+			return array_keys( $this->get_type_options() );
+		}
+
+		/**
+		 * Get the supported field types with their translated labels.
+		 *
+		 * @return array
+		 */
+		public function get_type_options(): array {
 			return array(
-				self::TYPE_CUSTOM,
-				self::TYPE_VAT_NUMBER,
-				self::TYPE_REGISTRATION_NUMBER,
+				self::TYPE_CUSTOM              => __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ),
+				self::TYPE_VAT_NUMBER          => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
+				self::TYPE_REGISTRATION_NUMBER => __( 'Company registration number', 'woocommerce-pdf-invoices-packing-slips' ),
 			);
 		}
 
