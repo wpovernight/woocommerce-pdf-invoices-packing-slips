@@ -610,6 +610,36 @@ class SettingsGeneral {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'checkout_field_alternative_enable',
+				'title'    => __( 'Use a different field type for foreign customers', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_alternative_enable',
+					'description' => __( 'Applies when the billing country differs from Shop Country.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_alternative_type',
+				'title'    => __( 'Alternative field type', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_alternative_type',
+					'options'     => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_type_options(),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[checkout_field_alternative_enable]',
+						'data-show_for_option_values' => wp_json_encode( array( '1' ) ),
+						'data-keep_current_value'     => 'true',
+					),
+					'description' => __( 'The alternative type uses its default label. Display in countries still applies. Requires WooCommerce 9.9 or newer for the Checkout Block.', 'woocommerce-pdf-invoices-packing-slips' ) . $vat_plugin_notice,
+				),
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'checkout_field_label',
 				'title'    => __( 'Label', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'text_input',
@@ -791,6 +821,8 @@ class SettingsGeneral {
 				'members' => array(
 					'checkout_field_enable',
 					'checkout_field_type',
+					'checkout_field_alternative_enable',
+					'checkout_field_alternative_type',
 					'checkout_field_label',
 					'checkout_field_countries',
 					'checkout_field_enable_my_account',

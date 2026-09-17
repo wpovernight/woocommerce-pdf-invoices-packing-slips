@@ -1,11 +1,20 @@
 jQuery( function( $ ) {
 
 	function updateVisibility() {
-		const visible = wpoIpsCheckoutField.countries.indexOf( $( '#billing_country' ).val() ) !== -1;
-		const $field  = $( '#wpo_ips_checkout_field' );
+		const config  = wpoIpsCheckoutField;
+		const country = $( '#billing_country' ).val() || '';
+		const allowed = ! config.countries.length || config.countries.indexOf( country ) !== -1;
+		const type    = config.alternativeType && country && country !== config.shopCountry
+			? config.alternativeType
+			: config.primaryType;
 
-		$field.closest( '.form-row' ).toggle( visible );
-		$field.prop( 'disabled', ! visible );
+		$.each( config.fields, function( key, fieldType ) {
+			const $field  = $( '#' + key );
+			const visible = allowed && fieldType === type;
+
+			$field.closest( '.form-row' ).toggle( visible );
+			$field.prop( 'disabled', ! visible );
+		} );
 	}
 
 	$( document ).on( 'change', '#billing_country', updateVisibility );

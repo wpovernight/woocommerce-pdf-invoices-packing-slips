@@ -363,8 +363,9 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_enqueue_visibility_script(): void {
-		$countries = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_countries();
-		if ( ! wpo_ips_is_checkout_request() || empty( $countries ) ) {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$countries      = $checkout_field->get_countries();
+		if ( ! wpo_ips_is_checkout_request() || ( empty( $countries ) && ! $checkout_field->get_alternative_type() ) ) {
 			return;
 		}
 
@@ -377,7 +378,11 @@ class Frontend {
 			true
 		);
 		wp_localize_script( 'wpo-ips-checkout-field', 'wpoIpsCheckoutField', array(
-			'countries' => $countries,
+			'countries'       => $countries,
+			'shopCountry'     => $checkout_field->get_shop_country(),
+			'primaryType'     => $checkout_field->get_type(),
+			'alternativeType' => $checkout_field->get_alternative_type(),
+			'fields'          => $checkout_field->get_field_types(),
 		) );
 	}
 
@@ -391,51 +396,64 @@ class Frontend {
 			return;
 		}
 
-		$field_id = CheckoutField::BLOCK_FIELD_ID;
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		foreach ( $checkout_field->get_field_types( true ) as $field_id => $type ) {
+			if ( ! $checkout_field->is_enabled( $type ) ) {
+				continue;
+			}
 
-		$args = array(
-			'id'                => $field_id,
-			'label'             => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label(),
-			'location'          => 'order',
-			'type'              => 'text',
-			'sanitize_callback' => static function ( $val ) {
-				$val = sanitize_text_field( (string) $val );
-				return (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
-			},
-			'validate_callback' => function ( $val ) {
-				$val = (string) $val;
+			$args = array(
+				'id'                => $field_id,
+				'label'             => $checkout_field->get_label( $type ),
+				'location'          => 'order',
+				'type'              => 'text',
+				'sanitize_callback' => static function ( $val ) {
+					$val = sanitize_text_field( (string) $val );
+					return (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+				},
+				'validate_callback' => function ( $val ) use ( $type ) {
+					$val = (string) $val;
 
-				// If not treated as VAT, keep the existing flexible hook.
-				if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number() ) {
-					$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
+					// If not treated as VAT, keep the existing flexible hook.
+					if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number( $type ) ) {
+						$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
+						return ( $result instanceof \WP_Error ) ? $result : true;
+					}
+
+					$result = apply_filters( 'wpo_ips_checkout_field_validate', $this->checkout_field_validate_vat_number_value( $val ), $val );
 					return ( $result instanceof \WP_Error ) ? $result : true;
-				}
+				},
+			);
 
-				$result = apply_filters( 'wpo_ips_checkout_field_validate', $this->checkout_field_validate_vat_number_value( $val ), $val );
-				return ( $result instanceof \WP_Error ) ? $result : true;
-			},
-		);
-
-		$countries = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_countries();
-		if ( ! empty( $countries ) && defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9', '>=' ) ) {
-			$args['hidden'] = array(
-				'customer' => array(
-					'properties' => array(
-						'billing_address' => array(
-							'properties' => array(
-								'country' => array(
-									'not' => array( 'enum' => $countries ),
+			$conditions = array();
+			$countries  = $checkout_field->get_countries();
+			if ( ! empty( $countries ) ) {
+				$conditions[] = array( 'enum' => $countries );
+			}
+			if ( $checkout_field->get_alternative_type() ) {
+				$home_countries = array( 'enum' => array( '', $checkout_field->get_shop_country() ) );
+				$conditions[]   = $type === $checkout_field->get_type()
+					? $home_countries
+					: array( 'not' => $home_countries );
+			}
+			if ( $conditions && defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9', '>=' ) ) {
+				$args['hidden'] = array(
+					'customer' => array(
+						'properties' => array(
+							'billing_address' => array(
+								'properties' => array(
+									'country' => array( 'not' => array( 'allOf' => $conditions ) ),
 								),
 							),
 						),
 					),
-				),
-			);
+				);
+			}
+
+			$args = apply_filters( 'wpo_ips_checkout_field_block_args', $args, $type );
+
+			wpo_ips_register_additional_checkout_field( $args );
 		}
-
-		$args = apply_filters( 'wpo_ips_checkout_field_block_args', $args );
-
-		wpo_ips_register_additional_checkout_field( $args );
 	}
 
 	/**
@@ -444,29 +462,29 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_set_checkout_block_field_value(): void {
-		$field_id = CheckoutField::BLOCK_FIELD_ID;
+		foreach ( \WPO_WCPDF()->get_instance( 'checkout_field' )->get_field_types( true ) as $field_id => $type ) {
+			add_filter(
+				"woocommerce_get_default_value_for_{$field_id}",
+				static function ( $value, string $group, \WC_Data $wc_object ) use ( $type ) {
+					// Our field is in 'order' location, so group is typically 'other'.
+					if ( ! $wc_object instanceof \WC_Customer ) {
+						// Preserve null for draft orders so Store API can fall back to customer defaults.
+						return $value;
+					}
 
-		add_filter(
-			"woocommerce_get_default_value_for_{$field_id}",
-			static function ( $value, string $group, \WC_Data $wc_object ) {
-				// Our field is in 'order' location, so group is typically 'other'.
-				if ( ! $wc_object instanceof \WC_Customer ) {
-					// Preserve null for draft orders so Store API can fall back to customer defaults.
-					return $value;
-				}
+					$user_id = $wc_object->get_id();
+					if ( ! $user_id ) {
+						return (string) $value;
+					}
 
-				$user_id = $wc_object->get_id();
-				if ( ! $user_id ) {
-					return (string) $value;
-				}
+					$stored = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id, $type );
 
-				$stored = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id );
-
-				return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, $group, $wc_object );
-			},
-			10,
-			3
-		);
+					return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, $group, $wc_object );
+				},
+				10,
+				3
+			);
+		}
 	}
 
 	/**
@@ -483,9 +501,10 @@ class Frontend {
 			return;
 		}
 
-		$field_id = CheckoutField::BLOCK_FIELD_ID;
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_field_types( true )[ $key ] ?? '';
 
-		if ( $key !== $field_id ) {
+		if ( ! $type || ! $checkout_field->is_enabled( $type ) ) {
 			return;
 		}
 
@@ -496,14 +515,13 @@ class Frontend {
 		$val = sanitize_text_field( (string) wp_unslash( $value ) );
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
-		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
-
-		if ( version_compare( WC_VERSION, '9.9', '>=' ) && ! $checkout_field->is_allowed_country( $wc_object->get_billing_country() ) ) {
+		$country = $wc_object->get_billing_country();
+		if ( version_compare( WC_VERSION, '9.9', '>=' ) && ( ! $checkout_field->is_allowed_country( $country ) || $type !== $checkout_field->get_checkout_type( $country ) ) ) {
 			return;
 		}
 
 		if ( $wc_object instanceof \WC_Order ) {
-			$checkout_field->save_order_value( $wc_object, $val );
+			$checkout_field->save_order_value( $wc_object, $val, $type );
 			$customer_id = $wc_object->get_customer_id();
 		} else {
 			// Store API updates can save only the customer/session before an order exists.
@@ -511,7 +529,7 @@ class Frontend {
 		}
 
 		if ( $customer_id > 0 ) {
-			$checkout_field->save_user_value( $customer_id, $val );
+			$checkout_field->save_user_value( $customer_id, $val, $type );
 		}
 	}
 
@@ -522,28 +540,29 @@ class Frontend {
 	 * @return void
 	 */
 	public function checkout_field_remove_order_checkout_block_field_meta( \WC_Abstract_Order $order ): void {
-		$field_id    = CheckoutField::BLOCK_FIELD_ID;
-		$customer_id = is_callable( array( $order, 'get_customer_id' ) ) ? $order->get_customer_id() : 0;
-
 		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
-		if ( version_compare( WC_VERSION, '9.9', '>=' ) && ! $checkout_field->is_allowed_country( $order->get_billing_country() ) ) {
-			// A draft order may still contain a value entered before the country changed.
-			$checkout_field->save_order_value( $order, '' );
-		} elseif ( $customer_id > 0 ) {
-			// Accounts created during checkout are only linked after the field is saved on the order.
-			$value          = $checkout_field->get_order_value( $order );
+		$customer_id    = $order->get_customer_id();
+		$country        = $order->get_billing_country();
 
-			if ( null !== $value ) {
-				$checkout_field->save_user_value( $customer_id, $value );
+		foreach ( $checkout_field->get_field_types( true ) as $field_id => $type ) {
+			if ( version_compare( WC_VERSION, '9.9', '>=' ) && ( ! $checkout_field->is_allowed_country( $country ) || $type !== $checkout_field->get_checkout_type( $country ) || ! $checkout_field->is_enabled( $type ) ) ) {
+				// A draft may contain a value entered before the country or field type changed.
+				$checkout_field->save_order_value( $order, '', $type );
+			} elseif ( $customer_id > 0 ) {
+				// New accounts are only linked after the field is saved on the order.
+				$value = $checkout_field->get_order_value( $order, $type );
+				if ( null !== $value ) {
+					$checkout_field->save_user_value( $customer_id, $value, $type );
+				}
+			}
+
+			$order->delete_meta_data( '_wc_other/' . $field_id );
+			if ( $customer_id > 0 ) {
+				delete_user_meta( $customer_id, '_wc_other/' . $field_id );
 			}
 		}
 
-		$order->delete_meta_data( '_wc_other/' . $field_id );
 		$order->save_meta_data();
-
-		if ( $customer_id > 0 ) {
-			delete_user_meta( $customer_id, '_wc_other/' . $field_id );
-		}
 		$this->checkout_field_remove_session_checkout_block_field_meta();
 	}
 
@@ -594,14 +613,16 @@ class Frontend {
 			return;
 		}
 
-		$meta_key = '_wc_other/' . CheckoutField::BLOCK_FIELD_ID;
-		if ( ! $customer->meta_exists( $meta_key ) ) {
-			return;
-		}
+		foreach ( array( CheckoutField::BLOCK_FIELD_ID, CheckoutField::ALTERNATIVE_BLOCK_FIELD_ID ) as $field_id ) {
+			$meta_key = '_wc_other/' . $field_id;
+			if ( ! $customer->meta_exists( $meta_key ) ) {
+				continue;
+			}
 
-		$customer->delete_meta_data( $meta_key );
-		if ( metadata_exists( 'user', $customer->get_id(), $meta_key ) ) {
-			delete_user_meta( $customer->get_id(), $meta_key );
+			$customer->delete_meta_data( $meta_key );
+			if ( metadata_exists( 'user', $customer->get_id(), $meta_key ) ) {
+				delete_user_meta( $customer->get_id(), $meta_key );
+			}
 		}
 	}
 
@@ -633,16 +654,21 @@ class Frontend {
 
 		$fields['order'] = $fields['order'] ?? array();
 
-		$key = CheckoutField::CLASSIC_FIELD_KEY;
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		foreach ( $checkout_field->get_field_types() as $key => $type ) {
+			if ( ! $checkout_field->is_enabled( $type ) ) {
+				continue;
+			}
 
-		$args = array(
-			'type'     => 'text',
-			'label'    => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label(),
-			'required' => false,
-			'class'    => array( 'form-row-wide' ),
-		);
+			$args = array(
+				'type'     => 'text',
+				'label'    => $checkout_field->get_label( $type ),
+				'required' => false,
+				'class'    => array( 'form-row-wide' ),
+			);
 
-		$fields['order'][ $key ] = apply_filters( 'wpo_ips_checkout_field_classic_args', $args );
+			$fields['order'][ $key ] = apply_filters( 'wpo_ips_checkout_field_classic_args', $args, $type );
+		}
 
 		return $fields;
 	}
@@ -655,7 +681,8 @@ class Frontend {
 	 * @return mixed
 	 */
 	public function checkout_field_set_classic_checkout_field_value( $value, string $input ) {
-		if ( CheckoutField::CLASSIC_FIELD_KEY !== $input ) {
+		$type = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_field_types()[ $input ] ?? '';
+		if ( ! $type ) {
 			return $value;
 		}
 
@@ -664,7 +691,7 @@ class Frontend {
 			return $value;
 		}
 
-		$stored = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id );
+		$stored = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id, $type );
 
 		return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, 'classic', null );
 	}
@@ -689,7 +716,13 @@ class Frontend {
 			return;
 		}
 
-		$key = CheckoutField::CLASSIC_FIELD_KEY;
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_checkout_type( (string) ( $data['billing_country'] ?? '' ) );
+		if ( ! $checkout_field->is_enabled( $type ) ) {
+			return;
+		}
+
+		$key = array_search( $type, $checkout_field->get_field_types(), true );
 		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
 		$val = sanitize_text_field( $raw );
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
@@ -698,7 +731,7 @@ class Frontend {
 			return;
 		}
 
-		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number() ) {
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number( $type ) ) {
 			$result = $this->checkout_field_validate_vat_number_value( $val );
 
 			if ( $result instanceof \WP_Error ) {
@@ -733,22 +766,33 @@ class Frontend {
 			return;
 		}
 
-		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_allowed_country( (string) ( $data['billing_country'] ?? '' ) ) ) {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$country        = (string) ( $data['billing_country'] ?? '' );
+		$type           = $checkout_field->get_checkout_type( $country );
+		$visible        = $checkout_field->is_allowed_country( $country ) && $checkout_field->is_enabled( $type );
+
+		// Checkout can reuse a pending order after the country has changed.
+		foreach ( $checkout_field->get_field_types() as $field_type ) {
+			if ( ! $visible || $field_type !== $type ) {
+				$checkout_field->save_order_value( $order, '', $field_type );
+			}
+		}
+
+		if ( ! $visible ) {
 			return;
 		}
 
-		$key = CheckoutField::CLASSIC_FIELD_KEY;
+		$key = array_search( $type, $checkout_field->get_field_types(), true );
 
 		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
 		$val = sanitize_text_field( $raw );
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
-		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
-		$checkout_field->save_order_value( $order, $val );
+		$checkout_field->save_order_value( $order, $val, $type );
 
 		$customer_id = $order->get_customer_id();
 		if ( $customer_id > 0 ) {
-			$checkout_field->save_user_value( $customer_id, $val );
+			$checkout_field->save_user_value( $customer_id, $val, $type );
 		}
 	}
 

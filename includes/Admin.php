@@ -2203,8 +2203,8 @@ class Admin {
 				continue;
 			}
 
-			$label = $checkout_field->is_type( $type )
-				? $checkout_field->get_label()
+			$label = in_array( $type, $checkout_field->get_field_types(), true )
+				? $checkout_field->get_label( $type )
 				: $checkout_field->get_default_label( $type, $order->get_billing_country() );
 
 			echo '<p><strong>' . esc_html( $label ) . ':</strong><br>' . esc_html( $value ) . '</p>';

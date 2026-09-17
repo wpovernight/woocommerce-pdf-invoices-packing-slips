@@ -195,6 +195,8 @@ class Assets {
 						'checkout_field_enable',
 						'checkout_field_label',
 						'checkout_field_type',
+						'checkout_field_alternative_enable',
+						'checkout_field_alternative_type',
 						'checkout_field_countries',
 						'checkout_field_enable_my_account',
 						// document

@@ -22,6 +22,9 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		public const CLASSIC_FIELD_KEY        = 'wpo_ips_checkout_field';
 		public const BLOCK_FIELD_ID           = 'wpo-ips/checkout-field';
 
+		public const ALTERNATIVE_CLASSIC_FIELD_KEY = 'wpo_ips_checkout_field_alternative';
+		public const ALTERNATIVE_BLOCK_FIELD_ID    = 'wpo-ips/checkout-field-alternative';
+
 		protected static ?self $_instance = null;
 
 		/**
@@ -79,6 +82,64 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 			}
 
 			return $this->normalize_type( $type );
+		}
+
+		/**
+		 * Get the optional field type for billing countries outside the shop country.
+		 *
+		 * @return string Empty means use the primary type everywhere.
+		 */
+		public function get_alternative_type(): string {
+			$general = \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
+			if ( ! $general->get_setting( 'checkout_field_alternative_enable' ) ) {
+				return '';
+			}
+
+			$type = $general->get_setting( 'checkout_field_alternative_type' ) ?: self::TYPE_CUSTOM;
+
+			return $this->get_shop_country() && $type !== $this->get_type() && in_array( $type, $this->get_types(), true )
+				? $type
+				: '';
+		}
+
+		/**
+		 * Get the shop country used for checkout labels and type selection.
+		 *
+		 * @return string
+		 */
+		public function get_shop_country(): string {
+			return \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' )->get_setting( 'shop_address_country' );
+		}
+
+		/**
+		 * Resolve the field type for a billing country.
+		 *
+		 * @param string $country Billing country code.
+		 * @return string
+		 */
+		public function get_checkout_type( string $country ): string {
+			$alternative = $this->get_alternative_type();
+
+			return $alternative && '' !== $country && $country !== $this->get_shop_country()
+				? $alternative
+				: $this->get_type();
+		}
+
+		/**
+		 * Map checkout field IDs to their types.
+		 *
+		 * @param bool $block Whether to return Checkout Block IDs.
+		 * @return array
+		 */
+		public function get_field_types( bool $block = false ): array {
+			$fields      = array( ( $block ? self::BLOCK_FIELD_ID : self::CLASSIC_FIELD_KEY ) => $this->get_type() );
+			$alternative = $this->get_alternative_type();
+
+			if ( $alternative && ( ! $block || ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9', '>=' ) ) ) ) {
+				$fields[ $block ? self::ALTERNATIVE_BLOCK_FIELD_ID : self::ALTERNATIVE_CLASSIC_FIELD_KEY ] = $alternative;
+			}
+
+			return $fields;
 		}
 
 		/**
@@ -144,21 +205,25 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the configured field label, defaulting to the shop country label.
+		 * Get the field label, defaulting to the shop country label.
 		 *
+		 * @param string $type Field type. Defaults to the primary type.
 		 * @return string
 		 */
-		public function get_label(): string {
+		public function get_label( string $type = '' ): string {
 			$general_settings = WPO_WCPDF()
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
 
-			$label = trim( (string) $general_settings->get_setting( 'checkout_field_label' ) );
+			$type  = $type ?: $this->get_type();
+			$label = $type === $this->get_type()
+				? trim( (string) $general_settings->get_setting( 'checkout_field_label' ) )
+				: '';
 
 			if ( '' === $label ) {
 				$label = $this->get_default_label(
-					$this->get_type(),
-					(string) $general_settings->get_setting( 'shop_address_country' )
+					$type,
+					$this->get_shop_country()
 				);
 			}
 
@@ -308,10 +373,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		/**
 		 * Check whether the field should be treated as a VAT number.
 		 *
+		 * @param string $type Field type. Defaults to the primary type.
 		 * @return bool
 		 */
-		public function is_vat_number(): bool {
-			if ( ! $this->is_type( self::TYPE_VAT_NUMBER ) ) {
+		public function is_vat_number( string $type = '' ): bool {
+			if ( ( $type ?: $this->get_type() ) !== self::TYPE_VAT_NUMBER ) {
 				return false;
 			}
 
@@ -323,9 +389,10 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		/**
 		 * Check whether the checkout field is enabled.
 		 *
+		 * @param string $type Field type. Empty checks both configured types.
 		 * @return bool
 		 */
-		public function is_enabled(): bool {
+		public function is_enabled( string $type = '' ): bool {
 			$general_settings = WPO_WCPDF()
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
@@ -334,14 +401,14 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 				return false;
 			}
 
-			if (
-				$this->is_type( self::TYPE_VAT_NUMBER ) &&
-				! $this->is_vat_number()
-			) {
-				return false;
+			$types = $type ? array( $type ) : array_values( $this->get_field_types() );
+			foreach ( $types as $field_type ) {
+				if ( self::TYPE_VAT_NUMBER !== $field_type || $this->is_vat_number( $field_type ) ) {
+					return true;
+				}
 			}
 
-			return true;
+			return false;
 		}
 
 		/**
@@ -350,7 +417,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return bool
 		 */
 		public function is_my_account_enabled(): bool {
-			if ( ! $this->is_enabled() ) {
+			if ( ! $this->is_enabled( $this->get_type() ) ) {
 				return false;
 			}
 

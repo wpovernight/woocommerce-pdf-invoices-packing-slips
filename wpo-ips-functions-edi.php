@@ -1176,8 +1176,8 @@ function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): ar
 
 	if ( null !== $registration_number || $checkout_field->is_type( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER ) ) {
 		$data['registration_number'] = array(
-			'label'    => $checkout_field->is_type( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER )
-				? $checkout_field->get_label()
+			'label'    => in_array( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER, $checkout_field->get_field_types(), true )
+				? $checkout_field->get_label( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER )
 				: $checkout_field->get_default_label( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER, $order->get_billing_country() ),
 			'value'    => $registration_number,
 			'required' => false,
