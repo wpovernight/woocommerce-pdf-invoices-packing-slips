@@ -47,6 +47,7 @@ class Frontend {
 
 		// Optional Checkout field (General Settings).
 		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+			add_action( 'wp_enqueue_scripts', array( $this, 'checkout_field_enqueue_visibility_script' ) );
 			// Blocks/store-api hooks
 			$this->checkout_field_display_checkout_block_field();
 			$this->checkout_field_set_checkout_block_field_value();
@@ -357,6 +358,30 @@ class Frontend {
 	}
 
 	/**
+	 * Update classic checkout field visibility when the billing country changes.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_enqueue_visibility_script(): void {
+		$countries = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_countries();
+		if ( ! wpo_ips_is_checkout_request() || empty( $countries ) ) {
+			return;
+		}
+
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		wp_enqueue_script(
+			'wpo-ips-checkout-field',
+			\WPO_WCPDF()->plugin_url() . '/assets/js/checkout-field' . $suffix . '.js',
+			array( 'jquery' ),
+			WPO_WCPDF_VERSION,
+			true
+		);
+		wp_localize_script( 'wpo-ips-checkout-field', 'wpoIpsCheckoutField', array(
+			'countries' => $countries,
+		) );
+	}
+
+	/**
 	 * Display optional checkout field in the Checkout Block.
 	 *
 	 * @return void
@@ -390,6 +415,23 @@ class Frontend {
 				return ( $result instanceof \WP_Error ) ? $result : true;
 			},
 		);
+
+		$countries = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_countries();
+		if ( ! empty( $countries ) && defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9', '>=' ) ) {
+			$args['hidden'] = array(
+				'customer' => array(
+					'properties' => array(
+						'billing_address' => array(
+							'properties' => array(
+								'country' => array(
+									'not' => array( 'enum' => $countries ),
+								),
+							),
+						),
+					),
+				),
+			);
+		}
 
 		$args = apply_filters( 'wpo_ips_checkout_field_block_args', $args );
 
@@ -456,6 +498,10 @@ class Frontend {
 
 		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
 
+		if ( version_compare( WC_VERSION, '9.9', '>=' ) && ! $checkout_field->is_allowed_country( $wc_object->get_billing_country() ) ) {
+			return;
+		}
+
 		if ( $wc_object instanceof \WC_Order ) {
 			$checkout_field->save_order_value( $wc_object, $val );
 			$customer_id = $wc_object->get_customer_id();
@@ -479,9 +525,12 @@ class Frontend {
 		$field_id    = CheckoutField::BLOCK_FIELD_ID;
 		$customer_id = is_callable( array( $order, 'get_customer_id' ) ) ? $order->get_customer_id() : 0;
 
-		if ( $customer_id > 0 ) {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		if ( version_compare( WC_VERSION, '9.9', '>=' ) && ! $checkout_field->is_allowed_country( $order->get_billing_country() ) ) {
+			// A draft order may still contain a value entered before the country changed.
+			$checkout_field->save_order_value( $order, '' );
+		} elseif ( $customer_id > 0 ) {
 			// Accounts created during checkout are only linked after the field is saved on the order.
-			$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
 			$value          = $checkout_field->get_order_value( $order );
 
 			if ( null !== $value ) {
@@ -636,6 +685,10 @@ class Frontend {
 			return;
 		}
 
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_allowed_country( (string) ( $data['billing_country'] ?? '' ) ) ) {
+			return;
+		}
+
 		$key = CheckoutField::CLASSIC_FIELD_KEY;
 		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
 		$val = sanitize_text_field( $raw );
@@ -677,6 +730,10 @@ class Frontend {
 
 		$order = wc_get_order( $order_id );
 		if ( empty( $order ) ) {
+			return;
+		}
+
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_allowed_country( (string) ( $data['billing_country'] ?? '' ) ) ) {
 			return;
 		}
 

@@ -120,6 +120,30 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
+		 * Get the billing countries where the checkout field is displayed.
+		 *
+		 * @return array Empty means all countries.
+		 */
+		public function get_countries(): array {
+			$settings  = \WPO_WCPDF()->get_instance( 'settings' )->general_settings;
+			$countries = $settings['checkout_field_countries'] ?? array();
+
+			return is_array( $countries ) ? array_values( array_filter( $countries ) ) : array();
+		}
+
+		/**
+		 * Check whether the checkout field is displayed for a billing country.
+		 *
+		 * @param string $country Billing country code.
+		 * @return bool
+		 */
+		public function is_allowed_country( string $country ): bool {
+			$countries = $this->get_countries();
+
+			return empty( $countries ) || in_array( $country, $countries, true );
+		}
+
+		/**
 		 * Get the configured field label, defaulting to the shop country label.
 		 *
 		 * @return string
