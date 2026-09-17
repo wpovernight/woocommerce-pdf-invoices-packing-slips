@@ -120,12 +120,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the resolved field label.
+		 * Get the configured field label, defaulting to the shop country label.
 		 *
-		 * @param string|null $country Country for the default label. Null uses the shop country.
 		 * @return string
 		 */
-		public function get_label( ?string $country = null ): string {
+		public function get_label(): string {
 			$general_settings = WPO_WCPDF()
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
@@ -135,7 +134,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 			if ( '' === $label ) {
 				$label = $this->get_default_label(
 					$this->get_type(),
-					$country ?? (string) $general_settings->get_setting( 'shop_address_country' )
+					(string) $general_settings->get_setting( 'shop_address_country' )
 				);
 			}
 
