@@ -1153,8 +1153,9 @@ jQuery( function( $ ) {
 		let value    = $this.val();
 		let checkbox = false;
 
-		const $controllerRow     = $this.closest( 'tr' );
-		const controllerIsVisible = ! $controllerRow.length || $controllerRow.is( ':visible' );
+		// Check the row itself; a collapsed accordion also makes its rows fail :visible.
+		const $controllerRow      = $this.closest( 'tr' );
+		const controllerIsVisible = ! $controllerRow.length || $controllerRow.css( 'display' ) !== 'none';
 
 		if ( $this.is( ':checkbox' ) ) {
 			value    = $this.is( ':checked' );
@@ -1186,7 +1187,7 @@ jQuery( function( $ ) {
 			}
 
 			if ( show ) {
-				const wasHidden = ! $row.is( ':visible' );
+				const wasHidden = $row.css( 'display' ) === 'none';
 
 				$row.show();
 
