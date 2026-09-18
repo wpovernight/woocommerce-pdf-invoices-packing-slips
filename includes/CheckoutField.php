@@ -461,7 +461,6 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 				$type     = ! empty( $settings['checkout_field_as_vat_number'] )
 					? self::TYPE_VAT_NUMBER
 					: self::TYPE_CUSTOM;
-				add_option( 'wpo_ips_checkout_field_legacy_type', $type );
 			}
 
 			return $this->normalize_type( (string) $type );
