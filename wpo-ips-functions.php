@@ -617,17 +617,23 @@ function wcpdf_convert_encoding( string $string, string $tool = 'mb_convert_enco
  */
 function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
 	if ( empty( $html ) ) {
-		return $html;
+		return '';
 	}
 
-	// default allowed tags
-	$allow_tags = array_merge( apply_filters( 'wpo_wcpdf_sanitize_html_default_allow_tags', array(
-		// tag   => allowed attributes eg. array( 'href', 'title' ) in case of a <a> tag.
-		'br'     => array(),
-		'em'     => array(),
-		'strong' => array(),
-		'p'      => array(),
-	), $context ), $allow_tags );
+	// Default allowed tags.
+	$allow_tags = array_merge(
+		apply_filters(
+			'wpo_wcpdf_sanitize_html_default_allow_tags',
+			array(
+				'br'     => array(),
+				'em'     => array(),
+				'strong' => array(),
+				'p'      => array(),
+			),
+			$context
+		),
+		$allow_tags
+	);
 
 	$safe_tags = array(
 		'b'          => array(),
@@ -672,79 +678,16 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	$filtered_tags = array();
 
 	foreach ( $allow_tags as $tag => $attributes ) {
-		if ( array_key_exists( $tag, $safe_tags ) ) {
-			$safe_attributes       = array_intersect( $attributes, $safe_tags[ $tag ] );
-			$filtered_tags[ $tag ] = ! empty( $safe_attributes ) ? $safe_attributes : array();
-		}
-	}
-
-	if ( empty( $filtered_tags ) ) {
-		return $html;
-	}
-
-	$dom = new \DOMDocument();
-
-	// clean up special chars
-	if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
-		$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
-	}
-
-	libxml_use_internal_errors( true ); // suppress malformed HTML errors
-	@$dom->loadHTML( '<div>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-	libxml_clear_errors();
-
-	$extra_wrapper = $dom->getElementsByTagName( 'div' )->item( 0 );
-	$content       = ! empty( $extra_wrapper ) ? $extra_wrapper->parentNode->removeChild( $extra_wrapper ) : null;
-
-	if ( ! empty( $content ) ) {
-		// Clear DOM by removing all nodes from it.
-		while ( $dom->firstChild ) {
-			$dom->removeChild( $dom->firstChild );
+		if ( ! array_key_exists( $tag, $safe_tags ) ) {
+			continue;
 		}
 
-		// Append the content to the DOM to remove the extra DIV wrapper.
-		while ( $content->firstChild ) {
-			$dom->appendChild( $content->firstChild );
-		}
+		$safe_attributes = array_intersect( $attributes, $safe_tags[ $tag ] );
+
+		$filtered_tags[ $tag ] = array_fill_keys( $safe_attributes, true );
 	}
 
-	$xpath = new \DOMXPath( $dom );
-
-	// iterate over all nodes.
-	foreach ( $xpath->query( '//*' ) as $node ) {
-		// check if the node is allowed.
-		if ( array_key_exists( $node->nodeName, $filtered_tags ) ) {
-			// if the node is allowed, check each attribute.
-			foreach ( $node->attributes as $attr ) {
-				if ( ! in_array( $attr->nodeName, $filtered_tags[ $node->nodeName ], true ) ) {
-					$node->removeAttribute( $attr->nodeName );
-				}
-			}
-		} else {
-			// if the node is not allowed, remove it but try to preserve text.
-			if ( $node->parentNode ) {
-				$fragment = $dom->createDocumentFragment();
-
-				while ( $node->childNodes->length > 0 ) {
-					$fragment->appendChild( $node->childNodes->item( 0 ) );
-				}
-
-				if ( $fragment->hasChildNodes() ) {
-					$node->parentNode->replaceChild( $fragment, $node );
-				} else {
-					$node->parentNode->removeChild( $node );
-				}
-			}
-		}
-	}
-
-	$html = $dom->saveHTML();
-
-	if ( empty( $html ) ) {
-		return '';
-	}
-
-	return trim( $html );
+	return trim( wp_kses( $html, $filtered_tags ) );
 }
 
 /**
