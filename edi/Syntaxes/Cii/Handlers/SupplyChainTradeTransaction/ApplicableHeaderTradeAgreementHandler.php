@@ -221,7 +221,6 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$address_line_1 = wpo_ips_edi_sanitize_string( $order->get_billing_address_1() ?: '' );
 		$address_line_2 = wpo_ips_edi_sanitize_string( $order->get_billing_address_2() ?: '' );
 		$address_city   = wpo_ips_edi_sanitize_string( $order->get_billing_city() ?: '' );
-		$country_code   = $order->get_billing_country() ?: '';
 
 		// Postal Address
 		$buyer_trade_party['value'][] = array(
