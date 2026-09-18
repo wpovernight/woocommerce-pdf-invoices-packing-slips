@@ -605,7 +605,11 @@ class SettingsGeneral {
 						'data-vat-label'           => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'vat_number', $shop_country ),
 						'data-registration-label'  => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'registration_number', $shop_country ),
 					),
-					'description' => __( 'Choose how the checkout field should be interpreted. This allows the same field to be used for custom customer identification, VAT numbers, or company registration numbers.', 'woocommerce-pdf-invoices-packing-slips' ) . $vat_plugin_notice,
+					'description' => __( 'Choose how the checkout field should be interpreted. This allows the same field to be used for custom customer identification, VAT numbers, or company registration numbers.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' . sprintf(
+						/* translators: %s: WooCommerce EU VAT Compliance plugin link */
+						__( 'For advanced VAT validation, reporting, and full compliance with EU VAT rules, we recommend using %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://wpovernight.com/downloads/woocommerce-eu-vat-compliance/?utm_medium=plugin&utm_source=ips&utm_campaign=general-tab&utm_content=woocommerce-eu-vat-compliance-cross" target="_blank" rel="noopener noreferrer">WooCommerce EU VAT Compliance</a>'
+					) . $vat_plugin_notice,
 				),
 			),
 			array(

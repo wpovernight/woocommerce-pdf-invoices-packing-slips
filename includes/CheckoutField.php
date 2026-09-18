@@ -417,7 +417,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return bool
 		 */
 		public function is_my_account_enabled(): bool {
-			if ( ! $this->is_enabled( $this->get_type() ) ) {
+			if ( ! $this->is_enabled() ) {
 				return false;
 			}
 
@@ -428,6 +428,24 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 			return ! empty(
 				$general_settings->get_setting( 'checkout_field_enable_my_account' )
 			);
+		}
+
+		/**
+		 * Get the editable field type for a customer's saved billing country.
+		 *
+		 * @param int $user_id Customer ID.
+		 * @return string Empty when the account field should not be displayed.
+		 */
+		public function get_account_type( int $user_id ): string {
+			if ( ! $user_id || ! $this->is_my_account_enabled() ) {
+				return '';
+			}
+
+			$customer = new \WC_Customer( $user_id );
+			$country  = $customer->get_billing_country();
+			$type     = $this->get_checkout_type( $country );
+
+			return $this->is_allowed_country( $country ) && $this->is_enabled( $type ) ? $type : '';
 		}
 
 		/**

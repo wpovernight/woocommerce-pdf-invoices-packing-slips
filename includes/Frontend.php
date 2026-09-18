@@ -802,23 +802,21 @@ class Frontend {
 	 * @return void
 	 */
 	public function account_details_display_checkout_field(): void {
-		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_my_account_enabled() ) {
+		$user_id        = get_current_user_id();
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_account_type( $user_id );
+		if ( '' === $type ) {
 			return;
 		}
 
-		$user_id = get_current_user_id();
-		if ( ! $user_id ) {
-			return;
-		}
-
-		$key   = CheckoutField::CLASSIC_FIELD_KEY;
-		$value = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id );
+		$key   = array_search( $type, $checkout_field->get_field_types(), true );
+		$value = (string) $checkout_field->get_user_value( $user_id, $type );
 		$value = (string) apply_filters( 'wpo_ips_checkout_field_default_value', $value, $value, 'my-account', null );
 
-		$label       = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label();
+		$label       = $checkout_field->get_label( $type );
 		$description = '';
 
-		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number() ) {
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number( $type ) ) {
 			$description = __( 'Please include the country prefix (for example NL123456789).', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
@@ -839,11 +837,13 @@ class Frontend {
 	 * @return \WP_Error
 	 */
 	public function account_details_validate_checkout_field( \WP_Error $errors, \WP_User $user ): \WP_Error {
-		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_my_account_enabled() ) {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_account_type( $user->ID );
+		if ( '' === $type ) {
 			return $errors;
 		}
 
-		$key = CheckoutField::CLASSIC_FIELD_KEY;
+		$key = array_search( $type, $checkout_field->get_field_types(), true );
 
 		// Field is optional: if missing, don't block save.
 		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -858,7 +858,7 @@ class Frontend {
 		}
 
 		// VAT mode.
-		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number() ) {
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number( $type ) ) {
 			$result = $this->checkout_field_validate_vat_number_value( $val );
 
 			if ( $result instanceof \WP_Error ) {
@@ -884,11 +884,13 @@ class Frontend {
 	 * @return void
 	 */
 	public function account_details_save_checkout_field( int $user_id ): void {
-		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_my_account_enabled() ) {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_account_type( $user_id );
+		if ( '' === $type ) {
 			return;
 		}
 
-		$key = CheckoutField::CLASSIC_FIELD_KEY;
+		$key = array_search( $type, $checkout_field->get_field_types(), true );
 
 		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			// If the field isn't present in the form submission, do nothing.
@@ -898,7 +900,7 @@ class Frontend {
 		$val = (string) sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
 
-		\WPO_WCPDF()->get_instance( 'checkout_field' )->save_user_value( $user_id, $val );
+		$checkout_field->save_user_value( $user_id, $val, $type );
 	}
 
 
