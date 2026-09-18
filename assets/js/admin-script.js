@@ -415,6 +415,13 @@ jQuery( function( $ ) {
 	}
 
 	function settingsChanged( event, previewDelay ) {
+		const $element = $( event.target );
+
+		// Searching a Select2 dropdown does not change the setting's value.
+		if ( $element.is( '.select2-search__field, .select2-input' ) ) {
+			return;
+		}
+
 		if ( 'shop_address_country' === event.target.id ) {
 			shopCountryChanged( $( event.target ) );
 		}
@@ -423,8 +430,6 @@ jQuery( function( $ ) {
 		showSaveBtn();
 
 		// Check if preview needs to reload and with what delay
-		let $element = $( event.target );
-
 		if ( ! settingIsExcludedForPreview( $element.attr('name') ) ) {
 
 			if ( $element.hasClass( 'remove-requirement' ) || $element.attr('id') == 'disable_for' ) {
