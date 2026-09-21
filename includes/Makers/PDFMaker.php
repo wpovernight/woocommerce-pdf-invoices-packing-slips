@@ -182,7 +182,7 @@ class PDFMaker {
 		$debug_settings = \WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
 		$hosts          = array_merge( $hosts, wpo_ips_normalize_remote_hosts( (string) ( $debug_settings['allowed_remote_hosts'] ?? '' ) ) );
 
-		return array_values( array_unique( (array) apply_filters( 'wpo_ips_dompdf_allowed_remote_hosts', $hosts, $this->document ) ) );
+		return array_values( array_unique( $hosts ) );
 	}
 
 }
