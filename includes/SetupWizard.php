@@ -350,8 +350,6 @@ class SetupWizard {
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
 			if ( ! empty( $request['wcpdf_settings'] ) && is_array( $request['wcpdf_settings'] ) ) {
-				check_admin_referer( 'wpo-wcpdf-setup' );
-
 				// only the plugin options rendered by the wizard can be saved
 				$allowed_options = array( 'wpo_wcpdf_settings_general', 'wpo_wcpdf_documents_settings_invoice' );
 
@@ -363,7 +361,7 @@ class SetupWizard {
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
 						if ( 'attach_to_email_ids' === $key ) {
-							$value = array_fill_keys( array_filter( (array) $value ), '1' );
+							$value = array_fill_keys( $value, '1' );
 						}
 
 						if ( 'shop_address_additional' === $key && function_exists( 'sanitize_textarea_field' ) ) {
@@ -393,8 +391,6 @@ class SetupWizard {
 					update_option( $option, $new_settings );
 				}
 			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
-				check_admin_referer( 'wpo-wcpdf-setup' );
-
 				$orders_column_hidden_key = WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled()
 					? 'managewoocommerce_page_wc-orderscolumnshidden'
 					: 'manageedit-shop_ordercolumnshidden';
