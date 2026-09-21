@@ -1926,7 +1926,7 @@ function wpo_ips_get_refund_ids( mixed $order_or_ids ): array {
 	foreach ( $order_ids as $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( ! $order ) {
+		if ( ! $order instanceof WC_Order ) {
 			continue;
 		}
 
