@@ -345,29 +345,56 @@ class SetupWizard {
 		check_admin_referer( 'wpo-wcpdf-setup' );
 		$request = stripslashes_deep( $_POST );
 
-		if ( isset( $request['wcpdf_settings'] ) && ! is_array( $request['wcpdf_settings'] ) ) {
-			wp_die( esc_html__( 'Invalid setup wizard settings.', 'woocommerce-pdf-invoices-packing-slips' ), '', array( 'response' => 400 ) );
-		}
-
 		if ( isset( $this->steps[ $this->step ]['handler'] ) ) {
 			// for doing more than just saving an option value
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
 			if ( ! empty( $request['wcpdf_settings'] ) && is_array( $request['wcpdf_settings'] ) ) {
-				// Validate the entire submission before writing any option.
-				$validated = $this->validate_step_settings( $request['wcpdf_settings'] );
-				if ( is_wp_error( $validated ) ) {
-					wp_die( esc_html( $validated->get_error_message() ), '', array( 'response' => 400 ) );
-				}
+				check_admin_referer( 'wpo-wcpdf-setup' );
 
-				foreach ( $validated as $option => $settings ) {
-					$current_settings = (array) get_option( $option, array() );
+				// only the plugin options rendered by the wizard can be saved
+				$allowed_options = array( 'wpo_wcpdf_settings_general', 'wpo_wcpdf_documents_settings_invoice' );
+
+				foreach ( $request['wcpdf_settings'] as $option => $settings ) {
+					if ( ! in_array( $option, $allowed_options, true ) || ! is_array( $settings ) ) {
+						continue;
+					}
+
+					// sanitize posted settings
+					foreach ( $settings as $key => $value ) {
+						if ( 'attach_to_email_ids' === $key ) {
+							$value = array_fill_keys( array_filter( (array) $value ), '1' );
+						}
+
+						if ( 'shop_address_additional' === $key && function_exists( 'sanitize_textarea_field' ) ) {
+							$sanitize_function = 'sanitize_textarea_field';
+						} else {
+							$sanitize_function = 'sanitize_text_field';
+						}
+
+						$value = stripslashes_deep( $value );
+
+						if ( is_array( $value ) ) {
+							$settings[ $key ] = array_map( $sanitize_function, $value );
+						} else {
+							$settings[ $key ] = call_user_func( $sanitize_function, $value );
+						}
+					}
+
+					$current_settings = get_option( $option, array() );
+
+					// Enable Invoice document
 					if ( 'wpo_wcpdf_documents_settings_invoice' === $option && ! isset( $current_settings['enabled'] ) ) {
 						$settings['enabled'] = '1';
 					}
-					update_option( $option, $settings + $current_settings );
+
+					$new_settings = $settings + $current_settings;
+
+					update_option( $option, $new_settings );
 				}
-			} elseif ( 'show-action-buttons' === $this->step ) {
+			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
+				check_admin_referer( 'wpo-wcpdf-setup' );
+
 				$orders_column_hidden_key = WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled()
 					? 'managewoocommerce_page_wc-orderscolumnshidden'
 					: 'manageedit-shop_ordercolumnshidden';
@@ -393,108 +420,6 @@ class SetupWizard {
 		}
 
 		wp_safe_redirect( $this->get_step_link( $this->get_step(1) ) );
-	}
-
-	/**
-	 * Validate only the options and fields rendered by the current wizard step.
-	 *
-	 * @param array $input Submitted options.
-	 * @return array|\WP_Error
-	 */
-	private function validate_step_settings( array $input ): array|\WP_Error {
-		$general = 'wpo_wcpdf_settings_general';
-		$invoice = 'wpo_wcpdf_documents_settings_invoice';
-
-		$schemas = array(
-			'shop-name'       => array(
-				$general => array_fill_keys(
-					array(
-						'shop_name', 'shop_address_line_1', 'shop_address_line_2', 'shop_address_country',
-						'shop_address_state', 'shop_address_city', 'shop_address_postcode',
-					),
-					'text'
-				)
-			),
-			'logo'            => array(
-				$general => array( 'header_logo' => 'image' )
-			),
-			'attach-to'       => array(
-				$invoice => array( 'attach_to_email_ids' => 'emails' )
-			),
-			'display-options' => array(
-				$invoice => array(
-					'display_shipping_address' => array( '', 'when_different', 'always' ),
-					'display_email'            => array( '', '1' ),
-					'display_phone'            => array( '', '1' ),
-					'display_date'             => array( '', 'document_date', 'order_date' ),
-					'display_number'           => array( '', 'invoice_number', 'order_number' ),
-				)
-			),
-			'paper-format'    => array(
-				$general => array( 'paper_size' => array( 'a4', 'letter' ) )
-			),
-		);
-
-		$schema = $schemas[ $this->step ] ?? array();
-		$error  = new \WP_Error( 'invalid_wizard_settings', __( 'Invalid setup wizard settings.', 'woocommerce-pdf-invoices-packing-slips' ) );
-		$output = array();
-
-		foreach ( $input as $option => $settings ) {
-			if ( ! isset( $schema[ $option ] ) || ! is_array( $settings ) ) {
-				return $error;
-			}
-
-			foreach ( $settings as $key => $value ) {
-				if ( ! isset( $schema[ $option ][ $key ] ) ) {
-					return $error;
-				}
-
-				$type = $schema[ $option ][ $key ];
-
-				if ( is_array( $type ) ) {
-					if ( ! is_string( $value ) || ! in_array( $value, $type, true ) ) {
-						return $error;
-					}
-
-				} elseif ( 'emails' === $type ) {
-					$value = '' === $value ? array() : $value;
-					if ( ! is_array( $value ) ) {
-						return $error;
-					}
-
-					$emails = wcpdf_get_document( 'invoice', null )->get_wc_emails();
-					foreach ( $value as $email ) {
-						if ( ! is_string( $email ) || ! array_key_exists( $email, $emails ) ) {
-							return $error;
-						}
-					}
-
-					$value = array_fill_keys( $value, '1' );
-
-				} else {
-					// Translatable fields contain one level of language => value pairs.
-					if ( ! is_array( $value ) ) {
-						return $error;
-					}
-
-					foreach ( $value as $language => $text ) {
-						if ( ! is_string( $text ) ) {
-							return $error;
-						}
-
-						if ( 'image' === $type && '' !== $text && ! ctype_digit( $text ) ) {
-							return $error;
-						}
-
-						$value[ $language ] = 'image' === $type ? absint( $text ) : sanitize_text_field( $text );
-					}
-				}
-
-				$output[ $option ][ $key ] = $value;
-			}
-		}
-
-		return $output;
 	}
 
 }
