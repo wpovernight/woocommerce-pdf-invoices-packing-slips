@@ -67,6 +67,8 @@ class PDFMaker {
 			'isHtml5ParserEnabled'    => true,
 			'isFontSubsettingEnabled' => (bool) $this->settings['font_subsetting'],
 		) ) );
+
+		$this->restrict_remote_resources( $options );
 		
 		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_debug'] ) ) {
 			$this->set_additional_debug_options( $options );
@@ -124,6 +126,61 @@ class PDFMaker {
 		foreach ( $dompdf_debug_options as $option ) {
 			$options->set( $option, true );
 		}
+	}
+
+	/**
+	 * Restrict Dompdf remote resources to the site's own hosts and default ports (SSRF).
+	 *
+	 * @param Options $options
+	 * @return void
+	 */
+	private function restrict_remote_resources( Options $options ): void {
+		if ( null === $options->getAllowedRemoteHosts() ) {
+			$hosts = $this->get_allowed_remote_hosts();
+
+			// Dompdf treats an empty host list as unrestricted.
+			if ( empty( $hosts ) ) {
+				$options->setIsRemoteEnabled( false );
+			} else {
+				$options->setAllowedRemoteHosts( $hosts );
+			}
+		}
+
+		$port_rule = static function ( string $uri ): array {
+			$port = wp_parse_url( $uri, PHP_URL_PORT );
+
+			return null === $port || in_array( $port, array( 80, 443 ), true )
+				? array( true, null )
+				: array( false, 'Remote port not allowed: ' . $uri );
+		};
+
+		$protocols = $options->getAllowedProtocols();
+
+		foreach ( array( 'http://', 'https://' ) as $protocol ) {
+			if ( isset( $protocols[ $protocol ] ) ) {
+				$options->addAllowedProtocol( $protocol, ...array_merge( $protocols[ $protocol ]['rules'], array( $port_rule ) ) );
+			}
+		}
+	}
+
+	/**
+	 * Hosts Dompdf may load remote resources from.
+	 *
+	 * @return array
+	 */
+	private function get_allowed_remote_hosts(): array {
+		$urls = array( home_url(), site_url(), wp_get_upload_dir()['baseurl'] );
+
+		// Covers logos served by offload/CDN plugins.
+		if ( $this->document && is_callable( array( $this->document, 'get_header_logo_id' ) ) && $this->document->get_header_logo_id() ) {
+			$urls[] = (string) wp_get_attachment_url( $this->document->get_header_logo_id() );
+		}
+
+		$hosts = array_filter( array_map( static function ( $url ) {
+			return wp_parse_url( $url, PHP_URL_HOST );
+		}, $urls ) );
+
+		return array_values( array_unique( (array) apply_filters( 'wpo_ips_dompdf_allowed_remote_hosts', $hosts, $this->document ) ) );
 	}
 
 }
