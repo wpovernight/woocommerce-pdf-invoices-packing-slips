@@ -915,15 +915,8 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 		$parsed_url = wp_parse_url( $path );
 		$args	    = array();
 
-		// Check if the URL is localhost
-		if (
-			'localhost' === $parsed_url['host']                                             ||
-			'127.0.0.1' === $parsed_url['host']                                             ||
-			( preg_match( '/^192\.168\./', $parsed_url['host'] ) === 1 )                    || // 192.168.*
-			( preg_match( '/^10\./', $parsed_url['host'] ) === 1 )                          || // 10.*
-			( preg_match( '/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $parsed_url['host'] ) === 1 ) || // 172.16.* to 172.31.*
-			getenv( 'DISABLE_SSL_VERIFY' ) === 'true'
-		) {
+		// Local hosts often use self-signed certificates
+		if ( wpo_ips_is_local_host( (string) ( $parsed_url['host'] ?? '' ) ) || 'true' === getenv( 'DISABLE_SSL_VERIFY' ) ) {
 			$args['sslverify'] = false;
 		}
 
@@ -2760,4 +2753,64 @@ function wpo_ips_get_document_link_email_placements( ?\WPO\IPS\Documents\OrderDo
 	);
 
 	return is_array( $placements ) ? $placements : array();
+}
+
+/**
+ * Check whether a host is local: localhost or a loopback, private or reserved IP address.
+ *
+ * @param string $host
+ * @return bool
+ */
+function wpo_ips_is_local_host( string $host ): bool {
+	$host = strtolower( rtrim( trim( $host, '[]' ), '.' ) );
+
+	if ( 'localhost' === $host || '.localhost' === substr( $host, -10 ) ) {
+		return true;
+	}
+
+	if ( false === filter_var( $host, FILTER_VALIDATE_IP ) ) {
+		return false;
+	}
+
+	return false === filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+}
+
+/**
+ * Normalize a list of hosts allowed for remote PDF resources.
+ * Accepts an array or a string (one host per line or comma separated). IP addresses and localhost are rejected.
+ *
+ * @param array|string $hosts
+ * @return array
+ */
+function wpo_ips_normalize_remote_hosts( $hosts ): array {
+	if ( is_string( $hosts ) ) {
+		$hosts = preg_split( '/[\s,]+/', $hosts );
+	}
+
+	$normalized = array();
+
+	foreach ( (array) $hosts as $host ) {
+		$host = strtolower( trim( (string) $host ) );
+
+		// A full URL was entered: keep the host only.
+		if ( false !== strpos( $host, '/' ) ) {
+			$host = (string) wp_parse_url( ( false === strpos( $host, '://' ) ? 'https://' : '' ) . ltrim( $host, '/' ), PHP_URL_HOST );
+		}
+
+		$host = rtrim( $host, '.' );
+
+		if (
+			'' === $host ||
+			wpo_ips_is_local_host( $host ) ||
+			false !== filter_var( trim( $host, '[]' ), FILTER_VALIDATE_IP ) ||
+			false === strpos( $host, '.' ) ||
+			! preg_match( '/^[a-z0-9.-]+$/', $host )
+		) {
+			continue;
+		}
+
+		$normalized[] = $host;
+	}
+
+	return array_values( array_unique( $normalized ) );
 }

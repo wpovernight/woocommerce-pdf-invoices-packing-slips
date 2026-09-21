@@ -751,6 +751,41 @@ class Install {
 			}
 		}
 
+		// 6.0.0-i1621.1: allow remote hosts already used in settings, now that PDFs only load resources from the site's own hosts
+		if ( version_compare( $installed_version, '6.0.0-i1621.1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			$debug_settings = is_array( $debug_settings ) ? $debug_settings : array();
+
+			if ( ! isset( $debug_settings['allowed_remote_hosts'] ) ) {
+				global $wpdb;
+
+				$option_names   = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'wpo\\_wcpdf\\_documents\\_settings\\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$option_names[] = 'wpo_wcpdf_settings_general';
+				$hosts          = array();
+
+				foreach ( $option_names as $option_name ) {
+					$settings = get_option( $option_name, array() );
+
+					if ( ! is_array( $settings ) ) {
+						continue;
+					}
+
+					array_walk_recursive( $settings, function ( $value ) use ( &$hosts ) {
+						if ( is_string( $value ) && preg_match_all( '#(?:\bsrc\s*=\s*["\']?|url\(\s*["\']?)\s*(?:https?:)?//([^/"\'\s>):?\#]+)#i', $value, $matches ) ) {
+							$hosts = array_merge( $hosts, $matches[1] );
+						}
+					} );
+				}
+
+				$hosts = wpo_ips_normalize_remote_hosts( $hosts );
+
+				if ( ! empty( $hosts ) ) {
+					$debug_settings['allowed_remote_hosts'] = implode( "\n", $hosts );
+					update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+				}
+			}
+		}
+
 		// Maybe reinstall fonts
 		$main_instance->maybe_reinstall_fonts( true );
 	}
