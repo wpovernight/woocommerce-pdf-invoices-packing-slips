@@ -616,7 +616,7 @@ function wcpdf_convert_encoding( string $string, string $tool = 'mb_convert_enco
  * @return string
  */
 function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
-	if ( empty( $html ) ) {
+	if ( '' === $html ) {
 		return '';
 	}
 
