@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 5.16.1
+Stable tag: 5.16.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,12 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.16.2 (2026-09-22) =
+- Fix: Inconsistent billing name/company output handling
+- Fix: Refund AJAX order permission checks
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 11.1
 
 = 5.16.1 (2026-08-21) =
 - Fix: Add seller identification for category O invoices in EDI
