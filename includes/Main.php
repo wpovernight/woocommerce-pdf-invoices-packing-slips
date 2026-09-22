@@ -626,7 +626,7 @@ class Main {
 		$order_ids = array_map( 'absint', (array) wp_unslash( $_POST['order_ids'] ) );
 
 		// Check the user privileges
-		$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( 'credit-note' );
+		$full_permission = WPO_WCPDF()->admin->user_can_manage_document( 'credit-note' );
 
 		if ( ! $full_permission ) {
 			foreach ( $order_ids as $order_id ) {
