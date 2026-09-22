@@ -110,6 +110,16 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.16.3 (2026-09-22) =
+- Fix: Use V5 admin accessor in backported security fix
+- Translations: Updated translation template (POT)
+
+= 5.16.2 (2026-09-22) =
+- Fix: Inconsistent billing name/company output handling
+- Fix: Refund AJAX order permission checks
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 11.1
+
 = 5.16.1 (2026-08-21) =
 - Fix: Add seller identification for category O invoices in EDI
 - Fix: Selector for checked checkboxes in order script
