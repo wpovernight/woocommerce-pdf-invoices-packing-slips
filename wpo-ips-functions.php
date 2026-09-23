@@ -2782,7 +2782,7 @@ function wpo_ips_is_local_host( string $host ): bool {
  * @param array|string $hosts
  * @return array
  */
-function wpo_ips_normalize_remote_hosts( $hosts ): array {
+function wpo_ips_normalize_remote_hosts( array|string $hosts ): array {
 	if ( is_string( $hosts ) ) {
 		$hosts = preg_split( '/[\s,]+/', $hosts );
 	}
@@ -2793,8 +2793,8 @@ function wpo_ips_normalize_remote_hosts( $hosts ): array {
 		$host = strtolower( trim( (string) $host ) );
 
 		// A full URL was entered: keep the host only.
-		if ( false !== strpos( $host, '/' ) ) {
-			$host = (string) wp_parse_url( ( false === strpos( $host, '://' ) ? 'https://' : '' ) . ltrim( $host, '/' ), PHP_URL_HOST );
+		if ( str_contains( $host, '/' ) ) {
+			$host = (string) wp_parse_url( ( ! str_contains( $host, '://' ) ? 'https://' : '' ) . ltrim( $host, '/' ), PHP_URL_HOST );
 		}
 
 		$host = rtrim( $host, '.' );
@@ -2803,7 +2803,7 @@ function wpo_ips_normalize_remote_hosts( $hosts ): array {
 			'' === $host ||
 			wpo_ips_is_local_host( $host ) ||
 			false !== filter_var( trim( $host, '[]' ), FILTER_VALIDATE_IP ) ||
-			false === strpos( $host, '.' ) ||
+			! str_contains( $host, '.' ) ||
 			! preg_match( '/^[a-z0-9.-]+$/', $host )
 		) {
 			continue;
