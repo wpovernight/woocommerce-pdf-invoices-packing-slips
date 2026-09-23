@@ -88,8 +88,12 @@ class SettingsGeneral {
 			$shop_country
 		);
 
+		$registration_mappings = array_filter(
+			\wpo_ips_edi_get_identifier_mappings(),
+			static fn( $country_mapping ) => ! empty( $country_mapping['mappings']['registration_number'][0]['label'] )
+		);
 		$registration_labels = array();
-		foreach ( array_merge( array( '' ), array_keys( \WC()->countries->get_countries() ) ) as $country_code ) {
+		foreach ( array_merge( array( '' ), array_keys( $registration_mappings ) ) as $country_code ) {
 			$label = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'registration_number', $country_code );
 			$registration_labels[ $country_code ] = array(
 				'label' => $label,
