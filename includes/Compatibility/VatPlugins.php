@@ -200,7 +200,7 @@ class VatPlugins {
 					: '#' . $field_id . '_field input:not(:disabled)';
 			}
 
-			if ( 'classic' === $context && $checkout_field->get_alternative_type() ) {
+			if ( 'classic' === $context ) {
 				return (string) $info['classic_form_selector'] . ':not(:disabled)';
 			}
 		}
