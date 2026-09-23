@@ -2813,6 +2813,7 @@ function wpo_ips_get_allowed_remote_ports( ?object $document = null ): array {
 /**
  * Normalize a list of hosts allowed for remote PDF resources.
  * Accepts an array or a string (one host per line or comma separated). IP addresses and localhost are rejected.
+ * The site's own hosts are omitted because they are allowed automatically.
  *
  * @param array|string $hosts
  * @return array
@@ -2821,6 +2822,10 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts ): array {
 	if ( is_string( $hosts ) ) {
 		$hosts = preg_split( '/[\s,]+/', $hosts );
 	}
+
+	$site_hosts = array_map( static function ( $url ) {
+		return rtrim( strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) ), '.' );
+	}, array( home_url(), site_url() ) );
 
 	$normalized = array();
 
@@ -2836,6 +2841,7 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts ): array {
 
 		if (
 			'' === $host ||
+			in_array( $host, $site_hosts, true ) ||
 			wpo_ips_is_local_host( $host ) ||
 			false !== filter_var( trim( $host, '[]' ), FILTER_VALIDATE_IP ) ||
 			! str_contains( $host, '.' ) ||
