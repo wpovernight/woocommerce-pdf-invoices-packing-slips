@@ -1062,7 +1062,7 @@ class SettingsDebug {
 					'width'       => '50',
 					'height'      => '4',
 					'placeholder' => 'cdn.example.com',
-					'description' => __( 'By default, images and other resources in PDFs are only loaded from this website. Add other domains here, one per line (for example cdn.example.com).', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'By default, images and other resources in PDFs are only loaded from this website. Add allowed hostnames here, one per line (for example cdn.example.com). Each entry allows only that exact hostname. List subdomains separately; wildcards and leading-dot notation are not supported.', 'woocommerce-pdf-invoices-packing-slips' ),
 				),
 			),
 			array(
