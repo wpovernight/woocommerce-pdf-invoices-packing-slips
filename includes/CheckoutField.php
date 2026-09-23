@@ -227,7 +227,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 				);
 			}
 
-			return (string) apply_filters( 'wpo_ips_checkout_field_label', $label );
+			return (string) apply_filters( 'wpo_ips_checkout_field_label', $label, $type, $this );
 		}
 
 		/**
