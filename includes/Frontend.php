@@ -576,7 +576,7 @@ class Frontend {
 	 */
 	public function checkout_field_enable_rest_cleanup( mixed $response, array $handler, \WP_REST_Request $request ): mixed {
 		// Inspect the dispatched route so this also works for Store API batch requests.
-		$this->checkout_field_rest_cleanup = (bool) preg_match( '#^/wc/store/v[0-9]+/checkout(?:/|$)#', $request->get_route() );
+		$this->checkout_field_rest_cleanup = (bool) preg_match( '#^/wc/store(?:/v[0-9]+)?/checkout(?:/|$)#', $request->get_route() );
 
 		if ( $this->checkout_field_rest_cleanup ) {
 			$this->checkout_field_remove_session_checkout_block_field_meta();
