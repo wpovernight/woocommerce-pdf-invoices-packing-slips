@@ -912,16 +912,32 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 
 	// Check if the path is a URL
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
-		$parsed_url = wp_parse_url( $path );
-		$args	    = array();
+		$parsed_url    = wp_parse_url( $path );
+		$args          = array();
+		$allowed_ports = wpo_ips_get_allowed_remote_ports();
+		$port          = $parsed_url['port'] ?? ( 'https' === strtolower( $parsed_url['scheme'] ?? '' ) ? 443 : 80 );
+
+		if ( ! in_array( $port, $allowed_ports, true ) ) {
+			return false;
+		}
 
 		// Local hosts often use self-signed certificates
 		if ( wpo_ips_is_local_host( (string) ( $parsed_url['host'] ?? '' ) ) || 'true' === getenv( 'DISABLE_SSL_VERIFY' ) ) {
 			$args['sslverify'] = false;
 		}
 
-		$args     = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
-		$response = wp_safe_remote_head( $path, $args );
+		$args = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
+
+		// Scope the WordPress safe-port override to this request.
+		$safe_ports = static function () use ( $allowed_ports ): array {
+			return $allowed_ports;
+		};
+		add_filter( 'http_allowed_safe_ports', $safe_ports, PHP_INT_MAX );
+		try {
+			$response = wp_safe_remote_head( $path, $args );
+		} finally {
+			remove_filter( 'http_allowed_safe_ports', $safe_ports, PHP_INT_MAX );
+		}
 
 		if ( is_wp_error( $response ) ) {
 			wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . $response->get_error_message(), 'critical' );
@@ -2773,6 +2789,25 @@ function wpo_ips_is_local_host( string $host ): bool {
 	}
 
 	return false === filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+}
+
+/**
+ * Get allowed ports for remote PDF resources and image readability checks.
+ *
+ * @param object|null $document Document context, when available.
+ * @return int[]
+ */
+function wpo_ips_get_allowed_remote_ports( ?object $document = null ): array {
+	$ports = apply_filters( 'wpo_ips_allowed_remote_ports', array( 80, 443 ), $document );
+	$valid = array();
+
+	foreach ( (array) $ports as $port ) {
+		if ( ( is_int( $port ) || ( is_string( $port ) && ctype_digit( $port ) ) ) && $port >= 1 && $port <= 65535 ) {
+			$valid[] = (int) $port;
+		}
+	}
+
+	return array_values( array_unique( $valid ) );
 }
 
 /**

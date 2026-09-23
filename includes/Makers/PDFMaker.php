@@ -129,7 +129,7 @@ class PDFMaker {
 	}
 
 	/**
-	 * Restrict Dompdf remote resources to the site's own hosts and default ports (SSRF).
+	 * Restrict Dompdf remote resources to allowed hosts and ports (SSRF).
 	 *
 	 * @param Options $options
 	 * @return void
@@ -146,10 +146,11 @@ class PDFMaker {
 			}
 		}
 
-		$port_rule = static function ( string $uri ): array {
-			$port = wp_parse_url( $uri, PHP_URL_PORT );
+		$allowed_ports = wpo_ips_get_allowed_remote_ports( $this->document );
+		$port_rule     = static function ( string $uri ) use ( $allowed_ports ): array {
+			$port = wp_parse_url( $uri, PHP_URL_PORT ) ?? ( 'https' === strtolower( (string) wp_parse_url( $uri, PHP_URL_SCHEME ) ) ? 443 : 80 );
 
-			return null === $port || in_array( $port, array( 80, 443 ), true )
+			return in_array( $port, $allowed_ports, true )
 				? array( true, null )
 				: array( false, 'Remote port not allowed: ' . $uri );
 		};
