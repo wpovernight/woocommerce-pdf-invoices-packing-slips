@@ -1845,6 +1845,10 @@ class Admin {
 		$document_type = isset( $request['document'] ) ? sanitize_text_field( $request['document'] ) : '';
 		$order_id      = isset( $request['order_id'] ) ? absint( $request['order_id'] )              : 0;
 
+		if ( ! $this->user_can_manage_document( $document_type ) ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have sufficient permissions to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
+		}
+
 		if ( empty( $order_id ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid order ID.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
