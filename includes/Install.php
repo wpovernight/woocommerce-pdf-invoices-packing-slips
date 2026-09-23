@@ -757,18 +757,21 @@ class Install {
 
 			if ( is_array( $general_settings ) ) {
 				$is_legacy_checkout_field = ! array_key_exists( 'checkout_field_type', $general_settings );
+				// An active VAT plugin made the old field behave as a custom field.
+				$legacy_field_type = (
+					! empty( $general_settings['checkout_field_as_vat_number'] ) &&
+					! \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active()
+				) ? 'vat_number' : 'custom';
 
 				// Keep this outside the editable settings so type changes cannot reinterpret old values.
 				add_option(
 					'wpo_ips_checkout_field_legacy_type',
-					! empty( $general_settings['checkout_field_as_vat_number'] ) ? 'vat_number' : 'custom'
+					$legacy_field_type
 				);
 
 				if ( $is_legacy_checkout_field ) {
-					// Migrate the old VAT number checkbox to the new field type.
-					$general_settings['checkout_field_type'] = ! empty( $general_settings['checkout_field_as_vat_number'] )
-						? 'vat_number'
-						: 'custom';
+					// Preserve the old field's effective type, including VAT plugin compatibility.
+					$general_settings['checkout_field_type'] = $legacy_field_type;
 
 					// Clear the legacy default label so the new type-specific default can be used.
 					$checkout_field_label = isset( $general_settings['checkout_field_label'] )

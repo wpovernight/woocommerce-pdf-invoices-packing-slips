@@ -472,9 +472,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 
 			if ( false === $type ) {
 				$settings = get_option( 'wpo_wcpdf_settings_general', array() );
-				$type     = ! empty( $settings['checkout_field_as_vat_number'] )
-					? self::TYPE_VAT_NUMBER
-					: self::TYPE_CUSTOM;
+				// Match the migration when checkout runs before the settings are upgraded.
+				$type = (
+					! empty( $settings['checkout_field_as_vat_number'] ) &&
+					! \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active()
+				) ? self::TYPE_VAT_NUMBER : self::TYPE_CUSTOM;
 			}
 
 			return $this->normalize_type( (string) $type );
