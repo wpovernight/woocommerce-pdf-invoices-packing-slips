@@ -2764,7 +2764,7 @@ function wpo_ips_get_document_link_email_placements( ?\WPO\IPS\Documents\OrderDo
 function wpo_ips_is_local_host( string $host ): bool {
 	$host = strtolower( rtrim( trim( $host, '[]' ), '.' ) );
 
-	if ( 'localhost' === $host || '.localhost' === substr( $host, -10 ) ) {
+	if ( 'localhost' === $host || str_ends_with( $host, '.localhost' ) ) {
 		return true;
 	}
 
