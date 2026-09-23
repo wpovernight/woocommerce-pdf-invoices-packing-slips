@@ -2122,7 +2122,21 @@ class SettingsDebug {
 	 */
 	public function normalize_allowed_remote_hosts( $value ) {
 		if ( is_array( $value ) && isset( $value['allowed_remote_hosts'] ) && is_string( $value['allowed_remote_hosts'] ) ) {
-			$value['allowed_remote_hosts'] = implode( "\n", wpo_ips_normalize_remote_hosts( $value['allowed_remote_hosts'] ) );
+			$rejected                     = array();
+			$value['allowed_remote_hosts'] = implode( "\n", wpo_ips_normalize_remote_hosts( $value['allowed_remote_hosts'], $rejected ) );
+
+			if ( ! empty( $rejected ) && function_exists( 'add_settings_error' ) ) {
+				add_settings_error(
+					'wpo_wcpdf_settings_debug',
+					'wpo_ips_invalid_remote_hosts',
+					'<span style="font-weight: normal;">' . sprintf(
+						/* translators: %s: comma-separated list of invalid entries. */
+						esc_html__( 'These entries were ignored in Allowed image hosts: %s. Enter exact hostnames such as cdn.example.com. Wildcards, leading-dot notation, IP addresses, and localhost are not supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<strong>' . esc_html( implode( ', ', array_unique( $rejected ) ) ) . '</strong>'
+					) . '</span>',
+					'warning'
+				);
+			}
 		}
 
 		return $value;

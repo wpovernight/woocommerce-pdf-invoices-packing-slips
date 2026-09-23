@@ -2816,9 +2816,12 @@ function wpo_ips_get_allowed_remote_ports( ?object $document = null ): array {
  * The site's own hosts are omitted because they are allowed automatically.
  *
  * @param array|string $hosts
+ * @param array        $rejected Invalid entries, returned by reference.
  * @return array
  */
-function wpo_ips_normalize_remote_hosts( array|string $hosts ): array {
+function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected = array() ): array {
+	$rejected = array();
+
 	if ( is_string( $hosts ) ) {
 		$hosts = preg_split( '/[\s,]+/', $hosts );
 	}
@@ -2830,7 +2833,11 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts ): array {
 	$normalized = array();
 
 	foreach ( (array) $hosts as $host ) {
-		$host = strtolower( trim( (string) $host ) );
+		$entry = trim( (string) $host );
+		if ( '' === $entry ) {
+			continue;
+		}
+		$host = strtolower( $entry );
 
 		// A full URL was entered: keep the host only.
 		if ( str_contains( $host, '/' ) ) {
@@ -2839,14 +2846,18 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts ): array {
 
 		$host = rtrim( $host, '.' );
 
+		if ( '' !== $host && in_array( $host, $site_hosts, true ) ) {
+			continue;
+		}
+
 		if (
 			'' === $host ||
-			in_array( $host, $site_hosts, true ) ||
 			wpo_ips_is_local_host( $host ) ||
 			false !== filter_var( trim( $host, '[]' ), FILTER_VALIDATE_IP ) ||
 			! str_contains( $host, '.' ) ||
 			! preg_match( '/^[a-z0-9.-]+$/', $host )
 		) {
+			$rejected[] = $entry;
 			continue;
 		}
 
