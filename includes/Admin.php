@@ -1010,7 +1010,7 @@ class Admin {
 		if ( ! isset( $current['number'] ) ) {
 			$number_settings = $document->get_number_settings();
 			$default_number  = 0;
-			$debug_settings  = \WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
+			$debug_settings  = \WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 
 			if (
 				! empty( $debug_settings['default_manual_document_number'] ) &&
@@ -1121,7 +1121,7 @@ class Admin {
 		$settings_instance = \WPO_WCPDF()->get_instance( 'settings' );
 
 		$document_data_editing_enabled = $settings_instance->user_can_manage_settings() &&
-			( ! empty( $settings_instance->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ), true ) );
+			( ! empty( $settings_instance->get_settings( 'debug' )['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ), true ) );
 		?>
 		<div class="wcpdf-data-fields" data-document="<?php echo esc_attr( $document->get_type() ); ?>" data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>">
 			<section class="wcpdf-data-fields-section number-date">
@@ -1810,7 +1810,7 @@ class Admin {
 	 * @return void
 	 */
 	public function debug_enabled_warning( \WP_Admin_Bar $wp_admin_bar ): void {
-		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_debug'] ) && current_user_can( 'administrator' ) ) {
+		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_debug'] ) && current_user_can( 'administrator' ) ) {
 			$status_settings_url = 'admin.php?page=wpo_wcpdf_options_page&tab=debug';
 			$title               = __( 'DEBUG output enabled', 'woocommerce-pdf-invoices-packing-slips' );
 			$args                = array(
@@ -1924,7 +1924,7 @@ class Admin {
 		$key_prefix                    = "_wcpdf_{$document->slug}_";
 		$settings_instance             = \WPO_WCPDF()->get_instance( 'settings' );
 		$document_data_editing_enabled = $settings_instance->user_can_manage_settings() &&
-			( ! empty( $settings_instance->debug_settings['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ), true ) );
+			( ! empty( $settings_instance->get_settings( 'debug' )['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ), true ) );
 
 		if ( $document_data_editing_enabled ) {
 			// Number

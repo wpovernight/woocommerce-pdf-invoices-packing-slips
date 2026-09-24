@@ -305,7 +305,7 @@ class Assets {
 						'forbidden'                       => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'confirm_plugin_report_sensitive' => __( 'The report may contain sensitive data such as license keys and log contents. Are you sure you want to include this information?', 'woocommerce-pdf-invoices-packing-slips' ),
 						'danger_zone'                     => array(
-							'enabled' => isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_danger_zone_tools'] ) ? true : false,
+							'enabled' => isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_danger_zone_tools'] ) ? true : false,
 							'message' => sprintf(
 								/* translators: 1. open anchor tag, 2. close anchor tag */
 								__( '<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
