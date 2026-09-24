@@ -994,15 +994,16 @@ class Settings {
 			return;
 		}
 
+		// Read loaded settings to skip template discovery when no template is selected yet.
 		$general_settings = $this->get_settings( 'general' );
 
-		// bail if no template is selected yet (fresh install)
 		if ( empty( $general_settings['template_path'] ) ) {
 			return;
 		}
 
 		$installed_templates = $this->get_installed_templates( true );
-		// Template discovery filters may update the loaded settings.
+		// Read loaded settings again because discovery filters may have changed them.
+		// This does not reload options from the database and preserves callback updates when saving.
 		$general_settings    = $this->get_settings( 'general' );
 		$selected_template   = wp_normalize_path( $general_settings['template_path'] );
 		$template_match      = '';
