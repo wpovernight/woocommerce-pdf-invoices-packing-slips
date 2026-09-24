@@ -387,7 +387,6 @@ class SetupWizard {
 					}
 
 					$new_settings = $settings + $current_settings;
-
 					update_option( $option, $new_settings );
 				}
 			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
