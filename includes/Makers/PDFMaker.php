@@ -170,22 +170,14 @@ class PDFMaker {
 	 * @return array
 	 */
 	private function get_allowed_remote_hosts(): array {
-		$urls = array( home_url(), site_url(), wp_get_upload_dir()['baseurl'] );
-
-		// Covers logos served by offload/CDN plugins. Bulk documents keep the logo settings on their wrapper document.
-		$logo_document = $this->document->wrapper_document ?? $this->document;
-
-		if ( $logo_document && is_callable( array( $logo_document, 'get_header_logo_id' ) ) && $logo_document->get_header_logo_id() ) {
-			$urls[] = (string) wp_get_attachment_url( $logo_document->get_header_logo_id() );
-		}
-
 		$hosts          = array_filter( array_map( static function ( $url ) {
 			return wp_parse_url( $url, PHP_URL_HOST );
-		}, $urls ) );
+		}, wpo_ips_get_trusted_resource_urls( $this->document ) ) );
 		$debug_settings = \WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
 		$hosts          = array_merge( $hosts, wpo_ips_normalize_remote_hosts( (string) ( $debug_settings['allowed_remote_hosts'] ?? '' ) ) );
+		$hosts          = (array) apply_filters( 'wpo_ips_allowed_remote_hosts', $hosts, $this->document );
 
-		return array_values( array_unique( $hosts ) );
+		return array_values( array_unique( array_filter( $hosts, 'is_string' ) ) );
 	}
 
 }
