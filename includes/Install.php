@@ -772,13 +772,18 @@ class Install {
 					}
 
 					array_walk_recursive( $settings, function ( $value ) use ( &$hosts ) {
-						if ( is_string( $value ) && preg_match_all( '#(?:\bsrc\s*=\s*["\']?|url\(\s*["\']?)\s*(?:https?:)?//([^/"\'\s>):?\#]+)#i', $value, $matches ) ) {
+						if ( is_string( $value ) && preg_match_all( '#(?:\bsrc\s*=\s*["\']?|url\(\s*["\']?|@import\s+["\'])\s*(?:https?:)?//([^/"\'\s>):?\#]+)#i', $value, $matches ) ) {
 							$hosts = array_merge( $hosts, $matches[1] );
 						}
 					} );
 				}
 
 				$hosts = wpo_ips_normalize_remote_hosts( $hosts );
+
+				// Google Fonts stylesheets load the font files from a second host.
+				if ( in_array( 'fonts.googleapis.com', $hosts, true ) && ! in_array( 'fonts.gstatic.com', $hosts, true ) ) {
+					$hosts[] = 'fonts.gstatic.com';
+				}
 
 				if ( ! empty( $hosts ) ) {
 					$debug_settings['allowed_remote_hosts'] = implode( "\n", $hosts );
