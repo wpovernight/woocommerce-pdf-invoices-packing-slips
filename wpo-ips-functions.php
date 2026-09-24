@@ -902,10 +902,11 @@ function wpo_wcpdf_base64_encode_file( string $local_path ): string|bool {
 /**
  * Check if a file is readable
  *
- * @param string $path
+ * @param string      $path
+ * @param object|null $document Document context for allowed remote ports.
  * @return bool
  */
-function wpo_wcpdf_is_file_readable( string $path ): bool {
+function wpo_wcpdf_is_file_readable( string $path, ?object $document = null ): bool {
 	if ( empty( $path ) ) {
 		return false;
 	}
@@ -914,7 +915,7 @@ function wpo_wcpdf_is_file_readable( string $path ): bool {
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
 		$parsed_url    = wp_parse_url( $path );
 		$args          = array();
-		$allowed_ports = wpo_ips_get_allowed_remote_ports();
+		$allowed_ports = wpo_ips_get_allowed_remote_ports( $document );
 		$port          = $parsed_url['port'] ?? ( 'https' === strtolower( $parsed_url['scheme'] ?? '' ) ? 443 : 80 );
 
 		if ( ! in_array( $port, $allowed_ports, true ) ) {
@@ -2805,11 +2806,11 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 	$settings_document = $document->wrapper_document ?? $document;
 
 	if ( $settings_document && is_callable( array( $settings_document, 'get_header_logo_id' ) ) && $settings_document->get_header_logo_id() ) {
-		$urls[] = (string) wp_get_attachment_url( $settings_document->get_header_logo_id() );
+		$urls[] = (string) wp_get_attachment_image_url( $settings_document->get_header_logo_id(), 'full' );
 	}
 
 	// Product thumbnails, e.g. the Premium Templates thumbnail column.
-	if ( $settings_document && is_callable( array( $settings_document, 'get_thumbnail_id' ) ) ) {
+	if ( $settings_document && is_callable( array( $settings_document, 'get_thumbnail' ) ) ) {
 		$order_ids = $document->order_ids ?? array( $document->order_id ?? 0 );
 
 		foreach ( array_filter( $order_ids ) as $order_id ) {
@@ -2820,11 +2821,19 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 			}
 
 			foreach ( $order->get_items() as $item ) {
-				$product      = is_callable( array( $item, 'get_product' ) ) ? $item->get_product() : null;
-				$thumbnail_id = $product ? $settings_document->get_thumbnail_id( $product ) : false;
+				$product   = is_callable( array( $item, 'get_product' ) ) ? $item->get_product() : null;
+				$thumbnail = $product ? $settings_document->get_thumbnail( $product ) : '';
 
-				if ( $thumbnail_id ) {
-					$urls[] = (string) wp_get_attachment_url( $thumbnail_id );
+				if ( '' !== $thumbnail ) {
+					// Use the rendered source, including CDN filters and thumbnail-size overrides.
+					$html = new \DOMDocument();
+					$html->loadHTML( '<?xml encoding="UTF-8">' . $thumbnail, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
+					foreach ( $html->getElementsByTagName( 'img' ) as $image ) {
+						$src = $image->getAttribute( 'src' );
+						if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
+							$urls[] = $src;
+						}
+					}
 				}
 			}
 		}
@@ -2837,13 +2846,14 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
  * Get allowed ports for remote PDF resources and image readability checks.
  *
  * @param object|null $document Document context, when available.
+ * @param array|null  $resource_urls Previously discovered URLs, or null to discover them.
  * @return int[]
  */
-function wpo_ips_get_allowed_remote_ports( ?object $document = null ): array {
+function wpo_ips_get_allowed_remote_ports( ?object $document = null, ?array $resource_urls = null ): array {
 	$ports = array( 80, 443, 8080 );
 
 	// The site's own non-standard ports, e.g. local development or an offload/CDN host.
-	foreach ( wpo_ips_get_trusted_resource_urls( $document ) as $url ) {
+	foreach ( $resource_urls ?? wpo_ips_get_trusted_resource_urls( $document ) as $url ) {
 		$port = wp_parse_url( $url, PHP_URL_PORT );
 
 		if ( $port ) {

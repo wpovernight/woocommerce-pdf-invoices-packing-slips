@@ -135,8 +135,10 @@ class PDFMaker {
 	 * @return void
 	 */
 	private function restrict_remote_resources( Options $options ): void {
+		$resource_urls = wpo_ips_get_trusted_resource_urls( $this->document );
+
 		if ( empty( $options->getAllowedRemoteHosts() ) ) {
-			$hosts = $this->get_allowed_remote_hosts();
+			$hosts = $this->get_allowed_remote_hosts( $resource_urls );
 
 			// Dompdf treats an empty host list as unrestricted.
 			if ( empty( $hosts ) ) {
@@ -146,7 +148,7 @@ class PDFMaker {
 			}
 		}
 
-		$allowed_ports = wpo_ips_get_allowed_remote_ports( $this->document );
+		$allowed_ports = wpo_ips_get_allowed_remote_ports( $this->document, $resource_urls );
 		$port_rule     = static function ( string $uri ) use ( $allowed_ports ): array {
 			$port = wp_parse_url( $uri, PHP_URL_PORT ) ?? ( 'https' === strtolower( (string) wp_parse_url( $uri, PHP_URL_SCHEME ) ) ? 443 : 80 );
 
@@ -167,12 +169,13 @@ class PDFMaker {
 	/**
 	 * Hosts Dompdf may load remote resources from.
 	 *
+	 * @param array $resource_urls Previously discovered resource URLs.
 	 * @return array
 	 */
-	private function get_allowed_remote_hosts(): array {
+	private function get_allowed_remote_hosts( array $resource_urls ): array {
 		$hosts          = array_filter( array_map( static function ( $url ) {
 			return wp_parse_url( $url, PHP_URL_HOST );
-		}, wpo_ips_get_trusted_resource_urls( $this->document ) ) );
+		}, $resource_urls ) );
 		$debug_settings = \WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
 		$hosts          = array_merge( $hosts, wpo_ips_normalize_remote_hosts( (string) ( $debug_settings['allowed_remote_hosts'] ?? '' ) ) );
 		$hosts          = (array) apply_filters( 'wpo_ips_allowed_remote_hosts', $hosts, $this->document );
