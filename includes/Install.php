@@ -761,6 +761,7 @@ class Install {
 
 				$option_names   = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'wpo\\_wcpdf\\_documents\\_settings\\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 				$option_names[] = 'wpo_wcpdf_settings_general';
+				$option_names[] = 'wpo_wcpdf_editor_settings'; // Premium Templates custom CSS, custom blocks, and customizer columns.
 				$hosts          = array();
 
 				foreach ( $option_names as $option_name ) {
