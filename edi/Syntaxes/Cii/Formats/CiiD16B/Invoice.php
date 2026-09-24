@@ -83,12 +83,6 @@ class Invoice extends AbstractCiiFormat {
 				'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\ExchangedDocumentHandler::class,
 			),
 			
-			// Header Trade Delivery
-			'header_trade_delivery' => array(
-				'enabled' => false,
-				'handler' => \WPO\IPS\EDI\Syntaxes\Cii\Handlers\HeaderTradeDeliveryHandler::class,
-			),
-			
 			// Supply Chain Trade Transaction
 			'included_supply_chain_trade_line_item' => array(
 				'enabled' => true,
