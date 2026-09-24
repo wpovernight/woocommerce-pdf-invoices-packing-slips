@@ -176,7 +176,7 @@ class PDFMaker {
 		$hosts          = array_filter( array_map( static function ( $url ) {
 			return wp_parse_url( $url, PHP_URL_HOST );
 		}, $resource_urls ) );
-		$debug_settings = \WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
+		$debug_settings = \WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$hosts          = array_merge( $hosts, wpo_ips_normalize_remote_hosts( (string) ( $debug_settings['allowed_remote_hosts'] ?? '' ) ) );
 		$hosts          = (array) apply_filters( 'wpo_ips_allowed_remote_hosts', $hosts, $this->document );
 
