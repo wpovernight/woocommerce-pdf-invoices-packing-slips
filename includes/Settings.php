@@ -1002,6 +1002,8 @@ class Settings {
 		}
 
 		$installed_templates = $this->get_installed_templates( true );
+		// Template discovery filters may update the loaded settings.
+		$general_settings    = $this->get_settings( 'general' );
 		$selected_template   = wp_normalize_path( $general_settings['template_path'] );
 		$template_match      = '';
 		if ( ! in_array( $selected_template, $installed_templates, true ) && substr_count( $selected_template, '/' ) > 1 ) {
