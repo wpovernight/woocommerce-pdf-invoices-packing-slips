@@ -135,7 +135,7 @@ class PDFMaker {
 	 * @return void
 	 */
 	private function restrict_remote_resources( Options $options ): void {
-		if ( null === $options->getAllowedRemoteHosts() ) {
+		if ( empty( $options->getAllowedRemoteHosts() ) ) {
 			$hosts = $this->get_allowed_remote_hosts();
 
 			// Dompdf treats an empty host list as unrestricted.

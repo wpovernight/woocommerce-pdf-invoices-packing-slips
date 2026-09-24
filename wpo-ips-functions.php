@@ -2798,7 +2798,24 @@ function wpo_ips_is_local_host( string $host ): bool {
  * @return int[]
  */
 function wpo_ips_get_allowed_remote_ports( ?object $document = null ): array {
-	$ports = apply_filters( 'wpo_ips_allowed_remote_ports', array( 80, 443 ), $document );
+	$ports = array( 80, 443, 8080 );
+	$urls  = array( home_url(), site_url(), wp_get_upload_dir()['baseurl'] );
+
+	// Covers logos served by offload/CDN plugins.
+	if ( $document && is_callable( array( $document, 'get_header_logo_id' ) ) && $document->get_header_logo_id() ) {
+		$urls[] = (string) wp_get_attachment_url( $document->get_header_logo_id() );
+	}
+
+	// The site's own non-standard ports, e.g. local development.
+	foreach ( $urls as $url ) {
+		$port = wp_parse_url( $url, PHP_URL_PORT );
+
+		if ( $port ) {
+			$ports[] = $port;
+		}
+	}
+
+	$ports = apply_filters( 'wpo_ips_allowed_remote_ports', $ports, $document );
 	$valid = array();
 
 	foreach ( (array) $ports as $port ) {
@@ -2823,7 +2840,7 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected =
 	$rejected = array();
 
 	if ( is_string( $hosts ) ) {
-		$hosts = preg_split( '/[\s,]+/', $hosts );
+		$hosts = preg_split( '/[\r\n,]+/', $hosts );
 	}
 
 	$site_hosts = array_map( static function ( $url ) {
@@ -2854,8 +2871,8 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected =
 			'' === $host ||
 			wpo_ips_is_local_host( $host ) ||
 			false !== filter_var( trim( $host, '[]' ), FILTER_VALIDATE_IP ) ||
-			! str_contains( $host, '.' ) ||
-			! preg_match( '/^[a-z0-9.-]+$/', $host )
+			! preg_match( '/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/', $host ) || // valid labels, at least one dot
+			preg_match( '/(?:^|\.)(?:\d+|0x[0-9a-f]*)$/', $host ) // numeric last label: IPv4 shorthand such as 127.1 or 0x7f.1
 		) {
 			$rejected[] = $entry;
 			continue;
