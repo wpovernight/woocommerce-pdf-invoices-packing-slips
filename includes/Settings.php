@@ -264,7 +264,7 @@ class Settings {
 	public function maybe_disable_preview_on_settings_tabs( array $settings_tabs ): array {
 		$this->load_settings();
 
-		if ( isset( $this->debug_settings['disable_preview'] ) ) {
+		if ( isset( $this->get_settings( 'debug' )['disable_preview'] ) ) {
 			foreach ( $settings_tabs as $tab_key => &$tab ) {
 				if ( is_array( $tab ) && ! empty( $tab['preview_states'] ) ) {
 					$tab['preview_states'] = 1;
@@ -619,27 +619,29 @@ class Settings {
 	 * @return array
 	 */
 	public function get_common_document_settings(): array {
+		$general_settings = $this->get_settings( 'general' );
+
 		return array(
-			'paper_size'              => $this->general_settings['paper_size'] ?? '',
-			'font_subsetting'         => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
-			'header_logo'             => $this->general_settings['header_logo'] ?? '',
-			'header_logo_height'      => $this->general_settings['header_logo_height'] ?? '',
-			'vat_number'              => $this->general_settings['vat_number'] ?? '',
-			'coc_number'              => $this->general_settings['coc_number'] ?? '',
-			'shop_name'               => $this->general_settings['shop_name'] ?? '',
-			'shop_phone_number'       => $this->general_settings['shop_phone_number'] ?? '',
-			'shop_email_address'      => $this->general_settings['shop_email_address'] ?? '',
-			'shop_address_line_1'     => $this->general_settings['shop_address_line_1'] ?? '',
-			'shop_address_line_2'     => $this->general_settings['shop_address_line_2'] ?? '',
-			'shop_address_country'    => $this->general_settings['shop_address_country'] ?? '',
-			'shop_address_state'      => $this->general_settings['shop_address_state'] ?? '',
-			'shop_address_city'       => $this->general_settings['shop_address_city'] ?? '',
-			'shop_address_postcode'   => $this->general_settings['shop_address_postcode'] ?? '',
-			'shop_address_additional' => $this->general_settings['shop_address_additional'] ?? '',
-			'footer'                  => $this->general_settings['footer'] ?? '',
-			'extra_1'                 => $this->general_settings['extra_1'] ?? '',
-			'extra_2'                 => $this->general_settings['extra_2'] ?? '',
-			'extra_3'                 => $this->general_settings['extra_3'] ?? '',
+			'paper_size'              => $general_settings['paper_size'] ?? '',
+			'font_subsetting'         => isset( $general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
+			'header_logo'             => $general_settings['header_logo'] ?? '',
+			'header_logo_height'      => $general_settings['header_logo_height'] ?? '',
+			'vat_number'              => $general_settings['vat_number'] ?? '',
+			'coc_number'              => $general_settings['coc_number'] ?? '',
+			'shop_name'               => $general_settings['shop_name'] ?? '',
+			'shop_phone_number'       => $general_settings['shop_phone_number'] ?? '',
+			'shop_email_address'      => $general_settings['shop_email_address'] ?? '',
+			'shop_address_line_1'     => $general_settings['shop_address_line_1'] ?? '',
+			'shop_address_line_2'     => $general_settings['shop_address_line_2'] ?? '',
+			'shop_address_country'    => $general_settings['shop_address_country'] ?? '',
+			'shop_address_state'      => $general_settings['shop_address_state'] ?? '',
+			'shop_address_city'       => $general_settings['shop_address_city'] ?? '',
+			'shop_address_postcode'   => $general_settings['shop_address_postcode'] ?? '',
+			'shop_address_additional' => $general_settings['shop_address_additional'] ?? '',
+			'footer'                  => $general_settings['footer'] ?? '',
+			'extra_1'                 => $general_settings['extra_1'] ?? '',
+			'extra_2'                 => $general_settings['extra_2'] ?? '',
+			'extra_3'                 => $general_settings['extra_3'] ?? '',
 		);
 	}
 
@@ -671,7 +673,7 @@ class Settings {
 	public function get_output_format( ?object $document = null, ?array $request = null ): string {
 		$output_format = 'pdf'; // default
 
-		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
+		if ( isset( $this->get_settings( 'debug' )['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
 			$output_format = 'html';
 		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats, true ) ) {
 			$output_format = esc_attr( $request['output'] );
@@ -690,8 +692,8 @@ class Settings {
 	 * @return string
 	 */
 	public function get_output_mode(): string {
-		if ( isset( $this->general_settings['download_display'] ) ) {
-			switch ( $this->general_settings['download_display'] ) {
+		if ( isset( $this->get_settings( 'general' )['download_display'] ) ) {
+			switch ( $this->get_settings( 'general' )['download_display'] ) {
 				case 'display':
 					$output_mode = 'inline';
 					break;
@@ -755,7 +757,7 @@ class Settings {
 	public function get_template_path( string $template_path = '' ): string {
 		$selected_template = $template_path
 			? sanitize_text_field( $template_path )
-			: ( $this->general_settings['template_path'] ?? '' );
+			: ( $this->get_settings( 'general' )['template_path'] ?? '' );
 
 		// return default path if no template selected
 		if ( empty( $selected_template ) ) {
@@ -992,14 +994,19 @@ class Settings {
 			return;
 		}
 
-		// bail if no template is selected yet (fresh install)
-		if ( empty( $this->general_settings['template_path'] ) ) {
+		// Read loaded settings to skip template discovery when no template is selected yet.
+		$general_settings = $this->get_settings( 'general' );
+
+		if ( empty( $general_settings['template_path'] ) ) {
 			return;
 		}
 
 		$installed_templates = $this->get_installed_templates( true );
-		$selected_template = wp_normalize_path( $this->general_settings['template_path'] );
-		$template_match = '';
+		// Read loaded settings again because discovery filters may have changed them.
+		// This does not reload options from the database and preserves callback updates when saving.
+		$general_settings    = $this->get_settings( 'general' );
+		$selected_template   = wp_normalize_path( $general_settings['template_path'] );
+		$template_match      = '';
 		if ( ! in_array( $selected_template, $installed_templates, true ) && substr_count( $selected_template, '/' ) > 1 ) {
 			// search for path match
 			foreach ( $installed_templates as $path => $template_id ) {
@@ -1022,8 +1029,10 @@ class Settings {
 
 			// migrate setting if we have a match
 			if ( ! empty( $template_match ) ) {
-				$this->general_settings['template_path'] = $template_match;
-				update_option( 'wpo_wcpdf_settings_general', $this->general_settings );
+				$general_settings['template_path'] = $template_match;
+				// Synchronize loaded settings before option update callbacks run.
+				$this->general_settings = $general_settings;
+				update_option( 'wpo_wcpdf_settings_general', $general_settings );
 				/* translators: 1. path, 2. template ID */
 				wcpdf_log_error( sprintf( 'Template setting migrated from %1$s to %2$s', $path, $template_id ), 'info' );
 			}
@@ -1063,7 +1072,7 @@ class Settings {
 	public function get_sequential_number_store_method(): string {
 		global $wpdb;
 		
-		$method = isset( $this->debug_settings['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
+		$method = isset( $this->get_settings( 'debug' )['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
 
 		// safety first - always use calculate when auto_increment_increment is not 1
 		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -1517,6 +1526,24 @@ class Settings {
 		}
 
 		return $modified_settings_fields;
+	}
+
+	/**
+	 * Get the currently loaded settings for a type.
+	 *
+	 * @param string $type Settings type: general, debug, or edi.
+	 * @return array
+	 * @throws \InvalidArgumentException When the settings type is unknown.
+	 */
+	public function get_settings( string $type ): array {
+		return match ( $type ) {
+			'general' => $this->general_settings,
+			'debug'   => $this->debug_settings,
+			'edi'     => $this->edi_settings,
+			default   => throw new \InvalidArgumentException(
+				sprintf( 'Unknown settings type: %s', $type )
+			),
+		};
 	}
 
 	/**
