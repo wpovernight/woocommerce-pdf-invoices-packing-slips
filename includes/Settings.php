@@ -1540,7 +1540,7 @@ class Settings {
 			'general' => $this->general_settings,
 			'debug'   => $this->debug_settings,
 			'edi'     => $this->edi_settings,
-			default  => throw new \InvalidArgumentException(
+			default   => throw new \InvalidArgumentException(
 				sprintf( 'Unknown settings type: %s', $type )
 			),
 		};
