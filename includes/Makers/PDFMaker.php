@@ -172,9 +172,11 @@ class PDFMaker {
 	private function get_allowed_remote_hosts(): array {
 		$urls = array( home_url(), site_url(), wp_get_upload_dir()['baseurl'] );
 
-		// Covers logos served by offload/CDN plugins.
-		if ( $this->document && is_callable( array( $this->document, 'get_header_logo_id' ) ) && $this->document->get_header_logo_id() ) {
-			$urls[] = (string) wp_get_attachment_url( $this->document->get_header_logo_id() );
+		// Covers logos served by offload/CDN plugins. Bulk documents keep the logo settings on their wrapper document.
+		$logo_document = $this->document->wrapper_document ?? $this->document;
+
+		if ( $logo_document && is_callable( array( $logo_document, 'get_header_logo_id' ) ) && $logo_document->get_header_logo_id() ) {
+			$urls[] = (string) wp_get_attachment_url( $logo_document->get_header_logo_id() );
 		}
 
 		$hosts          = array_filter( array_map( static function ( $url ) {

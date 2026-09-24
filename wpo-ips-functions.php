@@ -2801,9 +2801,11 @@ function wpo_ips_get_allowed_remote_ports( ?object $document = null ): array {
 	$ports = array( 80, 443, 8080 );
 	$urls  = array( home_url(), site_url(), wp_get_upload_dir()['baseurl'] );
 
-	// Covers logos served by offload/CDN plugins.
-	if ( $document && is_callable( array( $document, 'get_header_logo_id' ) ) && $document->get_header_logo_id() ) {
-		$urls[] = (string) wp_get_attachment_url( $document->get_header_logo_id() );
+	// Covers logos served by offload/CDN plugins. Bulk documents keep the logo settings on their wrapper document.
+	$logo_document = $document->wrapper_document ?? $document;
+
+	if ( $logo_document && is_callable( array( $logo_document, 'get_header_logo_id' ) ) && $logo_document->get_header_logo_id() ) {
+		$urls[] = (string) wp_get_attachment_url( $logo_document->get_header_logo_id() );
 	}
 
 	// The site's own non-standard ports, e.g. local development.
