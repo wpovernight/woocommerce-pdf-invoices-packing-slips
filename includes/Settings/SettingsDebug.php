@@ -165,7 +165,7 @@ class SettingsDebug {
 		$premium_plugins        = $this->get_premium_plugins();
 		$directory_permissions  = $this->get_directory_permissions();
 		$yearly_reset_schedule  = $this->get_yearly_reset_schedule();
-		$debug_settings         = WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
+		$debug_settings         = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
 
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
@@ -400,13 +400,13 @@ class SettingsDebug {
 
 		switch ( $type ) {
 			case 'general':
-				$settings = $settings_instance->general_settings;
+				$settings = $settings_instance->get_settings( 'general' );
 				break;
 			case 'debug':
-				$settings = $settings_instance->debug_settings;
+				$settings = $settings_instance->get_settings( 'debug' );
 				break;
 			case 'edi':
-				$settings = $settings_instance->edi_settings;
+				$settings = $settings_instance->get_settings( 'edi' );
 				break;
 			case 'edi_tax':
 				$settings = wpo_ips_edi_get_tax_settings();
@@ -1222,7 +1222,7 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_server_config(): array {
-		$debug_settings    = WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
+		$debug_settings    = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$filesystem_method = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' );
 		$filesystem_method = 'wp' === $filesystem_method && function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : $filesystem_method;
 
@@ -1991,7 +1991,7 @@ class SettingsDebug {
 	 */
 	public function maybe_schedule_unstable_version_check(): void {
 		$hook           = 'wpo_wcpdf_check_unstable_version_daily';
-		$debug_settings = WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
+		$debug_settings = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$enabled        = isset( $debug_settings['check_unstable_versions'] );
 
 		if (

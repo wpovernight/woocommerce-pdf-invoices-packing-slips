@@ -1079,7 +1079,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	static $logged      = array();
 
 	$cache_key          = md5( $textdomain . '::' . $string );
-	$log_enabled        = ! empty( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_missing_translations'] );
+	$log_enabled        = ! empty( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['log_missing_translations'] );
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = $string;
 

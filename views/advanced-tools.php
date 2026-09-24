@@ -236,7 +236,7 @@ $settings_instance = \WPO_WCPDF()->get_instance( 'settings' );
 		<?php do_action( 'wpo_wcpdf_after_debug_tools', $this ); ?>
 	</div>
 	<!-- danger_zone (admin access only) -->
-	<?php if ( current_user_can( 'administrator' ) && isset( $settings_instance->debug_settings['enable_danger_zone_tools'] ) ) : ?>
+	<?php if ( current_user_can( 'administrator' ) && isset( $settings_instance->get_settings( 'debug' )['enable_danger_zone_tools'] ) ) : ?>
 		<?php
 			$documents  = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 			$date_types = array(
