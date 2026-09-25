@@ -40,6 +40,9 @@ class Main {
 		// enable debug mode if set in settings
 		$this->maybe_enable_debug();
 
+		// Register template hooks before documents resolve settings or initialize their numbers.
+		$this->load_template_functions();
+
 		// register document link email hooks
 		$this->register_document_link_email_hooks();
 		
