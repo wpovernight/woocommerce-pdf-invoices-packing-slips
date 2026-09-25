@@ -214,6 +214,17 @@ class WPO_WCPDF {
 			$this->get_instance( 'notices' );
 		}
 
+		// Shortcodes can appear on any page; load their handler only when rendered.
+		foreach ( array( 'wcpdf_download_invoice', 'wcpdf_download_pdf', 'wcpdf_document_link' ) as $shortcode ) {
+			add_shortcode( $shortcode, function ( $atts, $content = null, $shortcode_tag = '' ) {
+				return $this->get_instance( 'frontend' )->generate_document_shortcode(
+					is_array( $atts ) ? $atts : array(),
+					$content,
+					$shortcode_tag
+				);
+			} );
+		}
+
 		// Frontend only where useful
 		if (
 			wpo_ips_is_account_page()        ||
