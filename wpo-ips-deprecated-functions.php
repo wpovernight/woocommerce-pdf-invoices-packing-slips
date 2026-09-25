@@ -181,3 +181,26 @@ function wpo_wcpdf_get_wp_filesystem(): mixed {
 
 	return false;
 }
+
+/**
+ * Get Peppol VAT number mappings.
+ *
+ * @return array
+ *
+ * @deprecated 6.0.0 Use wpo_ips_edi_get_identifier_mappings() instead.
+ */
+function wpo_ips_edi_get_peppol_vat_mappings(): array {
+	_deprecated_function( __FUNCTION__, '6.0.0', 'wpo_ips_edi_get_identifier_mappings' );
+
+	$identifier_mappings = wpo_ips_edi_get_identifier_mappings();
+	$vat_mappings        = array();
+
+	foreach ( $identifier_mappings as $country_code => $country_data ) {
+		$vat_mappings[ $country_code ] = array(
+			'name'     => $country_data['name'] ?? $country_code,
+			'mappings' => $country_data['mappings']['vat_number'] ?? array(),
+		);
+	}
+
+	return $vat_mappings;
+}
