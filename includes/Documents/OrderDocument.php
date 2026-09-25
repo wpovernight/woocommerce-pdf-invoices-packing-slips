@@ -1559,7 +1559,7 @@ abstract class OrderDocument {
 				return;
 			}
 
-			$img_src     = isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['embed_images'] )
+			$img_src     = isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['embed_images'] )
 				? wpo_wcpdf_get_image_src_in_base64( $src )
 				: $src;
 

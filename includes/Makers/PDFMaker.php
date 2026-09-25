@@ -68,7 +68,7 @@ class PDFMaker {
 			'isFontSubsettingEnabled' => (bool) $this->settings['font_subsetting'],
 		) ) );
 		
-		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['enable_debug'] ) ) {
+		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_debug'] ) ) {
 			$this->set_additional_debug_options( $options );
 		}
 		

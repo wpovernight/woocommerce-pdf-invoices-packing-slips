@@ -435,7 +435,7 @@ class Notices {
 	 * @return void
 	 */
 	public function new_unstable_version_available_notice(): void {
-		$debug_settings         = $this->settings->debug_settings;
+		$debug_settings         = $this->settings->get_settings( 'debug' );
 		$check_unstable_enabled = isset( $debug_settings['check_unstable_versions'] );
 		$unstable_state         = get_option( 'wpo_wcpdf_unstable_version_state', array() );
 		$current_tag            = isset( $unstable_state['tag'] ) ? $unstable_state['tag'] : '';
