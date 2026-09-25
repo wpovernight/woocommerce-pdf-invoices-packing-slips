@@ -609,41 +609,11 @@ class SettingsGeneral {
 						'data-vat-label'           => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'vat_number', $shop_country ),
 						'data-registration-label'  => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'registration_number', $shop_country ),
 					),
-					'description' => __( 'Choose how the checkout field should be interpreted. This allows the same field to be used for custom customer identification, VAT numbers, or company registration numbers.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' . sprintf(
+					'description' => __( 'Choose how the checkout field should be interpreted.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' . sprintf(
 						/* translators: %s: WooCommerce EU VAT Compliance plugin link */
 						__( 'For advanced VAT validation, reporting, and full compliance with EU VAT rules, we recommend using %s.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'<a href="https://wpovernight.com/downloads/woocommerce-eu-vat-compliance/?utm_medium=plugin&utm_source=ips&utm_campaign=general-tab&utm_content=woocommerce-eu-vat-compliance-cross" target="_blank" rel="noopener noreferrer">WooCommerce EU VAT Compliance</a>'
 					) . $vat_plugin_notice,
-				),
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'checkout_field_alternative_enable',
-				'title'    => __( 'Use a different field type for foreign customers', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'checkbox',
-				'section'  => 'general_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'checkout_field_alternative_enable',
-					'description' => __( 'Applies when the billing country differs from Shop Country.', 'woocommerce-pdf-invoices-packing-slips' ),
-				),
-			),
-			array(
-				'type'     => 'setting',
-				'id'       => 'checkout_field_alternative_type',
-				'title'    => __( 'Alternative field type', 'woocommerce-pdf-invoices-packing-slips' ),
-				'callback' => 'select',
-				'section'  => 'general_settings',
-				'args'     => array(
-					'option_name' => $option_name,
-					'id'          => 'checkout_field_alternative_type',
-					'options'     => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_type_options(),
-					'custom_attributes' => array(
-						'data-show_for_option_name'   => $option_name . '[checkout_field_alternative_enable]',
-						'data-show_for_option_values' => wp_json_encode( array( '1' ) ),
-						'data-keep_current_value'     => 'true',
-					),
-					'description' => __( 'The alternative type uses its default label. Display in countries still applies. Requires WooCommerce 9.9 or newer for the Checkout Block.', 'woocommerce-pdf-invoices-packing-slips' ) . $vat_plugin_notice,
 				),
 			),
 			array(
@@ -657,6 +627,22 @@ class SettingsGeneral {
 					'id'          => 'checkout_field_label',
 					'placeholder' => $checkout_field_default_label,
 					'description' => __( 'Customize the label displayed at checkout. Leave empty to use the default label for the selected field type.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_alternative_type',
+				'title'    => __( 'Foreign customer field type', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_alternative_type',
+					'default'     => '',
+					'options'     => array(
+						'' => __( 'None', 'woocommerce-pdf-invoices-packing-slips' ),
+					) + \WPO_WCPDF()->get_instance( 'checkout_field' )->get_type_options(),
+					'description' => __( 'Choose the field type to use for foreign customers. The default label for this field type will be used.', 'woocommerce-pdf-invoices-packing-slips' ) . $vat_plugin_notice,
 				),
 			),
 			array(
@@ -829,9 +815,8 @@ class SettingsGeneral {
 				'members' => array(
 					'checkout_field_enable',
 					'checkout_field_type',
-					'checkout_field_alternative_enable',
-					'checkout_field_alternative_type',
 					'checkout_field_label',
+					'checkout_field_alternative_type',
 					'checkout_field_countries',
 					'checkout_field_enable_my_account',
 				),

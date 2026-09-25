@@ -91,13 +91,15 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 */
 		public function get_alternative_type(): string {
 			$general = \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
-			if ( ! $general->get_setting( 'checkout_field_alternative_enable' ) ) {
+			$type    = (string) $general->get_setting( 'checkout_field_alternative_type' );
+
+			if ( '' === $type ) {
 				return '';
 			}
 
-			$type = $general->get_setting( 'checkout_field_alternative_type' ) ?: self::TYPE_CUSTOM;
+			$type = $this->normalize_type( $type );
 
-			return $this->get_shop_country() && $type !== $this->get_type() && in_array( $type, $this->get_types(), true )
+			return $this->get_shop_country() && $type !== $this->get_type()
 				? $type
 				: '';
 		}
