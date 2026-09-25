@@ -82,8 +82,27 @@ class Settings {
 			add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 		}
 
-		// Runtime hook
+		// Runtime hooks must also be available to cron and CLI runners.
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
+
+		// Save order tax data in every request context, loading EDI settings on demand.
+		add_action( 'woocommerce_order_after_calculate_totals', function ( $and_taxes, $order ) {
+			$this->get_instance( 'edi' )->save_taxes_on_calculate_order_totals( $and_taxes, $order );
+		}, 10, 2 );
+		add_action( 'woocommerce_checkout_order_processed', function ( $order_id, $posted_data, $order ) {
+			$this->get_instance( 'edi' )->save_taxes_on_checkout( $order_id, $posted_data, $order );
+		}, 10, 3 );
+
+		// Load settings components only when their scheduled jobs run.
+		add_action( 'wpo_wcpdf_number_table_data_fetch', function ( ...$args ) {
+			$this->get_instance( 'debug' )->fetch_number_table_data( ...$args );
+		}, 10, 7 );
+		add_action( 'wpo_wcpdf_check_unstable_version_daily', function () {
+			$this->get_instance( 'debug' )->run_unstable_version_check();
+		} );
+		add_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing', function () {
+			$this->get_instance( 'upgrade' )->clear_extensions_license_cache();
+		} );
 	}
 
 	private function load_settings_components(): void {

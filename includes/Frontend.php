@@ -28,16 +28,9 @@ class Frontend {
 	 * Constructor
 	 */
 	public function __construct() {
-		// Shortcodes
-		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
-		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
-		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
-
 		// REST
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
-			add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
-		}
+		add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
+		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
 
 		// Account
 		if ( wpo_ips_is_account_page() ) {
@@ -980,7 +973,7 @@ class Frontend {
 	 * @return bool
 	 */
 	protected function current_user_can_access_shortcode_order( \WC_Abstract_Order $order, string $document_type ): bool {
-		if ( WPO_WCPDF()->admin->user_can_manage_document( $document_type ) ) {
+		if ( WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( $document_type ) ) {
 			return true;
 		}
 

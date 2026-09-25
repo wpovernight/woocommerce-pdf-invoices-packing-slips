@@ -704,11 +704,11 @@ function wpo_wcpdf_sanitize_phone_number( string $text ): string {
 /**
  * Safe redirect or die.
  *
- * @param  string          $url
+ * @param  string|null     $url
  * @param  string|\WP_Error $message
  * @return void
  */
-function wcpdf_safe_redirect_or_die( string $url = '', string|\WP_Error $message = '' ): void {
+function wcpdf_safe_redirect_or_die( ?string $url = '', string|\WP_Error $message = '' ): void {
 	if ( ! empty( $url ) ) {
 		wp_safe_redirect( $url );
 		exit;
@@ -2740,7 +2740,11 @@ function wpo_ips_is_pretty_document_link_request(): bool {
 		'/'
 	);
 
-	return $request_path === $identifier || 0 === strpos( $request_path . '/', $identifier . '/' );
+	// Document links are relative to the home URL, which may include a subdirectory.
+	$home_path     = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+	$endpoint_path = ltrim( $home_path . '/' . $identifier, '/' );
+
+	return $request_path === $endpoint_path || 0 === strpos( $request_path . '/', $endpoint_path . '/' );
 }
 
 /**
