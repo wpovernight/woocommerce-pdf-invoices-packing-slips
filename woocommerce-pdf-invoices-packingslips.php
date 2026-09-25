@@ -196,10 +196,8 @@ class WPO_WCPDF {
 		$this->get_instance( 'vat_plugins' );
 		$this->get_instance( 'main' );
 
-		// Endpoint only matters for document links/downloads/admin generation
-		if ( $is_document_context || wpo_ips_is_pretty_document_link_request() ) {
-			$this->get_instance( 'endpoint' );
-		}
+		// Register document routing on every request so rewrite rebuilds retain its rule.
+		$this->get_instance( 'endpoint' );
 
 		// Document-related runtime
 		if ( $is_document_context ) {
