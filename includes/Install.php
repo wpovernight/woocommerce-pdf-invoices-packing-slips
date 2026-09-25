@@ -751,6 +751,47 @@ class Install {
 			}
 		}
 
+		// 6.0.0: migrate the optional checkout field settings.
+		if ( version_compare( $installed_version, '6.0.0', '<' ) ) {
+			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+
+			if ( is_array( $general_settings ) ) {
+				$is_legacy_checkout_field = ! array_key_exists( 'checkout_field_type', $general_settings );
+				// An active VAT plugin made the old field behave as a custom field.
+				$legacy_field_type = (
+					! empty( $general_settings['checkout_field_as_vat_number'] ) &&
+					! \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active()
+				) ? 'vat_number' : 'custom';
+
+				// Keep this outside the editable settings so type changes cannot reinterpret old values.
+				add_option(
+					'wpo_ips_checkout_field_legacy_type',
+					$legacy_field_type
+				);
+
+				if ( $is_legacy_checkout_field ) {
+					// Preserve the old field's effective type, including VAT plugin compatibility.
+					$general_settings['checkout_field_type'] = $legacy_field_type;
+
+					// Clear the legacy default label so the new type-specific default can be used.
+					$checkout_field_label = isset( $general_settings['checkout_field_label'] )
+						? trim( (string) $general_settings['checkout_field_label'] )
+						: '';
+
+					$legacy_default_labels = array(
+						'Customer identification',
+						__( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' ),
+					);
+
+					if ( in_array( $checkout_field_label, $legacy_default_labels, true ) ) {
+						$general_settings['checkout_field_label'] = '';
+					}
+
+					update_option( 'wpo_wcpdf_settings_general', $general_settings );
+				}
+			}
+		}
+
 		// 6.0.0-i1621.1: allow remote hosts already used in settings and the selected template, now that PDFs only load resources from the site's own hosts
 		if ( version_compare( $installed_version, '6.0.0-i1621.1', '<' ) ) {
 			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );

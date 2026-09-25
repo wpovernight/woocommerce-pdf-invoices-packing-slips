@@ -1219,29 +1219,31 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
 	
-	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
+	$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+	$vat_number     = $checkout_field->get_order_value( $order, \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER );
+	$meta_key       = null;
 
-	if ( ! empty( $frontend_instance ) && is_callable( array( $frontend_instance, 'checkout_field_is_vat_number' ) ) ) {
-		$checkout_field_is_vat_number = $frontend_instance->checkout_field_is_vat_number();
+	if ( null !== $vat_number ) {
+		$meta_key = $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER );
 
-		if ( $checkout_field_is_vat_number ) {
-			array_unshift( $vat_meta_keys, '_wpo_ips_checkout_field' );
+		// A read-only legacy fallback does not populate the typed metadata key.
+		if ( '' === trim( (string) $order->get_meta( $meta_key ) ) ) {
+			$meta_key = \WPO\IPS\CheckoutField::LEGACY_ORDER_META_KEY;
 		}
-	}
+	} else {
+		foreach ( $vat_meta_keys as $candidate_meta_key ) {
+			$meta_value = $order->get_meta( $candidate_meta_key );
 
-	$vat_number = null;
+			// Handle multidimensional VAT data (e.g., Aelia EU VAT Assistant)
+			if ( '_eu_vat_evidence' === $candidate_meta_key && is_array( $meta_value ) ) {
+				$meta_value = $meta_value['exemption']['vat_number'] ?? '';
+			}
 
-	foreach ( $vat_meta_keys as $meta_key ) {
-		$meta_value = $order->get_meta( $meta_key );
-
-		// Handle multidimensional VAT data (e.g., Aelia EU VAT Assistant)
-		if ( '_eu_vat_evidence' === $meta_key && is_array( $meta_value ) ) {
-			$meta_value = $meta_value['exemption']['vat_number'] ?? '';
-		}
-
-		if ( $meta_value ) {
-			$vat_number = $meta_value;
-			break;
+			if ( $meta_value ) {
+				$vat_number = $meta_value;
+				$meta_key   = $candidate_meta_key;
+				break;
+			}
 		}
 	}
 
@@ -1249,11 +1251,60 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'wpo_wcpdf_order_customer_vat_number',
 		$vat_number,
 		$order,
-		$meta_key ?? null
+		$meta_key
 	);
 
 	return is_string( $vat_number )
 		? $vat_number
+		: null;
+}
+
+/**
+ * Retrieve the customer company registration number from order meta.
+ *
+ * @param \WC_Abstract_Order $order
+ * @return string|null
+ */
+function wpo_wcpdf_get_order_customer_registration_number( \WC_Abstract_Order $order ): ?string {
+	$registration_number_meta_keys = (array) apply_filters(
+		'wpo_wcpdf_order_customer_registration_number_meta_keys',
+		array(),
+		$order
+	);
+
+	$checkout_field      = \WPO_WCPDF()->get_instance( 'checkout_field' );
+	$registration_number = $checkout_field->get_order_value( $order, \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER );
+	$meta_key            = null;
+
+	if ( null !== $registration_number ) {
+		array_unshift( $registration_number_meta_keys, $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER ) );
+	}
+
+	foreach ( $registration_number_meta_keys as $candidate_meta_key ) {
+		$meta_value = $order->get_meta( $candidate_meta_key, true );
+
+		if ( ! is_scalar( $meta_value ) ) {
+			continue;
+		}
+
+		$meta_value = trim( (string) $meta_value );
+
+		if ( '' !== $meta_value ) {
+			$registration_number = $meta_value;
+			$meta_key            = $candidate_meta_key;
+			break;
+		}
+	}
+
+	$registration_number = apply_filters(
+		'wpo_wcpdf_order_customer_registration_number',
+		$registration_number,
+		$order,
+		$meta_key
+	);
+
+	return is_string( $registration_number )
+		? $registration_number
 		: null;
 }
 
@@ -2717,6 +2768,14 @@ function wpo_ips_is_document_download_request(): bool {
  * @return bool
  */
 function wpo_ips_is_checkout_request(): bool {
+	if (
+		isset( $_GET['wc-ajax'] ) &&
+		is_scalar( $_GET['wc-ajax'] ) &&
+		'checkout' === sanitize_key( wp_unslash( (string) $_GET['wc-ajax'] ) )
+	) {
+		return true;
+	}
+
 	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
 		return false;
 	}
