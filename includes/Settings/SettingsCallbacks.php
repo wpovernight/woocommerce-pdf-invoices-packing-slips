@@ -432,6 +432,7 @@ class SettingsCallbacks {
 	 *   title             - secondary title of the input (optional)
 	 *   setting_name      - name of the main setting
 	 *   id                - key of the setting
+	 *   show_empty_option - keep the empty option selectable in enhanced selects (optional)
 	 *   multiple          - whether the select is multiple (optional)
 	 *   options           - array of options for the select
 	 *   current           - current value(s) of the setting
@@ -464,16 +465,19 @@ class SettingsCallbacks {
 				$multiple = '';
 			}
 
-			$placeholder = ! empty( $placeholder ) ? esc_attr( $placeholder ) : '';
+			// Select2 placeholders hide the empty option; keep it selectable when requested.
+			$placeholder_attribute = ! empty( $show_empty_option )
+				? ''
+				: 'data-placeholder="' . esc_attr( $placeholder ?? '' ) . '"';
 			$title       = ! empty( $title ) ? esc_attr( $title ) : '';
 			$class       = 'wc-enhanced-select wpo-wcpdf-enhanced-select';
 			$css         = 'width:400px';
 			
 			printf(
-				'<select id="%1$s" name="%2$s" data-placeholder="%3$s" title="%4$s" class="%5$s" style="%6$s" %7$s %8$s %9$s>',
+				'<select id="%1$s" name="%2$s" %3$s title="%4$s" class="%5$s" style="%6$s" %7$s %8$s %9$s>',
 				esc_attr( $id ),
 				esc_attr( $setting_name ),
-				esc_attr( $placeholder ),
+				$placeholder_attribute, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped above.
 				esc_attr( $title ),
 				esc_attr( $class ),
 				esc_attr( $css ),
