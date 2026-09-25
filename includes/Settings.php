@@ -85,6 +85,14 @@ class Settings {
 		// Runtime hooks must also be available to cron and CLI runners.
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
 
+		// Save order tax data in every request context, loading EDI settings on demand.
+		add_action( 'woocommerce_order_after_calculate_totals', function ( $and_taxes, $order ) {
+			$this->get_instance( 'edi' )->save_taxes_on_calculate_order_totals( $and_taxes, $order );
+		}, 10, 2 );
+		add_action( 'woocommerce_checkout_order_processed', function ( $order_id, $posted_data, $order ) {
+			$this->get_instance( 'edi' )->save_taxes_on_checkout( $order_id, $posted_data, $order );
+		}, 10, 3 );
+
 		// Load settings components only when their scheduled jobs run.
 		add_action( 'wpo_wcpdf_number_table_data_fetch', function ( ...$args ) {
 			$this->get_instance( 'debug' )->fetch_number_table_data( ...$args );
