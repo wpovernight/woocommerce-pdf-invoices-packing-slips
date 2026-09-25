@@ -704,11 +704,11 @@ function wpo_wcpdf_sanitize_phone_number( string $text ): string {
 /**
  * Safe redirect or die.
  *
- * @param  string          $url
+ * @param  string|null     $url
  * @param  string|\WP_Error $message
  * @return void
  */
-function wcpdf_safe_redirect_or_die( string $url = '', string|\WP_Error $message = '' ): void {
+function wcpdf_safe_redirect_or_die( ?string $url = '', string|\WP_Error $message = '' ): void {
 	if ( ! empty( $url ) ) {
 		wp_safe_redirect( $url );
 		exit;
