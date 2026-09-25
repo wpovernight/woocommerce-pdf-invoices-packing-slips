@@ -33,10 +33,8 @@ class Frontend {
 		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
 
 		// REST
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
-			add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
-		}
+		add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
+		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
 
 		// Account
 		if ( wpo_ips_is_account_page() ) {
