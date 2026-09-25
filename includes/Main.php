@@ -516,6 +516,9 @@ class Main {
 					break;
 				}
 				break;
+			default:
+				$allowed = false;
+				break;
 		}
 
 		$allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
@@ -1198,7 +1201,7 @@ class Main {
 			'logOutputFile'           => $this->get_tmp_path( 'dompdf' ) . "/log.htm",
 			'fontDir'                 => $path,
 			'fontCache'               => $path,
-			'isRemoteEnabled'         => true,
+			'isRemoteEnabled'         => false,
 			'isFontSubsettingEnabled' => true,
 			'isHtml5ParserEnabled'    => true,
 		) );
