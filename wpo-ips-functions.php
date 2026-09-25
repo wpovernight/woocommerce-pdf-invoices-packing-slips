@@ -2740,7 +2740,11 @@ function wpo_ips_is_pretty_document_link_request(): bool {
 		'/'
 	);
 
-	return $request_path === $identifier || 0 === strpos( $request_path . '/', $identifier . '/' );
+	// Document links are relative to the home URL, which may include a subdirectory.
+	$home_path     = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+	$endpoint_path = ltrim( $home_path . '/' . $identifier, '/' );
+
+	return $request_path === $endpoint_path || 0 === strpos( $request_path . '/', $endpoint_path . '/' );
 }
 
 /**
