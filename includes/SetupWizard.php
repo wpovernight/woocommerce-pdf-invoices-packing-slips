@@ -338,17 +338,26 @@ class SetupWizard {
 	 * @return void
 	 */
 	public function save_step(): void {
-		$request = stripslashes_deep( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), '', array( 'response' => 403 ) );
+		}
+
+		check_admin_referer( 'wpo-wcpdf-setup' );
+		$request = stripslashes_deep( $_POST );
 
 		if ( isset( $this->steps[ $this->step ]['handler'] ) ) {
-			check_admin_referer( 'wpo-wcpdf-setup' );
 			// for doing more than just saving an option value
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
 			if ( ! empty( $request['wcpdf_settings'] ) && is_array( $request['wcpdf_settings'] ) ) {
-				check_admin_referer( 'wpo-wcpdf-setup' );
+				// only the plugin options rendered by the wizard can be saved
+				$allowed_options = array( 'wpo_wcpdf_settings_general', 'wpo_wcpdf_documents_settings_invoice' );
 
 				foreach ( $request['wcpdf_settings'] as $option => $settings ) {
+					if ( ! in_array( $option, $allowed_options, true ) || ! is_array( $settings ) ) {
+						continue;
+					}
+
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
 						if ( 'attach_to_email_ids' === $key ) {
@@ -378,7 +387,6 @@ class SetupWizard {
 					}
 
 					$new_settings = $settings + $current_settings;
-					
 					update_option( $option, $new_settings );
 				}
 			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {

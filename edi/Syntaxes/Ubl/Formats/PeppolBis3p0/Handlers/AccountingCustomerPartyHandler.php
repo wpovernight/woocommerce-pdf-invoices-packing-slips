@@ -68,47 +68,6 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	}
 
 	/**
-	 * Returns the party legal entity for the customer.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_legal_entity(): ?array {
-		$order             = \wpo_ips_edi_get_parent_order( $this->document->order );
-		$billing_company   = $order->get_billing_company();
-		$billing_name      = $order->get_formatted_billing_full_name();
-		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
-
-		if ( empty( $registration_name ) ) {
-			wpo_ips_edi_log(
-				sprintf(
-					'UBL/Peppol PartyLegalEntity: Registration name is missing for customer in order ID %d.',
-					$this->document->order->get_id()
-				),
-				'error'
-			);
-			return null;
-		}
-
-		$party_legal_entity = array(
-			'name'  => 'cac:PartyLegalEntity',
-			'value' => array(
-				'name'  => 'cbc:RegistrationName',
-				'value' => wpo_ips_edi_sanitize_string( $registration_name ),
-			),
-		);
-
-		$party_legal_entity = apply_filters(
-			'wpo_ips_edi_ubl_customer_party_legal_entity',
-			$party_legal_entity,
-			$this
-		);
-
-		return is_array( $party_legal_entity )
-			? $party_legal_entity
-			: null;
-	}
-
-	/**
 	 * Gets the Peppol Endpoint ID and scheme for the customer from user meta.
 	 *
 	 * @return array|null Array with 'endpoint_id' and 'endpoint_eas' keys, or null if invalid/missing.

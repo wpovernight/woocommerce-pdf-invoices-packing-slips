@@ -41,6 +41,7 @@ class SettingsDebug {
 
 		// IPS
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
+		add_filter( 'pre_update_option_wpo_wcpdf_settings_debug', array( $this, 'normalize_allowed_remote_hosts' ) );
 		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
 		add_action( 'wpo_wcpdf_check_unstable_version_daily', array( $this, 'run_unstable_version_check' ) );
 		add_action( 'wpo_wcpdf_after_sidebar', array( $this, 'display_search_field' ), 10, 2 );
@@ -164,7 +165,7 @@ class SettingsDebug {
 		$premium_plugins        = $this->get_premium_plugins();
 		$directory_permissions  = $this->get_directory_permissions();
 		$yearly_reset_schedule  = $this->get_yearly_reset_schedule();
-		$debug_settings         = WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
+		$debug_settings         = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
 
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
@@ -399,13 +400,13 @@ class SettingsDebug {
 
 		switch ( $type ) {
 			case 'general':
-				$settings = $settings_instance->general_settings;
+				$settings = $settings_instance->get_settings( 'general' );
 				break;
 			case 'debug':
-				$settings = $settings_instance->debug_settings;
+				$settings = $settings_instance->get_settings( 'debug' );
 				break;
 			case 'edi':
-				$settings = $settings_instance->edi_settings;
+				$settings = $settings_instance->get_settings( 'edi' );
 				break;
 			case 'edi_tax':
 				$settings = wpo_ips_edi_get_tax_settings();
@@ -1051,6 +1052,21 @@ class SettingsDebug {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'allowed_remote_hosts',
+				'title'    => __( 'Allowed image hosts', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'textarea',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'allowed_remote_hosts',
+					'width'       => '50',
+					'height'      => '4',
+					'placeholder' => 'cdn.example.com',
+					'description' => __( 'By default, images and other resources in PDFs are only loaded from this website and from the hosts serving the shop logo and product images. Add allowed hostnames here, one per line (for example cdn.example.com). Each entry allows only that exact hostname. List subdomains separately; wildcards and leading-dot notation are not supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'reload_attachment_translations',
 				'title'    => __( 'Reload translations for attachments', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'checkbox',
@@ -1206,7 +1222,7 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_server_config(): array {
-		$debug_settings    = WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
+		$debug_settings    = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$filesystem_method = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' );
 		$filesystem_method = 'wp' === $filesystem_method && function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : $filesystem_method;
 
@@ -1620,6 +1636,7 @@ class SettingsDebug {
 					'pretty_document_links',
 					'disable_preview',
 					'embed_images',
+					'allowed_remote_hosts',
 					'html_output',
 				),
 			),
@@ -1974,7 +1991,7 @@ class SettingsDebug {
 	 */
 	public function maybe_schedule_unstable_version_check(): void {
 		$hook           = 'wpo_wcpdf_check_unstable_version_daily';
-		$debug_settings = WPO_WCPDF()->get_instance( 'settings' )->debug_settings;
+		$debug_settings = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$enabled        = isset( $debug_settings['check_unstable_versions'] );
 
 		if (
@@ -2095,6 +2112,34 @@ class SettingsDebug {
 		\wcpdf_pdf_headers( $filename, 'download', $pdf );
 		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		exit();
+	}
+
+	/**
+	 * Keep only valid domain names in the allowed remote hosts setting.
+	 *
+	 * @param mixed $value Debug settings being saved.
+	 * @return mixed
+	 */
+	public function normalize_allowed_remote_hosts( $value ) {
+		if ( is_array( $value ) && isset( $value['allowed_remote_hosts'] ) && is_string( $value['allowed_remote_hosts'] ) ) {
+			$rejected                     = array();
+			$value['allowed_remote_hosts'] = implode( "\n", wpo_ips_normalize_remote_hosts( $value['allowed_remote_hosts'], $rejected ) );
+
+			if ( ! empty( $rejected ) && function_exists( 'add_settings_error' ) ) {
+				add_settings_error(
+					'wpo_wcpdf_settings_debug',
+					'wpo_ips_invalid_remote_hosts',
+					'<span style="font-weight: normal;">' . sprintf(
+						/* translators: %s: comma-separated list of invalid entries. */
+						esc_html__( 'These entries were ignored in Allowed image hosts: %s. Enter exact hostnames such as cdn.example.com. Wildcards, leading-dot notation, IP addresses, and localhost are not supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<strong>' . esc_html( implode( ', ', array_unique( $rejected ) ) ) . '</strong>'
+					) . '</span>',
+					'warning'
+				);
+			}
+		}
+
+		return $value;
 	}
 	
 	/**
