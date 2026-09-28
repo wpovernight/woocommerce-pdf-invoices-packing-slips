@@ -314,7 +314,7 @@ class Frontend {
 			return '';
 		}
 
-		if ( $has_explicit_order_id && ! $this->current_user_can_access_shortcode_order( $order, $values['document_type'] ) ) {
+		if ( ! $this->current_user_can_access_shortcode_order( $order, $values['document_type'] ) ) {
 			return '';
 		}
 
@@ -325,6 +325,10 @@ class Frontend {
 		}
 
 		$pdf_url = WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
+
+		if ( empty( $pdf_url ) ) {
+			return '';
+		}
 
 		if ( 'wcpdf_document_link' === $shortcode_tag ) {
 			return esc_url( $pdf_url );
@@ -985,13 +989,17 @@ class Frontend {
 	}
 
 	/**
-	 * Check whether the current user can use a shortcode with an explicit order ID.
+	 * Check shortcode access using the configured document link access type.
 	 *
 	 * @param \WC_Abstract_Order $order
 	 * @param string             $document_type
 	 * @return bool
 	 */
 	protected function current_user_can_access_shortcode_order( \WC_Abstract_Order $order, string $document_type ): bool {
+		if ( 'full' === WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link_access_type() ) {
+			return true;
+		}
+
 		if ( WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( $document_type ) ) {
 			return true;
 		}
