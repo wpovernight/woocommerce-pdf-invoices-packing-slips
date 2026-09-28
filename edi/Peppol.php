@@ -42,6 +42,8 @@ class Peppol {
 		add_action( 'woocommerce_checkout_order_created', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 999, 1 );
 		add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'peppol_handle_new_order_automatic_endpoint_id_derivation' ), 999, 1 );
 
+		add_rewrite_endpoint( 'peppol', EP_PAGES );
+
 		if ( ! \wpo_ips_is_frontend_page_request() ) {
 			return;
 		}
@@ -50,8 +52,6 @@ class Peppol {
 		add_filter( 'woocommerce_account_menu_items', array( $this, 'peppol_account_menu_item' ), 10, 2 );
 		add_action( 'template_redirect', array( $this, 'save_peppol_settings' ) );
 		add_action( 'woocommerce_account_peppol_endpoint', array( $this, 'peppol_settings_account_page' ) );
-
-		add_rewrite_endpoint( 'peppol', EP_PAGES );
 
 		add_filter( 'woocommerce_checkout_fields', array( $this, 'peppol_display_classic_checkout_fields' ), 10, 1 );
 		add_filter( 'woocommerce_checkout_get_value', array( $this, 'peppol_set_classic_checkout_fields_value' ), 10, 2 );

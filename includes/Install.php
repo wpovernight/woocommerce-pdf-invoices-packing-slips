@@ -751,6 +751,103 @@ class Install {
 			}
 		}
 
+		// 6.0.0: migrate the optional checkout field settings.
+		if ( version_compare( $installed_version, '6.0.0', '<' ) ) {
+			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+
+			if ( is_array( $general_settings ) ) {
+				$is_legacy_checkout_field = ! array_key_exists( 'checkout_field_type', $general_settings );
+				// An active VAT plugin made the old field behave as a custom field.
+				$legacy_field_type = (
+					! empty( $general_settings['checkout_field_as_vat_number'] ) &&
+					! \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active()
+				) ? 'vat_number' : 'custom';
+
+				// Keep this outside the editable settings so type changes cannot reinterpret old values.
+				add_option(
+					'wpo_ips_checkout_field_legacy_type',
+					$legacy_field_type
+				);
+
+				if ( $is_legacy_checkout_field ) {
+					// Preserve the old field's effective type, including VAT plugin compatibility.
+					$general_settings['checkout_field_type'] = $legacy_field_type;
+
+					// Clear the legacy default label so the new type-specific default can be used.
+					$checkout_field_label = isset( $general_settings['checkout_field_label'] )
+						? trim( (string) $general_settings['checkout_field_label'] )
+						: '';
+
+					$legacy_default_labels = array(
+						'Customer identification',
+						__( 'Customer identification', 'woocommerce-pdf-invoices-packing-slips' ),
+					);
+
+					if ( in_array( $checkout_field_label, $legacy_default_labels, true ) ) {
+						$general_settings['checkout_field_label'] = '';
+					}
+
+					update_option( 'wpo_wcpdf_settings_general', $general_settings );
+				}
+			}
+		}
+
+		// 6.0.0-i1621.1: allow remote hosts already used in settings and the selected template, now that PDFs only load resources from the site's own hosts
+		if ( version_compare( $installed_version, '6.0.0-i1621.1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			$debug_settings = is_array( $debug_settings ) ? $debug_settings : array();
+
+			if ( ! isset( $debug_settings['allowed_remote_hosts'] ) ) {
+				global $wpdb;
+
+				$option_names   = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'wpo\\_wcpdf\\_documents\\_settings\\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$option_names[] = 'wpo_wcpdf_settings_general';
+				$option_names[] = 'wpo_wcpdf_editor_settings'; // Premium Templates custom CSS, custom blocks, and customizer columns.
+				$hosts          = array();
+				$find_hosts     = static function ( string $content ): array {
+					return preg_match_all( '#(?:\bsrc\s*=\s*["\']?|url\(\s*["\']?|@import\s+["\'])\s*(?:https?:)?//([^/"\'\s>):?\#]+)#i', $content, $matches ) ? $matches[1] : array();
+				};
+
+				foreach ( $option_names as $option_name ) {
+					$settings = get_option( $option_name, array() );
+
+					if ( ! is_array( $settings ) ) {
+						continue;
+					}
+
+					array_walk_recursive( $settings, function ( $value ) use ( &$hosts, $find_hosts ) {
+						if ( is_string( $value ) ) {
+							$hosts = array_merge( $hosts, $find_hosts( $value ) );
+						}
+					} );
+				}
+
+				// The selected template, e.g. a custom template in a child theme, can reference images and fonts directly.
+				$template_path  = $settings_instance->get_template_path();
+				$template_files = '' !== $template_path
+					? array_merge( glob( trailingslashit( $template_path ) . '*' ) ?: array(), glob( trailingslashit( $template_path ) . '*/*' ) ?: array() )
+					: array();
+
+				foreach ( $template_files as $template_file ) {
+					if ( preg_match( '/\.(php|css)$/i', $template_file ) && $file_system_instance->is_file( $template_file ) ) {
+						$hosts = array_merge( $hosts, $find_hosts( (string) $file_system_instance->get_contents( $template_file ) ) );
+					}
+				}
+
+				$hosts = wpo_ips_normalize_remote_hosts( $hosts );
+
+				// Google Fonts stylesheets load the font files from a second host.
+				if ( in_array( 'fonts.googleapis.com', $hosts, true ) && ! in_array( 'fonts.gstatic.com', $hosts, true ) ) {
+					$hosts[] = 'fonts.gstatic.com';
+				}
+
+				if ( ! empty( $hosts ) ) {
+					$debug_settings['allowed_remote_hosts'] = implode( "\n", $hosts );
+					update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
+				}
+			}
+		}
+
 		// Maybe reinstall fonts
 		$main_instance->maybe_reinstall_fonts( true );
 	}

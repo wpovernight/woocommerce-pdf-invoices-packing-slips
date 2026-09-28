@@ -1554,12 +1554,12 @@ abstract class OrderDocument {
 				$src  = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $path ); // replaces path with URL
 			}
 
-			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
+			if ( ! wpo_wcpdf_is_file_readable( $src, $this ) ) {
 				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
 				return;
 			}
 
-			$img_src     = isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['embed_images'] )
+			$img_src     = isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['embed_images'] )
 				? wpo_wcpdf_get_image_src_in_base64( $src )
 				: $src;
 

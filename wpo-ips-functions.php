@@ -616,18 +616,24 @@ function wcpdf_convert_encoding( string $string, string $tool = 'mb_convert_enco
  * @return string
  */
 function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', array $allow_tags = array() ): string {
-	if ( empty( $html ) ) {
-		return $html;
+	if ( '' === $html ) {
+		return '';
 	}
 
-	// default allowed tags
-	$allow_tags = array_merge( apply_filters( 'wpo_wcpdf_sanitize_html_default_allow_tags', array(
-		// tag   => allowed attributes eg. array( 'href', 'title' ) in case of a <a> tag.
-		'br'     => array(),
-		'em'     => array(),
-		'strong' => array(),
-		'p'      => array(),
-	), $context ), $allow_tags );
+	// Default allowed tags.
+	$allow_tags = array_merge(
+		apply_filters(
+			'wpo_wcpdf_sanitize_html_default_allow_tags',
+			array(
+				'br'     => array(),
+				'em'     => array(),
+				'strong' => array(),
+				'p'      => array(),
+			),
+			$context
+		),
+		$allow_tags
+	);
 
 	$safe_tags = array(
 		'b'          => array(),
@@ -672,79 +678,16 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	$filtered_tags = array();
 
 	foreach ( $allow_tags as $tag => $attributes ) {
-		if ( array_key_exists( $tag, $safe_tags ) ) {
-			$safe_attributes       = array_intersect( $attributes, $safe_tags[ $tag ] );
-			$filtered_tags[ $tag ] = ! empty( $safe_attributes ) ? $safe_attributes : array();
-		}
-	}
-
-	if ( empty( $filtered_tags ) ) {
-		return $html;
-	}
-
-	$dom = new \DOMDocument();
-
-	// clean up special chars
-	if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
-		$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
-	}
-
-	libxml_use_internal_errors( true ); // suppress malformed HTML errors
-	@$dom->loadHTML( '<div>' . $html . '</div>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
-	libxml_clear_errors();
-
-	$extra_wrapper = $dom->getElementsByTagName( 'div' )->item( 0 );
-	$content       = ! empty( $extra_wrapper ) ? $extra_wrapper->parentNode->removeChild( $extra_wrapper ) : null;
-
-	if ( ! empty( $content ) ) {
-		// Clear DOM by removing all nodes from it.
-		while ( $dom->firstChild ) {
-			$dom->removeChild( $dom->firstChild );
+		if ( ! array_key_exists( $tag, $safe_tags ) ) {
+			continue;
 		}
 
-		// Append the content to the DOM to remove the extra DIV wrapper.
-		while ( $content->firstChild ) {
-			$dom->appendChild( $content->firstChild );
-		}
+		$safe_attributes = array_intersect( $attributes, $safe_tags[ $tag ] );
+
+		$filtered_tags[ $tag ] = array_fill_keys( $safe_attributes, true );
 	}
 
-	$xpath = new \DOMXPath( $dom );
-
-	// iterate over all nodes.
-	foreach ( $xpath->query( '//*' ) as $node ) {
-		// check if the node is allowed.
-		if ( array_key_exists( $node->nodeName, $filtered_tags ) ) {
-			// if the node is allowed, check each attribute.
-			foreach ( $node->attributes as $attr ) {
-				if ( ! in_array( $attr->nodeName, $filtered_tags[ $node->nodeName ], true ) ) {
-					$node->removeAttribute( $attr->nodeName );
-				}
-			}
-		} else {
-			// if the node is not allowed, remove it but try to preserve text.
-			if ( $node->parentNode ) {
-				$fragment = $dom->createDocumentFragment();
-
-				while ( $node->childNodes->length > 0 ) {
-					$fragment->appendChild( $node->childNodes->item( 0 ) );
-				}
-
-				if ( $fragment->hasChildNodes() ) {
-					$node->parentNode->replaceChild( $fragment, $node );
-				} else {
-					$node->parentNode->removeChild( $node );
-				}
-			}
-		}
-	}
-
-	$html = $dom->saveHTML();
-
-	if ( empty( $html ) ) {
-		return '';
-	}
-
-	return trim( $html );
+	return trim( wp_kses( $html, $filtered_tags ) );
 }
 
 /**
@@ -959,33 +902,43 @@ function wpo_wcpdf_base64_encode_file( string $local_path ): string|bool {
 /**
  * Check if a file is readable
  *
- * @param string $path
+ * @param string      $path
+ * @param object|null $document Document context for allowed remote ports.
  * @return bool
  */
-function wpo_wcpdf_is_file_readable( string $path ): bool {
+function wpo_wcpdf_is_file_readable( string $path, ?object $document = null ): bool {
 	if ( empty( $path ) ) {
 		return false;
 	}
 
 	// Check if the path is a URL
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
-		$parsed_url = wp_parse_url( $path );
-		$args	    = array();
+		$parsed_url    = wp_parse_url( $path );
+		$args          = array();
+		$allowed_ports = wpo_ips_get_allowed_remote_ports( $document );
+		$port          = $parsed_url['port'] ?? ( 'https' === strtolower( $parsed_url['scheme'] ?? '' ) ? 443 : 80 );
 
-		// Check if the URL is localhost
-		if (
-			'localhost' === $parsed_url['host']                                             ||
-			'127.0.0.1' === $parsed_url['host']                                             ||
-			( preg_match( '/^192\.168\./', $parsed_url['host'] ) === 1 )                    || // 192.168.*
-			( preg_match( '/^10\./', $parsed_url['host'] ) === 1 )                          || // 10.*
-			( preg_match( '/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $parsed_url['host'] ) === 1 ) || // 172.16.* to 172.31.*
-			getenv( 'DISABLE_SSL_VERIFY' ) === 'true'
-		) {
+		if ( ! in_array( $port, $allowed_ports, true ) ) {
+			return false;
+		}
+
+		// Local hosts often use self-signed certificates
+		if ( wpo_ips_is_local_host( (string) ( $parsed_url['host'] ?? '' ) ) || 'true' === getenv( 'DISABLE_SSL_VERIFY' ) ) {
 			$args['sslverify'] = false;
 		}
 
-		$args     = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
-		$response = wp_safe_remote_head( $path, $args );
+		$args = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
+
+		// Scope the WordPress safe-port override to this request.
+		$safe_ports = static function () use ( $allowed_ports ): array {
+			return $allowed_ports;
+		};
+		add_filter( 'http_allowed_safe_ports', $safe_ports, PHP_INT_MAX );
+		try {
+			$response = wp_safe_remote_head( $path, $args );
+		} finally {
+			remove_filter( 'http_allowed_safe_ports', $safe_ports, PHP_INT_MAX );
+		}
 
 		if ( is_wp_error( $response ) ) {
 			wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . $response->get_error_message(), 'critical' );
@@ -1126,7 +1079,7 @@ function wpo_wcpdf_dynamic_translate( string $string, string $textdomain ): stri
 	static $logged      = array();
 
 	$cache_key          = md5( $textdomain . '::' . $string );
-	$log_enabled        = ! empty( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_missing_translations'] );
+	$log_enabled        = ! empty( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['log_missing_translations'] );
 	$multilingual_class = '\WPO\WC\PDF_Invoices_Pro\Multilingual_Full';
 	$translation        = $string;
 
@@ -1266,29 +1219,31 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'_billing_btw_nummer'     // Some Belgium customers use this key as a custom field
 	), $order );
 	
-	$frontend_instance = WPO_WCPDF()->get_instance( 'frontend' );
+	$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+	$vat_number     = $checkout_field->get_order_value( $order, \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER );
+	$meta_key       = null;
 
-	if ( ! empty( $frontend_instance ) && is_callable( array( $frontend_instance, 'checkout_field_is_vat_number' ) ) ) {
-		$checkout_field_is_vat_number = $frontend_instance->checkout_field_is_vat_number();
+	if ( null !== $vat_number ) {
+		$meta_key = $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_VAT_NUMBER );
 
-		if ( $checkout_field_is_vat_number ) {
-			array_unshift( $vat_meta_keys, '_wpo_ips_checkout_field' );
+		// A read-only legacy fallback does not populate the typed metadata key.
+		if ( '' === trim( (string) $order->get_meta( $meta_key ) ) ) {
+			$meta_key = \WPO\IPS\CheckoutField::LEGACY_ORDER_META_KEY;
 		}
-	}
+	} else {
+		foreach ( $vat_meta_keys as $candidate_meta_key ) {
+			$meta_value = $order->get_meta( $candidate_meta_key );
 
-	$vat_number = null;
+			// Handle multidimensional VAT data (e.g., Aelia EU VAT Assistant)
+			if ( '_eu_vat_evidence' === $candidate_meta_key && is_array( $meta_value ) ) {
+				$meta_value = $meta_value['exemption']['vat_number'] ?? '';
+			}
 
-	foreach ( $vat_meta_keys as $meta_key ) {
-		$meta_value = $order->get_meta( $meta_key );
-
-		// Handle multidimensional VAT data (e.g., Aelia EU VAT Assistant)
-		if ( '_eu_vat_evidence' === $meta_key && is_array( $meta_value ) ) {
-			$meta_value = $meta_value['exemption']['vat_number'] ?? '';
-		}
-
-		if ( $meta_value ) {
-			$vat_number = $meta_value;
-			break;
+			if ( $meta_value ) {
+				$vat_number = $meta_value;
+				$meta_key   = $candidate_meta_key;
+				break;
+			}
 		}
 	}
 
@@ -1296,11 +1251,60 @@ function wpo_wcpdf_get_order_customer_vat_number( \WC_Abstract_Order $order ): ?
 		'wpo_wcpdf_order_customer_vat_number',
 		$vat_number,
 		$order,
-		$meta_key ?? null
+		$meta_key
 	);
 
 	return is_string( $vat_number )
 		? $vat_number
+		: null;
+}
+
+/**
+ * Retrieve the customer company registration number from order meta.
+ *
+ * @param \WC_Abstract_Order $order
+ * @return string|null
+ */
+function wpo_wcpdf_get_order_customer_registration_number( \WC_Abstract_Order $order ): ?string {
+	$registration_number_meta_keys = (array) apply_filters(
+		'wpo_wcpdf_order_customer_registration_number_meta_keys',
+		array(),
+		$order
+	);
+
+	$checkout_field      = \WPO_WCPDF()->get_instance( 'checkout_field' );
+	$registration_number = $checkout_field->get_order_value( $order, \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER );
+	$meta_key            = null;
+
+	if ( null !== $registration_number ) {
+		array_unshift( $registration_number_meta_keys, $checkout_field->get_order_meta_key( \WPO\IPS\CheckoutField::TYPE_REGISTRATION_NUMBER ) );
+	}
+
+	foreach ( $registration_number_meta_keys as $candidate_meta_key ) {
+		$meta_value = $order->get_meta( $candidate_meta_key, true );
+
+		if ( ! is_scalar( $meta_value ) ) {
+			continue;
+		}
+
+		$meta_value = trim( (string) $meta_value );
+
+		if ( '' !== $meta_value ) {
+			$registration_number = $meta_value;
+			$meta_key            = $candidate_meta_key;
+			break;
+		}
+	}
+
+	$registration_number = apply_filters(
+		'wpo_wcpdf_order_customer_registration_number',
+		$registration_number,
+		$order,
+		$meta_key
+	);
+
+	return is_string( $registration_number )
+		? $registration_number
 		: null;
 }
 
@@ -1983,7 +1987,7 @@ function wpo_ips_get_refund_ids( mixed $order_or_ids ): array {
 	foreach ( $order_ids as $order_id ) {
 		$order = wc_get_order( $order_id );
 
-		if ( ! $order ) {
+		if ( ! $order instanceof WC_Order ) {
 			continue;
 		}
 
@@ -2764,6 +2768,14 @@ function wpo_ips_is_document_download_request(): bool {
  * @return bool
  */
 function wpo_ips_is_checkout_request(): bool {
+	if (
+		isset( $_GET['wc-ajax'] ) &&
+		is_scalar( $_GET['wc-ajax'] ) &&
+		'checkout' === sanitize_key( wp_unslash( (string) $_GET['wc-ajax'] ) )
+	) {
+		return true;
+	}
+
 	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
 		return false;
 	}
@@ -2817,4 +2829,162 @@ function wpo_ips_get_document_link_email_placements( ?\WPO\IPS\Documents\OrderDo
 	);
 
 	return is_array( $placements ) ? $placements : array();
+}
+
+/**
+ * Check whether a host is local: localhost or a loopback, private or reserved IP address.
+ *
+ * @param string $host
+ * @return bool
+ */
+function wpo_ips_is_local_host( string $host ): bool {
+	$host = strtolower( rtrim( trim( $host, '[]' ), '.' ) );
+
+	if ( 'localhost' === $host || str_ends_with( $host, '.localhost' ) ) {
+		return true;
+	}
+
+	if ( false === filter_var( $host, FILTER_VALIDATE_IP ) ) {
+		return false;
+	}
+
+	return false === filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+}
+
+/**
+ * Get the URLs of resources PDFs may load: the site, its uploads, and the document's logo and product thumbnails.
+ * The logo and thumbnails cover media served by offload/CDN plugins from another host or port.
+ *
+ * @param object|null $document Document context, when available.
+ * @return string[]
+ */
+function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
+	$urls = array( home_url(), site_url(), wp_get_upload_dir()['baseurl'] );
+
+	// Bulk documents keep the document settings on their wrapper document.
+	$settings_document = $document->wrapper_document ?? $document;
+
+	if ( $settings_document && is_callable( array( $settings_document, 'get_header_logo_id' ) ) && $settings_document->get_header_logo_id() ) {
+		$urls[] = (string) wp_get_attachment_image_url( $settings_document->get_header_logo_id(), 'full' );
+	}
+
+	// Product thumbnails, e.g. the Premium Templates thumbnail column.
+	if ( $settings_document && is_callable( array( $settings_document, 'get_thumbnail' ) ) ) {
+		$order_ids = $document->order_ids ?? array( $document->order_id ?? 0 );
+
+		foreach ( array_filter( $order_ids ) as $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( ! $order ) {
+				continue;
+			}
+
+			foreach ( $order->get_items() as $item ) {
+				$product   = is_callable( array( $item, 'get_product' ) ) ? $item->get_product() : null;
+				$thumbnail = $product ? $settings_document->get_thumbnail( $product ) : '';
+
+				if ( '' !== $thumbnail ) {
+					// Use the rendered source, including CDN filters and thumbnail-size overrides.
+					$html = new \DOMDocument();
+					$html->loadHTML( '<?xml encoding="UTF-8">' . $thumbnail, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
+					foreach ( $html->getElementsByTagName( 'img' ) as $image ) {
+						$src = $image->getAttribute( 'src' );
+						if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
+							$urls[] = $src;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return array_values( array_unique( array_filter( $urls ) ) );
+}
+
+/**
+ * Get allowed ports for remote PDF resources and image readability checks.
+ *
+ * @param object|null $document Document context, when available.
+ * @param array|null  $resource_urls Previously discovered URLs, or null to discover them.
+ * @return int[]
+ */
+function wpo_ips_get_allowed_remote_ports( ?object $document = null, ?array $resource_urls = null ): array {
+	$ports = array( 80, 443, 8080 );
+
+	// The site's own non-standard ports, e.g. local development or an offload/CDN host.
+	foreach ( $resource_urls ?? wpo_ips_get_trusted_resource_urls( $document ) as $url ) {
+		$port = wp_parse_url( $url, PHP_URL_PORT );
+
+		if ( $port ) {
+			$ports[] = $port;
+		}
+	}
+
+	$ports = apply_filters( 'wpo_ips_allowed_remote_ports', $ports, $document );
+	$valid = array();
+
+	foreach ( (array) $ports as $port ) {
+		if ( ( is_int( $port ) || ( is_string( $port ) && ctype_digit( $port ) ) ) && $port >= 1 && $port <= 65535 ) {
+			$valid[] = (int) $port;
+		}
+	}
+
+	return array_values( array_unique( $valid ) );
+}
+
+/**
+ * Normalize a list of hosts allowed for remote PDF resources.
+ * Accepts an array or a string (one host per line or comma separated). IP addresses and localhost are rejected.
+ * The site's own hosts are omitted because they are allowed automatically.
+ *
+ * @param array|string $hosts
+ * @param array        $rejected Invalid entries, returned by reference.
+ * @return array
+ */
+function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected = array() ): array {
+	$rejected = array();
+
+	if ( is_string( $hosts ) ) {
+		$hosts = preg_split( '/[\r\n,]+/', $hosts );
+	}
+
+	$site_hosts = array_map( static function ( $url ) {
+		return rtrim( strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) ), '.' );
+	}, array( home_url(), site_url() ) );
+
+	$normalized = array();
+
+	foreach ( (array) $hosts as $host ) {
+		$entry = trim( (string) $host );
+		if ( '' === $entry ) {
+			continue;
+		}
+		$host = strtolower( $entry );
+
+		// A full URL was entered: keep the host only.
+		if ( str_contains( $host, '/' ) ) {
+			$host = (string) wp_parse_url( ( ! str_contains( $host, '://' ) ? 'https://' : '' ) . ltrim( $host, '/' ), PHP_URL_HOST );
+		}
+
+		$host = rtrim( $host, '.' );
+
+		if ( '' !== $host && in_array( $host, $site_hosts, true ) ) {
+			continue;
+		}
+
+		if (
+			'' === $host ||
+			wpo_ips_is_local_host( $host ) ||
+			false !== filter_var( trim( $host, '[]' ), FILTER_VALIDATE_IP ) ||
+			! preg_match( '/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/', $host ) || // valid labels, at least one dot
+			preg_match( '/(?:^|\.)(?:\d+|0x[0-9a-f]*)$/', $host ) // numeric last label: IPv4 shorthand such as 127.1 or 0x7f.1
+		) {
+			$rejected[] = $entry;
+			continue;
+		}
+
+		$normalized[] = $host;
+	}
+
+	return array_values( array_unique( $normalized ) );
 }

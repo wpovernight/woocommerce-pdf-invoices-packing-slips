@@ -1,5 +1,31 @@
 jQuery( function( $ ) {
 
+	$( '#checkout_field_type' ).on( 'change', function() {
+		const $field = $( this );
+		const $label = $( '#checkout_field_label' );
+
+		const labels = {
+			custom:              $field.data( 'custom-label' ),
+			vat_number:          $field.data( 'vat-label' ),
+			registration_number: $field.data( 'registration-label' ),
+		};
+
+		$label.attr( 'placeholder', labels[ $field.val() ] || labels.custom );
+	} ).trigger( 'change' );
+
+	$( '#shop_address_country' ).on( 'change', function() {
+		const $field = $( '#checkout_field_type' );
+		const labels = $field.data( 'registration-labels' );
+		if ( ! labels ) {
+			return;
+		}
+
+		const countryLabels = labels[ $( this ).val() ] || labels[ '' ];
+		$( '#coc_number' ).closest( 'tr' ).children( 'th' ).text( countryLabels.shop );
+		$field.data( 'registration-label', countryLabels.label );
+		$field.triggerHandler( 'change' );
+	} ).triggerHandler( 'change' );
+
 	$( '.wcpdf-extensions .more' ).hide();
 
 	$( '.wcpdf-extensions > li' ).on( 'click', function( event ) {
@@ -389,6 +415,13 @@ jQuery( function( $ ) {
 	}
 
 	function settingsChanged( event, previewDelay ) {
+		const $element = $( event.target );
+
+		// Searching a Select2 dropdown does not change the setting's value.
+		if ( $element.is( '.select2-search__field, .select2-input' ) ) {
+			return;
+		}
+
 		if ( 'shop_address_country' === event.target.id ) {
 			shopCountryChanged( $( event.target ) );
 		}
@@ -397,8 +430,6 @@ jQuery( function( $ ) {
 		showSaveBtn();
 
 		// Check if preview needs to reload and with what delay
-		let $element = $( event.target );
-
 		if ( ! settingIsExcludedForPreview( $element.attr('name') ) ) {
 
 			if ( $element.hasClass( 'remove-requirement' ) || $element.attr('id') == 'disable_for' ) {
@@ -723,6 +754,10 @@ jQuery( function( $ ) {
 		previewSearchTimeout = setTimeout( function() { previewOrderSearch( $elem ) }, duration );
 	} );
 
+	function decodeHtmlEntities( str ) {
+		return $( '<textarea />' ).html( str ).text();
+	}
+
 	// Preview order search
 	function previewOrderSearch( $elem ) {
 		let $div   = $elem.closest( '.preview-data' ).find( '#preview-order-search-results' );
@@ -758,12 +793,33 @@ jQuery( function( $ ) {
 						$div.show();
 					} else {
 						$.each( response.data, function( i, item ) {
-							let firstLine = '<a data-order_id="'+i+'"><span class="order-number">#'+item.order_number+'</span> - '+item.billing_first_name+' '+item.billing_last_name;
+							const $result = $( '<a>' ).attr( 'data-order_id', i );
+
+							$result.append(
+								$( '<span>' ).addClass( 'order-number' ).text( '#' + item.order_number )
+							);
+
+							$result.append(
+								document.createTextNode(
+									' - ' + decodeHtmlEntities( item.billing_first_name ) + ' ' + decodeHtmlEntities( item.billing_last_name )
+								)
+							);
+
 							if ( item.billing_company.length > 0 ) {
-								firstLine = firstLine+', '+item.billing_company;
+								$result.append(
+									document.createTextNode( ', ' + decodeHtmlEntities( item.billing_company ) )
+								);
 							}
-							let secondLine = '<br><span class="date">'+item.date_created+'</span><span class="total">'+item.total+'</span></a>';
-							$div.append( firstLine+secondLine );
+
+							$result.append( '<br>' );
+							$result.append(
+								$( '<span>' ).addClass( 'date' ).html( item.date_created )
+							);
+							$result.append(
+								$( '<span>' ).addClass( 'total' ).html( item.total )
+							);
+
+							$div.append( $result );
 							$div.show();
 						} );
 					}
@@ -1122,8 +1178,9 @@ jQuery( function( $ ) {
 		let value    = $this.val();
 		let checkbox = false;
 
-		const $controllerRow     = $this.closest( 'tr' );
-		const controllerIsVisible = ! $controllerRow.length || $controllerRow.is( ':visible' );
+		// Check the row itself; a collapsed accordion also makes its rows fail :visible.
+		const $controllerRow      = $this.closest( 'tr' );
+		const controllerIsVisible = ! $controllerRow.length || $controllerRow.css( 'display' ) !== 'none';
 
 		if ( $this.is( ':checkbox' ) ) {
 			value    = $this.is( ':checked' );
@@ -1155,7 +1212,7 @@ jQuery( function( $ ) {
 			}
 
 			if ( show ) {
-				const wasHidden = ! $row.is( ':visible' );
+				const wasHidden = $row.css( 'display' ) === 'none';
 
 				$row.show();
 
