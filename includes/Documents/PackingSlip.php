@@ -16,9 +16,10 @@ class PackingSlip extends OrderDocumentMethods {
 	 */
 	public function __construct( $order = 0 ) {
 		// set properties
-		$this->type  = 'packing-slip';
-		$this->title = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
-		$this->icon  = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
+		$this->type         = 'packing-slip';
+		$this->title        = __( 'Packing Slip', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->plural_title = __( 'Packing Slips', 'woocommerce-pdf-invoices-packing-slips' );
+		$this->icon         = WPO_WCPDF()->plugin_url() . "/assets/images/packing-slip.svg";
 		
 		// call parent constructor
 		parent::__construct( $order );
@@ -42,6 +43,22 @@ class PackingSlip extends OrderDocumentMethods {
 
 		return (string) apply_filters(
 			'wpo_wcpdf_document_title',
+			$title,
+			$this
+		);
+	}
+
+	/**
+	 * Get the plural document title.
+	 *
+	 * @return string
+	 */
+	public function get_plural_title(): string {
+		// Override/not using $this->plural_title to allow for language switching.
+		$title = __( 'Packing Slips', 'woocommerce-pdf-invoices-packing-slips' );
+
+		return (string) apply_filters(
+			'wpo_wcpdf_document_plural_title',
 			$title,
 			$this
 		);

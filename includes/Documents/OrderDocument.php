@@ -14,6 +14,7 @@ abstract class OrderDocument {
 	public string $type;
 	public string $slug;
 	public string $title;
+	public string $plural_title              = '';
 	public string $icon;
 	public ?\WC_Abstract_Order $order        = null;
 	public ?int $order_id                    = null;
@@ -864,12 +865,30 @@ abstract class OrderDocument {
 	}
 
 	/**
-	 * Print the document number title
+	 * Print the document title
 	 *
 	 * @return void
 	 */
 	public function title(): void {
 		echo esc_html( $this->get_title() );
+	}
+
+	/**
+	 * Get the plural document title.
+	 *
+	 * @return string
+	 */
+	public function get_plural_title(): string {
+		return $this->get_title_for( 'document_plural' );
+	}
+
+	/**
+	 * Print the plural document title.
+	 *
+	 * @return void
+	 */
+	public function plural_title(): void {
+		echo esc_html( $this->get_plural_title() );
 	}
 
 	/**
@@ -1134,6 +1153,11 @@ abstract class OrderDocument {
 		switch ( $slug ) {
 			case 'document':
 				$title = apply_filters_deprecated( "wpo_wcpdf_{$this->slug}_title", array( $this->title, $this ), '3.8.7', 'wpo_wcpdf_document_title' );
+				break;
+			case 'document_plural':
+				$title = ! empty( $this->plural_title )
+					? $this->plural_title
+					: $this->get_title();
 				break;
 			case 'document_number':
 				$title = sprintf(
@@ -1530,12 +1554,12 @@ abstract class OrderDocument {
 				$src  = str_replace( trailingslashit( WP_CONTENT_DIR ), trailingslashit( WP_CONTENT_URL ), $path ); // replaces path with URL
 			}
 
-			if ( ! wpo_wcpdf_is_file_readable( $src ) ) {
+			if ( ! wpo_wcpdf_is_file_readable( $src, $this ) ) {
 				wcpdf_log_error( 'Header logo file not readable: ' . $src, 'critical' );
 				return;
 			}
 
-			$img_src     = isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['embed_images'] )
+			$img_src     = isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['embed_images'] )
 				? wpo_wcpdf_get_image_src_in_base64( $src )
 				: $src;
 
@@ -2175,14 +2199,20 @@ abstract class OrderDocument {
 	 * Wrap the HTML content in a full HTML document structure.
 	 *
 	 * @param string $content
+	 * @param bool   $is_bulk
 	 * @return string
 	 */
-	public function wrap_html_content( string $content ): string {
-		$html = $this->render_template( $this->locate_template_file( "html-document-wrapper.php" ), array(
-				'content' => apply_filters( 'wpo_wcpdf_html_content', $content ),
+	public function wrap_html_content( string $content, bool $is_bulk = false ): string {
+		return $this->render_template(
+			$this->locate_template_file( 'html-document-wrapper.php' ),
+			array(
+				'content' => apply_filters(
+					'wpo_wcpdf_html_content',
+					$content
+				),
+				'is_bulk' => $is_bulk,
 			)
 		);
-		return $html;
 	}
 
 	/**

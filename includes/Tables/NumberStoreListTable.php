@@ -151,7 +151,7 @@ class NumberStoreListTable extends \WP_List_Table {
 			'order_status'      => __( 'Order Status', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 
-		if ( ! isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['calculate_document_numbers'] ) ) {
+		if ( ! isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['calculate_document_numbers'] ) ) {
 			unset( $columns['calculated_number'] );
 		}
 

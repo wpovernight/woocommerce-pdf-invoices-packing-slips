@@ -75,7 +75,6 @@ class Main {
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
-		add_action( 'wp_ajax_nopriv_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
 		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'document_printed_ajax' ) );
 	}
 
@@ -132,7 +131,7 @@ class Main {
 		add_filter( 'wcpdf_disable_deprecation_notices', '__return_true' );
 
 		// reload translations because WC may have switched to site locale (by setting the plugin_locale filter to site locale in wc_switch_to_site_locale())
-		if ( apply_filters( 'wpo_wcpdf_allow_reload_attachment_translations', isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['reload_attachment_translations'] ) ) ) {
+		if ( apply_filters( 'wpo_wcpdf_allow_reload_attachment_translations', isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['reload_attachment_translations'] ) ) ) {
 			WPO_WCPDF()->translations( true );
 			do_action( 'wpo_wcpdf_reload_attachment_translations' );
 		}
@@ -174,7 +173,7 @@ class Main {
 
 							$this->mark_document_printed( $document, 'email_attachment' );
 
-							if ( ! empty( \WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
+							if ( ! empty( \WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['log_to_order_notes'] ) ) {
 								$email_title = $email_id;
 
 								if ( is_object( $email ) && is_callable( array( $email, 'get_title' ) ) ) {
@@ -517,6 +516,9 @@ class Main {
 					break;
 				}
 				break;
+			default:
+				$allowed = false;
+				break;
 		}
 
 		$allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
@@ -641,7 +643,32 @@ class Main {
 			);
 		}
 
-		$order_ids  = array_map( 'absint', (array) $_POST['order_ids'] );
+		$order_ids = array_map( 'absint', (array) wp_unslash( $_POST['order_ids'] ) );
+
+		// Check the user privileges
+		$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( 'credit-note' );
+
+		if ( ! $full_permission ) {
+			foreach ( $order_ids as $order_id ) {
+				if ( ! current_user_can( 'view_order', $order_id ) ) {
+					wp_send_json_error(
+						array(
+							'message' => __( 'You do not have permission to access one or more of these orders.', 'woocommerce-pdf-invoices-packing-slips' ),
+						),
+						403
+					);
+				}
+			}
+		}
+
+		if ( empty( $order_ids ) ) {
+			wp_send_json_error(
+				array(
+					'message' => __( 'No orders were provided.', 'woocommerce-pdf-invoices-packing-slips' ),
+				)
+			);
+		}
+
 		$refund_ids = \wpo_ips_get_refund_ids( $order_ids );
 
 		if ( empty( $refund_ids ) ) {
@@ -1174,7 +1201,7 @@ class Main {
 			'logOutputFile'           => $this->get_tmp_path( 'dompdf' ) . "/log.htm",
 			'fontDir'                 => $path,
 			'fontCache'               => $path,
-			'isRemoteEnabled'         => true,
+			'isRemoteEnabled'         => false,
 			'isFontSubsettingEnabled' => true,
 			'isHtml5ParserEnabled'    => true,
 		) );
@@ -1235,7 +1262,7 @@ class Main {
 	 * @return bool
 	 */
 	public function test_mode_settings( bool $use_historical_settings, OrderDocument $document ): bool {
-		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->general_settings['test_mode'] ) ) {
+		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'general' )['test_mode'] ) ) {
 			$use_historical_settings = false;
 		}
 		return $use_historical_settings;
@@ -1294,7 +1321,7 @@ class Main {
 	 * @return array Modified array of filters with currency symbol font filters added if applicable
 	 */
 	public function pdf_currency_filters( array $filters ): array {
-		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->general_settings['currency_font'] ) ) {
+		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'general' )['currency_font'] ) ) {
 			$filters[] = array( 'woocommerce_currency_symbol', array( $this, 'use_currency_font' ), 10001, 2 );
 			// 'wpo_wcpdf_custom_styles' is actually an action, but WP handles them with the same functions
 			$filters[] = array( 'wpo_wcpdf_custom_styles', array( $this, 'currency_symbol_font_styles' ) );
@@ -1395,11 +1422,11 @@ class Main {
 	public function schedule_temporary_files_cleanup(): void {
 		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
 		
-		if ( ! isset( $settings_instance->debug_settings['enable_cleanup'] ) ) {
+		if ( ! isset( $settings_instance->get_settings( 'debug' )['enable_cleanup'] ) ) {
 			return;
 		}
 
-		$cleanup_age_days = isset( $settings_instance->debug_settings['cleanup_days'] ) ? floatval( $settings_instance->debug_settings['cleanup_days'] ) : 7.0;
+		$cleanup_age_days = isset( $settings_instance->get_settings( 'debug' )['cleanup_days'] ) ? floatval( $settings_instance->get_settings( 'debug' )['cleanup_days'] ) : 7.0;
 		$delete_timestamp = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
 		
 		$this->temporary_files_cleanup( $delete_timestamp );
@@ -1607,7 +1634,7 @@ class Main {
 	 * @return void
 	 */
 	public function log_document_creation_to_order_notes( OrderDocument $document, string $trigger ): void {
-		if ( empty( $document ) || empty( $trigger ) || ! isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
+		if ( empty( $document ) || empty( $trigger ) || ! isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['log_to_order_notes'] ) ) {
 			return;
 		}
 
@@ -1650,7 +1677,7 @@ class Main {
 	 * @return void
 	 */
 	public function log_document_deletion_to_order_notes( OrderDocument $document ): void {
-		if ( ! empty( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
+		if ( ! empty( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['log_to_order_notes'] ) ) {
 			$user_note = '';
 			$user      = wp_get_current_user();
 
@@ -1685,7 +1712,7 @@ class Main {
 			$this->get_document_triggers()
 		);
 
-		if ( ! empty( $document ) && isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) ) {
+		if ( ! empty( $document ) && isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['log_to_order_notes'] ) && ! empty( $trigger ) && array_key_exists( $trigger, $triggers ) ) {
 			/* translators: 1. document title, 2. creation trigger */
 			$message = __( '%1$s document marked as printed via %2$s.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title(), $triggers[$trigger] );
@@ -1700,7 +1727,7 @@ class Main {
 	 * @return void
 	 */
 	public function log_unmark_document_printed_to_order_notes( OrderDocument $document ): void {
-		if ( ! empty( $document ) && isset( WPO_WCPDF()->get_instance( 'settings' )->debug_settings['log_to_order_notes'] ) ) {
+		if ( ! empty( $document ) && isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['log_to_order_notes'] ) ) {
 			/* translators: 1. document title, 2. creation trigger */
 			$message = __( '%1$s document unmark printed.', 'woocommerce-pdf-invoices-packing-slips' );
 			$note    = sprintf( $message, $document->get_title() );
@@ -2166,7 +2193,9 @@ class Main {
 			return;
 		}
 
-		$due_date_timestamp = is_callable( array( $document, 'get_due_date' ) ) ? $document->get_due_date() : 0;
+		$due_date_timestamp = is_callable( array( $document, 'get_due_date' ) )
+			? $document->get_due_date()
+			: 0;
 
 		if ( 0 >= $due_date_timestamp ) {
 			return;
@@ -2175,7 +2204,7 @@ class Main {
 		$due_date = apply_filters_deprecated(
 			'wpo_wcpdf_due_date_display',
 			array(
-				date_i18n( wcpdf_date_format( $this, 'due_date' ), $due_date_timestamp ),
+				date_i18n( wcpdf_date_format( $document, 'due_date' ), $due_date_timestamp ),
 				$due_date_timestamp,
 				$document_type,
 				$document
@@ -2183,8 +2212,10 @@ class Main {
 			'3.9.0',
 			'wpo_wcpdf_document_due_date'
 		);
-		$due_date_title = is_callable( array( $document, 'get_due_date_title' ) ) ?
-			$document->get_due_date_title() : __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
+
+		$due_date_title = is_callable( array( $document, 'get_due_date_title' ) )
+			? $document->get_due_date_title()
+			: __( 'Due Date:', 'woocommerce-pdf-invoices-packing-slips' );
 
 		if ( ! empty( $due_date ) ) {
 			echo '<tr class="due-date">
@@ -2322,7 +2353,7 @@ class Main {
 	 * @return string
 	 */
 	public function apply_ink_saving_styles( string $css, OrderDocument $document ): string {
-		$settings = WPO_WCPDF()->get_instance( 'settings' )->general_settings ?? array();
+		$settings = WPO_WCPDF()->get_instance( 'settings' )?->get_settings( 'general' ) ?? array();
 
 		$ink_saving_enabled = ! empty( $settings['template_ink_saving'] );
 		$current_template   = $settings['template_path'] ?? '';
@@ -2445,7 +2476,7 @@ class Main {
 	 * @return string
 	 */
 	public function apply_template_color_styles( string $css, ?object $document ): string {
-		$settings = WPO_WCPDF()->settings->general_settings ?? array();
+		$settings = WPO_WCPDF()->settings?->get_settings( 'general' ) ?? array();
 
 		$template_color   = $settings['template_color'] ?? '';
 		$current_template = $settings['template_path'] ?? '';
