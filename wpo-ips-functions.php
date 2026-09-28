@@ -2872,6 +2872,23 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 		$urls[] = (string) wp_get_attachment_image_url( $settings_document->get_header_logo_id(), 'full' );
 	}
 
+	// Each invoice in a bulk PDF can retain a different logo in its historical settings.
+	if ( $document instanceof \WPO\IPS\Documents\BulkDocument ) {
+		foreach ( array_filter( $document->order_ids ) as $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( ! $order ) {
+				continue;
+			}
+
+			$order_document = wcpdf_get_document( $document->get_type(), $order );
+
+			if ( $order_document && is_callable( array( $order_document, 'get_header_logo_id' ) ) && $order_document->get_header_logo_id() ) {
+				$urls[] = (string) wp_get_attachment_image_url( $order_document->get_header_logo_id(), 'full' );
+			}
+		}
+	}
+
 	// Product thumbnails, e.g. the Premium Templates thumbnail column.
 	if ( $settings_document && is_callable( array( $settings_document, 'get_thumbnail' ) ) ) {
 		$order_ids = $document->order_ids ?? array( $document->order_id ?? 0 );
