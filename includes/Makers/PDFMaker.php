@@ -67,6 +67,8 @@ class PDFMaker {
 			'isHtml5ParserEnabled'    => true,
 			'isFontSubsettingEnabled' => (bool) $this->settings['font_subsetting'],
 		) ) );
+
+		$this->restrict_remote_resources( $options );
 		
 		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_debug'] ) ) {
 			$this->set_additional_debug_options( $options );
@@ -124,6 +126,61 @@ class PDFMaker {
 		foreach ( $dompdf_debug_options as $option ) {
 			$options->set( $option, true );
 		}
+	}
+
+	/**
+	 * Restrict Dompdf remote resources to allowed hosts and ports (SSRF).
+	 *
+	 * @param Options $options
+	 * @return void
+	 */
+	private function restrict_remote_resources( Options $options ): void {
+		$resource_urls = wpo_ips_get_trusted_resource_urls( $this->document );
+
+		if ( empty( $options->getAllowedRemoteHosts() ) ) {
+			$hosts = $this->get_allowed_remote_hosts( $resource_urls );
+
+			// Dompdf treats an empty host list as unrestricted.
+			if ( empty( $hosts ) ) {
+				$options->setIsRemoteEnabled( false );
+			} else {
+				$options->setAllowedRemoteHosts( $hosts );
+			}
+		}
+
+		$allowed_ports = wpo_ips_get_allowed_remote_ports( $this->document, $resource_urls );
+		$port_rule     = static function ( string $uri ) use ( $allowed_ports ): array {
+			$port = wp_parse_url( $uri, PHP_URL_PORT ) ?? ( 'https' === strtolower( (string) wp_parse_url( $uri, PHP_URL_SCHEME ) ) ? 443 : 80 );
+
+			return in_array( $port, $allowed_ports, true )
+				? array( true, null )
+				: array( false, 'Remote port not allowed: ' . $uri );
+		};
+
+		$protocols = $options->getAllowedProtocols();
+
+		foreach ( array( 'http://', 'https://' ) as $protocol ) {
+			if ( isset( $protocols[ $protocol ] ) ) {
+				$options->addAllowedProtocol( $protocol, ...array_merge( $protocols[ $protocol ]['rules'], array( $port_rule ) ) );
+			}
+		}
+	}
+
+	/**
+	 * Hosts Dompdf may load remote resources from.
+	 *
+	 * @param array $resource_urls Previously discovered resource URLs.
+	 * @return array
+	 */
+	private function get_allowed_remote_hosts( array $resource_urls ): array {
+		$hosts          = array_filter( array_map( static function ( $url ) {
+			return wp_parse_url( $url, PHP_URL_HOST );
+		}, $resource_urls ) );
+		$debug_settings = \WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
+		$hosts          = array_merge( $hosts, wpo_ips_normalize_remote_hosts( (string) ( $debug_settings['allowed_remote_hosts'] ?? '' ) ) );
+		$hosts          = (array) apply_filters( 'wpo_ips_allowed_remote_hosts', $hosts, $this->document );
+
+		return array_values( array_unique( array_filter( $hosts, 'is_string' ) ) );
 	}
 
 }

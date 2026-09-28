@@ -242,11 +242,14 @@ class Endpoint {
 		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
 		$access_type    = isset( $debug_settings['document_link_access_type'] ) ? $debug_settings['document_link_access_type'] : 'logged_in';
 
-		return (string) apply_filters(
+		$access_type = apply_filters(
 			'wpo_wcpdf_document_link_access_type',
 			$access_type,
 			$this
 		);
+
+		// An invalid value must never select an unauthenticated access path.
+		return in_array( $access_type, array( 'logged_in', 'full' ), true ) ? $access_type : 'logged_in';
 	}
 
 	/**
