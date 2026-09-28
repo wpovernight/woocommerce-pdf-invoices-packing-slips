@@ -131,7 +131,7 @@ jQuery( function ( $ ) {
 		},
 	} );
 
-	$( document ).on( 'input change', COUNTRY_SELECTOR + ', ' + VAT_SELECTOR, function () {
+	$( document ).on( 'input change', [ COUNTRY_SELECTOR, VAT_SELECTOR ].filter( Boolean ).join( ', ' ), function () {
 		engine.log( 'input/change event', {
 			target: this && this.name ? this.name : ( this && this.id ? this.id : '' ),
 			country: getValue( COUNTRY_SELECTOR ),

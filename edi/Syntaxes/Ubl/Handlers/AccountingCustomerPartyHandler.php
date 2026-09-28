@@ -212,11 +212,18 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	 * @return array|null
 	 */
 	public function get_party_legal_entity(): ?array {
-		$order             = \wpo_ips_edi_get_parent_order( $this->document->order );
-		$billing_company   = $order->get_billing_company();
-		$billing_name      = $order->get_formatted_billing_full_name();
-		$registration_name = ! empty( $billing_company ) ? $billing_company : $billing_name;
-		$vat_number        = \wpo_ips_edi_get_order_customer_vat_number( $order );
+		$order               = \wpo_ips_edi_get_parent_order( $this->document->order );
+		$billing_company     = $order->get_billing_company();
+		$billing_name        = $order->get_formatted_billing_full_name();
+		$registration_name   = ! empty( $billing_company ) ? $billing_company : $billing_name;
+		$registration_number = \wpo_ips_edi_get_order_customer_registration_number( $order );
+		$country_code        = (string) $order->get_billing_country();
+
+		$registration_number_scheme = (string) \wpo_ips_edi_get_identifier_mappings(
+			$country_code,
+			'registration_number',
+			'icd'
+		);
 
 		if ( empty( $registration_name ) ) {
 			wpo_ips_edi_log(
@@ -235,21 +242,19 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 			'value' => wpo_ips_edi_sanitize_string( $registration_name ),
 		);
 
-		// CompanyID is optional; add only when VAT exists
-		if ( ! empty( $vat_number ) ) {
-			if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat_number ) ) {
-				wpo_ips_edi_log(
-					sprintf(
-						'UBL PartyLegalEntity: VAT number does not have a country prefix for customer in order %d.',
-						$order->get_id()
-					),
-					'error'
+		if ( ! empty( $registration_number ) ) {
+			$company_id = array(
+				'name'  => 'cbc:CompanyID',
+				'value' => wpo_ips_edi_sanitize_string( $registration_number ),
+			);
+
+			if ( ! empty( $registration_number_scheme ) ) {
+				$company_id['attributes'] = array(
+					'schemeID' => $registration_number_scheme,
 				);
 			}
-			$values[] = array(
-				'name'  => 'cbc:CompanyID',
-				'value' => $vat_number,
-			);
+
+			$values[] = $company_id;
 		}
 
 		$party_legal_entity = array(

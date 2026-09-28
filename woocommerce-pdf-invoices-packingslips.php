@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or Electronic Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              6.0.0-beta.3
+ * Version:              6.0.0-i1621.1
  * Requires PHP:         8.1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
@@ -12,7 +12,7 @@
  * License URI:          https://opensource.org/licenses/gpl-license.php
  * Text Domain:          woocommerce-pdf-invoices-packing-slips
  * WC requires at least: 4.0
- * WC tested up to:      11.0
+ * WC tested up to:      11.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -35,12 +35,13 @@ use WPO\IPS\FontSynchronizer;
 use WPO\IPS\EDI\Peppol;
 use WPO\IPS\Notices;
 use WPO\IPS\SetupWizard;
+use WPO\IPS\CheckoutField;
 
 if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public string $version                         = '6.0.0-beta.3';
+	public string $version                         = '6.0.0-i1621.1';
 	public string $version_php                     = '8.1';
 	public string $version_woo                     = '4.0';
 	public string $version_wp                      = '5.3';
@@ -63,6 +64,7 @@ class WPO_WCPDF {
 	public ?Peppol $peppol                         = null;
 	public ?Notices $notices                       = null;
 	public ?SetupWizard $setup_wizard              = null;
+	public ?CheckoutField $checkout_field          = null;
 
 	protected ?bool $dependencies_ready            = null;
 	protected ?bool $woocommerce_activated         = null;
@@ -224,6 +226,11 @@ class WPO_WCPDF {
 			$this->get_instance( 'frontend' );
 		}
 
+		// REST_REQUEST is not defined yet during normal init. Register fields before Store API routes.
+		add_action( 'rest_api_init', function () {
+			$this->get_instance( 'frontend' );
+		}, 5 );
+
 		// Peppol only when enabled and relevant
 		if (
 			function_exists( 'wpo_ips_edi_peppol_is_available' ) &&
@@ -266,6 +273,7 @@ class WPO_WCPDF {
 				'peppol'              => Peppol::class,
 				'notices'             => Notices::class,
 				'setup_wizard'        => SetupWizard::class,
+				'checkout_field'      => CheckoutField::class,
 			),
 			$this
 		);
@@ -598,7 +606,7 @@ class WPO_WCPDF {
 	 * @return void
 	 */
 	public function set_new_unstable_version_available_option( array $unstable, string $owner, string $repo ): void {
-		$debug_settings = $this->get_instance( 'settings' )->debug_settings;
+		$debug_settings = $this->get_instance( 'settings' )->get_settings( 'debug' );
 		$enabled        = isset( $debug_settings['check_unstable_versions'] );
 		$new_tag        = sanitize_text_field( $unstable['tag'] );
 
