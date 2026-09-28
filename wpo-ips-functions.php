@@ -902,33 +902,43 @@ function wpo_wcpdf_base64_encode_file( string $local_path ): string|bool {
 /**
  * Check if a file is readable
  *
- * @param string $path
+ * @param string      $path
+ * @param object|null $document Document context for allowed remote ports.
  * @return bool
  */
-function wpo_wcpdf_is_file_readable( string $path ): bool {
+function wpo_wcpdf_is_file_readable( string $path, ?object $document = null ): bool {
 	if ( empty( $path ) ) {
 		return false;
 	}
 
 	// Check if the path is a URL
 	if ( filter_var( $path, FILTER_VALIDATE_URL ) ) {
-		$parsed_url = wp_parse_url( $path );
-		$args	    = array();
+		$parsed_url    = wp_parse_url( $path );
+		$args          = array();
+		$allowed_ports = wpo_ips_get_allowed_remote_ports( $document );
+		$port          = $parsed_url['port'] ?? ( 'https' === strtolower( $parsed_url['scheme'] ?? '' ) ? 443 : 80 );
 
-		// Check if the URL is localhost
-		if (
-			'localhost' === $parsed_url['host']                                             ||
-			'127.0.0.1' === $parsed_url['host']                                             ||
-			( preg_match( '/^192\.168\./', $parsed_url['host'] ) === 1 )                    || // 192.168.*
-			( preg_match( '/^10\./', $parsed_url['host'] ) === 1 )                          || // 10.*
-			( preg_match( '/^172\.(1[6-9]|2[0-9]|3[0-1])\./', $parsed_url['host'] ) === 1 ) || // 172.16.* to 172.31.*
-			getenv( 'DISABLE_SSL_VERIFY' ) === 'true'
-		) {
+		if ( ! in_array( $port, $allowed_ports, true ) ) {
+			return false;
+		}
+
+		// Local hosts often use self-signed certificates
+		if ( wpo_ips_is_local_host( (string) ( $parsed_url['host'] ?? '' ) ) || 'true' === getenv( 'DISABLE_SSL_VERIFY' ) ) {
 			$args['sslverify'] = false;
 		}
 
-		$args     = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
-		$response = wp_safe_remote_head( $path, $args );
+		$args = apply_filters( 'wpo_wcpdf_url_remote_head_args', $args, $parsed_url, $path );
+
+		// Scope the WordPress safe-port override to this request.
+		$safe_ports = static function () use ( $allowed_ports ): array {
+			return $allowed_ports;
+		};
+		add_filter( 'http_allowed_safe_ports', $safe_ports, PHP_INT_MAX );
+		try {
+			$response = wp_safe_remote_head( $path, $args );
+		} finally {
+			remove_filter( 'http_allowed_safe_ports', $safe_ports, PHP_INT_MAX );
+		}
 
 		if ( is_wp_error( $response ) ) {
 			wcpdf_log_error( 'Failed to access file URL: ' . $path . ' Error: ' . $response->get_error_message(), 'critical' );
@@ -2819,4 +2829,162 @@ function wpo_ips_get_document_link_email_placements( ?\WPO\IPS\Documents\OrderDo
 	);
 
 	return is_array( $placements ) ? $placements : array();
+}
+
+/**
+ * Check whether a host is local: localhost or a loopback, private or reserved IP address.
+ *
+ * @param string $host
+ * @return bool
+ */
+function wpo_ips_is_local_host( string $host ): bool {
+	$host = strtolower( rtrim( trim( $host, '[]' ), '.' ) );
+
+	if ( 'localhost' === $host || str_ends_with( $host, '.localhost' ) ) {
+		return true;
+	}
+
+	if ( false === filter_var( $host, FILTER_VALIDATE_IP ) ) {
+		return false;
+	}
+
+	return false === filter_var( $host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE );
+}
+
+/**
+ * Get the URLs of resources PDFs may load: the site, its uploads, and the document's logo and product thumbnails.
+ * The logo and thumbnails cover media served by offload/CDN plugins from another host or port.
+ *
+ * @param object|null $document Document context, when available.
+ * @return string[]
+ */
+function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
+	$urls = array( home_url(), site_url(), wp_get_upload_dir()['baseurl'] );
+
+	// Bulk documents keep the document settings on their wrapper document.
+	$settings_document = $document->wrapper_document ?? $document;
+
+	if ( $settings_document && is_callable( array( $settings_document, 'get_header_logo_id' ) ) && $settings_document->get_header_logo_id() ) {
+		$urls[] = (string) wp_get_attachment_image_url( $settings_document->get_header_logo_id(), 'full' );
+	}
+
+	// Product thumbnails, e.g. the Premium Templates thumbnail column.
+	if ( $settings_document && is_callable( array( $settings_document, 'get_thumbnail' ) ) ) {
+		$order_ids = $document->order_ids ?? array( $document->order_id ?? 0 );
+
+		foreach ( array_filter( $order_ids ) as $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( ! $order ) {
+				continue;
+			}
+
+			foreach ( $order->get_items() as $item ) {
+				$product   = is_callable( array( $item, 'get_product' ) ) ? $item->get_product() : null;
+				$thumbnail = $product ? $settings_document->get_thumbnail( $product ) : '';
+
+				if ( '' !== $thumbnail ) {
+					// Use the rendered source, including CDN filters and thumbnail-size overrides.
+					$html = new \DOMDocument();
+					$html->loadHTML( '<?xml encoding="UTF-8">' . $thumbnail, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
+					foreach ( $html->getElementsByTagName( 'img' ) as $image ) {
+						$src = $image->getAttribute( 'src' );
+						if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
+							$urls[] = $src;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return array_values( array_unique( array_filter( $urls ) ) );
+}
+
+/**
+ * Get allowed ports for remote PDF resources and image readability checks.
+ *
+ * @param object|null $document Document context, when available.
+ * @param array|null  $resource_urls Previously discovered URLs, or null to discover them.
+ * @return int[]
+ */
+function wpo_ips_get_allowed_remote_ports( ?object $document = null, ?array $resource_urls = null ): array {
+	$ports = array( 80, 443, 8080 );
+
+	// The site's own non-standard ports, e.g. local development or an offload/CDN host.
+	foreach ( $resource_urls ?? wpo_ips_get_trusted_resource_urls( $document ) as $url ) {
+		$port = wp_parse_url( $url, PHP_URL_PORT );
+
+		if ( $port ) {
+			$ports[] = $port;
+		}
+	}
+
+	$ports = apply_filters( 'wpo_ips_allowed_remote_ports', $ports, $document );
+	$valid = array();
+
+	foreach ( (array) $ports as $port ) {
+		if ( ( is_int( $port ) || ( is_string( $port ) && ctype_digit( $port ) ) ) && $port >= 1 && $port <= 65535 ) {
+			$valid[] = (int) $port;
+		}
+	}
+
+	return array_values( array_unique( $valid ) );
+}
+
+/**
+ * Normalize a list of hosts allowed for remote PDF resources.
+ * Accepts an array or a string (one host per line or comma separated). IP addresses and localhost are rejected.
+ * The site's own hosts are omitted because they are allowed automatically.
+ *
+ * @param array|string $hosts
+ * @param array        $rejected Invalid entries, returned by reference.
+ * @return array
+ */
+function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected = array() ): array {
+	$rejected = array();
+
+	if ( is_string( $hosts ) ) {
+		$hosts = preg_split( '/[\r\n,]+/', $hosts );
+	}
+
+	$site_hosts = array_map( static function ( $url ) {
+		return rtrim( strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) ), '.' );
+	}, array( home_url(), site_url() ) );
+
+	$normalized = array();
+
+	foreach ( (array) $hosts as $host ) {
+		$entry = trim( (string) $host );
+		if ( '' === $entry ) {
+			continue;
+		}
+		$host = strtolower( $entry );
+
+		// A full URL was entered: keep the host only.
+		if ( str_contains( $host, '/' ) ) {
+			$host = (string) wp_parse_url( ( ! str_contains( $host, '://' ) ? 'https://' : '' ) . ltrim( $host, '/' ), PHP_URL_HOST );
+		}
+
+		$host = rtrim( $host, '.' );
+
+		if ( '' !== $host && in_array( $host, $site_hosts, true ) ) {
+			continue;
+		}
+
+		if (
+			'' === $host ||
+			wpo_ips_is_local_host( $host ) ||
+			false !== filter_var( trim( $host, '[]' ), FILTER_VALIDATE_IP ) ||
+			! preg_match( '/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/', $host ) || // valid labels, at least one dot
+			preg_match( '/(?:^|\.)(?:\d+|0x[0-9a-f]*)$/', $host ) // numeric last label: IPv4 shorthand such as 127.1 or 0x7f.1
+		) {
+			$rejected[] = $entry;
+			continue;
+		}
+
+		$normalized[] = $host;
+	}
+
+	return array_values( array_unique( $normalized ) );
 }

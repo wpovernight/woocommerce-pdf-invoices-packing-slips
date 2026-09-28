@@ -751,7 +751,7 @@ class Install {
 			}
 		}
 
-		// 6.0.0 update: migrate the optional checkout field settings.
+		// 6.0.0: migrate the optional checkout field settings.
 		if ( version_compare( $installed_version, '6.0.0', '<' ) ) {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
 
@@ -788,6 +788,62 @@ class Install {
 					}
 
 					update_option( 'wpo_wcpdf_settings_general', $general_settings );
+				}
+			}
+		}
+
+		// 6.0.0-i1621.1: allow remote hosts already used in settings and the selected template, now that PDFs only load resources from the site's own hosts
+		if ( version_compare( $installed_version, '6.0.0-i1621.1', '<' ) ) {
+			$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
+			$debug_settings = is_array( $debug_settings ) ? $debug_settings : array();
+
+			if ( ! isset( $debug_settings['allowed_remote_hosts'] ) ) {
+				global $wpdb;
+
+				$option_names   = $wpdb->get_col( "SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'wpo\\_wcpdf\\_documents\\_settings\\_%'" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+				$option_names[] = 'wpo_wcpdf_settings_general';
+				$option_names[] = 'wpo_wcpdf_editor_settings'; // Premium Templates custom CSS, custom blocks, and customizer columns.
+				$hosts          = array();
+				$find_hosts     = static function ( string $content ): array {
+					return preg_match_all( '#(?:\bsrc\s*=\s*["\']?|url\(\s*["\']?|@import\s+["\'])\s*(?:https?:)?//([^/"\'\s>):?\#]+)#i', $content, $matches ) ? $matches[1] : array();
+				};
+
+				foreach ( $option_names as $option_name ) {
+					$settings = get_option( $option_name, array() );
+
+					if ( ! is_array( $settings ) ) {
+						continue;
+					}
+
+					array_walk_recursive( $settings, function ( $value ) use ( &$hosts, $find_hosts ) {
+						if ( is_string( $value ) ) {
+							$hosts = array_merge( $hosts, $find_hosts( $value ) );
+						}
+					} );
+				}
+
+				// The selected template, e.g. a custom template in a child theme, can reference images and fonts directly.
+				$template_path  = $settings_instance->get_template_path();
+				$template_files = '' !== $template_path
+					? array_merge( glob( trailingslashit( $template_path ) . '*' ) ?: array(), glob( trailingslashit( $template_path ) . '*/*' ) ?: array() )
+					: array();
+
+				foreach ( $template_files as $template_file ) {
+					if ( preg_match( '/\.(php|css)$/i', $template_file ) && $file_system_instance->is_file( $template_file ) ) {
+						$hosts = array_merge( $hosts, $find_hosts( (string) $file_system_instance->get_contents( $template_file ) ) );
+					}
+				}
+
+				$hosts = wpo_ips_normalize_remote_hosts( $hosts );
+
+				// Google Fonts stylesheets load the font files from a second host.
+				if ( in_array( 'fonts.googleapis.com', $hosts, true ) && ! in_array( 'fonts.gstatic.com', $hosts, true ) ) {
+					$hosts[] = 'fonts.gstatic.com';
+				}
+
+				if ( ! empty( $hosts ) ) {
+					$debug_settings['allowed_remote_hosts'] = implode( "\n", $hosts );
+					update_option( 'wpo_wcpdf_settings_debug', $debug_settings );
 				}
 			}
 		}
