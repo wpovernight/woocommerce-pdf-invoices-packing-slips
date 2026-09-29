@@ -4,6 +4,41 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
+<div id="debug-tools">
+	<div class="wrapper">
+		<?php do_action( 'wpo_wcpdf_before_debug_tools', $this ); ?>
+		<!-- plugin_report -->
+		<div class="tool plugin-report">
+			<h4><span class="dashicons dashicons-sos"></span><?php esc_html_e( 'Download plugin report', 'woocommerce-pdf-invoices-packing-slips' ); ?></h4>
+
+			<p><?php printf(
+				/* translators: support email link */
+				esc_html__( 'Download a report with plugin, environment, and store information that you can attach to support requests made to %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+				'<a href="mailto:support@wpovernight.com">support@wpovernight.com</a>'
+			); ?></p>
+
+			<p>
+				<label>
+					<input type="checkbox" id="wpo_ips_include_sensitive" />
+					<?php esc_html_e( 'Include sensitive data in the report (license keys, logs, user name and email, directory permissions).', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</label>
+			</p>
+
+			<p>
+				<label>
+					<input type="checkbox" id="wpo_ips_output_html" />
+					<?php esc_html_e( 'Output report as HTML instead of PDF.', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+				</label>
+			</p>
+
+			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin-ajax.php?action=wpo_ips_plugin_report' ), 'wpo_ips_plugin_report', 'nonce' ) ); ?>" class="button button-primary">
+				<?php esc_html_e( 'Download report', 'woocommerce-pdf-invoices-packing-slips' ); ?>
+			</a>
+		</div>
+		<!-- /plugin_report -->
+	</div>
+</div>
+
 <table class="widefat system-status-table" cellspacing="1px" cellpadding="4px" style="width:100%;">
 	<caption><?php esc_html_e( 'Installed Plugin Versions', 'woocommerce-pdf-invoices-packing-slips' ); ?></caption>
 	<thead>
@@ -145,7 +180,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</thead>
 	<tbody>
 		<?php
-			foreach ( WPO_WCPDF()->documents->get_documents( 'all' ) as $document ) :
+			foreach ( WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' ) as $document ) :
 				$is_enabled       = (bool) $document->is_enabled();
 				$is_enabled_class = $is_enabled ? 'valid-status' : 'invalid-status';
 				$is_enabled_text  = $is_enabled ? esc_html__( 'Yes', 'woocommerce-pdf-invoices-packing-slips' ) : esc_html__( 'No', 'woocommerce-pdf-invoices-packing-slips' );
@@ -230,7 +265,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					printf(
 						/* translators: 1,2. directory paths, 3. UPLOADS, 4. wpo_wcpdf_tmp_path, 5. attachments, 6. dompdf, 7. fonts */
 						esc_html__( 'The central temp folder is %1$s. By default, this folder is created in the WordPress uploads folder (%2$s), which can be defined by setting %3$s in wp-config.php. Alternatively, you can control the specific folder for PDF invoices by using the %4$s filter. Make sure this folder is writable and that the subfolders %5$s, %6$s and %7$s are present (these will be created by the plugin if the central temp folder is writable).', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<code>' . wpo_wcpdf_escape_url_path_or_base64( WPO_WCPDF()->main->get_tmp_path() ) . '</code>', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						'<code>' . wpo_wcpdf_escape_url_path_or_base64( WPO_WCPDF()->get_instance( 'main' )->get_tmp_path() ) . '</code>', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						'<code>' . wpo_wcpdf_escape_url_path_or_base64( trailingslashit( wp_upload_dir()['basedir'] ) ) . '</code>', // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						'<code>UPLOADS</code>',
 						'<code>wpo_wcpdf_tmp_path</code>',

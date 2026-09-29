@@ -10,7 +10,7 @@
 	$user_id    = get_current_user_id();
 	$column_key = 'wc_actions';
 	
-	$orders_column_hidden_key = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled()
+	$orders_column_hidden_key = WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled()
 		? 'managewoocommerce_page_wc-orderscolumnshidden'
 		: 'manageedit-shop_ordercolumnshidden';
 	

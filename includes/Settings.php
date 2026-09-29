@@ -6,8 +6,9 @@ use WPO\IPS\Settings\SettingsCallbacks;
 use WPO\IPS\Settings\SettingsGeneral;
 use WPO\IPS\Settings\SettingsDocuments;
 use WPO\IPS\Settings\SettingsDebug;
-use WPO\IPS\Settings\SettingsUbl;
+use WPO\IPS\Settings\SettingsEDI;
 use WPO\IPS\Settings\SettingsUpgrade;
+use WPO\IPS\Documents\OrderDocument;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -17,91 +18,123 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings' ) ) :
 
 class Settings {
 
-	public $options_page_hook;
-	public $callbacks;
-	public $general;
-	public $documents;
-	public $debug;
-	public $upgrade;
-	public $ubl;
-	public $general_settings;
-	public $debug_settings;
-	public $ubl_tax_settings;
+	public ?SettingsCallbacks $callbacks     = null;
+	public ?SettingsGeneral $general         = null;
+	public ?SettingsDocuments $documents     = null;
+	public ?SettingsDebug $debug             = null;
+	public ?SettingsUpgrade $upgrade         = null;
+	public ?SettingsEDI $edi                 = null;
+	
+	public string|false $options_page_hook   = false;
+	public array $general_settings;
+	public array $debug_settings;
+	public array $edi_settings;
 
-	private $installed_templates       = array();
-	private $installed_templates_cache = array();
-	private $template_list_cache       = array();
+	private array $installed_templates       = array();
+	private array $installed_templates_cache = array();
+	private array $template_list_cache       = array();
 
-	protected static $_instance = null;
+	protected bool $settings_loaded          = false;
+	protected static ?self $_instance        = null;
 
-	public static function instance() {
+	/**
+	 * Singleton instance accessor.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		$this->callbacks        = SettingsCallbacks::instance();
-		$this->general          = SettingsGeneral::instance();
-		$this->documents        = SettingsDocuments::instance();
-		$this->debug            = SettingsDebug::instance();
-		$this->ubl              = SettingsUbl::instance();
-		$this->upgrade          = SettingsUpgrade::instance();
+		$this->load_settings();
 
-		$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
-		$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
-		$this->ubl_tax_settings = get_option( 'wpo_wcpdf_settings_ubl_taxes' );
+		// Admin hooks only
+		if ( is_admin() || wp_doing_ajax() ) {
+			$this->load_settings_components();
 
-		// Settings menu item
-		add_action( 'admin_menu', array( $this, 'menu' ), 999 ); // Add menu
-		// Links on plugin page
-		add_filter( 'plugin_action_links_'.WPO_WCPDF()->plugin_basename, array( $this, 'add_settings_link' ) );
-		add_filter( 'plugin_row_meta', array( $this, 'add_support_links' ), 10, 2 );
+			// WP
+			add_action( 'admin_menu', array( $this, 'menu' ), 999 );
+			add_filter( 'plugin_action_links_' . WPO_WCPDF()->plugin_basename, array( $this, 'add_settings_link' ) );
+			add_filter( 'plugin_row_meta', array( $this, 'add_support_links' ), 10, 2 );
+			add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
+			add_action( 'update_option_wpo_wcpdf_settings_general', array( $this, 'general_settings_updated' ), 10, 3 );
+			add_action( 'update_option_wpo_wcpdf_settings_debug', array( $this, 'debug_settings_updated' ), 10, 3 );
+			add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
 
-		// settings capabilities
-		add_filter( 'option_page_capability_wpo_wcpdf_general_settings', array( $this, 'user_settings_capability' ) );
+			// IPS
+			add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 2 );
+			add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
+			add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_categories' ), 999 );
+			add_filter( 'wpo_wcpdf_settings_fields_debug', array( $this, 'update_debug_settings_categories' ), 999, 4 );
 
-		// AJAX set number store
-		add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
+			// AJAX
+			add_action( 'wp_ajax_wpo_wcpdf_set_next_number', array( $this, 'set_number_store' ) );
+			add_action( 'wp_ajax_wpo_wcpdf_get_media_upload_setting_html', array( $this, 'get_media_upload_setting_html' ) );
+			add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
+			add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
+			add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
+		}
 
-		// AJAX get header logo setting HTML
-		add_action( 'wp_ajax_wpo_wcpdf_get_media_upload_setting_html', array( $this, 'get_media_upload_setting_html' ) );
-
-		// refresh template path cache each time the general settings are updated
-		add_action( "update_option_wpo_wcpdf_settings_general", array( $this, 'general_settings_updated' ), 10, 3 );
-		// sets transient to flush rewrite rules
-		add_action( "update_option_wpo_wcpdf_settings_debug", array( $this, 'debug_settings_updated' ), 10, 3 );
-		add_action( 'init', array( $this, 'maybe_delete_flush_rewrite_rules_transient' ) );
-		// migrate old template paths to template IDs before loading settings page
-		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'maybe_migrate_template_paths' ), 9, 2 );
-
-		// AJAX preview
-		add_action( 'wp_ajax_wpo_wcpdf_preview', array( $this, 'ajax_preview' ) );
-		// AJAX preview order search
-		add_action( 'wp_ajax_wpo_wcpdf_preview_order_search', array( $this, 'preview_order_search' ) );
-
-		// schedule yearly reset numbers
+		// Runtime hook
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
-
-		// Apply categories to document settings.
-		add_action( 'wpo_wcpdf_init_documents', array( $this, 'update_documents_settings_categories' ), 999 );
-
-		// Apply categories to general settings.
-		add_filter( 'wpo_wcpdf_settings_fields_general', array( $this, 'update_general_settings_categories' ), 999, 5 );
-
-		// Apply categories to debug (Advanced) settings.
-		add_filter( 'wpo_wcpdf_settings_fields_debug', array( $this, 'update_debug_settings_categories' ), 999, 4 );
-
-		// Sync address from WooCommerce address.
-		add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 	}
 
-	public function menu() {
-		$parent_slug = 'woocommerce';
+	private function load_settings_components(): void {
+		$this->get_instance( 'callbacks' );
+		$this->get_instance( 'general' );
+		$this->get_instance( 'documents' );
+		$this->get_instance( 'debug' );
+		$this->get_instance( 'upgrade' );
+		$this->get_instance( 'edi' );
+	}
+	
+	/**
+	 * Get a settings instance by slug.
+	 *
+	 * @param string $setting
+	 * @return object|null
+	 */
+	public function get_instance( string $setting ): ?object {
+		$map = apply_filters(
+			'wpo_ips_settings_instance_map',
+			array(
+				'callbacks' => SettingsCallbacks::class,
+				'general'   => SettingsGeneral::class,
+				'documents' => SettingsDocuments::class,
+				'debug'     => SettingsDebug::class,
+				'upgrade'   => SettingsUpgrade::class,
+				'edi'       => SettingsEDI::class,
+			),
+			$this
+		);
 
+		if ( ! isset( $map[ $setting ] ) ) {
+			return null;
+		}
+
+		if ( null === $this->{$setting} ) {
+			$class = $map[ $setting ];
+			$this->{$setting} = $class::instance();
+		}
+
+		return $this->{$setting};
+	}
+
+	/**
+	 * Add plugin settings page to WooCommerce menu.
+	 * 
+	 * @return void
+	 */
+	public function menu(): void {
 		$this->options_page_hook = add_submenu_page(
-			$parent_slug,
+			'woocommerce',
 			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
 			esc_html__( 'PDF Invoices', 'woocommerce-pdf-invoices-packing-slips' ),
 			$this->user_settings_capability(),
@@ -112,8 +145,11 @@ class Settings {
 
 	/**
 	 * Add settings link to plugins page
+	 * 
+	 * @param array $links
+	 * @return array
 	 */
-	public function add_settings_link( $links ) {
+	public function add_settings_link( array $links ): array {
 		$action_links = array(
 			'settings' => '<a href="admin.php?page=wpo_wcpdf_options_page">'. esc_html__( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
 		);
@@ -124,9 +160,13 @@ class Settings {
 	/**
 	 * Add various support links to plugin page
 	 * after meta (version, authors, site)
+	 * 
+	 * @param array $links
+	 * @param string $file
+	 * @return array
 	 */
-	public function add_support_links( $links, $file ) {
-		if ( $file == WPO_WCPDF()->plugin_basename ) {
+	public function add_support_links( array $links, string $file ): array {
+		if ( $file === WPO_WCPDF()->plugin_basename ) {
 			$row_meta = array(
 				'docs'    => '<a href="https://docs.wpovernight.com/topic/woocommerce-pdf-invoices-packing-slips/" target="_blank" title="' . esc_html__( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . esc_html__( 'Documentation', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
 				'support' => '<a href="https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips" target="_blank" title="' . esc_html__( 'Support Forum', 'woocommerce-pdf-invoices-packing-slips' ) . '">' . esc_html__( 'Support Forum', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>',
@@ -143,7 +183,7 @@ class Settings {
 	 *
 	 * @return string The matched or default user capability.
 	 */
-	public function user_settings_capability() {
+	public function user_settings_capability(): string {
 		$manage_woocommerce = 'manage_woocommerce';
 
 		// Get the default capability
@@ -166,18 +206,24 @@ class Settings {
 
 	/**
 	 * Check if user role can manage settings.
+	 * 
 	 * @return bool
 	 */
-	public function user_can_manage_settings() {
+	public function user_can_manage_settings(): bool {
 		return current_user_can( $this->user_settings_capability() );
 	}
 
-	public function settings_page() {
+	/**
+	 * Output the settings page.
+	 * 
+	 * @return void
+	 */
+	public function settings_page(): void {
 		// feedback on settings save
 		settings_errors();
 
 		$settings_tabs = apply_filters( 'wpo_wcpdf_settings_tabs', array(
-			'general' => array(
+			'general'   => array(
 				'title'          => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
@@ -185,13 +231,11 @@ class Settings {
 				'title'          => __( 'Documents', 'woocommerce-pdf-invoices-packing-slips' ),
 				'preview_states' => 3,
 			),
+			'edi'       => array(
+				'title'          => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+				'preview_states' => 1,
+			),
 		) );
-
-		$settings_tabs['ubl'] = array(
-			'title'          => __( 'Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
-			'preview_states' => 1,
-			//'beta'           => true,
-		);
 
 		// add status and upgrade tabs last in row
 		$settings_tabs['debug'] = array(
@@ -211,11 +255,16 @@ class Settings {
 		include WPO_WCPDF()->plugin_path() . '/views/settings-page.php';
 	}
 
-	public function maybe_disable_preview_on_settings_tabs( $settings_tabs ) {
-		$debug_settings = get_option( 'wpo_wcpdf_settings_debug', array() );
-		$close_preview  = isset( $debug_settings['disable_preview'] );
+	/**
+	 * Maybe disable preview on settings tabs based on debug settings.
+	 *
+	 * @param array $settings_tabs
+	 * @return array
+	 */
+	public function maybe_disable_preview_on_settings_tabs( array $settings_tabs ): array {
+		$this->load_settings();
 
-		if ( $close_preview ) {
+		if ( isset( $this->get_settings( 'debug' )['disable_preview'] ) ) {
 			foreach ( $settings_tabs as $tab_key => &$tab ) {
 				if ( is_array( $tab ) && ! empty( $tab['preview_states'] ) ) {
 					$tab['preview_states'] = 1;
@@ -226,7 +275,13 @@ class Settings {
 		return $settings_tabs;
 	}
 
-	public function ajax_preview() {
+	/**
+	 * AJAX callback to generate document preview.
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function ajax_preview(): void {
 		check_ajax_referer( 'wpo_wcpdf_preview', 'security' );
 
 		try {
@@ -246,7 +301,7 @@ class Settings {
 			if ( ! empty( $_POST['order_id'] ) ) {
 				$order_id = sanitize_text_field( wp_unslash( $_POST['order_id'] ) );
 
-				if ( $document_type == 'credit-note' ) {
+				if ( 'credit-note' === $document_type ) {
 					// get last refund ID of the order if available
 					$refund = wc_get_orders(
 						array(
@@ -274,7 +329,7 @@ class Settings {
 				if ( empty( $order ) ) {
 					wp_send_json_error( array( 'error' => esc_html__( 'Order not found!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 				}
-				if ( ! in_array( $order->get_type(), array( 'shop_order', 'shop_order_refund' ) ) ) {
+				if ( ! in_array( $order->get_type(), array( 'shop_order', 'shop_order_refund' ), true ) ) {
 					wp_send_json_error( array( 'error' => esc_html__( 'Object found is not an order!', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 				}
 
@@ -290,17 +345,16 @@ class Settings {
 						}
 
 						// validate option values
-						$form_settings = $this->callbacks->validate( $form_settings );
+						$form_settings = $this->get_instance( 'callbacks' )->validate( $form_settings );
 
 						// filter the options
-						add_filter( "option_{$option_key}", function( $value, $option ) use ( $form_settings ) {
-							return maybe_unserialize( $form_settings );
+						add_filter( "option_{$option_key}", function( $_value, $_option ) use ( $form_settings ) {
+							return $form_settings;
 						}, 99, 2 );
 					}
 
 					// reload settings
-					$this->general_settings = get_option( 'wpo_wcpdf_settings_general' );
-					$this->debug_settings   = get_option( 'wpo_wcpdf_settings_debug' );
+					$this->load_settings( true );
 
 					do_action( 'wpo_wcpdf_preview_after_reload_settings' );
 				}
@@ -331,22 +385,45 @@ class Settings {
 
 					// Apply document number formatting.
 					if ( $document_number ) {
-						if ( ! empty( $document->settings['number_format'] ) && is_array( $document->settings['number_format'] ) ) {
-							$document_number->load_number_data( $document->settings['number_format'] );
+						$number_data = array();
+
+						if (
+							isset( $document->settings['display_number'] ) &&
+							'order_number' === $document->settings['display_number']
+						) {
+							$order_number = $order->get_order_number();
+							$number_data  = array(
+								'number'           => (int) preg_replace( '/\D/', '', $order_number ),
+								'formatted_number' => "{$order_number}",
+							);
+						}
+
+						if (
+							! empty( $document->settings['number_format'] ) &&
+							is_array( $document->settings['number_format'] )
+						) {
+							$number_data = array_merge(
+								$number_data,
+								$document->settings['number_format']
+							);
+						}
+
+						if ( ! empty( $number_data ) ) {
+							$document_number->load_number_data( $number_data );
 						}
 
 						$document_number->apply_formatting( $document, $order );
 					}
 
 					// preview
-					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) ) : 'pdf';
+					$output_format = ( ! empty( $_REQUEST['output_format'] ) && $_REQUEST['output_format'] != 'pdf' && in_array( $_REQUEST['output_format'], $document->output_formats, true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) ) : 'pdf';
 					switch ( $output_format ) {
 						default:
 						case 'pdf':
 							$preview_data = base64_encode( $document->preview_pdf() );
 							break;
-						case 'ubl':
-							$preview_data = $document->preview_ubl();
+						case 'xml':
+							$preview_data = $document->preview_xml();
 							break;
 					}
 
@@ -358,9 +435,11 @@ class Settings {
 					wp_send_json_error(
 						array(
 							'error' => sprintf(
-								/* translators: order ID */
-								esc_html__( 'Document not available for order #%s, try selecting a different order.', 'woocommerce-pdf-invoices-packing-slips' ),
-								$order_id
+								/* translators: 1. order ID, 2. documentation page link, 3. documentation page link closing tag */
+								esc_html__( 'The PDF preview for order #%1$d is not available. This can happen if some settings prevent the document from being generated. Please review your configuration or check the %2$sdocumentation%3$s for more details.', 'woocommerce-pdf-invoices-packing-slips' ),
+								$order_id,
+								'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/troubleshooting-pdf-preview-unavailability/" target="_blank">',
+								'</a>'
 							)
 						)
 					);
@@ -386,7 +465,13 @@ class Settings {
 		wp_die();
 	}
 
-	public function preview_order_search() {
+	/**
+	 * AJAX callback to search for orders in document preview.
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function preview_order_search(): void {
 		check_ajax_referer( 'wpo_wcpdf_preview', 'security' );
 
 		try {
@@ -445,13 +530,13 @@ class Settings {
 						if ( empty( $order ) ) {
 							continue;
 						}
-						$order_id                              = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : 0;
-						$data[$order_id]['order_number']       = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
-						$data[$order_id]['billing_first_name'] = is_callable( array( $order, 'get_billing_first_name' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_first_name(), 'first_name' ) : '';
-						$data[$order_id]['billing_last_name']  = is_callable( array( $order, 'get_billing_last_name' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_last_name(), 'last_name' ) : '';
-						$data[$order_id]['billing_company']    = is_callable( array( $order, 'get_billing_company' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_company(), 'company' ) : '';
-						$data[$order_id]['date_created']       = is_callable( array( $order, 'get_date_created' ) ) ? '<strong>' . esc_attr__( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . $order->get_date_created()->format( 'Y/m/d' ) : '';
-						$data[$order_id]['total']              = is_callable( array( $order, 'get_total' ) ) ? '<strong>' . esc_attr__( 'Total', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . wc_price( $order->get_total() ) : '';
+						$order_id                                = is_callable( array( $order, 'get_id' ) ) ? $order->get_id() : 0;
+						$data[ $order_id ]['order_number']       = is_callable( array( $order, 'get_order_number' ) ) ? $order->get_order_number() : '';
+						$data[ $order_id ]['billing_first_name'] = is_callable( array( $order, 'get_billing_first_name' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_first_name(), 'first_name' ) : '';
+						$data[ $order_id ]['billing_last_name']  = is_callable( array( $order, 'get_billing_last_name' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_last_name(), 'last_name' ) : '';
+						$data[ $order_id ]['billing_company']    = is_callable( array( $order, 'get_billing_company' ) ) ? wpo_wcpdf_sanitize_html_content( $order->get_billing_company(), 'company' ) : '';
+						$data[ $order_id ]['date_created']       = is_callable( array( $order, 'get_date_created' ) ) ? '<strong>' . esc_attr__( 'Date', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . $order->get_date_created()->format( 'Y/m/d' ) : '';
+						$data[ $order_id ]['total']              = is_callable( array( $order, 'get_total' ) ) ? '<strong>' . esc_attr__( 'Total', 'woocommerce-pdf-invoices-packing-slips' ) . ':</strong> ' . wc_price( $order->get_total() ) : '';
 					}
 
 					$data = apply_filters( 'wpo_wcpdf_preview_order_search_data', $data, $results );
@@ -478,12 +563,21 @@ class Settings {
 		wp_die();
 	}
 
-	public function add_settings_fields( $settings_fields, $page, $option_group, $option_name ) {
+	/**
+	 * Add settings fields to the settings page.
+	 *
+	 * @param array $settings_fields
+	 * @param string $page
+	 * @param string $option_group
+	 * @param string $option_name
+	 * @return void
+	 */
+	public function add_settings_fields( array $settings_fields, string $page, string $option_group, string $option_name ): void {
 		foreach ( $settings_fields as $settings_field ) {
 			if ( ! isset( $settings_field['callback'] ) ) {
 				continue;
-			} elseif ( is_callable( array( $this->callbacks, $settings_field['callback'] ) ) ) {
-				$callback = array( $this->callbacks, $settings_field['callback'] );
+			} elseif ( is_callable( array( $this->get_instance( 'callbacks' ), $settings_field['callback'] ) ) ) {
+				$callback = array( $this->get_instance( 'callbacks' ), $settings_field['callback'] );
 			} elseif ( is_callable( $settings_field['callback'] ) ) {
 				$callback = $settings_field['callback'];
 			} else {
@@ -509,12 +603,12 @@ class Settings {
 				);
 				// register option separately for singular options
 				if ( is_string( $settings_field['callback'] ) && $settings_field['callback'] == 'singular_text_element') {
-					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
+					register_setting( $option_group, $settings_field['args']['option_name'], array( $this->get_instance( 'callbacks' ), 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 				}
 			}
 		}
 		// $page, $option_group & $option_name are all the same...
-		register_setting( $option_group, $option_name, array( $this->callbacks, 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
+		register_setting( $option_group, $option_name, array( $this->get_instance( 'callbacks' ), 'validate' ) ); // phpcs:ignore PluginCheck.CodeAnalysis.SettingSanitization.register_settingDynamic
 		add_filter( 'option_page_capability_'.$page, array( $this, 'user_settings_capability' ) );
 
 	}
@@ -525,57 +619,81 @@ class Settings {
 	 * @return array
 	 */
 	public function get_common_document_settings(): array {
+		$general_settings = $this->get_settings( 'general' );
+
 		return array(
-			'paper_size'              => $this->general_settings['paper_size'] ?? '',
-			'font_subsetting'         => isset( $this->general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
-			'header_logo'             => $this->general_settings['header_logo'] ?? '',
-			'header_logo_height'      => $this->general_settings['header_logo_height'] ?? '',
-			'vat_number'              => $this->general_settings['vat_number'] ?? '',
-			'coc_number'              => $this->general_settings['coc_number'] ?? '',
-			'shop_name'               => $this->general_settings['shop_name'] ?? '',
-			'shop_phone_number'       => $this->general_settings['shop_phone_number'] ?? '',
-			'shop_email_address'      => $this->general_settings['shop_email_address'] ?? '',
-			'shop_address_line_1'     => $this->general_settings['shop_address_line_1'] ?? '',
-			'shop_address_line_2'     => $this->general_settings['shop_address_line_2'] ?? '',
-			'shop_address_country'    => $this->general_settings['shop_address_country'] ?? '',
-			'shop_address_state'      => $this->general_settings['shop_address_state'] ?? '',
-			'shop_address_city'       => $this->general_settings['shop_address_city'] ?? '',
-			'shop_address_postcode'   => $this->general_settings['shop_address_postcode'] ?? '',
-			'shop_address_additional' => $this->general_settings['shop_address_additional'] ?? '',
-			'footer'                  => $this->general_settings['footer'] ?? '',
-			'extra_1'                 => $this->general_settings['extra_1'] ?? '',
-			'extra_2'                 => $this->general_settings['extra_2'] ?? '',
-			'extra_3'                 => $this->general_settings['extra_3'] ?? '',
+			'paper_size'              => $general_settings['paper_size'] ?? '',
+			'font_subsetting'         => isset( $general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
+			'header_logo'             => $general_settings['header_logo'] ?? '',
+			'header_logo_height'      => $general_settings['header_logo_height'] ?? '',
+			'vat_number'              => $general_settings['vat_number'] ?? '',
+			'coc_number'              => $general_settings['coc_number'] ?? '',
+			'shop_name'               => $general_settings['shop_name'] ?? '',
+			'shop_phone_number'       => $general_settings['shop_phone_number'] ?? '',
+			'shop_email_address'      => $general_settings['shop_email_address'] ?? '',
+			'shop_address_line_1'     => $general_settings['shop_address_line_1'] ?? '',
+			'shop_address_line_2'     => $general_settings['shop_address_line_2'] ?? '',
+			'shop_address_country'    => $general_settings['shop_address_country'] ?? '',
+			'shop_address_state'      => $general_settings['shop_address_state'] ?? '',
+			'shop_address_city'       => $general_settings['shop_address_city'] ?? '',
+			'shop_address_postcode'   => $general_settings['shop_address_postcode'] ?? '',
+			'shop_address_additional' => $general_settings['shop_address_additional'] ?? '',
+			'footer'                  => $general_settings['footer'] ?? '',
+			'extra_1'                 => $general_settings['extra_1'] ?? '',
+			'extra_2'                 => $general_settings['extra_2'] ?? '',
+			'extra_3'                 => $general_settings['extra_3'] ?? '',
 		);
 	}
 
-	public function get_document_settings( $document_type, $output_format = 'pdf' ) {
+	/**
+	 * Get document settings by document type and output format.
+	 *
+	 * @param string $document_type
+	 * @param string $output_format
+	 * @return array|false
+	 */
+	public function get_document_settings( string $document_type, string $output_format = 'pdf' ): array|false {
 		if ( ! empty( $document_type ) ) {
-			$option_name = ( 'pdf' === $output_format ) ? "wpo_wcpdf_documents_settings_{$document_type}" : "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
+			$option_name = ( 'pdf' === $output_format || 'xml' === $output_format ) // In 5.0.0 and later, E‑Documents settings are isolated from document settings, so PDF is the default.
+				? "wpo_wcpdf_documents_settings_{$document_type}"
+				: "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
 			return get_option( $option_name, array() );
 		} else {
 			return false;
 		}
 	}
 
-	public function get_output_format( $document = null, $request = null ) {
+	/**
+	 * Get output format for document generation.
+	 *
+	 * @param object|null $document
+	 * @param array|null $request
+	 * @return string
+	 */
+	public function get_output_format( ?object $document = null, ?array $request = null ): string {
 		$output_format = 'pdf'; // default
 
-		if ( isset( $this->debug_settings['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
+		if ( isset( $this->get_settings( 'debug' )['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
 			$output_format = 'html';
-		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats ) ) {
-			$document_settings = $this->get_document_settings( $document->get_type(), esc_attr( $request['output'] ) );
-			if ( isset( $document_settings['enabled'] ) ) {
-				$output_format = esc_attr( $request['output'] );
-			}
+		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats, true ) ) {
+			$output_format = esc_attr( $request['output'] );
 		}
 
-		return apply_filters( 'wpo_wcpdf_output_format', $output_format, $document );
+		return (string) apply_filters(
+			'wpo_wcpdf_output_format',
+			$output_format,
+			$document
+		);
 	}
 
-	public function get_output_mode() {
-		if ( isset( $this->general_settings['download_display'] ) ) {
-			switch ( $this->general_settings['download_display'] ) {
+	/**
+	 * Get output mode for document generation.
+	 *
+	 * @return string
+	 */
+	public function get_output_mode(): string {
+		if ( isset( $this->get_settings( 'general' )['download_display'] ) ) {
+			switch ( $this->get_settings( 'general' )['download_display'] ) {
 				case 'display':
 					$output_mode = 'inline';
 					break;
@@ -587,18 +705,68 @@ class Settings {
 		} else {
 			$output_mode = 'download';
 		}
+		
 		return $output_mode;
 	}
 
-	public function get_template_path() {
+	/**
+	 * Get installed templates list as options.
+	 *
+	 * @return array
+	 */
+	public function get_installed_templates_list(): array {
+		$installed_templates = $this->get_installed_templates();
+		$template_list       = array();
+
+		foreach ( $installed_templates as $path => $template_id ) {
+			$template_name = basename( $template_id );
+			$group         = dirname( $template_id );
+
+			// check if this is an extension template
+			if ( false !== strpos( $group, 'extension::' ) ) {
+				$extension = explode( '::', $group );
+				$group     = 'extension';
+			}
+
+			switch ( $group ) {
+				case 'default':
+				case 'premium_plugin':
+					// no suffix
+					break;
+				case 'extension':
+					$template_name = sprintf( '%s (%s) [%s]', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ), $extension[1] );
+					break;
+				case 'theme':
+				default:
+					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
+					break;
+			}
+
+			$template_list[ $template_id ] = $template_name;
+		}
+
+		return $template_list;
+	}
+
+	/**
+	 * Get template path by template name or path.
+	 *
+	 * @param string $template_path Template name or path.
+	 * @return string
+	 */
+	public function get_template_path( string $template_path = '' ): string {
+		$selected_template = $template_path
+			? sanitize_text_field( $template_path )
+			: ( $this->get_settings( 'general' )['template_path'] ?? '' );
+
 		// return default path if no template selected
-		if ( empty( $this->general_settings['template_path'] ) ) {
+		if ( empty( $selected_template ) ) {
 			return wp_normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
 		}
 
 		$installed_templates = $this->get_installed_templates();
-		$selected_template = $this->general_settings['template_path'];
-		if ( in_array( $selected_template, $installed_templates ) ) {
+
+		if ( in_array( $selected_template, $installed_templates, true ) ) {
 			return array_search( $selected_template, $installed_templates );
 		} else {
 			// unknown template or full template path (filter override)
@@ -620,7 +788,13 @@ class Settings {
 		return $template_path;
 	}
 
-	public function get_installed_templates( $force_reload = false ) {
+	/**
+	 * Get installed templates list with paths.
+	 *
+	 * @param bool $force_reload Force reload of templates from disk.
+	 * @return array
+	 */
+	public function get_installed_templates( bool $force_reload = false ): array {
 		// because this method can be called (too) early we load from a cached list in those cases
 		// this cache is updated each time the template settings are saved/updated
 		if ( ! did_action( 'wpo_wcpdf_init_documents' ) && ( $cached_template_list = $this->get_template_list_cache() ) ) {
@@ -674,14 +848,22 @@ class Settings {
 		return $installed_templates;
 	}
 
-	public function get_template_list_cache() {
-		$template_list = get_option( 'wpo_wcpdf_installed_template_paths', array() );
+	/**
+	 * Get template list cache and check if folders still exist, if not try to update the paths (e.g. after migration or restore).
+	 *
+	 * @return array
+	 */
+	public function get_template_list_cache(): array {
+		$template_list        = get_option( 'wpo_wcpdf_installed_template_paths', array() );
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+		
 		if ( ! empty( $template_list ) ) {
 			$checked_list = array();
-			$outdated = false;
+			$outdated     = false;
+			
 			// cache could be outdated, so we check whether the folders exist
 			foreach ( $template_list as $path => $template_id ) {
-				if ( WPO_WCPDF()->file_system->is_dir( $path ) ) {
+				if ( $file_system_instance->is_dir( $path ) ) {
 					$checked_list[$path] = $template_id; // folder exists
 					continue;
 				}
@@ -692,8 +874,9 @@ class Settings {
 				if ( ! empty( $path ) && false !== strpos( $path, $wp_content_folder ) && defined( WP_CONTENT_DIR ) ) {
 					// try wp-content
 					$relative_path = substr( $path, strrpos( $path, $wp_content_folder ) + strlen( $wp_content_folder ) );
-					$new_path = WP_CONTENT_DIR . $relative_path;
-					if ( WPO_WCPDF()->file_system->is_dir( $new_path ) ) {
+					$new_path      = WP_CONTENT_DIR . $relative_path;
+					
+					if ( $file_system_instance->is_dir( $new_path ) ) {
 						$checked_list[$new_path] = $template_id;
 					}
 				}
@@ -711,36 +894,81 @@ class Settings {
 		}
 	}
 
-	public function set_template_list_cache( $template_list ) {
+	/**
+	 * Set template list cache.
+	 *
+	 * @param array $template_list
+	 * @return void
+	 */
+	public function set_template_list_cache( array $template_list ): void {
 		$this->template_list_cache = $template_list;
 		update_option( 'wpo_wcpdf_installed_template_paths', $template_list );
 	}
 
-	public function delete_template_list_cache() {
+	/**
+	 * Delete template list cache.
+	 *
+	 * @return void
+	 */
+	public function delete_template_list_cache(): void {
 		delete_option( 'wpo_wcpdf_installed_template_paths' );
 	}
 
-	public function general_settings_updated( $old_settings, $settings, $option ) {
-		if ( is_array( $settings ) && ! empty ( $settings['template_path'] ) ) {
+	/**
+	 * Callback for when general settings are updated, to check if we need to update the template list cache.
+	 *
+	 * @param array $old_settings
+	 * @param array $settings
+	 * @param string $option
+	 * @return void
+	 */
+	public function general_settings_updated( array $old_settings, array $settings, string $option ): void {
+		if ( ! empty ( $settings['template_path'] ) ) {
 			$this->delete_template_list_cache();
 			$this->set_template_list_cache( $this->get_installed_templates() );
 		}
 	}
 
-	public function debug_settings_updated( $old_settings, $settings, $option ) {
-		if ( is_array( $settings ) && is_array( $old_settings ) && empty( $old_settings['pretty_document_links'] ) && ! empty ( $settings['pretty_document_links'] ) ) {
-			set_transient( 'wpo_wcpdf_flush_rewrite_rules', 'yes', HOUR_IN_SECONDS );
+	/**
+	 * Callback for when debug settings are updated, to mark rewrite rules for flushing.
+	 *
+	 * @param array  $old_settings
+	 * @param array  $settings
+	 * @param string $option
+	 * @return void
+	 */
+	public function debug_settings_updated( array $old_settings, array $settings, string $option ): void {
+		$old_pretty_links = ! empty( $old_settings['pretty_document_links'] );
+		$new_pretty_links = ! empty( $settings['pretty_document_links'] );
+
+		if ( $old_pretty_links === $new_pretty_links ) {
+			return;
 		}
+
+		set_transient( 'wpo_wcpdf_flush_rewrite_rules', true, MINUTE_IN_SECONDS );
 	}
 
-	public function maybe_delete_flush_rewrite_rules_transient() {
-		if ( get_transient( 'wpo_wcpdf_flush_rewrite_rules' ) ) {
-			flush_rewrite_rules();
-			delete_transient( 'wpo_wcpdf_flush_rewrite_rules' );
+	/**
+	 * Flush rewrite rules when requested by transient, then remove the transient.
+	 *
+	 * @return void
+	 */
+	public function maybe_delete_flush_rewrite_rules_transient(): void {
+		if ( ! get_transient( 'wpo_wcpdf_flush_rewrite_rules' ) ) {
+			return;
 		}
+
+		flush_rewrite_rules();
+		delete_transient( 'wpo_wcpdf_flush_rewrite_rules' );
 	}
 
-	public function get_relative_template_path( $absolute_path ) {
+	/**
+	 * Get relative template path from absolute path, to be used as template ID in settings.
+	 *
+	 * @param string $absolute_path
+	 * @return string
+	 */
+	public function get_relative_template_path( string $absolute_path ): string {
 		if ( empty( $absolute_path ) ) {
 			return '';
 		}
@@ -754,20 +982,32 @@ class Settings {
 		return str_replace( $base_path, '', wp_normalize_path( $absolute_path ) );
 	}
 
-	public function maybe_migrate_template_paths( $settings_section = null, $nonce = null ) {
+	/**
+	 * Migrate template paths in settings if they don't match any installed template but we can find a match by path or name.
+	 *
+	 * @param string|null $settings_section
+	 * @param string|null $nonce
+	 * @return void
+	 */
+	public function maybe_migrate_template_paths( ?string $settings_section = null, ?string $nonce = null ): void {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
 
-		// bail if no template is selected yet (fresh install)
-		if ( empty( $this->general_settings['template_path'] ) ) {
+		// Read loaded settings to skip template discovery when no template is selected yet.
+		$general_settings = $this->get_settings( 'general' );
+
+		if ( empty( $general_settings['template_path'] ) ) {
 			return;
 		}
 
 		$installed_templates = $this->get_installed_templates( true );
-		$selected_template = wp_normalize_path( $this->general_settings['template_path'] );
-		$template_match = '';
-		if ( ! in_array( $selected_template, $installed_templates ) && substr_count( $selected_template, '/' ) > 1 ) {
+		// Read loaded settings again because discovery filters may have changed them.
+		// This does not reload options from the database and preserves callback updates when saving.
+		$general_settings    = $this->get_settings( 'general' );
+		$selected_template   = wp_normalize_path( $general_settings['template_path'] );
+		$template_match      = '';
+		if ( ! in_array( $selected_template, $installed_templates, true ) && substr_count( $selected_template, '/' ) > 1 ) {
 			// search for path match
 			foreach ( $installed_templates as $path => $template_id ) {
 				$path = wp_normalize_path( $path );
@@ -789,15 +1029,22 @@ class Settings {
 
 			// migrate setting if we have a match
 			if ( ! empty( $template_match ) ) {
-				$this->general_settings['template_path'] = $template_match;
-				update_option( 'wpo_wcpdf_settings_general', $this->general_settings );
+				$general_settings['template_path'] = $template_match;
+				// Synchronize loaded settings before option update callbacks run.
+				$this->general_settings = $general_settings;
+				update_option( 'wpo_wcpdf_settings_general', $general_settings );
 				/* translators: 1. path, 2. template ID */
 				wcpdf_log_error( sprintf( 'Template setting migrated from %1$s to %2$s', $path, $template_id ), 'info' );
 			}
 		}
 	}
 
-	public function set_number_store() {
+	/**
+	 * AJAX callback to set the next number for a document type store.
+	 *
+	 * @return void
+	 */
+	public function set_number_store(): void {
 		$store = ! empty( $_POST['store'] ) ? sanitize_text_field( wp_unslash( $_POST['store'] ) ) : '';
 
 		check_ajax_referer( "wpo_wcpdf_next_{$store}", 'security' );
@@ -817,9 +1064,15 @@ class Settings {
 		die();
 	}
 
-	public function get_sequential_number_store_method() {
+	/**
+	 * Get the method to use for sequential number store, based on debug settings and database configuration.
+	 *
+	 * @return string
+	 */
+	public function get_sequential_number_store_method(): string {
 		global $wpdb;
-		$method = isset( $this->debug_settings['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
+		
+		$method = isset( $this->get_settings( 'debug' )['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
 
 		// safety first - always use calculate when auto_increment_increment is not 1
 		$row = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -833,7 +1086,12 @@ class Settings {
 		return $method;
 	}
 
-	public function schedule_yearly_reset_numbers() {
+	/**
+	 * Schedule the yearly reset of document numbers, with a single action in Action Scheduler and a semaphore lock to avoid concurrency issues.
+	 *
+	 * @return void
+	 */
+	public function schedule_yearly_reset_numbers(): void {
 		if ( ! $this->maybe_schedule_yearly_reset_numbers() ) {
 			return;
 		}
@@ -906,7 +1164,12 @@ class Settings {
 		}
 	}
 
-	public function yearly_reset_numbers() {
+	/**
+	 * Yearly reset of document numbers, triggered by Action Scheduler, with a semaphore lock to avoid concurrency issues.
+	 *
+	 * @return void
+	 */
+	public function yearly_reset_numbers(): void {
 		$semaphore = new Semaphore( 'yearly_reset_numbers' );
 
 		if ( $semaphore->lock() ) {
@@ -915,7 +1178,7 @@ class Settings {
 
 			try {
 				// reset numbers
-				$documents     = WPO_WCPDF()->documents->get_documents( 'all' );
+				$documents     = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 				$number_stores = array();
 				foreach ( $documents as $document ) {
 					if ( is_callable( array( $document, 'get_sequential_number_store' ) ) ) {
@@ -957,10 +1220,15 @@ class Settings {
 		$this->schedule_yearly_reset_numbers();
 	}
 
-	public function maybe_schedule_yearly_reset_numbers() {
+	/**
+	 * Check if we need to schedule the yearly reset of document numbers, by checking if any document has the yearly reset enabled, and unschedule if not.
+	 *
+	 * @return bool
+	 */
+	public function maybe_schedule_yearly_reset_numbers(): bool {
 		$schedule = false;
 
-		foreach ( WPO_WCPDF()->documents->get_documents( 'all' ) as $document ) {
+		foreach ( WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' ) as $document ) {
 			if ( isset( $document->settings['reset_number_yearly'] ) ) {
 				$schedule = true;
 				break;
@@ -979,7 +1247,12 @@ class Settings {
 		return $schedule;
 	}
 
-	public function yearly_reset_action_is_scheduled() {
+	/**
+	 * Check if the yearly reset of document numbers is scheduled, by checking if there is a pending action in Action Scheduler.
+	 *
+	 * @return bool
+	 */
+	public function yearly_reset_action_is_scheduled(): bool {
 		$is_scheduled = false;
 
 		if ( ! function_exists( '\\as_get_scheduled_actions' ) ) {
@@ -1009,7 +1282,12 @@ class Settings {
 		return $is_scheduled;
 	}
 
-	public function get_media_upload_setting_html() {
+	/**
+	 * AJAX callback to get the media upload setting field HTML.
+	 *
+	 * @return void
+	 */
+	public function get_media_upload_setting_html(): void {
 		check_ajax_referer( 'wpo_wcpdf_get_media_upload_setting_html', 'security' );
 
 		$request = stripslashes_deep( $_POST );
@@ -1029,13 +1307,22 @@ class Settings {
 
 		// get settings HTML
 		ob_start();
-		$this->callbacks->media_upload( $args );
+		$this->get_instance( 'callbacks' )->media_upload( $args );
 		$html = ob_get_clean();
 
-		return wp_send_json_success( $html );
+		wp_send_json_success( $html );
 	}
 
-	public function move_setting_after_id( $settings, $insert_settings, $after_setting_id ) {
+	/**
+	 * Move settings fields after a specific setting ID, and replace the section if needed.
+	 *
+	 * @param array $settings
+	 * @param array $insert_settings
+	 * @param string $after_setting_id
+	 *
+	 * @return array
+	 */
+	public function move_setting_after_id( array $settings, array $insert_settings, string $after_setting_id ): array {
 		$pos = 1; // this is already +1 to insert after the actual pos
 		foreach ( $settings as $setting ) {
 			if ( isset( $setting['id'] ) && $setting['id'] == $after_setting_id ) {
@@ -1074,7 +1361,7 @@ class Settings {
 	 * @return void
 	 */
 	public function update_documents_settings_categories(): void {
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+		$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 
 		foreach ( $documents as $document ) {
 			foreach ( $document->output_formats as $output_format ) {
@@ -1091,7 +1378,6 @@ class Settings {
 	 * Apply categories to documents settings fields.
 	 *
 	 * @param array  $settings_fields
-	 *
 	 * @return array
 	 */
 	public function apply_document_settings_categories( array $settings_fields ): array {
@@ -1124,10 +1410,9 @@ class Settings {
 	 * @param string $option_group
 	 * @param string $option_name
 	 * @param SettingsGeneral $general_settings
-	 *
 	 * @return array
 	 */
-	public function update_general_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name, \WPO\IPS\Settings\SettingsGeneral $general_settings ): array {
+	public function update_general_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name, SettingsGeneral $general_settings ): array {
 		$settings_categories = is_callable( array( $general_settings, 'get_settings_categories' ) )
 			? $general_settings->get_settings_categories()
 			: array();
@@ -1146,12 +1431,11 @@ class Settings {
 	 * @param string $page
 	 * @param string $option_group
 	 * @param string $option_name
-	 *
 	 * @return array
 	 */
 	public function update_debug_settings_categories( array $settings_fields, string $page, string $option_group, string $option_name ): array {
-		$settings_categories = is_callable( array( $this->debug, 'get_settings_categories' ) )
-			? $this->debug->get_settings_categories()
+		$settings_categories = is_callable( array( $this->get_instance( 'debug' ), 'get_settings_categories' ) )
+			? $this->get_instance( 'debug' )->get_settings_categories()
 			: array();
 
 		if ( empty( $settings_categories ) ) {
@@ -1166,7 +1450,6 @@ class Settings {
 	 *
 	 * @param array $settings_fields
 	 * @param array $settings_categories
-	 *
 	 * @return array
 	 */
 	public function apply_setting_categories( array $settings_fields, array $settings_categories ): array {
@@ -1194,11 +1477,19 @@ class Settings {
 
 		// Update settings fields.
 		foreach ( $settings_categories as $category_name => $category_details ) {
+			$category_title = isset( $category_details['title'] ) && is_string( $category_details['title'] )
+				? $category_details['title']
+				: '';
+
+			$category_members = isset( $category_details['members'] ) && is_array( $category_details['members'] )
+				? $category_details['members']
+				: array();
+
 			// Add section for each category.
-			$modified_settings_fields[] = $this->create_section( $category_name, $category_details['title'] );
+			$modified_settings_fields[] = $this->create_section( $category_name, $category_title );
 
 			// Add settings fields based on the order in the members array.
-			foreach ( $category_details['members'] as $member ) {
+			foreach ( $category_members as $member ) {
 				if ( isset( $settings_lookup[ $member ] ) ) {
 					$key = $settings_lookup[ $member ];
 
@@ -1238,14 +1529,53 @@ class Settings {
 	}
 
 	/**
+	 * Get the currently loaded settings for a type.
+	 *
+	 * @param string $type Settings type: general, debug, or edi.
+	 * @return array
+	 * @throws \InvalidArgumentException When the settings type is unknown.
+	 */
+	public function get_settings( string $type ): array {
+		return match ( $type ) {
+			'general' => $this->general_settings,
+			'debug'   => $this->debug_settings,
+			'edi'     => $this->edi_settings,
+			default   => throw new \InvalidArgumentException(
+				sprintf( 'Unknown settings type: %s', $type )
+			),
+		};
+	}
+
+	/**
+	 * Initializes settings by loading them from the database.
+	 *
+	 * @param bool $force_reload Force reload settings.
+	 * @return void
+	 */
+	public function load_settings( bool $force_reload = false ): void {
+		if ( $this->settings_loaded && ! $force_reload ) {
+			return;
+		}
+
+		$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
+		$debug_settings   = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$edi_settings     = get_option( 'wpo_ips_edi_settings', array() );
+
+		$this->general_settings = is_array( $general_settings ) ? $general_settings : array();
+		$this->debug_settings   = is_array( $debug_settings )   ? $debug_settings   : array();
+		$this->edi_settings     = is_array( $edi_settings )     ? $edi_settings     : array();
+
+		$this->settings_loaded = true;
+	}
+
+	/**
 	 * Creates a section array for settings fields.
 	 *
 	 * @param string $category_name The ID of the category.
 	 * @param string $category_title The title of the section.
-	 *
 	 * @return array The section configuration array.
 	 */
-	private function create_section( string $category_name, string $category_title ): array {
+	public function create_section( string $category_name, string $category_title ): array {
 		return array(
 			'type'     => 'section',
 			'id'       => $category_name,
@@ -1265,7 +1595,6 @@ class Settings {
 	 * @param string   $new_setting_id      The new setting ID to add to the specified category.
 	 * @param string   $category_name       Name of the category to which the settings will be added.
 	 * @param int|null $position            Optional. The position at which to insert the new settings (starts from 1). Defaults to appending at the end.
-	 *
 	 * @return array
 	 */
 	public function add_single_setting_field_to_category( array $settings_categories, string $new_setting_id, string $category_name, ?int $position = null ): array {
@@ -1279,7 +1608,6 @@ class Settings {
 	 * @param array    $new_setting_ids     Array of new setting IDs to add to the specified category.
 	 * @param string   $category_name       Name of the category to which the settings will be added.
 	 * @param int|null $position            Optional. The position at which to insert the new settings (starts from 1). Defaults to appending at the end.
-	 *
 	 * @return array
 	 */
 	public function add_multiple_setting_fields_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
@@ -1293,10 +1621,9 @@ class Settings {
 	 * @param array    $new_setting_ids     Array of new setting IDs to add to the specified category.
 	 * @param string   $category_name       Name of the category to which the settings will be added.
 	 * @param int|null $position            Optional. The position at which to insert the new settings (1-based index). Defaults to appending at the end.
-	 *
 	 * @return array
 	 */
-	private function add_setting_field_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
+	public function add_setting_field_to_category( array $settings_categories, array $new_setting_ids, string $category_name, ?int $position = null ): array {
 		if ( ! isset( $settings_categories[ $category_name ] ) ) {
 			return $settings_categories;
 		}
@@ -1318,7 +1645,6 @@ class Settings {
 	 * @param array  $settings_categories Array of settings categories where the setting name is searched.
 	 * @param string $category            Name of the category to search in.
 	 * @param string $setting_name        Name of the setting to find in the settings array.
-	 *
 	 * @return int Position of the setting (1-based index) if found; otherwise, returns 0.
 	 */
 	public function get_setting_position( array $settings_categories, string $category, string $setting_name ): int {
@@ -1338,7 +1664,6 @@ class Settings {
 	 * @param string $category_name
 	 * @param string $title
 	 * @param array  $members
-	 *
 	 * @return array
 	 */
 	public function add_settings_category( array $settings_categories, string $category_name, string $title, array $members ): array {
@@ -1408,6 +1733,45 @@ class Settings {
 		}
 
 		wp_send_json_success( array( 'value' => $value ) );
+	}
+
+	/**
+	 * Get search index for settings fields of a specific settings page.
+	 *
+	 * @param string $page The settings page key.
+	 * @return array
+	 */
+	public function get_search_index( string $page ): array {
+		global $wp_settings_fields, $wp_settings_sections;
+
+		$index = array();
+
+		if ( empty( $wp_settings_fields[ $page ] ) ) {
+			return $index;
+		}
+
+		foreach ( $wp_settings_fields[ $page ] as $section_id => $fields ) {
+			$section_title = isset( $wp_settings_sections[ $page ][ $section_id ]['title'] )
+				? wp_strip_all_tags( $wp_settings_sections[ $page ][ $section_id ]['title'] )
+				: '';
+
+			foreach ( $fields as $field_id => $field ) {
+				$title = wp_strip_all_tags( $field['title'] );
+
+				if ( empty( trim( $title ) ) ) {
+					continue;
+				}
+
+				$index[] = array(
+					'id'       => $field_id,
+					'label'    => $title,
+					'section'  => $section_title,
+					'category' => $section_id,
+				);
+			}
+		}
+
+		return $index;
 	}
 
 }

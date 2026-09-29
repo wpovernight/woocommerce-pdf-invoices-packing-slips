@@ -7,17 +7,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! class_exists( '\\WPO\\IPS\\Documents\\SequentialNumberStore' ) ) :
 
-/**
- * Class handling database interaction for sequential numbers
- */
-
 class SequentialNumberStore {
 
-	private \wpdb  $wpdb;
+	private ?\wpdb  $wpdb      = null;
 	public string $store_name;
 	public string $method;
 	public string $table_name;
-	public bool   $is_new = false;
+	public bool   $is_new      = false;
 
 	/**
 	 * Constructor

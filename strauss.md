@@ -88,17 +88,27 @@ Ensure your `composer.json` is configured correctly for Strauss. Below is an exa
 {
 	"name": "wpovernight/woocommerce-pdf-invoices-packing-slips",
 	"description": "PDF Invoices & Packing Slips for WooCommerce",
+	"license": "GPL-2.0-or-later",
+	"authors": [
+		{
+			"name": "WP Overnight",
+			"email": "support@wpovernight.com",
+			"homepage": "https://wpovernight.com"
+		}
+	],
 	"autoload": {
 		"psr-4": {
 			"WPO\\IPS\\": "includes/",
-			"WPO\\IPS\\UBL\\": "ubl/"
+			"WPO\\IPS\\EDI\\": "edi/"
 		}
 	},
 	"require": {
+		"php": "^8.1",
 		"dompdf/dompdf": "^3.1",
 		"symfony/polyfill-mbstring": "^1.31",
 		"symfony/polyfill-iconv": "^1.31",
-		"sabre/xml": "^4.0"
+		"sabre/xml": "^4.0",
+		"sabberworm/php-css-parser": "^8.9"
 	},
 	"extra": {
 		"strauss": {
@@ -138,7 +148,10 @@ Ensure your `composer.json` is configured correctly for Strauss. Below is an exa
 				}
 			},
 			"exclude_from_copy": {
-				"packages": [],
+				"packages": [
+					"symfony/polyfill-mbstring",
+					"symfony/polyfill-iconv"
+				],
 				"namespaces": [],
 				"file_patterns": [
 					"/^psr.*$/"
@@ -158,7 +171,9 @@ Ensure your `composer.json` is configured correctly for Strauss. Below is an exa
 		}
 	},
 	"config": {
-		"platform-check": false
+		"platform": {
+			"php": "8.1"
+		}
 	}
 }
 ```

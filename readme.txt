@@ -2,26 +2,27 @@
 Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, mohamadntr
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
-Requires at least: 4.4
-Tested up to: 6.8
-Requires PHP: 7.4
-Stable tag: 4.9.0-beta.1
+Requires at least: 5.3
+Tested up to: 7.0
+Requires PHP: 8.1
+Stable tag: 6.0.0-beta.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Create, print & automatically email PDF or UBL Invoices & PDF Packing Slips for WooCommerce orders.
+Create, print & automatically email PDF or XML Invoices & PDF Packing Slips for WooCommerce orders.
 
 == Description ==
 
-This WooCommerce extension automatically adds a PDF or UBL invoice to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
+This WooCommerce extension automatically adds a PDF or XML invoice (e-invoicing) to the order confirmation emails sent out to your customers. Includes a basic template (additional templates are available from [WP Overnight](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)) as well as the possibility to modify/create your own templates. In addition, you can choose to download or print invoices and packing slips from the WooCommerce order admin.
 
 = Main features =
-- Automatically attach invoice PDF or UBL to WooCommerce emails of your choice
-- Download the PDF or UBL Invoice / PDF Packing Slip from the order admin page
+- Automatically attach invoice PDF or XML to WooCommerce emails of your choice
+- Download the PDF or XML Invoice / PDF Packing Slip from the order admin page
+- Choose from a range of e‑document formats: UBL 2.1, Peppol BIS 3.0, CII D16B, Factur‑X 1.0, ZUGFeRD 1.0, and ZUGFeRD 2.0.
 - Generate PDF invoices / packing slips in bulk
 - **Fully customizable** HTML/CSS invoice templates
 - Download invoices from the My Account page
-- Sequential invoice numbers - with custom formatting
+- Sequential invoice numbers
 - **Available in:** Czech, Dutch, English, Finnish, French, German, Hungarian, Italian, Japanese (see FAQ for adding custom fonts!), Norwegian, Portuguese, Polish, Romanian, Russian, Slovak, Slovenian, Spanish, Swedish & Ukrainian
 
 = Free extensions =
@@ -35,9 +36,11 @@ The following free extensions are available to add additional features to the pl
 = Premium extensions =
 In addition to this, we offer several premium extensions:
 
-- Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox & more with [PDF Invoices & Packing Slips for WooCommerce Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
-- Automatically send new orders or packing slips to your printer as soon as the customer orders! [WooCommerce Automatic Order Printing](https://www.simbahosting.co.uk/s3/product/woocommerce-printnode-automatic-order-printing/?affiliates=2) (from our partners at Simba Hosting)
+- Create/email PDF Proforma Invoices, Credit Notes (for Refunds), email Packing Slips, automatic upload to Dropbox, Google Drive & more with [PDF Invoices & Packing Slips for WooCommerce Professional](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-professional/)
 - Get the complete feature set, including **Professional**, **Premium Templates**, and additional features with the [WooCommerce PDF Invoices & Packing Slips Plus Bundle](https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/)
+- Add Peppol network delivery for WooCommerce invoices and credit notes right inside your invoicing workflow. [eDocuments for WooCommerce: Peppol](https://wpovernight.com/downloads/woocommerce-edocuments-peppol/)
+- Automatically send new orders or packing slips to your printer as soon as the customer orders! [WooCommerce Automatic Order Printing (PrintNode)](https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode/)
+- Enable EU VAT number collection, automatic validation and reverse-charge logic right in your WooCommerce store. [WooCommerce European (EU/UK/Norway/Switzerland) VAT Compliance](https://wpovernight.com/downloads/woocommerce-eu-vat-compliance/)
 
 = Fully customizable =
 In addition to a number of default settings (including a custom header/logo) and several layout fields that you can use out of the box, the plugin contains HTML/CSS-based templates that allow for customization & full control over the PDF output. Copy the templates to your theme folder and you don't have to worry that your customizations will be overwritten when you update the plugin.
@@ -51,7 +54,7 @@ In addition to a number of default settings (including a custom header/logo) and
 
 = Minimum Requirements =
 
-* WooCommerce 3.3 or later
+* WooCommerce 4.0 or later
 * WordPress 4.4 or later
 
 = Automatic installation =
@@ -106,6 +109,235 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.16.3 (2026-09-22) =
+- Fix: Use V5 admin accessor in backported security fix
+- Translations: Updated translation template (POT)
+
+= 5.16.2 (2026-09-22) =
+- Fix: Inconsistent billing name/company output handling
+- Fix: Refund AJAX order permission checks
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 11.1
+
+= 5.16.1 (2026-08-21) =
+- Fix: Add seller identification for category O invoices in EDI
+- Fix: Selector for checked checkboxes in order script
+- Fix: Disabled Composer runtime platform check
+- Translations: Updated translation template (POT)
+
+= 5.16.0 (2026-08-17) =
+- New: Add logging for automatic Peppol Endpoint ID derivation
+- New: Add version 6 upgrade readiness notice
+- New: Update DOMPDF to version 3.1.6
+- New: Include settings sections in search results, making related options easier to find
+- Fix: Peppol Endpoint derivation with EU VAT for WooCommerce
+- Fix: CII seller party generation when VAT number is missing
+- Fix: EDI VAT identifiers for category O invoices
+- Fix: EDI line totals for high-quantity items
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 11.0
+- Tested: Tested up WordPress 7.1
+
+= 5.15.2 (2026-07-13) =
+- Fix: UBL Supplier `PartyLegalEntity` to omit empty values
+- Fix: Deprecated emoji styles callback in setup wizard
+- Fix: Add CII supplier registration number support
+- Fix: Relax the type hint to prevent a fatal error in `Main::apply_template_color_styles()`
+- Translations: Updated translation template (POT)
+
+= 5.15.1 (2026-07-08) =
+- Fix: Empty UBL `IssueDate` when document date meta is missing
+- Fix: EDI total reconciliation with emitted line amounts
+- Fix: Make cancelled/failed order email labels distinct between admin and customer
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.9
+
+= 5.15.0 (2026-06-29) =
+- New: Add global template color setting
+- New: Add BIC support to UBL payment means
+- New: Improve Peppol endpoint derivation from VAT numbers
+- Fix: Normalize UBL/Peppol Credit Note signs
+- Fix: Validate order access before generating shortcode links
+- Fix: Automatic “Mark as printed” options
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.9
+
+= 5.14.0 (2026-06-08) =
+- New: Add partial invoice number search setting
+- Fix: Empty order item prices when WooCommerce subtotal is filtered
+- Fix: Prevent fatal when REST invoice number lookup returns bulk document
+- Fix: Document number display setting not respected in preview
+- Fix: Bulk Document: “Mark as printed” not applied to all orders in bulk export
+- Translations: Updated translation template (POT)
+
+= 5.13.0 (2026-06-01) =
+- New: Add email attachment success/failure logging to order notes
+- New: Add WC EU VAT Number plugin support
+- Fix: XML action button color in order meta box
+- Fix: Include account number in EDI payment means data
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.8
+
+= 5.12.2 (2026-05-25) =
+- Fix: UBL payable amount for unpaid renewal orders
+- Fix: Order selection and XML behavior in document preview
+- Fix: Fatal error when locale value is missing
+- Fix: EDI price rounding for discounted multi-quantity lines
+- Translations: Updated translation template (POT)
+
+= 5.12.1 (2026-05-18) =
+- Tweak: Normalize VAT numbers for EDI output
+- Fix: Preview document selection panel can't be closed
+- Translations: Updated translation template (POT)
+
+= 5.12.0 (2026-05-11) =
+- New: Add PHP 8.1 upgrade notice for version 6
+- Tweak: Remove "PDF" prefix from document title in order meta box
+- Translations: Updated translation template (POT)
+
+= 5.11.0 (2026-05-05) =
+- New: My Account display helper to order documents
+- Fix: EDI delivery date serialization
+- Fix: Show supplier bank account setting for single BACS account
+- Translations: Updated translation template (POT)
+
+= 5.10.0 (2026-05-04) =
+- New: Add support for subtotal tax rounding in UBL line prices
+- New: Add search settings feature
+- Tweak: Improve EDI supplier bank details handling across formats
+- Fix: Peppol settings visibility when switching formats
+- Fix: Escaping context in PDF templates
+- Fix: CII invoice XML for discounted and free lines
+- Fix: Error on calling `woocommerce_register_additional_checkout_field()` on older Woo versions
+- Fix: Handling of zero product/VAT categories in EN16931 UBL output
+- Fix: Fatal error during Peppol checkout field initialization
+- Translations: Updated translation template (POT)
+
+= 5.9.2 (2026-03-31) =
+- New: Added Composer installation support
+- Tested: Compatibility confirmed with WooCommerce 10.7
+
+= 5.9.1 (2026-03-26) =
+- Fix: Corrected Peppol Endpoint ID field location setting not being applied due to wrong key
+- Fix: Allow resetting Checkout Script Loading setting back to Automatic detection
+
+= 5.9.0 (2026-03-23) =
+- New: Introduced filter to allow modification of document number placeholder values
+- New: Bump Dompdf dependency to version 3.1.5
+- New: Add filter to override classic checkout detection for shortcodes or page builders
+- New: Add support for `_billing_btw_nummer` VAT meta key
+- New: Added warning in order sidebar E-Documents meta box when Tax Classification is not configured
+- New: Allow manual status check when EDI Peppol document dispatch status gets stuck
+- Tweak: Refine preview canvas shadow styling and adjust margin
+- Tweak: Improve DB error logging to include failing query and prevent misleading duplicate context logs
+- Tweak: Remove supplier legal identifier ID from backend settings and XML generation
+- Fix: Fatal error when settings category title is `null`
+- Fix: Plugin check errors and warnings with code improvements and PHPCS adjustments
+- Fix: Remove unnecessary unserialization and harden document settings handling
+- Fix: Namespaced call to `woocommerce_register_additional_checkout_field()`
+- Translations: Updated translation template (POT)
+- Tested: Tested up WordPress 7.0
+
+= 5.8.1 (2026-03-02) =
+- Fix: PHP 7.4 parse error caused by `sabberworm/php-css-parser` dependency update
+
+= 5.8.0 (2026-03-02) =
+- New: Automatically derive the Peppol Endpoint ID from the VAT number during checkout and order creation (Belgium supported)
+- New: Add unified supplier data filter for CII and UBL and extend Dokan compatibility
+- New: Always display VAT number in Order customer identifiers section
+- New: Add `wpo_ips_edi_due_date_days` filter to customize EDI due date days
+- Tweak: Improve description of extra template fields to clarify HTML formatting limitations
+- Fix: Ensure "Treat as VAT number" setting is saved correctly
+- Fix: Copy Peppol meta data and custom VAT field to WooCommerce Subscriptions renewal orders
+- Fix: Incorrect VAT breakdown causing CII EN16931 validation failure
+- Fix: Revert line net amount alignment change for UBL and CII
+- Dev: Update Composer dependencies and add `thecodingmachine/safe` library
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.6
+
+= 5.7.0 (2026-02-09) =
+- New: Add filter to override EDI action button HTML
+- New: Add cheque payment method support to E-Documents
+- Tweak: Align line net amount with unit price times quantity for UBL and CII
+- Fix: Authorization when saving Peppol identifiers via AJAX
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.5
+
+= 5.6.0 (2026-01-21) =
+- New: Introduce filters to customize E-Documents zero-tax category
+- Fix: UBL credit note validation failure caused by negative unit price
+- Fix: Fatal checkout validation error triggered during Peppol processing
+- Translations: Updated translation template (POT)
+
+= 5.5.0 (2026-01-19) =
+- New: Add reference to Peppol extension in readme
+- New: Added configurable custom field to checkout
+- New: Peppol Checkout Field improvements
+- Tweak: Normalize Shop VAT and CoC settings to avoid invalid formatted values
+- Fix: UBL Tax total rounding issues
+- Fix: UBL tax grouping and monetary totals consistency
+- Fix: XML preview overflowing horizontally when PDF is embedded
+- Fix: Hide XML bulk actions when E-Documents feature is disabled
+- Fix: Hide XML preview button for unsupported document types
+- Fix: Prevent extra output in individual XML invoice downloads
+- Fix: Item price allowance rounding in UBL and CII
+- Fix: Backend saving of Peppol Endpoint ID for guest orders
+- Translations: Updated translation template (POT)
+
+= 5.4.0 (2025-12-24) =
+- New: Added Peppol Network cross-sell to E-Documents Network settings
+- Translations: Updated translation template (POT)
+
+= 5.3.1 (2025-12-23) =
+- Fix: Ensure Peppol Endpoint ID is saved on checkout, including guest orders
+- Translations: Updated translation template (POT)
+
+= 5.3.0 (2025-12-22) =
+- New: Advanced Status tool to generate and download a complete plugin report for support purposes
+- Tweak: Hide Legal Identifier from My Account Peppol page and order E-Docs meta box
+- Fix: Make UBL `PartyLegalEntity` `CompanyID` optional for buyer and supplier
+- Fix: Fatal error on checkout when checkout fields data is invalid
+- Translations: Updated translation template (POT)
+
+= 5.2.0 (2025-12-09) =
+- New: Added WooCommerce and WordPress minimum version requirements to the system requirements table
+- New: Introduced an ink-saving mode option for the Simple template
+- New: Added support for the VAT Number meta key from the WooCommerce EU VAT & B2B plugin
+- Tweak: Validate `template_path` against installed templates list in `load_template_functions()`
+- Tweak: Moved description output before custom field rendering in the settings `select()` callback
+- Fix: Remove XML documents from settings export (no longer supported)
+- Fix: Updated documentation link in the E-Documents Tax Classification page
+- Fix: Prevented fatal error during checkout validation when hook arguments are invalid
+- Fix: Resolved fatal error caused by an invalid option type when loading debug settings
+- Fix: Added fallback for `wc_string_to_bool()` in `unstable_option_announcement_notice()` to prevent a fatal error when WooCommerce is inactive
+- Fix: Header logo not displaying when using remote image URLs
+- Translations: Updated translation template (POT)
+
+= 5.1.0 (2025-11-25) =
+- New: Add setting to validate customer Peppol Endpoint ID during checkout
+- Fix: Ensure Buyer VAT identifier includes country prefix in E-Documents
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 10.4
+
+= 5.0.0 (2025-11-24) =
+- New: Refactored E‑Documents Architecture for better EN16931 Compliance and Multi‑Format Support
+- New: Document filter functions replaced by new global functions
+- Tweak: Enhanced notice displayed when documents are unavailable in the preview
+- Tweak: Ensure script compatibility with WooCommerce 10.3
+- Fix: Extended currency symbol support in Bulk Actions
+- Fix: Harden debug tools AJAX handlers with capability checks and validation
+- Translations: Updated translation template (POT)
+- Tested: Tested up WordPress 6.9
+
+= 4.9.1 (2025-11-06) =
+- Fix: Fatal error when Credit Note passes Order Refund to `wpo_ips_order_has_local_pickup_method()`
+
+= 4.9.0 (2025-11-03) =
+- New: Upgrade Dompdf to version 3.1.4
+- Tweak: Improve display of Shipping cost and location details in PDF totals
+- Fix: Extended currency symbols show in PDF but not in PDF Preview
+- Translations: Updated translation template (POT)
 
 = 4.8.0 (2025-10-21) =
 - New: Added notice for missing custom template files

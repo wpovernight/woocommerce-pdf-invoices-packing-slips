@@ -11,23 +11,16 @@ if ( ! class_exists( '\\WPO\\IPS\\FontSynchronizer' ) ) :
 
 class FontSynchronizer {
 
-	/**
-	 * Filename for the dompdf 'font cache'
-	 *
-	 * @var string
-	 */
 	public string $font_cache_filename = 'installed-fonts.json';
+	protected ?Dompdf $dompdf          = null;
+	protected static ?self $_instance  = null;
 
 	/**
-	 * Vanilla instance of dompdf
+	 * Get singleton instance
 	 *
-	 * @var Dompdf
+	 * @return self
 	 */
-	public Dompdf $dompdf;
-
-	protected static $_instance = null;
-
-	public static function instance() {
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -35,10 +28,16 @@ class FontSynchronizer {
 	}
 
 	/**
-	 * Constructor
+	 * Get dompdf instance
+	 *
+	 * @return Dompdf
 	 */
-	public function __construct() {
-		$this->dompdf = new Dompdf();
+	protected function get_dompdf_instance(): Dompdf {
+		if ( null === $this->dompdf ) {
+			$this->dompdf = new Dompdf();
+		}
+
+		return $this->dompdf;
 	}
 
 	/**
@@ -81,7 +80,7 @@ class FontSynchronizer {
 		// rebuild font cache file
 		$cacheData   = wp_json_encode( $local_fonts, JSON_PRETTY_PRINT );
 		// write file with merged cache data
-		WPO_WCPDF()->file_system->put_contents( $destination . $this->font_cache_filename, $cacheData, FS_CHMOD_FILE );
+		WPO_WCPDF()->get_instance( 'file_system' )->put_contents( $destination . $this->font_cache_filename, $cacheData, FS_CHMOD_FILE );
 	}
 
 	/**
@@ -103,7 +102,7 @@ class FontSynchronizer {
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
 
-				if ( WPO_WCPDF()->file_system->exists( $file ) ) {
+				if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $file ) ) {
 					wp_delete_file( $file );
 				} else {
 					wcpdf_log_error( sprintf( "Could not delete font file (%s)", $file ), 'critical' );
@@ -129,9 +128,9 @@ class FontSynchronizer {
 			foreach ( $extensions as $extension ) {
 				$file = $filename . $extension;
 
-				if ( WPO_WCPDF()->file_system->is_readable( $file ) ) {
+				if ( WPO_WCPDF()->get_instance( 'file_system' )->is_readable( $file ) ) {
 					$local_filename = $destination . basename( $file );
-					
+
 					if ( ! copy( $file, $local_filename ) ) {
 						wcpdf_log_error( sprintf( 'Failed to copy font file: %s to %s', $file, $local_filename ) );
 					}
@@ -154,15 +153,16 @@ class FontSynchronizer {
 	 */
 	public function get_local_fonts( string $path ): array {
 		// prepare variables used in the cache list
-		$fontDir           = $path;
-		$rootDir           = $this->dompdf->getOptions()->getRootDir();
-		$cache_file        = trailingslashit( $path ) . $this->font_cache_filename;
-		$legacy_cache_file = trailingslashit( $path ) . 'dompdf_font_family_cache.php'; // Dompdf <2.0
+		$fontDir              = $path;
+		$rootDir              = $this->get_dompdf_instance()->getOptions()->getRootDir();
+		$cache_file           = trailingslashit( $path ) . $this->font_cache_filename;
+		$legacy_cache_file    = trailingslashit( $path ) . 'dompdf_font_family_cache.php'; // Dompdf <2.0
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-		if ( WPO_WCPDF()->file_system->is_readable( $cache_file ) ) {
-			$json_data = WPO_WCPDF()->file_system->get_contents( $cache_file );
+		if ( $file_system_instance->is_readable( $cache_file ) ) {
+			$json_data = $file_system_instance->get_contents( $cache_file );
 			$font_data = json_decode( $json_data, true );
-		} elseif ( WPO_WCPDF()->file_system->is_readable( $legacy_cache_file ) ) {
+		} elseif ( $file_system_instance->is_readable( $legacy_cache_file ) ) {
 			$font_data = include $legacy_cache_file;
 			wp_delete_file( $legacy_cache_file );
 		} else {
@@ -188,7 +188,7 @@ class FontSynchronizer {
 	 * @return array
 	 */
 	public function get_dompdf_fonts(): array {
-		$fonts = $this->dompdf->getFontMetrics()->getFontFamilies();
+		$fonts = $this->get_dompdf_instance()->getFontMetrics()->getFontFamilies();
 		return $this->normalize_font_paths( $fonts );
 	}
 
@@ -245,6 +245,7 @@ class FontSynchronizer {
 
 		return $fonts;
 	}
+	
 }
 
 endif; // class_exists

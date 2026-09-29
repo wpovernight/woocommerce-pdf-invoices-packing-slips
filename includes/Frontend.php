@@ -9,92 +9,178 @@ if ( ! class_exists( '\\WPO\\IPS\\Frontend' ) ) :
 
 class Frontend {
 
-	protected static $_instance = null;
+	protected static ?self $_instance = null;
+	private bool $checkout_field_rest_cleanup = false;
 
-	public static function instance() {
+	/**
+	 * Get the singleton instance of this class.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
-	public function __construct()	{
-		add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_pdf_link' ), 999, 2 ); // needs to be triggered later because of Jetpack query string: https://github.com/Automattic/jetpack/blob/1a062c5388083c7f15b9a3e82e61fde838e83047/projects/plugins/jetpack/modules/woocommerce-analytics/classes/class-jetpack-woocommerce-analytics-my-account.php#L235
-		add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 ); // support for legacy WC REST API
-		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_pdf_link_on_new_tab' ), 999 );
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		// Shortcodes
 		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
 		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
+
+		// REST
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
+			add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
+		}
+
+		// Order actions.
+		if ( wpo_ips_is_account_page() || wpo_ips_is_order_received_page() ) {
+			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 );
+			add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
+		}
+
+		// Optional Checkout field (General Settings).
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+			add_action( 'wp_enqueue_scripts', array( $this, 'checkout_field_enqueue_visibility_script' ) );
+			// Blocks/store-api hooks
+			$this->checkout_field_display_checkout_block_field();
+			$this->checkout_field_set_checkout_block_field_value();
+
+			add_action( 'woocommerce_set_additional_field_value', array( $this, 'checkout_field_save_checkout_block_field' ), 10, 4 );
+			add_action( 'woocommerce_store_api_checkout_order_processed', array( $this, 'checkout_field_remove_order_checkout_block_field_meta' ), 10, 1 );
+
+			add_action( 'woocommerce_customer_loaded', array( $this, 'checkout_field_remove_customer_checkout_block_field_meta' ) );
+			add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'checkout_field_remove_session_checkout_block_field_meta' ) );
+			$this->checkout_field_remove_session_checkout_block_field_meta();
+
+			add_filter( 'rest_request_before_callbacks', array( $this, 'checkout_field_enable_rest_cleanup' ), 10, 3 );
+			add_filter( 'rest_request_after_callbacks', array( $this, 'checkout_field_disable_rest_cleanup' ) );
+		}
+
+		if ( wpo_ips_is_checkout_request() && \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+			// Classic checkout hooks
+			add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_display_classic_checkout_field' ), 10, 1 );
+			add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
+			add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
+			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
+		}
+
+		// My Account (Account details).
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_my_account_enabled() ) {
+			add_action( 'woocommerce_edit_account_form', array( $this, 'account_details_display_checkout_field' ), 20 );
+			add_filter( 'woocommerce_save_account_details_errors', array( $this, 'account_details_validate_checkout_field' ), 20, 2 );
+			add_action( 'woocommerce_save_account_details', array( $this, 'account_details_save_checkout_field' ), 20, 1 );
+		}
 	}
 
 	/**
-	 * Display Invoice download link on My Account page
+	 * Display My Account invoice actions.
 	 *
-	 * @param array $actions
+	 * @param array              $actions
 	 * @param \WC_Abstract_Order $order
 	 * @return array
 	 */
-	public function my_account_invoice_pdf_link( array $actions, \WC_Abstract_Order $order ): array {
+	public function my_account_invoice_actions( array $actions, \WC_Abstract_Order $order ): array {
 		$this->disable_storing_document_settings();
 
-		$invoice         = wcpdf_get_document( 'invoice', $order );
-		$invoice_allowed = false;
+		$document_type  = 'invoice';
+		$document_title = __( 'Invoice', 'woocommerce-pdf-invoices-packing-slips' );
+		$invoice        = wcpdf_get_document( $document_type, $order );
 
-		if ( $invoice && $invoice->is_enabled() ) {
-			// check my account button settings
-			$button_setting = $invoice->get_setting( 'my_account_buttons', 'available' );
+		if ( ! $invoice ) {
+			return (array) apply_filters(
+				'wpo_wcpdf_myaccount_actions',
+				$actions,
+				$order
+			);
+		}
 
-			switch ( $button_setting ) {
-				case 'available':
-					$invoice_allowed = $invoice->exists();
-					break;
-				case 'always':
-					$invoice_allowed = true;
-					break;
-				case 'custom':
-					$allowed_statuses = $invoice->get_setting( 'my_account_restrict', array() );
+		$invoice_allowed = $invoice->is_allowed_in_my_account( 'available' );
 
-					if ( ! empty( $allowed_statuses ) && in_array( $order->get_status(), array_keys( $allowed_statuses ), true ) ) {
-						$invoice_allowed = true;
-					}
-					break;
-				case 'never':
-				default:
-					break;
+		// Backward compatibility with the existing status-based filter.
+		if ( ! $invoice_allowed ) {
+			$invoice_allowed = in_array(
+				$order->get_status(),
+				apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ),
+				true
+			);
+		}
+
+		if ( $invoice_allowed ) {
+			$name = is_callable( array( $invoice, 'get_title' ) )
+				? $invoice->get_title()
+				: $document_title;
+
+			$endpoint_instance = \WPO_WCPDF()->get_instance( 'endpoint' );
+
+			$document_url = $endpoint_instance->get_document_link(
+				$order,
+				$document_type,
+				array( 'my-account' => 'true' )
+			);
+
+			if ( $document_url ) {
+				$actions[ $document_type ] = array(
+					'url'  => $document_url,
+					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $name, $invoice ),
+				);
 			}
 
-			// Check if invoice has been created already or if status allows download (filter your own array of allowed statuses)
-			if ( $invoice_allowed || in_array( $order->get_status(), apply_filters( 'wpo_wcpdf_myaccount_allowed_order_statuses', array() ) ) ) {
-				$actions['invoice'] = array(
-					'url'  => WPO_WCPDF()->endpoint->get_document_link( $order, 'invoice', array( 'my-account' => 'true' ) ),
-					'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', $invoice->get_title(), $invoice )
+			if ( $invoice->is_enabled( 'xml' ) && wpo_ips_edi_is_available() ) {
+				$xml_url = $endpoint_instance->get_document_link(
+					$order,
+					$document_type,
+					array(
+						'output'     => 'xml',
+						'my-account' => 'true',
+					)
 				);
+
+				if ( $xml_url ) {
+					$actions[ $document_type . '_xml' ] = array(
+						'url'  => $xml_url,
+						'name' => apply_filters( 'wpo_wcpdf_myaccount_button_text', "E-{$name}", $invoice ),
+					);
+				}
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_myaccount_actions', $actions, $order );
+		return (array) apply_filters(
+			'wpo_wcpdf_myaccount_actions',
+			$actions,
+			$order
+		);
 	}
 
 	/**
-	 * Open PDF links in a new browser tab/window on the My Account and Thank You (Order Received) pages
+	 * Open link links in a new browser tab/window on the My Account and Thank You (Order Received) pages
+	 *
+	 * @return void
 	 */
-	public function open_my_account_pdf_link_on_new_tab() {
-		$is_account        = function_exists( 'is_account_page' )        && is_account_page();
-		$is_order_received = function_exists( 'is_order_received_page' ) && is_order_received_page();
-		
+	public function open_my_account_link_on_new_tab(): void {
+		$is_account        = \wpo_ips_is_account_page();
+		$is_order_received = \wpo_ips_is_order_received_page();
+
 		if ( $is_account || $is_order_received ) {
 			$general_settings = get_option( 'wpo_wcpdf_settings_general', array() );
-			
+
 			if ( isset( $general_settings['download_display'] ) && 'display' === $general_settings['download_display'] ) {
-				$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-				$file_path = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+				$suffix               = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+				$file_path            = WPO_WCPDF()->plugin_path() . '/assets/js/my-account-link' . $suffix . '.js';
+				$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-				if ( WPO_WCPDF()->file_system->exists( $file_path ) ) {
-					$script = WPO_WCPDF()->file_system->get_contents( $file_path );
+				if ( $file_system_instance->exists( $file_path ) ) {
+					$script            = $file_system_instance->get_contents( $file_path );
+					$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
-					if ( $script && WPO_WCPDF()->endpoint->pretty_links_enabled() ) {
-						$script = str_replace( 'generate_wpo_wcpdf', WPO_WCPDF()->endpoint->get_identifier(), $script );
+					if ( $script && $endpoint_instance->pretty_links_enabled() ) {
+						$script = str_replace( 'generate_wpo_wcpdf', $endpoint_instance->get_identifier(), $script );
 					}
 
 					wp_add_inline_script( 'jquery', $script );
@@ -108,7 +194,6 @@ class Frontend {
 	 *
 	 * @param array $data
 	 * @param \WC_Abstract_Order $order
-	 *
 	 * @return array
 	 */
 	public function add_invoice_number_to_wc_legacy_order_api( array $data, \WC_Abstract_Order $order ): array {
@@ -123,7 +208,6 @@ class Frontend {
 	 * @param \WP_REST_Response $response
 	 * @param \WC_Data $order
 	 * @param \WP_REST_Request $request
-	 *
 	 * @return \WP_REST_Response
 	 */
 	public function add_invoice_number_to_wc_order_api( \WP_REST_Response $response, \WC_Data $order, \WP_REST_Request $request ): \WP_REST_Response {
@@ -137,32 +221,49 @@ class Frontend {
 	/**
 	 * Retrieve formatted invoice number for a given order
 	 *
-	 * @param \WC_Abstract_Order|\WC_Order $order
-	 *
+	 * @param \WC_Abstract_Order $order
 	 * @return string
 	 */
-	private function get_invoice_number( $order ): string {
-		$this->disable_storing_document_settings();
-		$invoice        = wcpdf_get_document( 'invoice', $order );
+	private function get_invoice_number( \WC_Abstract_Order $order ): string {
 		$invoice_number = '';
 
-		if ( $invoice ) {
-			$number = $invoice->get_number();
-			if ( ! empty( $number ) ) {
-				$invoice_number = $number->get_formatted();
-			}
-		}
+		$this->disable_storing_document_settings();
 
-		$this->restore_storing_document_settings();
+		try {
+			$invoice = wcpdf_get_document( 'invoice', $order );
+
+			if ( ! $invoice || ! is_callable( array( $invoice, 'get_number' ) ) ) {
+				return '';
+			}
+
+			$number = $invoice->get_number();
+
+			if ( ! empty( $number ) ) {
+				$invoice_number = is_callable( array( $number, 'get_formatted' ) )
+					? $number->get_formatted()
+					: (string) $number;
+			}
+
+		} finally {
+			$this->restore_storing_document_settings();
+		}
 
 		return $invoice_number;
 	}
 
-	public function generate_document_shortcode( $atts, $content = null, $shortcode_tag = '' ) {
+	/**
+	 * Generate a document download link via shortcode
+	 *
+	 * @param array $atts
+	 * @param string|null $content
+	 * @param string $shortcode_tag
+	 * @return string
+	 */
+	public function generate_document_shortcode( array $atts, ?string $content = null, string $shortcode_tag = '' ): string {
 		global $wp;
 
 		if ( is_admin() ) {
-			return;
+			return '';
 		}
 
 		// Default values
@@ -174,8 +275,13 @@ class Frontend {
 			'document_type' => 'invoice',
 		), $atts );
 
+		$values['order_id']      = absint( $values['order_id'] );
+		$values['document_type'] = sanitize_key( $values['document_type'] );
+		$has_explicit_order_id   = ! empty( $values['order_id'] );
+
 		$is_document_type_valid = false;
-		$documents              = WPO_WCPDF()->documents->get_documents();
+		$documents              = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
+
 		foreach ( $documents as $document ) {
 			if ( $document->get_type() === $values['document_type'] ) {
 				$is_document_type_valid = true;
@@ -195,14 +301,16 @@ class Frontend {
 		}
 
 		if ( ! $is_document_type_valid ) {
-			return;
+			return '';
 		}
 
 		// Get $order
-		if ( empty( $values['order_id'] ) ) {
+		$order = null;
+
+		if ( ! $has_explicit_order_id ) {
 			if ( is_checkout() && is_wc_endpoint_url( 'order-received' ) && isset( $wp->query_vars['order-received'] ) ) {
 				$order = wc_get_order( $wp->query_vars['order-received'] );
-			} elseif ( is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
+			} elseif ( \wpo_ips_is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
 				$order = wc_get_order( $wp->query_vars['view-order'] );
 			}
 		} else {
@@ -210,16 +318,20 @@ class Frontend {
 		}
 
 		if ( empty( $order ) || ! is_object( $order ) ) {
-			return;
+			return '';
+		}
+
+		if ( $has_explicit_order_id && ! $this->current_user_can_access_shortcode_order( $order, $values['document_type'] ) ) {
+			return '';
 		}
 
 		$document = wcpdf_get_document( $values['document_type'], $order );
 
 		if ( ! $document || ! $document->is_allowed() ) {
-			return;
+			return '';
 		}
 
-		$pdf_url = WPO_WCPDF()->endpoint->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
+		$pdf_url = WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
 
 		if ( 'wcpdf_document_link' === $shortcode_tag ) {
 			return esc_url( $pdf_url );
@@ -238,18 +350,662 @@ class Frontend {
 	 * Document objects are created in order to check for existence and retrieve data,
 	 * but we don't want to store the settings for uninitialized documents.
 	 * Only use in frontend/backed (page requests), otherwise settings will never be stored!
+	 *
+	 * @return void
 	 */
-	public function disable_storing_document_settings() {
-		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+	public function disable_storing_document_settings(): void {
+		add_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'prevent_storing_document_settings' ), 9999 );
 	}
 
-	public function restore_storing_document_settings() {
-		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'return_false' ), 9999 );
+	/**
+	 * Restore the original document settings storing behavior.
+	 * This should be called after disabling storing settings to avoid affecting other parts of the code.
+	 *
+	 * @return void
+	 */
+	public function restore_storing_document_settings(): void {
+		remove_filter( 'wpo_wcpdf_document_store_settings', array( $this, 'prevent_storing_document_settings' ), 9999 );
 	}
 
-	public function return_false(){
+	/**
+	 * Prevent document settings from being stored during temporary document checks.
+	 *
+	 * @return bool
+	 */
+	public function prevent_storing_document_settings(): bool {
 		return false;
 	}
+
+	/**
+	 * Update classic checkout field visibility when the billing country changes.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_enqueue_visibility_script(): void {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$countries      = $checkout_field->get_countries();
+		if ( ! wpo_ips_is_checkout_request() || ( empty( $countries ) && ! $checkout_field->get_alternative_type() ) ) {
+			return;
+		}
+
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		wp_enqueue_script(
+			'wpo-ips-checkout-field',
+			\WPO_WCPDF()->plugin_url() . '/assets/js/checkout-field' . $suffix . '.js',
+			array( 'jquery' ),
+			WPO_WCPDF_VERSION,
+			true
+		);
+		wp_localize_script( 'wpo-ips-checkout-field', 'wpoIpsCheckoutField', array(
+			'countries'       => $countries,
+			'shopCountry'     => $checkout_field->get_shop_country(),
+			'primaryType'     => $checkout_field->get_type(),
+			'alternativeType' => $checkout_field->get_alternative_type(),
+			'fields'          => $checkout_field->get_field_types(),
+		) );
+	}
+
+	/**
+	 * Display optional checkout field in the Checkout Block.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_display_checkout_block_field(): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+			return;
+		}
+
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		foreach ( $checkout_field->get_field_types( true ) as $field_id => $type ) {
+			if ( ! $checkout_field->is_enabled( $type ) ) {
+				continue;
+			}
+
+			$args = array(
+				'id'                => $field_id,
+				'label'             => $checkout_field->get_label( $type ),
+				'location'          => 'order',
+				'type'              => 'text',
+				'sanitize_callback' => static function ( $val ) {
+					$val = sanitize_text_field( (string) $val );
+					return (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+				},
+				'validate_callback' => function ( $val ) use ( $type ) {
+					$val = (string) $val;
+
+					// If not treated as VAT, keep the existing flexible hook.
+					if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number( $type ) ) {
+						$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
+						return ( $result instanceof \WP_Error ) ? $result : true;
+					}
+
+					$result = apply_filters( 'wpo_ips_checkout_field_validate', $this->checkout_field_validate_vat_number_value( $val ), $val );
+					return ( $result instanceof \WP_Error ) ? $result : true;
+				},
+			);
+
+			$conditions = array();
+			$countries  = $checkout_field->get_countries();
+			if ( ! empty( $countries ) ) {
+				$conditions[] = array( 'enum' => $countries );
+			}
+			if ( $checkout_field->get_alternative_type() ) {
+				$home_countries = array( 'enum' => array( '', $checkout_field->get_shop_country() ) );
+				$conditions[]   = $type === $checkout_field->get_type()
+					? $home_countries
+					: array( 'not' => $home_countries );
+			}
+			if ( $conditions && defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9', '>=' ) ) {
+				$args['hidden'] = array(
+					'customer' => array(
+						'properties' => array(
+							'billing_address' => array(
+								'properties' => array(
+									'country' => array( 'not' => array( 'allOf' => $conditions ) ),
+								),
+							),
+						),
+					),
+				);
+			}
+
+			$args = apply_filters( 'wpo_ips_checkout_field_block_args', $args, $type );
+
+			wpo_ips_register_additional_checkout_field( $args );
+		}
+	}
+
+	/**
+	 * Set default value for the optional checkout field in the Checkout Block.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_set_checkout_block_field_value(): void {
+		foreach ( \WPO_WCPDF()->get_instance( 'checkout_field' )->get_field_types( true ) as $field_id => $type ) {
+			add_filter(
+				"woocommerce_get_default_value_for_{$field_id}",
+				static function ( $value, string $group, \WC_Data $wc_object ) use ( $type ) {
+					// Our field is in 'order' location, so group is typically 'other'.
+					if ( ! $wc_object instanceof \WC_Customer ) {
+						// Preserve null for draft orders so Store API can fall back to customer defaults.
+						return $value;
+					}
+
+					$user_id = $wc_object->get_id();
+					if ( ! $user_id ) {
+						return (string) $value;
+					}
+
+					$stored = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id, $type );
+
+					return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, $group, $wc_object );
+				},
+				10,
+				3
+			);
+		}
+	}
+
+	/**
+	 * Save optional checkout field from the Checkout Block.
+	 *
+	 * @param string $key Field key.
+	 * @param mixed $value Field value.
+	 * @param string $group Group name.
+	 * @param \WC_Customer|\WC_Order $wc_object
+	 * @return void
+	 */
+	public function checkout_field_save_checkout_block_field( string $key, mixed $value, string $group, object $wc_object ): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+			return;
+		}
+
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_field_types( true )[ $key ] ?? '';
+
+		if ( ! $type || ! $checkout_field->is_enabled( $type ) ) {
+			return;
+		}
+
+		if ( ! ( $wc_object instanceof \WC_Order ) && ! ( $wc_object instanceof \WC_Customer ) ) {
+			return;
+		}
+
+		$val = sanitize_text_field( (string) wp_unslash( $value ) );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		$country = $wc_object->get_billing_country();
+		if ( version_compare( WC_VERSION, '9.9', '>=' ) && ( ! $checkout_field->is_allowed_country( $country ) || $type !== $checkout_field->get_checkout_type( $country ) ) ) {
+			return;
+		}
+
+		if ( $wc_object instanceof \WC_Order ) {
+			$checkout_field->save_order_value( $wc_object, $val, $type );
+			$customer_id = $wc_object->get_customer_id();
+		} else {
+			// Store API updates can save only the customer/session before an order exists.
+			$customer_id = $wc_object->get_id();
+		}
+
+		if ( $customer_id > 0 ) {
+			$checkout_field->save_user_value( $customer_id, $val, $type );
+		}
+	}
+
+	/**
+	 * Persist the customer checkout field and remove WooCommerce's untyped copies.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @return void
+	 */
+	public function checkout_field_remove_order_checkout_block_field_meta( \WC_Abstract_Order $order ): void {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$customer_id    = $order->get_customer_id();
+		$country        = $order->get_billing_country();
+
+		foreach ( $checkout_field->get_field_types( true ) as $field_id => $type ) {
+			if ( version_compare( WC_VERSION, '9.9', '>=' ) && ( ! $checkout_field->is_allowed_country( $country ) || $type !== $checkout_field->get_checkout_type( $country ) || ! $checkout_field->is_enabled( $type ) ) ) {
+				// A draft may contain a value entered before the country or field type changed.
+				$checkout_field->save_order_value( $order, '', $type );
+			} elseif ( $customer_id > 0 ) {
+				// New accounts are only linked after the field is saved on the order.
+				$value = $checkout_field->get_order_value( $order, $type );
+				if ( null !== $value ) {
+					$checkout_field->save_user_value( $customer_id, $value, $type );
+				}
+			}
+
+			$order->delete_meta_data( '_wc_other/' . $field_id );
+			if ( $customer_id > 0 ) {
+				delete_user_meta( $customer_id, '_wc_other/' . $field_id );
+			}
+		}
+
+		$order->save_meta_data();
+		$this->checkout_field_remove_session_checkout_block_field_meta();
+	}
+
+	/**
+	 * Enable customer metadata cleanup for Store API checkout callbacks.
+	 *
+	 * @param mixed            $response REST response.
+	 * @param array            $handler  Route handler.
+	 * @param \WP_REST_Request $request  REST request.
+	 * @return mixed
+	 */
+	public function checkout_field_enable_rest_cleanup( mixed $response, array $handler, \WP_REST_Request $request ): mixed {
+		// Inspect the dispatched route so this also works for Store API batch requests.
+		$this->checkout_field_rest_cleanup = (bool) preg_match( '#^/wc/store(?:/v[0-9]+)?/checkout(?:/|$)#', $request->get_route() );
+
+		if ( $this->checkout_field_rest_cleanup ) {
+			$this->checkout_field_remove_session_checkout_block_field_meta();
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Disable customer metadata cleanup after the REST callbacks finish.
+	 *
+	 * @param mixed $response REST response.
+	 * @return mixed
+	 */
+	public function checkout_field_disable_rest_cleanup( mixed $response ): mixed {
+		$this->checkout_field_rest_cleanup = false;
+
+		return $response;
+	}
+
+	/**
+	 * Remove WooCommerce's untyped customer copy so typed defaults remain authoritative.
+	 *
+	 * @param \WC_Customer $customer Customer object.
+	 * @return void
+	 */
+	public function checkout_field_remove_customer_checkout_block_field_meta( \WC_Customer $customer ): void {
+		if ( ! $this->checkout_field_rest_cleanup && ! wpo_ips_is_checkout_request() ) {
+			return;
+		}
+
+		// Guests have no persistent typed customer values; keep their checkout session data.
+		if ( ! $customer->get_id() ) {
+			return;
+		}
+
+		foreach ( array( CheckoutField::BLOCK_FIELD_ID, CheckoutField::ALTERNATIVE_BLOCK_FIELD_ID ) as $field_id ) {
+			$meta_key = '_wc_other/' . $field_id;
+			if ( ! $customer->meta_exists( $meta_key ) ) {
+				continue;
+			}
+
+			$customer->delete_meta_data( $meta_key );
+			if ( metadata_exists( 'user', $customer->get_id(), $meta_key ) ) {
+				delete_user_meta( $customer->get_id(), $meta_key );
+			}
+		}
+	}
+
+	/**
+	 * Clear the native copy after session metadata has been loaded as well.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_remove_session_checkout_block_field_meta(): void {
+		if ( \WC()->customer instanceof \WC_Customer ) {
+			$this->checkout_field_remove_customer_checkout_block_field_meta( \WC()->customer );
+		}
+	}
+
+	/**
+	 * Display optional checkout field in the Classic Checkout page.
+	 *
+	 * @param mixed $fields
+	 * @return array
+	 */
+	public function checkout_field_display_classic_checkout_field( $fields ): array {
+		if ( ! is_array( $fields ) ) {
+			$fields = array();
+		}
+
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+			return $fields;
+		}
+
+		$fields['order'] = $fields['order'] ?? array();
+
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		foreach ( $checkout_field->get_field_types() as $key => $type ) {
+			if ( ! $checkout_field->is_enabled( $type ) ) {
+				continue;
+			}
+
+			$args = array(
+				'type'     => 'text',
+				'label'    => $checkout_field->get_label( $type ),
+				'required' => false,
+				'class'    => array( 'form-row-wide' ),
+			);
+
+			$fields['order'][ $key ] = apply_filters( 'wpo_ips_checkout_field_classic_args', $args, $type );
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Set default value for the optional checkout field in the Classic Checkout page.
+	 *
+	 * @param mixed $value
+	 * @param string $input
+	 * @return mixed
+	 */
+	public function checkout_field_set_classic_checkout_field_value( $value, string $input ) {
+		$type = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_field_types()[ $input ] ?? '';
+		if ( ! $type ) {
+			return $value;
+		}
+
+		$user_id = get_current_user_id();
+		if ( ! $user_id ) {
+			return $value;
+		}
+
+		$stored = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_user_value( $user_id, $type );
+
+		return (string) apply_filters( 'wpo_ips_checkout_field_default_value', $stored, $value, 'classic', null );
+	}
+
+	/**
+	 * Validate optional checkout field from the Classic Checkout page.
+	 *
+	 * @param mixed $data
+	 * @param mixed $errors
+	 * @return void
+	 */
+	public function checkout_field_validate_classic_checkout_field_value( $data, $errors ): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() || ! $errors instanceof \WP_Error ) {
+			return;
+		}
+
+		if ( ! is_array( $data ) ) {
+			return;
+		}
+
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_allowed_country( (string) ( $data['billing_country'] ?? '' ) ) ) {
+			return;
+		}
+
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_checkout_type( (string) ( $data['billing_country'] ?? '' ) );
+		if ( ! $checkout_field->is_enabled( $type ) ) {
+			return;
+		}
+
+		$key = array_search( $type, $checkout_field->get_field_types(), true );
+		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
+		$val = sanitize_text_field( $raw );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		if ( '' === trim( $val ) ) {
+			return;
+		}
+
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number( $type ) ) {
+			$result = $this->checkout_field_validate_vat_number_value( $val );
+
+			if ( $result instanceof \WP_Error ) {
+				$errors->add( $result->get_error_code(), $result->get_error_message(), array( 'id' => $key ) );
+			}
+
+			return;
+		}
+
+		// Non-VAT mode: keep existing flexibility.
+		$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
+
+		if ( $result instanceof \WP_Error ) {
+			$errors->add( $result->get_error_code(), $result->get_error_message(), array( 'id' => $key ) );
+		}
+	}
+
+	/**
+	 * Save optional checkout field from the Classic Checkout page.
+	 *
+	 * @param int $order_id
+	 * @param array $data
+	 * @return void
+	 */
+	public function checkout_field_save_classic_checkout_field( int $order_id, array $data ): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
+			return;
+		}
+
+		$order = wc_get_order( $order_id );
+		if ( empty( $order ) ) {
+			return;
+		}
+
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$country        = (string) ( $data['billing_country'] ?? '' );
+		$type           = $checkout_field->get_checkout_type( $country );
+		$visible        = $checkout_field->is_allowed_country( $country ) && $checkout_field->is_enabled( $type );
+
+		// Checkout can reuse a pending order after the country has changed.
+		foreach ( $checkout_field->get_field_types() as $field_type ) {
+			if ( ! $visible || $field_type !== $type ) {
+				$checkout_field->save_order_value( $order, '', $field_type );
+			}
+		}
+
+		if ( ! $visible ) {
+			return;
+		}
+
+		$key = array_search( $type, $checkout_field->get_field_types(), true );
+
+		$raw = isset( $data[ $key ] ) ? (string) $data[ $key ] : '';
+		$val = sanitize_text_field( $raw );
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		$checkout_field->save_order_value( $order, $val, $type );
+
+		$customer_id = $order->get_customer_id();
+		if ( $customer_id > 0 ) {
+			$checkout_field->save_user_value( $customer_id, $val, $type );
+		}
+	}
+
+	/**
+	 * Display the optional checkout field in My Account > Account details.
+	 *
+	 * @return void
+	 */
+	public function account_details_display_checkout_field(): void {
+		$user_id        = get_current_user_id();
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_account_type( $user_id );
+		if ( '' === $type ) {
+			return;
+		}
+
+		$key   = array_search( $type, $checkout_field->get_field_types(), true );
+		$value = (string) $checkout_field->get_user_value( $user_id, $type );
+		$value = (string) apply_filters( 'wpo_ips_checkout_field_default_value', $value, $value, 'my-account', null );
+
+		$label       = $checkout_field->get_label( $type );
+		$description = '';
+
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number( $type ) ) {
+			$description = __( 'Please include the country prefix (for example NL123456789).', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
+		echo '<p class="woocommerce-form-row woocommerce-form-row--wide form-row form-row-wide">';
+		echo '<label for="' . esc_attr( $key ) . '">' . esc_html( $label ) . '</label>';
+		echo '<input type="text" class="woocommerce-Input woocommerce-Input--text input-text" name="' . esc_attr( $key ) . '" id="' . esc_attr( $key ) . '" value="' . esc_attr( $value ) . '" />';
+		if ( '' !== $description ) {
+			echo '<span class="description">' . esc_html( $description ) . '</span>';
+		}
+		echo '</p>';
+	}
+
+	/**
+	 * Validate the My Account field.
+	 *
+	 * @param \WP_Error $errors
+	 * @param \WP_User  $user
+	 * @return \WP_Error
+	 */
+	public function account_details_validate_checkout_field( \WP_Error $errors, \WP_User $user ): \WP_Error {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_account_type( $user->ID );
+		if ( '' === $type ) {
+			return $errors;
+		}
+
+		$key = array_search( $type, $checkout_field->get_field_types(), true );
+
+		// Field is optional: if missing, don't block save.
+		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			return $errors;
+		}
+
+		$val = (string) sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		if ( '' === trim( $val ) ) {
+			return $errors;
+		}
+
+		// VAT mode.
+		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_vat_number( $type ) ) {
+			$result = $this->checkout_field_validate_vat_number_value( $val );
+
+			if ( $result instanceof \WP_Error ) {
+				$errors->add( $result->get_error_code(), $result->get_error_message() );
+			}
+
+			return $errors;
+		}
+
+		// Non-VAT mode: keep your flexible validation hook.
+		$result = apply_filters( 'wpo_ips_checkout_field_validate', true, $val );
+		if ( $result instanceof \WP_Error ) {
+			$errors->add( $result->get_error_code(), $result->get_error_message() );
+		}
+
+		return $errors;
+	}
+
+	/**
+	 * Save the My Account field (user meta only).
+	 *
+	 * @param int $user_id
+	 * @return void
+	 */
+	public function account_details_save_checkout_field( int $user_id ): void {
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		$type           = $checkout_field->get_account_type( $user_id );
+		if ( '' === $type ) {
+			return;
+		}
+
+		$key = array_search( $type, $checkout_field->get_field_types(), true );
+
+		if ( ! isset( $_POST[ $key ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			// If the field isn't present in the form submission, do nothing.
+			return;
+		}
+
+		$val = (string) sanitize_text_field( wp_unslash( $_POST[ $key ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$val = (string) apply_filters( 'wpo_ips_checkout_field_sanitize', $val );
+
+		$checkout_field->save_user_value( $user_id, $val, $type );
+	}
+
+
+
+
+	/**
+	 * Validate the checkout field value when treated as a VAT number.
+	 *
+	 * @param string $raw_value
+	 * @return true|\WP_Error
+	 */
+	private function checkout_field_validate_vat_number_value( string $raw_value ): bool|\WP_Error {
+		$vat = strtoupper( preg_replace( '/\s+/', '', trim( $raw_value ) ) );
+
+		// Optional field: empty is always OK.
+		if ( '' === $vat ) {
+			return true;
+		}
+
+		/**
+		 * Allow other code to normalize the VAT number before validation.
+		 *
+		 * @param string $vat
+		 * @param string $raw_value
+		 */
+		$vat = (string) apply_filters( 'wpo_ips_checkout_field_vat_normalize', $vat, $raw_value );
+
+		// Must start with a valid country prefix.
+		if ( ! wpo_ips_edi_vat_number_has_country_prefix( $vat ) ) {
+			$error = new \WP_Error(
+				'invalid_vat_prefix',
+				__( 'Please enter a VAT number including a valid country prefix (for example PT123456789).', 'woocommerce-pdf-invoices-packing-slips' )
+			);
+
+			/**
+			 * Allow overriding the error returned by the base validation.
+			 *
+			 * @param \WP_Error $error
+			 * @param string   $vat
+			 */
+			$filtered_error = apply_filters(
+				'wpo_ips_checkout_field_vat_prefix_error',
+				$error,
+				$vat
+			);
+
+			return $filtered_error instanceof \WP_Error
+				? $filtered_error
+				: $error;
+		}
+
+		/**
+		 * Allow additional VAT checks (format, length, VIES, etc).
+		 * Return true to accept, or WP_Error to reject.
+		 *
+		 * @param true|\WP_Error $result
+		 * @param string         $vat
+		 * @param string         $raw_value
+		 */
+		$result = apply_filters(
+			'wpo_ips_checkout_field_vat_validate',
+			true,
+			$vat,
+			$raw_value
+		);
+
+		return $result instanceof \WP_Error
+			? $result
+			: true;
+	}
+
+	/**
+	 * Check whether the current user can use a shortcode with an explicit order ID.
+	 *
+	 * @param \WC_Abstract_Order $order
+	 * @param string             $document_type
+	 * @return bool
+	 */
+	protected function current_user_can_access_shortcode_order( \WC_Abstract_Order $order, string $document_type ): bool {
+		if ( WPO_WCPDF()->admin->user_can_manage_document( $document_type ) ) {
+			return true;
+		}
+
+		return is_user_logged_in() && current_user_can( 'view_order', $order->get_id() );
+	}
+
 }
 
 endif; // class_exists

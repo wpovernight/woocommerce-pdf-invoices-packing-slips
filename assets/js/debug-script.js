@@ -1,9 +1,11 @@
 jQuery( function( $ ) {
 
 	$( '#debug-tools .tool' ).on( 'click', 'input[type="submit"]', function( e ) {
+		let $form = $( this ).closest( 'form' );
+		let tool  = $form.find( 'input[name="debug_tool"]' ).val();
+
 		e.preventDefault();
-		let $form    = $( this ).closest( 'form' );
-		let tool     = $form.find( 'input[name="debug_tool"]' ).val();
+
 		let formData = new FormData( $form[0] );
 		formData.append( 'action', 'wpo_wcpdf_debug_tools' );
 		formData.append( 'nonce', wpo_wcpdf_debug.nonce );
@@ -32,12 +34,17 @@ jQuery( function( $ ) {
 				cache:       false,
 				processData: false,
 				contentType: false,
-				success ( response ) {
+				success( response ) {
+					if ( response && response.success === false && response.data && response.data.message ) {
+						alert( response.data.message );
+						$form.closest( '.tool' ).unblock();
+						return;
+					}
+
 					process_form_response( tool, response, $form );
 					$form.closest( '.tool' ).unblock();
 				},
-				error ( xhr, error, status ) {
-					//console.log( error, status );
+				error( xhr ) {
 					$form.closest( '.tool' ).unblock();
 				}
 			} );
@@ -78,6 +85,42 @@ jQuery( function( $ ) {
 				break;
 		}
 	}
+	
+	// plugin report confirm when including sensitive data or outputting html
+	$( '#debug-tools .tool.plugin-report' ).on( 'click', 'a.button', function( e ) {
+		let $button            = $( this );
+		let $tool              = $button.closest( '.tool' );
+		let $include_sensitive = $tool.find( '#wpo_ips_include_sensitive' );
+		let $output_html       = $tool.find( '#wpo_ips_output_html' );
+		let base_href          = $button.data( 'base-href' );
+
+		if ( ! base_href ) {
+			base_href = $button.attr( 'href' );
+			$button.data( 'base-href', base_href );
+		}
+
+		let href = base_href;
+
+		if ( $include_sensitive.length && true === $include_sensitive.prop( 'checked' ) ) {
+			if ( ! window.confirm( wpo_wcpdf_debug.confirm_plugin_report_sensitive ) ) {
+				e.preventDefault();
+				return false;
+			}
+
+			href += ( href.indexOf( '?' ) === -1 ) ? '?' : '&';
+			href += 'include_sensitive=1';
+		}
+
+		if ( $output_html.length && true === $output_html.prop( 'checked' ) ) {
+			href += ( href.indexOf( '?' ) === -1 ) ? '?' : '&';
+			href += 'output_html=1';
+			$button.attr( 'target', '_blank' );
+		} else {
+			$button.removeAttr( 'target' );
+		}
+
+		$button.attr( 'href', href );
+	} );
 
 	// toggle custom redirect page
 	$( "[name='wpo_wcpdf_settings_debug[document_access_denied_redirect_page]']" ).on( 'change', function( event ) {

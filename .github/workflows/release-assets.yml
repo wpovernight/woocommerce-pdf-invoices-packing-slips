@@ -20,14 +20,16 @@ jobs:
           # set environment variables
           echo "plugin_slug=$PLUGIN_SLUG" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_ENV
-          echo "zip_file_name=$PLUGIN_SLUG.$VERSION.zip" >> $GITHUB_ENV
+          echo "zip_file_name=$ZIP_FILE_NAME" >> $GITHUB_ENV
 
       - name: Checkout Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
+          ref: ${{ github.event.release.tag_name }}
           path: ${{ env.plugin_slug }}
           submodules: true
+          fetch-depth: 1
 
       - name: Check stable version in readme.txt
         run: |

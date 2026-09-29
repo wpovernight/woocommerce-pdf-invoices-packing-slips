@@ -293,7 +293,7 @@ class Reader extends \XMLReader
             if ('{}' == substr($name, 0, 2) && array_key_exists(substr($name, 2), $this->elementMap)) {
                 $name = substr($name, 2);
             } else {
-                return ['WPO\\IPS\\Vendor\\Sabre\\Xml\\Element\\Base', 'xmlDeserialize'];
+                return [Element\Base::class, 'xmlDeserialize'];
             }
         }
 
@@ -302,7 +302,7 @@ class Reader extends \XMLReader
             return $deserializer;
         }
 
-        if (is_subclass_of($deserializer, 'WPO\\IPS\\Vendor\\Sabre\\Xml\\XmlDeserializable')) {
+        if (is_subclass_of($deserializer, XmlDeserializable::class)) {
             return [$deserializer, 'xmlDeserialize'];
         }
 

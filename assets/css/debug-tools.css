@@ -50,6 +50,14 @@
 	margin-left: 6px;
 }
 
+#debug-tools .plugin-report {
+	background-color: #F9F9F9;
+}
+
+#debug-tools .dashicons {
+	margin-right: 6px;
+}
+
 #document_custom_redirect_page,
 #document_custom_redirect_page + .description {
 	display: none;

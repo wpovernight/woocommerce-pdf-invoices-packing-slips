@@ -9,11 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-$wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias_mapping', array(
-
-	// includes/Compatibility
-	'\\WPO\\WC\\PDF_Invoices\\Compatibility\\Third_Party_Plugins' => '\\WPO\\IPS\\Compatibility\\ThirdPartyPlugins',
-	'\\WPO\\WC\\PDF_Invoices\\Compatibility\\Order_Util'          => '\\WPO\\IPS\\Compatibility\\OrderUtil',
+$wcpdf_legacy_eager_aliases = array(
 
 	// includes/Documents
 	'\\WPO\\WC\\PDF_Invoices\\Documents\\Order_Document_Methods'  => '\\WPO\\IPS\\Documents\\OrderDocumentMethods',
@@ -26,15 +22,36 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 
 	// includes/Makers
 	'\\WPO\\WC\\PDF_Invoices\\Makers\\PDF_Maker'                  => '\\WPO\\IPS\\Makers\\PDFMaker',
-	'\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker'                  => '\\WPO\\IPS\\Makers\\UBLMaker',
+	'\\WPO\\WC\\PDF_Invoices\\Makers\\UBL_Maker'                  => '\\WPO\\IPS\\Makers\\EDIMaker',
+	'\\WPO\\IPS\\Makers\\UBLMaker'                                => '\\WPO\\IPS\\Makers\\EDIMaker',
 
 	// includes/Settings
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Callbacks'       => '\\WPO\\IPS\\Settings\\SettingsCallbacks',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Debug'           => '\\WPO\\IPS\\Settings\\SettingsDebug',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Documents'       => '\\WPO\\IPS\\Settings\\SettingsDocuments',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_General'         => '\\WPO\\IPS\\Settings\\SettingsGeneral',
-	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL'             => '\\WPO\\IPS\\Settings\\SettingsUbl',
+	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_UBL'             => '\\WPO\\IPS\\Settings\\SettingsEDI',
+	'\\WPO\\IPS\\Settings\\SettingsUbl'                           => '\\WPO\\IPS\\Settings\\SettingsEDI',
 	'\\WPO\\WC\\PDF_Invoices\\Settings\\Settings_Upgrade'         => '\\WPO\\IPS\\Settings\\SettingsUpgrade',
+
+	// includes
+	'\\WPO\\WC\\PDF_Invoices\\Documents'                          => '\\WPO\\IPS\\Documents',
+	'\\WPO\\WC\\PDF_Invoices\\Main'                               => '\\WPO\\IPS\\Main',
+	'\\WPO\\WC\\PDF_Invoices\\Settings'                           => '\\WPO\\IPS\\Settings',
+
+);
+
+foreach ( $wcpdf_legacy_eager_aliases as $old_class => $new_class ) {
+	if ( ! class_exists( $old_class, false ) && class_exists( $new_class ) ) {
+		class_alias( $new_class, $old_class );
+	}
+}
+
+$wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias_mapping', array(
+
+	// includes/Compatibility
+	'\\WPO\\WC\\PDF_Invoices\\Compatibility\\Third_Party_Plugins' => '\\WPO\\IPS\\Compatibility\\ThirdPartyPlugins',
+	'\\WPO\\WC\\PDF_Invoices\\Compatibility\\Order_Util'          => '\\WPO\\IPS\\Compatibility\\OrderUtil',
 
 	// includes/Tables
 	'\\WPO\\WC\\PDF_Invoices\\Tables\\Number_Store_List_Table'    => '\\WPO\\IPS\\Tables\\NumberStoreListTable',
@@ -42,13 +59,10 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 	// includes
 	'\\WPO\\WC\\PDF_Invoices\\Admin'                              => '\\WPO\\IPS\\Admin',
 	'\\WPO\\WC\\PDF_Invoices\\Assets'                             => '\\WPO\\IPS\\Assets',
-	'\\WPO\\WC\\PDF_Invoices\\Documents'                          => '\\WPO\\IPS\\Documents',
 	'\\WPO\\WC\\PDF_Invoices\\Endpoint'                           => '\\WPO\\IPS\\Endpoint',
 	'\\WPO\\WC\\PDF_Invoices\\Font_Synchronizer'                  => '\\WPO\\IPS\\FontSynchronizer',
 	'\\WPO\\WC\\PDF_Invoices\\Frontend'                           => '\\WPO\\IPS\\Frontend',
 	'\\WPO\\WC\\PDF_Invoices\\Install'                            => '\\WPO\\IPS\\Install',
-	'\\WPO\\WC\\PDF_Invoices\\Main'                               => '\\WPO\\IPS\\Main',
-	'\\WPO\\WC\\PDF_Invoices\\Settings'                           => '\\WPO\\IPS\\Settings',
 	'\\WPO\\WC\\PDF_Invoices\\Setup_Wizard'                       => '\\WPO\\IPS\\SetupWizard',
 	'\\WPO\\WC\\PDF_Invoices\\Updraft_Semaphore_3_0'              => '\\WPO\\IPS\\Semaphore',
 
@@ -57,8 +71,20 @@ $wcpdf_legacy_class_alias_mapping = apply_filters( 'wpo_wcpdf_legacy_class_alias
 
 ) );
 
-foreach ( $wcpdf_legacy_class_alias_mapping as $old_class => $new_class ) {
-	if ( ! class_exists( $old_class ) && class_exists( $new_class ) ) {
-		class_alias( $new_class, $old_class );
-	}
-}
+spl_autoload_register(
+	static function ( $class ) use ( $wcpdf_legacy_class_alias_mapping ) {
+		$old_class = '\\' . ltrim( $class, '\\' );
+
+		if ( empty( $wcpdf_legacy_class_alias_mapping[ $old_class ] ) ) {
+			return;
+		}
+
+		$new_class = $wcpdf_legacy_class_alias_mapping[ $old_class ];
+
+		if ( class_exists( $new_class ) && ! class_exists( $old_class, false ) ) {
+			class_alias( $new_class, $old_class );
+		}
+	},
+	true,
+	true
+);

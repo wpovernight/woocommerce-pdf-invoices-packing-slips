@@ -25,7 +25,7 @@ class DocumentNumber {
 	 * @param OrderDocument|null       $document Optional related document object.
 	 * @param \WC_Abstract_Order|null  $order    Optional related order object.
 	 */
-	public function __construct( $number, array $settings = array(), ?OrderDocument $document = null, ?\WC_Abstract_Order $order = null ) {
+	public function __construct( mixed $number, array $settings = array(), ?OrderDocument $document = null, ?\WC_Abstract_Order $order = null ) {
 		$number = apply_filters( 'wpo_wcpdf_raw_document_number', $number, $settings, $document, $order );
 
 		// Normalize data from either a raw number or a full array
@@ -52,7 +52,6 @@ class DocumentNumber {
 	 * Loads number data values into the object, applying casting and normalization.
 	 *
 	 * @param array $data Associative array of values to load into object properties.
-	 *
 	 * @return void
 	 */
 	public function load_number_data( array $data ): void {
@@ -91,8 +90,13 @@ class DocumentNumber {
 	 * @return string
 	 */
 	public function get_formatted(): string {
-		$formatted_number = isset( $this->formatted_number ) ? $this->formatted_number : '';
-		return apply_filters( 'wpo_wcpdf_formatted_document_number', $formatted_number, $this, $this->document_type, $this->order_id );
+		return (string) apply_filters(
+			'wpo_wcpdf_formatted_document_number',
+			isset( $this->formatted_number ) ? $this->formatted_number : '',
+			$this,
+			$this->document_type,
+			$this->order_id
+		);
 	}
 
 	/**
@@ -161,6 +165,7 @@ class DocumentNumber {
 	public function to_array(): array {
 		return (array) $this;
 	}
+	
 }
 
 endif; // class_exists

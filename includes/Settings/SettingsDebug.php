@@ -1,7 +1,10 @@
 <?php
 namespace WPO\IPS\Settings;
 
+use WPO\IPS\Documents\OrderDocument;
 use WPO\IPS\Tables\NumberStoreListTable;
+use WPO\IPS\Semaphore;
+use WPO\IPS\Notices;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -11,33 +14,54 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsDebug' ) ) :
 
 class SettingsDebug {
 
-	protected static $_instance = null;
-	public $sections;
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get the singleton instance of the class.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		// Show a notice if the plugin requirements are not met.
-		add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
-		add_action( 'admin_init', array( $this, 'init_settings' ) );
-		add_action( 'admin_init', array( $this, 'maybe_schedule_unstable_version_check' ) );
+		// WP
+		if ( \wpo_ips_is_settings_page() ) {
+			add_action( 'admin_init', array( $this, 'handle_server_requirement_notice' ) );
+			add_action( 'admin_init', array( $this, 'init_settings' ) );
+			add_action( 'admin_init', array( $this, 'maybe_schedule_unstable_version_check' ) );
+		}
 
+		// IPS
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
+		add_filter( 'pre_update_option_wpo_wcpdf_settings_debug', array( $this, 'normalize_allowed_remote_hosts' ) );
 		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
 		add_action( 'wpo_wcpdf_check_unstable_version_daily', array( $this, 'run_unstable_version_check' ) );
+		add_action( 'wpo_wcpdf_after_sidebar', array( $this, 'display_search_field' ), 10, 2 );
 
+		// AJAX
 		add_action( 'wp_ajax_wpo_wcpdf_debug_tools', array( $this, 'ajax_process_settings_debug_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_danger_zone_tools', array( $this, 'ajax_process_danger_zone_tools' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_numbers_data', array( $this, 'ajax_numbers_data' ) );
+		add_action( 'wp_ajax_wpo_ips_plugin_report', array( $this, 'ajax_plugin_report' ) );
 	}
 
-	public function output( $active_section, $nonce ) {
-		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+	/**
+	 * Output the settings debug sections.
+	 *
+	 * @param string $active_section
+	 * @param string $nonce
+	 * @return void
+	 */
+	public function output( string $active_section, string $nonce ): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			return;
 		}
 
@@ -45,7 +69,7 @@ class SettingsDebug {
 		$sections       = $this->get_settings_sections();
 
 		?>
-		<div class="wcpdf-settings-sub-sections wcpdf-settings-debug">
+		<div class="wcpdf-settings-sub-sections">
 			<h2 class="nav-tab-wrapper">
 				<?php
 				foreach ( $sections as $section => $title ) {
@@ -56,6 +80,8 @@ class SettingsDebug {
 			</h2>
 		</div>
 		<?php
+
+		$this->display_search_field( 'debug', $active_section );
 
 		switch ( $active_section ) {
 			case 'settings':
@@ -78,11 +104,55 @@ class SettingsDebug {
 		do_action( 'wpo_wcpdf_settings_debug_after_output', $active_section, $sections );
 	}
 
-	public function display_settings() {
+	/**
+	 * Display the settings debug section.
+	 *
+	 * @return void
+	 */
+	public function display_settings(): void {
 		settings_fields( 'wpo_wcpdf_settings_debug' );
 		do_settings_sections( 'wpo_wcpdf_settings_debug' );
 
 		submit_button();
+	}
+
+	/**
+	 * Display the search field for settings sections that support it.
+	 *
+	 * @param string $active_tab
+	 * @param string $active_section
+	 *
+	 * @return void
+	 */
+	public function display_search_field( string $active_tab, string $active_section ): void {
+		$searchable_sections = apply_filters(
+			'wpo_wcpdf_searchable_sections',
+			array(
+				'general',
+				'documents',
+				'debug' => array( 'settings' )
+			)
+		);
+
+		// Tabs with subsection-specific search (associative keys) handle their own call in output(),
+		// so skip them when called via the `wpo_wcpdf_after_sidebar` hook to avoid duplicates.
+		if ( doing_action( 'wpo_wcpdf_after_sidebar' ) && isset( $searchable_sections[ $active_tab ] ) ) {
+			return;
+		}
+
+		if (
+			in_array( $active_tab, $searchable_sections, true ) ||
+			(
+				isset( $searchable_sections[ $active_tab ] ) &&
+				is_array( $searchable_sections[ $active_tab ] ) &&
+				in_array( $active_section, $searchable_sections[ $active_tab ], true ) )
+		) {
+			echo '
+				<div class="settings-search">
+					<input type="text" name="settings-search" id="wpo-settings-search" placeholder="', esc_attr_e( 'Search settings', 'woocommerce-pdf-invoices-packing-slips' ), '">
+				</div>
+			';
+		}
 	}
 
 	/**
@@ -95,7 +165,7 @@ class SettingsDebug {
 		$premium_plugins        = $this->get_premium_plugins();
 		$directory_permissions  = $this->get_directory_permissions();
 		$yearly_reset_schedule  = $this->get_yearly_reset_schedule();
-		$debug_settings         = WPO_WCPDF()->settings->debug_settings;
+		$debug_settings         = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$latest_github_releases = wpo_wcpdf_get_latest_releases_from_github();
 
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-status.php';
@@ -110,7 +180,13 @@ class SettingsDebug {
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-tools.php';
 	}
 
-	public function display_numbers( $nonce ) {
+	/**
+	 * Display the numbers table data.
+	 *
+	 * @param string $nonce
+	 * @return void
+	 */
+	public function display_numbers( string $nonce ): void {
 		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
 			return;
 		}
@@ -151,14 +227,19 @@ class SettingsDebug {
 		include WPO_WCPDF()->plugin_path() . '/views/advanced-numbers.php';
 	}
 
-	public function get_number_store_tables() {
+	/**
+	 * Get the number store tables and their corresponding document types.
+	 *
+	 * @return array
+	 */
+	public function get_number_store_tables(): array {
 		global $wpdb;
 
 		$tables = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery
 			"SHOW TABLES LIKE '{$wpdb->prefix}wcpdf_%'"
 		);
 
-		$document_titles = WPO_WCPDF()->documents->get_document_titles();
+		$document_titles = WPO_WCPDF()->get_instance( 'documents' )->get_document_titles();
 		$table_names     = array();
 
 		foreach ( $tables as $table ) {
@@ -200,7 +281,13 @@ class SettingsDebug {
 		return $table_names;
 	}
 
-	public function get_document_type_from_store_table_name( $table_name ) {
+	/**
+	 * Get the document type from the number store table name.
+	 *
+	 * @param string $table_name
+	 * @return string
+	 */
+	public function get_document_type_from_store_table_name( string $table_name ): string {
 		$document_type = '';
 
 		if ( empty( $table_name ) ) {
@@ -223,12 +310,17 @@ class SettingsDebug {
 		return $document_type;
 	}
 
-	public function get_additional_invoice_number_store_document_types() {
+	/**
+	 * Get additional document types that use the invoice number store.
+	 *
+	 * @return array
+	 */
+	public function get_additional_invoice_number_store_document_types(): array {
 		$additional_doc_types = array();
-		$documents            = WPO_WCPDF()->documents->get_documents();
+		$documents            = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 		foreach ( $documents as $document ) {
-			if ( in_array( $document->get_type(), array( 'proforma', 'credit-note' ) ) && $document->is_enabled() && is_callable( array( $document, 'get_number_sequence' ) ) ) {
+			if ( in_array( $document->get_type(), array( 'proforma', 'credit-note' ), true ) && $document->is_enabled() && is_callable( array( $document, 'get_number_sequence' ) ) ) {
 				$number_sequence = $document->get_number_sequence( '', $document );
 				if ( 'invoice_number' === $number_sequence ) {
 					$additional_doc_types[] = $document->get_type();
@@ -239,102 +331,62 @@ class SettingsDebug {
 		return $additional_doc_types;
 	}
 
-	private function generate_random_string( $data ) {
-		if ( ! empty( WPO_WCPDF()->main->get_random_string() ) ) {
-			$old_path = WPO_WCPDF()->main->get_tmp_base();
-		} else {
-			$old_path = WPO_WCPDF()->main->get_tmp_base( false );
+	/**
+	 * AJAX handler for processing settings debug tools.
+	 *
+	 * Dispatches to one of the internal debug tool handlers.
+	 *
+	 * @return void
+	 * @see self::export_settings()
+	 * @see self::import_settings()
+	 * @see self::reset_settings()
+	 * @see self::generate_random_string()
+	 * @see self::install_fonts()
+	 * @see self::reschedule_yearly_reset()
+	 * @see self::clear_tmp()
+	 * @see self::clear_released_semaphore_locks()
+	 */
+	public function ajax_process_settings_debug_tools(): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 
-		WPO_WCPDF()->main->generate_random_string();
-		$new_path = WPO_WCPDF()->main->get_tmp_base();
-		WPO_WCPDF()->main->copy_directory( $old_path, $new_path );
-		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
-
-		$message = esc_html__( 'Temporary folder moved to', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . wp_normalize_path( $new_path );
-
-		wcpdf_log_error( $message, 'info' );
-		wp_send_json_success( compact( 'message' ) );
-	}
-
-	private function install_fonts( $data ) {
-		WPO_WCPDF()->main->maybe_reinstall_fonts( true );
-
-		$message = esc_html__( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' );
-		wcpdf_log_error( $message, 'info' );
-		wp_send_json_success( compact( 'message' ) );
-	}
-
-	private function reschedule_yearly_reset( $data ) {
-		WPO_WCPDF()->settings->schedule_yearly_reset_numbers();
-
-		$message = esc_html__( 'Yearly reset numbering system rescheduled!', 'woocommerce-pdf-invoices-packing-slips' );
-		wcpdf_log_error( $message, 'info' );
-		wp_send_json_success( compact( 'message' ) );
-	}
-
-	private function clear_tmp( $data ) {
-		$output  = WPO_WCPDF()->main->temporary_files_cleanup( time() );
-		$message = reset( $output );
-
-		switch ( key( $output ) ) {
-			case 'error':
-				wcpdf_log_error( $message );
-				wp_send_json_error( compact( 'message' ) );
-				break;
-			case 'success':
-				wcpdf_log_error( $message, 'info' );
-				wp_send_json_success( compact( 'message' ) );
-				break;
-			default:
-				exit;
-		}
-	}
-
-	private function clear_released_semaphore_locks( $data ) {
-		\WPO\IPS\Semaphore::cleanup_released_locks();
-
-		$message = esc_html__( 'Released semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
-		wcpdf_log_error( $message, 'info' );
-		wp_send_json_success( compact( 'message' ) );
-	}
-
-	private function clear_released_legacy_semaphore_locks( $data ) {
-		\WPO\IPS\Semaphore::cleanup_released_locks( true );
-
-		$message = esc_html__( 'Released legacy semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
-		wcpdf_log_error( $message, 'info' );
-		wp_send_json_success( compact( 'message' ) );
-	}
-
-	private function clear_extensions_license_cache( $data ) {
-		WPO_WCPDF()->settings->upgrade->clear_extensions_license_cache();
-
-		$message = __( "Extensions' license cache cleared successfully!", 'woocommerce-pdf-invoices-packing-slips' );
-		wcpdf_log_error( $message, 'info' );
-		wp_send_json_success( compact( 'message' ) );
-	}
-
-	public function ajax_process_settings_debug_tools() {
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 
-		$data = stripslashes_deep( $_REQUEST );
+		$data = isset( $_POST ) ? stripslashes_deep( $_POST ) : array();
 
-		if ( empty( $data['action'] ) || 'wpo_wcpdf_debug_tools' !== $data['action'] || empty( $data['debug_tool'] ) ) {
-			return;
+		if (
+			empty( $data['action'] ) ||
+			'wpo_wcpdf_debug_tools' !== $data['action'] ||
+			empty( $data['debug_tool'] )
+		) {
+			$message = __( 'Invalid request.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 
-		$debug_tool = esc_attr( $data['debug_tool'] );
+		$debug_tool = sanitize_key( $data['debug_tool'] );
 
 		if ( is_callable( array( $this, $debug_tool ) ) ) {
-			// all except danger tools and wizard
 			call_user_func_array( array( $this, $debug_tool ), array( $data ) );
+		} else {
+			$message = __( 'Debug tool is not available.', 'woocommerce-pdf-invoices-packing-slips' );
+			wcpdf_log_error( $message );
+			wp_send_json_error( compact( 'message' ) );
 		}
 
 		wp_die();
 	}
 
-	private function export_settings( $data ) {
+	/**
+	 * Export settings to JSON file.
+	 *
+	 * @param array $data
+	 * @return void
+	 */
+	private function export_settings( array $data ): void {
 		extract( $data );
 
 		if ( empty( $type ) ) {
@@ -343,17 +395,21 @@ class SettingsDebug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 
-		$settings = [];
+		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
+		$settings          = [];
 
 		switch ( $type ) {
 			case 'general':
-				$settings = WPO_WCPDF()->settings->general_settings;
+				$settings = $settings_instance->get_settings( 'general' );
 				break;
 			case 'debug':
-				$settings = WPO_WCPDF()->settings->debug_settings;
+				$settings = $settings_instance->get_settings( 'debug' );
 				break;
-			case 'ubl_taxes':
-				$settings = WPO_WCPDF()->settings->ubl_tax_settings;
+			case 'edi':
+				$settings = $settings_instance->get_settings( 'edi' );
+				break;
+			case 'edi_tax':
+				$settings = wpo_ips_edi_get_tax_settings();
 				break;
 			default:
 				$settings = apply_filters( 'wpo_wcpdf_export_settings', $settings, $type );
@@ -362,13 +418,11 @@ class SettingsDebug {
 
 		// maybe it's a document type settings request
 		if ( empty( $settings ) ) {
-			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+			$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings = get_option( "wpo_wcpdf_documents_settings_{$type}", [] );
 					break;
 				}
@@ -386,15 +440,19 @@ class SettingsDebug {
 		wp_send_json_success( compact( 'filename', 'settings' ) );
 	}
 
-	private function import_settings( $data ) {
-		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
-
+	/**
+	 * Import settings from uploaded JSON file.
+	 *
+	 * @param array $data
+	 * @return void
+	 */
+	private function import_settings( array $data ): void {
 		extract( $data );
 
-		$file_data = [];
+		$file_data = array();
 
-		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {
-			$json_data = WPO_WCPDF()->file_system->get_contents( $_FILES['file']['tmp_name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( ! empty( $_FILES['file']['tmp_name'] ) && ! empty( $_FILES['file']['name'] ) ) {   // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$json_data = WPO_WCPDF()->get_instance( 'file_system' )->get_contents( $_FILES['file']['tmp_name'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 
 			if ( ! $json_data ) {
 				$message = __( 'Failed to get contents from JSON file!', 'woocommerce-pdf-invoices-packing-slips' );
@@ -416,26 +474,26 @@ class SettingsDebug {
 		}
 
 		$setting_types   = $this->get_setting_types();
-		$type            = esc_attr( $file_data['type'] );
+		$type            = sanitize_key( $file_data['type'] );
 		$new_settings    = stripslashes_deep( $file_data['settings'] );
 		$settings_option = '';
 
-		if ( ! in_array( $type, array_keys( $setting_types ) ) ) {
+		if ( ! in_array( $type, array_keys( $setting_types ), true ) ) {
 			$message = __( 'The JSON file settings type is not supported on this store!', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_log_error( $message );
 			wp_send_json_error( compact( 'message' ) );
 		}
 
-		if ( in_array( $type, array( 'general', 'debug', 'ubl_taxes' ) ) ) {
+		if ( in_array( $type, array( 'general', 'debug' ), true ) ) {
 			$settings_option = "wpo_wcpdf_settings_{$type}";
+		} elseif ( in_array( $type, array( 'edi', 'edi_tax' ), true ) ) {
+			$settings_option = "wpo_ips_{$type}_settings";
 		} else {
-			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+			$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
 				}
@@ -471,7 +529,13 @@ class SettingsDebug {
 		}
 	}
 
-	private function reset_settings( $data ) {
+	/**
+	 * Reset settings to defaults.
+	 *
+	 * @param array $data
+	 * @return void
+	 */
+	private function reset_settings( array $data ): void {
 		extract( $data );
 
 		if ( empty( $type ) ) {
@@ -489,8 +553,11 @@ class SettingsDebug {
 			case 'debug':
 				$settings_option = 'wpo_wcpdf_settings_debug';
 				break;
-			case 'ubl_taxes':
-				$settings_option = 'wpo_wcpdf_settings_ubl_taxes';
+			case 'edi':
+				$settings_option = 'wpo_ips_edi_settings';
+				break;
+			case 'edi_tax':
+				$settings_option = 'wpo_ips_edi_tax_settings';
 				break;
 			default:
 				$settings_option = apply_filters( 'wpo_wcpdf_reset_settings_option', $settings_option, $type );
@@ -499,13 +566,11 @@ class SettingsDebug {
 
 		// maybe it's a document type settings request
 		if ( empty( $settings_option ) ) {
-			$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+			$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 			foreach ( $documents as $document ) {
 				$document_type = $document->get_type();
-				if (
-					$document_type === substr( $type, 0, strlen( $document_type ) ) ||
-					false !== strpos( $type, '_ubl' )
-				) {
+
+				if ( $document_type === substr( $type, 0, strlen( $document_type ) ) ) {
 					$settings_option = "wpo_wcpdf_documents_settings_{$type}";
 					break;
 				}
@@ -523,7 +588,7 @@ class SettingsDebug {
 		}
 
 		// settings already reset
-		$current_settings = get_option( $settings_option, [] );
+		$current_settings = get_option( $settings_option, array() );
 		if ( empty( $current_settings ) ) {
 			$message = sprintf(
 				/* translators: settings type */
@@ -535,7 +600,7 @@ class SettingsDebug {
 		}
 
 		// reset settings
-		$updated = update_option( $settings_option, [] );
+		$updated = update_option( $settings_option, array() );
 		if ( $updated ) {
 			$message = sprintf(
 				/* translators: settings type */
@@ -555,7 +620,17 @@ class SettingsDebug {
 		}
 	}
 
-	public function ajax_process_danger_zone_tools() {
+	/**
+	 * AJAX handler for processing danger zone tools.
+	 *
+	 * @return void
+	 */
+	public function ajax_process_danger_zone_tools(): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
+			wp_send_json_error( compact( 'message' ) );
+		}
+
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 
 		$request = stripslashes_deep( $_POST );
@@ -594,7 +669,7 @@ class SettingsDebug {
 			'date_paid',
 		);
 
-		if ( in_array( $date_type, $wc_date_types ) ) {
+		if ( in_array( $date_type, $wc_date_types, true ) ) {
 			$date_arg      = $date_type;
 		} elseif ( 'document_date' === $date_type ) {
 			$document_slug = ! empty( $document_type ) ? str_replace( '-', '_', $document_type ) : '';
@@ -610,7 +685,7 @@ class SettingsDebug {
 
 		$args[ $date_arg ] = $from_date . '...' . $to_date;
 
-		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '6.8.0', '>=' ) && WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled() ) { // Woo >= 6.8.0 + HPOS
+		if ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '6.8.0', '>=' ) && WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() ) { // Woo >= 6.8.0 + HPOS
 			$args = wpo_wcpdf_parse_document_date_for_wp_query( $args, $args );
 		} else {
 			add_filter( 'woocommerce_order_data_store_cpt_get_orders_query', 'wpo_wcpdf_parse_document_date_for_wp_query', 10, 2 );
@@ -636,7 +711,7 @@ class SettingsDebug {
 				}
 
 				if ( 'all' === $document_type ) {
-					$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+					$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 
 					if ( is_array( $documents ) ) {
 						foreach ( $documents as $document ) {
@@ -686,7 +761,14 @@ class SettingsDebug {
 		wp_send_json_success( $response );
 	}
 
-	private function renumber_or_delete_document( $document, $delete_or_renumber ) {
+	/**
+	 * Renumber or delete a document based on the given action.
+	 *
+	 * @param OrderDocument $document
+	 * @param string $delete_or_renumber
+	 * @return bool
+	 */
+	private function renumber_or_delete_document( OrderDocument $document, string $delete_or_renumber ): bool {
 		$return = false;
 
 		if ( $document && $document->exists() ) {
@@ -716,33 +798,45 @@ class SettingsDebug {
 		return $return;
 	}
 
-	public function get_setting_types() {
-		$setting_types = [
-			'general'   => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
-			'debug'     => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
-			'ubl_taxes' => __( 'UBL Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
-		];
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+	/**
+	 * Get the available setting types.
+	 *
+	 * @return array
+	 */
+	public function get_setting_types(): array {
+		$setting_types = array(
+			'general' => __( 'General', 'woocommerce-pdf-invoices-packing-slips' ),
+			'debug'   => __( 'Debug', 'woocommerce-pdf-invoices-packing-slips' ),
+			'edi'     => __( 'E-Documents', 'woocommerce-pdf-invoices-packing-slips' ),
+			'edi_tax' => __( 'E-Document Taxes', 'woocommerce-pdf-invoices-packing-slips' ),
+		);
+
+		$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
+
 		foreach ( $documents as $document ) {
-			if ( $document->title != $document->get_title() ) {
-				$title = $document->title.' ('.$document->get_title().')';
+			$document_title = $document->get_title();
+
+			if ( $document->title !== $document_title ) {
+				$title = $document->title . ' (' . $document_title . ')';
 			} else {
-				$title = $document->get_title();
+				$title = $document_title;
 			}
 
-			foreach ( $document->output_formats as $output_format ) {
-				$slug = $document->get_type();
-				if ( 'pdf' !== $output_format ) {
-					$slug .= "_{$output_format}";
-				}
-				$setting_types[$slug] = strtoupper( $output_format ) . ' ' .  $title;
-			}
+			$setting_types[ $document->get_type() ] = $title;
 		}
 
-		return apply_filters( 'wpo_wcpdf_setting_types', $setting_types );
+		return (array) apply_filters(
+			'wpo_wcpdf_setting_types',
+			$setting_types
+		);
 	}
 
-	public function init_settings() {
+	/**
+	 * Initialize debug settings.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
 		// Register settings.
 		$page = $option_group = $option_name = 'wpo_wcpdf_settings_debug';
 
@@ -895,10 +989,11 @@ class SettingsDebug {
 			array(
 				'type'     => 'setting',
 				'id'       => 'default_manual_document_number',
-				'title'    => __( 'Default manual document number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => '',
 				'callback' => 'select',
 				'section'  => 'debug_settings',
 				'args'     => array(
+					'title'       => __( 'Default manual document number', 'woocommerce-pdf-invoices-packing-slips' ),
 					'option_name' => $option_name,
 					'id'          => 'default_manual_document_number',
 					'default'     => 'zero',
@@ -907,6 +1002,10 @@ class SettingsDebug {
 						'next_document_number' => __( 'Next document number', 'woocommerce-pdf-invoices-packing-slips' ),
 					),
 					'description' => __( 'Select the default value for the document number field in the "PDF document data" meta box when manually creating a new document.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[enable_document_data_editing]',
+						'data-show_for_option_values' => json_encode( array( 'yes' ) ),
+					),
 				)
 			),
 			array(
@@ -950,6 +1049,21 @@ class SettingsDebug {
 					'id'          => 'embed_images',
 					'description' => __( 'Embed images only if you are experiencing issues with them loading in your PDF. Please note that this option can significantly increase the file size.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'allowed_remote_hosts',
+				'title'    => __( 'Allowed image hosts', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'textarea',
+				'section'  => 'debug_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'allowed_remote_hosts',
+					'width'       => '50',
+					'height'      => '4',
+					'placeholder' => 'cdn.example.com',
+					'description' => __( 'By default, images and other resources in PDFs are only loaded from this website and from the hosts serving the shop logo and product images. Add allowed hostnames here, one per line (for example cdn.example.com). Each entry allows only that exact hostname. List subdomains separately; wildcards and leading-dot notation are not supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -1007,7 +1121,7 @@ class SettingsDebug {
 						$log_url        = str_replace(
 							WP_CONTENT_DIR,
 							content_url(),
-							WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) . '/log.htm'
+							WPO_WCPDF()->get_instance( 'main' )->get_tmp_path( 'dompdf' ) . '/log.htm'
 						);
 
 						return implode( '<br>', array(
@@ -1079,11 +1193,15 @@ class SettingsDebug {
 
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_debug', $settings_fields, $page, $option_group, $option_name );
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
-		return;
+		WPO_WCPDF()->get_instance( 'settings' )->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
 
-	public function document_link_access_type_table() {
+	/**
+	 * Output the document link access type table.
+	 *
+	 * @return void
+	 */
+	public function document_link_access_type_table(): void {
 		?>
 		<table id="document-link-access-type">
 			<tr>
@@ -1104,9 +1222,14 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_server_config(): array {
-		$debug_settings    = WPO_WCPDF()->settings->debug_settings;
+		$debug_settings    = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$filesystem_method = apply_filters( 'wpo_wcpdf_filesystem_method', $debug_settings['file_system_method'] ?? 'wp' );
 		$filesystem_method = 'wp' === $filesystem_method && function_exists( 'get_filesystem_method' ) ? get_filesystem_method() : $filesystem_method;
+
+		// WP + Woo
+		$wp_version        = get_bloginfo( 'version' );
+		$woo_version       = defined( 'WC_VERSION' ) ? WC_VERSION : null;
+		$woo_hpos_enabled  = WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled();
 
 		$memory_limit      = function_exists( 'wc_let_to_num' ) ? wc_let_to_num( WP_MEMORY_LIMIT ) : woocommerce_let_to_num( WP_MEMORY_LIMIT );
 		$php_mem_limit     = function_exists( 'memory_get_usage' ) ? @ini_get( 'memory_limit' ) : '-';
@@ -1122,11 +1245,51 @@ class SettingsDebug {
 		$zlib              = extension_loaded( 'zlib' );
 		$fileinfo          = extension_loaded( 'fileinfo' );
 
+		// Database
+		$db_details     = $this->get_database_details();
+		$database_value = $db_details['type'] ?? __( 'Unknown', 'woocommerce-pdf-invoices-packing-slips' );
+		if ( ! empty( $db_details['version'] ) ) {
+			$database_value .= ' ' . $db_details['version'];
+		}
+
 		$server_configs = array(
+			'WordPress version' => array(
+				'required' => sprintf(
+					/* translators: %s dependency min version */
+					__( '%s or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+					WPO_WCPDF()->version_wp
+				),
+				'value'    => $wp_version,
+				'result'   => WPO_WCPDF()->is_dependency_version_supported( 'wp' ),
+			),
+			'WooCommerce version' => array(
+				'required' => sprintf(
+					/* translators: %s dependency min version */
+					__( '%s or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+					WPO_WCPDF()->version_woo
+				),
+				'value'    => $woo_version,
+				'result'   => WPO_WCPDF()->is_dependency_version_supported( 'woo' ),
+			),
+			'WooCommerce HPOS' => array(
+				'required' => __( 'Recommended', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => $woo_hpos_enabled ? __( 'Enabled', 'woocommerce-pdf-invoices-packing-slips' ) : __( 'Disabled', 'woocommerce-pdf-invoices-packing-slips' ),
+				'result'   => true,
+			),
 			'PHP version' => array(
-				'required' => __( '7.4 or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+				'required' => sprintf(
+					/* translators: %s dependency min version */
+					__( '%s or superior', 'woocommerce-pdf-invoices-packing-slips' ),
+					WPO_WCPDF()->version_php
+				),
 				'value'    => PHP_VERSION,
 				'result'   => WPO_WCPDF()->is_dependency_version_supported( 'php' ),
+			),
+			'Database' => array(
+				'required' => __( 'MySQL, MariaDB, or SQLite', 'woocommerce-pdf-invoices-packing-slips' ),
+				'value'    => $database_value,
+				'result'   => ! empty( $db_details['type'] ),
+				'fallback' => __( 'Unable to detect the database server', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'DOMDocument extension' => array(
 				'required' => true,
@@ -1189,7 +1352,7 @@ class SettingsDebug {
 			'WP Filesystem Method' => array(
 				'required' => __( 'Required to save documents to the server', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'    => $filesystem_method,
-				'result'   => in_array( $filesystem_method, array( 'direct', 'php' ) ),
+				'result'   => in_array( $filesystem_method, array( 'direct', 'php' ), true ),
 				'fallback' => __( 'Check your server configuration', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
 			'allow_url_fopen' => array (
@@ -1204,7 +1367,7 @@ class SettingsDebug {
 				'result'   => $fileinfo,
 				'fallback' => __( 'fileinfo disabled', 'woocommerce-pdf-invoices-packing-slips' ),
 			),
-			'base64_decode'	=> array (
+			'base64_decode' => array (
 				'required' => __( 'To compress and decompress font and image data', 'woocommerce-pdf-invoices-packing-slips' ),
 				'value'	   => null,
 				'result'   => function_exists( 'base64_decode' ),
@@ -1239,7 +1402,10 @@ class SettingsDebug {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_server_configs', $server_configs );
+		return (array) apply_filters(
+			'wpo_wcpdf_server_configs',
+			$server_configs
+		);
 	}
 
 	/**
@@ -1254,16 +1420,14 @@ class SettingsDebug {
 		}
 
 		// Handle dismissal action.
-		if ( isset( $_GET['wpo_dismiss_requirements_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_requirements_notice' ) ) {
+		Notices::handle_notice_action(
+			'wpo_dismiss_requirements_notice',
+			'dismiss_requirements_notice',
+			function (): void {
 				update_option( 'wpo_wcpdf_dismiss_requirements_notice', true );
-				wp_redirect( remove_query_arg( array( 'wpo_dismiss_requirements_notice', '_wpnonce' ) ) );
-				exit;
-			} else {
-				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
-				return;
-			}
-		}
+			},
+			admin_url( 'admin.php?page=wpo_wcpdf_options_page' )
+		);
 
 		// Check if the server requirements are met.
 		$show_requirement_notice = false;
@@ -1286,33 +1450,7 @@ class SettingsDebug {
 		}
 
 		// Display the notice.
-		add_action( 'admin_notices', array( $this, 'display_server_requirement_notice' ) );
-	}
-
-	/**
-	 * Display a notice informing the user that the server requirements are not met.
-	 *
-	 * @return void
-	 */
-	public function display_server_requirement_notice(): void {
-		$status_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=debug&section=status' );
-		$dismiss_url     = wp_nonce_url( add_query_arg( 'wpo_dismiss_requirements_notice', true ), 'dismiss_requirements_notice' );
-		$notice_message  = sprintf(
-			/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
-			__( 'Your server does not meet the requirements for %1$s. Please check the %2$sStatus page%3$s for more information.', 'woocommerce-pdf-invoices-packing-slips' ),
-			'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-			'<a href="' . esc_url( $status_page_url ) . '">',
-			'</a>'
-		);
-
-		?>
-
-		<div class="notice notice-warning">
-			<p><?php echo wp_kses_post( $notice_message ); ?></p>
-			<p><a href="<?php echo esc_url( $dismiss_url ); ?>" class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>
-		</div>
-
-		<?php
+		Notices::maybe_add_admin_notice( array( Notices::class, 'display_server_requirement_notice' ) );
 	}
 
 	/**
@@ -1321,32 +1459,31 @@ class SettingsDebug {
 	 * @return array
 	 */
 	public function get_premium_plugins(): array {
-		$premium_plugins = apply_filters( 'wpo_wcpdf_premium_plugins', array(
-			'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php',
-			'woocommerce-pdf-ips-templates/woocommerce-pdf-ips-templates.php',
-		) );
+		$premium_plugins = apply_filters(
+			'wpo_wcpdf_premium_plugins',
+			array(
+				'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php'             => 'wpo_wcpdf_pro_license',
+				'woocommerce-pdf-ips-templates/woocommerce-pdf-ips-templates.php' => 'wpo_wcpdf_templates_license',
+			)
+		);
 
-		$plugins = array();
-		$installed_plugins = get_plugins();
+		// Get base data (name, version, is_active)
+		$plugin_files = array_keys( $premium_plugins );
+		$plugins      = wpo_ips_get_plugins_data( $plugin_files );
 
-		foreach ( $premium_plugins as $premium_plugin ) {
-			// Check if the plugin is installed.
-			if ( ! isset( $installed_plugins[ $premium_plugin ] ) ) {
-				continue;
-			}
+		// Add license keys
+		$licenses = get_option( 'wpocore_settings', array() );
 
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/' . $premium_plugin );
-
-			if ( ! empty( $plugin_data ) ) {
-				$plugins[ $premium_plugin ] = array(
-					'name'      => $plugin_data['Name'],
-					'version'   => $plugin_data['Version'],
-					'is_active' => is_plugin_active( $premium_plugin ),
-				);
-			}
+		foreach ( $plugins as $plugin_file => &$data ) {
+			$license_slug        = $premium_plugins[ $plugin_file ] ?? '';
+			$data['license_key'] = $license_slug && isset( $licenses[ $license_slug ] ) ? $licenses[ $license_slug ] : '';
 		}
+		unset( $data ); // break the reference
 
-		return apply_filters( 'wpo_wcpdf_premium_plugins_data', $plugins );
+		return (array) apply_filters(
+			'wpo_wcpdf_premium_plugins_data',
+			$plugins
+		);
 	}
 
 	/**
@@ -1359,35 +1496,42 @@ class SettingsDebug {
 			'ok'     => __( 'Writable', 'woocommerce-pdf-invoices-packing-slips' ),
 			'failed' => __( 'Not writable', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
+		
+		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
+		$main_instance        = WPO_WCPDF()->get_instance( 'main' );
 
 		$permissions = array(
 			'WCPDF_TEMP_DIR'       => array(
 				'description'    => __( 'Central temporary plugin folder', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'          => WPO_WCPDF()->main->get_tmp_path(),
-				'status'         => WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? 'ok' : 'failed',
-				'status_message' => WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path() ) ? $status['ok'] : $status['failed'],
+				'value'          => $main_instance->get_tmp_path(),
+				'status'         => $file_system_instance->is_writable( $main_instance->get_tmp_path() ) ? 'ok' : 'failed',
+				'status_message' => $file_system_instance->is_writable( $main_instance->get_tmp_path() ) ? $status['ok'] : $status['failed'],
 			),
 			'WCPDF_ATTACHMENT_DIR' => array(
 				'description'    => __( 'Temporary attachments folder', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ),
-				'status'         => WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',
-				'status_message' => WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'attachments' ) ) ? $status['ok'] : $status['failed'],
+				'value'          => trailingslashit( $main_instance->get_tmp_path( 'attachments' ) ),
+				'status'         => $file_system_instance->is_writable( $main_instance->get_tmp_path( 'attachments' ) ) ? 'ok' : 'failed',
+				'status_message' => $file_system_instance->is_writable( $main_instance->get_tmp_path( 'attachments' ) ) ? $status['ok'] : $status['failed'],
 			),
 			'DOMPDF_TEMP_DIR'      => array(
 				'description'    => __( 'Temporary DOMPDF folder', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ),
-				'status'         => WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ) ? 'ok' : 'failed',
-				'status_message' => WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'dompdf' ) ) ? $status['ok'] : $status['failed'],
+				'value'          => trailingslashit( $main_instance->get_tmp_path( 'dompdf' ) ),
+				'status'         => $file_system_instance->is_writable( $main_instance->get_tmp_path( 'dompdf' ) ) ? 'ok' : 'failed',
+				'status_message' => $file_system_instance->is_writable( $main_instance->get_tmp_path( 'dompdf' ) ) ? $status['ok'] : $status['failed'],
 			),
 			'DOMPDF_FONT_DIR'      => array(
 				'description'    => __( 'DOMPDF fonts folder (needs to be writable for custom/remote fonts)', 'woocommerce-pdf-invoices-packing-slips' ),
-				'value'          => trailingslashit( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ),
-				'status'         => WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ) ? 'ok' : 'failed',
-				'status_message' => WPO_WCPDF()->file_system->is_writable( WPO_WCPDF()->main->get_tmp_path( 'fonts' ) ) ? $status['ok'] : $status['failed'],
+				'value'          => trailingslashit( $main_instance->get_tmp_path( 'fonts' ) ),
+				'status'         => $file_system_instance->is_writable( $main_instance->get_tmp_path( 'fonts' ) ) ? 'ok' : 'failed',
+				'status_message' => $file_system_instance->is_writable( $main_instance->get_tmp_path( 'fonts' ) ) ? $status['ok'] : $status['failed'],
 			),
 		);
 
-		return apply_filters( 'wpo_wcpdf_plugin_directories', $permissions, $status );
+		return (array) apply_filters(
+			'wpo_wcpdf_plugin_directories',
+			$permissions,
+			$status
+		);
 	}
 
 	/**
@@ -1396,7 +1540,7 @@ class SettingsDebug {
 	 * @return array|false
 	 */
 	public function get_yearly_reset_schedule() {
-		if ( ! WPO_WCPDF()->settings->maybe_schedule_yearly_reset_numbers() ) {
+		if ( ! WPO_WCPDF()->get_instance( 'settings' )->maybe_schedule_yearly_reset_numbers() ) {
 			return false;
 		}
 
@@ -1458,12 +1602,15 @@ class SettingsDebug {
 	 * @return array
 	 */
 	private function get_settings_sections(): array {
-		return apply_filters( 'wpo_wcpdf_settings_debug_sections', array(
-			'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
-			'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
-			'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
-			'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
-		) );
+		return (array) apply_filters(
+			'wpo_wcpdf_settings_debug_sections',
+			array(
+				'settings' => __( 'Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'status'   => __( 'Status', 'woocommerce-pdf-invoices-packing-slips' ),
+				'tools'    => __( 'Tools', 'woocommerce-pdf-invoices-packing-slips' ),
+				'numbers'  => __( 'Numbers', 'woocommerce-pdf-invoices-packing-slips' ),
+			)
+		);
 	}
 
 	/**
@@ -1489,6 +1636,7 @@ class SettingsDebug {
 					'pretty_document_links',
 					'disable_preview',
 					'embed_images',
+					'allowed_remote_hosts',
 					'html_output',
 				),
 			),
@@ -1530,7 +1678,10 @@ class SettingsDebug {
 			),
 		);
 
-		return apply_filters( 'wpo_wcpdf_settings_debug_categories', $categories );
+		return (array) apply_filters(
+			'wpo_wcpdf_settings_debug_categories',
+			$categories
+		);
 	}
 
 	/**
@@ -1620,6 +1771,11 @@ class SettingsDebug {
 	 * @return void
 	 */
 	public function ajax_numbers_data(): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
+			wp_send_json_error( compact( 'message' ) );
+		}
+
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
 
 		$request = stripslashes_deep( $_POST );
@@ -1656,7 +1812,7 @@ class SettingsDebug {
 		$valid_table_name = null;
 		if (
 			isset( $request_data['table_name'] )
-			&& in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ) )
+			&& in_array( $request_data['table_name'], array_keys( $this->get_number_store_tables() ), true )
 		) {
 			$valid_table_name = sanitize_text_field( $request_data['table_name'] );
 		}
@@ -1835,7 +1991,7 @@ class SettingsDebug {
 	 */
 	public function maybe_schedule_unstable_version_check(): void {
 		$hook           = 'wpo_wcpdf_check_unstable_version_daily';
-		$debug_settings = WPO_WCPDF()->settings->debug_settings;
+		$debug_settings = WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' );
 		$enabled        = isset( $debug_settings['check_unstable_versions'] );
 
 		if (
@@ -1868,6 +2024,408 @@ class SettingsDebug {
 	 */
 	public function run_unstable_version_check(): void {
 		wpo_wcpdf_get_latest_releases_from_github();
+	}
+
+	/**
+	 * Generate and download the plugin report as a PDF.
+	 *
+	 * @return void
+	 */
+	public function ajax_plugin_report(): void {
+		$settings_instance = \WPO_WCPDF()->get_instance( 'settings' );
+		
+		if ( ! $settings_instance->user_can_manage_settings() ) {
+			wp_die( esc_html__( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
+		check_ajax_referer( 'wpo_ips_plugin_report', 'nonce' );
+
+		$include_sensitive    = isset( $_GET['include_sensitive'] )
+			? filter_var( wp_unslash( $_GET['include_sensitive'] ), FILTER_VALIDATE_BOOLEAN )
+			: false;
+		$output_html          = isset( $_GET['output_html'] )
+			? filter_var( wp_unslash( $_GET['output_html'] ), FILTER_VALIDATE_BOOLEAN )
+			: false;
+
+		$report_title         = 'PDF Invoices & Packing Slips for WooCommerce - Report';
+		$premium_plugins      = $this->get_premium_plugins();
+		$free_extensions      = $this->get_free_extensions();
+		$multilingual_plugins = $this->get_multilingual_plugins();
+		$plugin_version       = \WPO_WCPDF()->version;
+		$store_url            = get_site_url();
+		$report_date          = gmdate( 'Y-m-d H:i:s' );
+		$report_user          = $include_sensitive ? wp_get_current_user() : null;
+		$server_configs       = $this->get_server_config();
+		$dir_permissions      = $include_sensitive ? $this->get_directory_permissions() : array();
+		$yearly_reset         = $this->get_yearly_reset_schedule();
+
+		// Load CSS file contents
+		$report_css = '';
+		$suffix     = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$css_path   = \WPO_WCPDF()->plugin_path() . '/assets/css/plugin-report' . $suffix . '.css';
+		
+		$file_system_instance = \WPO_WCPDF()->get_instance( 'file_system' );
+
+		if ( $file_system_instance->exists( $css_path ) && $file_system_instance->is_readable( $css_path ) ) {
+			$report_css = $file_system_instance->get_contents( $css_path );
+		}
+
+		// Load Settings
+		$general_settings   = get_option( 'wpo_wcpdf_settings_general', array() );
+		$debug_settings     = get_option( 'wpo_wcpdf_settings_debug', array() );
+		$edi_settings       = get_option( 'wpo_ips_edi_settings', array() );
+		$documents_settings = array();
+
+		$all_documents = \WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
+		if ( ! empty( $all_documents ) ) {
+			foreach ( $all_documents as $document ) {
+				$document_type                        = $document->get_type();
+				$documents_settings[ $document_type ] = $settings_instance->get_document_settings( $document_type, 'pdf' );
+			}
+		}
+
+		// Logs
+		$logs_data = $include_sensitive ? $this->get_recent_logs() : array();
+
+		// Extensions Settings
+		$extensions_settings = apply_filters( 'wpo_ips_get_extensions_settings_for_report', array(), $include_sensitive );
+
+		ob_start();
+		include \WPO_WCPDF()->plugin_path() . '/views/plugin-report.php';
+		$report_html = ob_get_clean();
+
+		if ( $output_html ) {
+			echo $report_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			die();
+		}
+
+		$pdf_settings = array(
+			'paper_size'        => 'A4',
+			'paper_orientation' => 'portrait',
+			'font_subsetting'   => false,
+		);
+		$pdf_maker = \wcpdf_get_pdf_maker( $report_html, $pdf_settings, $this );
+		$pdf       = $pdf_maker->output();
+
+		$filename  = 'plugin-report-' . gmdate( 'Y-m-d' ) . '.pdf';
+
+		\wcpdf_pdf_headers( $filename, 'download', $pdf );
+		echo $pdf; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		exit();
+	}
+
+	/**
+	 * Keep only valid domain names in the allowed remote hosts setting.
+	 *
+	 * @param mixed $value Debug settings being saved.
+	 * @return mixed
+	 */
+	public function normalize_allowed_remote_hosts( $value ) {
+		if ( is_array( $value ) && isset( $value['allowed_remote_hosts'] ) && is_string( $value['allowed_remote_hosts'] ) ) {
+			$rejected                     = array();
+			$value['allowed_remote_hosts'] = implode( "\n", wpo_ips_normalize_remote_hosts( $value['allowed_remote_hosts'], $rejected ) );
+
+			if ( ! empty( $rejected ) && function_exists( 'add_settings_error' ) ) {
+				add_settings_error(
+					'wpo_wcpdf_settings_debug',
+					'wpo_ips_invalid_remote_hosts',
+					'<span style="font-weight: normal;">' . sprintf(
+						/* translators: %s: comma-separated list of invalid entries. */
+						esc_html__( 'These entries were ignored in Allowed image hosts: %s. Enter exact hostnames such as cdn.example.com. Wildcards, leading-dot notation, IP addresses, and localhost are not supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<strong>' . esc_html( implode( ', ', array_unique( $rejected ) ) ) . '</strong>'
+					) . '</span>',
+					'warning'
+				);
+			}
+		}
+
+		return $value;
+	}
+	
+	/**
+	 * Generate and store a new random string for the temporary folder.
+	 *
+	 * @param array $data Request data.
+	 * @return void
+	 * @see ajax_process_settings_debug_tools()
+	 */
+	private function generate_random_string( array $data ): void {
+		$new_path = WPO_WCPDF()->get_instance( 'main' )->regenerate_random_string( true );
+		$message  = esc_html__( 'Temporary folder moved to', 'woocommerce-pdf-invoices-packing-slips' ) . ': ' . wp_normalize_path( $new_path );
+
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
+	}
+
+	/**
+	 * Install fonts by triggering the font installation process in the main class.
+	 *
+	 * @param array $data
+	 * @return void
+	 * @see ajax_process_settings_debug_tools()
+	 */
+	private function install_fonts( array $data ): void {
+		WPO_WCPDF()->get_instance( 'main' )->maybe_reinstall_fonts( true );
+
+		$message = esc_html__( 'Fonts reinstalled!', 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
+	}
+
+	/**
+	 * Reset the number sequence for a specific document type.
+	 *
+	 * @param array $data
+	 * @return void
+	 * @see ajax_process_settings_debug_tools()
+	 */
+	private function reschedule_yearly_reset( array $data ): void {
+		WPO_WCPDF()->get_instance( 'settings' )->schedule_yearly_reset_numbers();
+
+		$message = esc_html__( 'Yearly reset numbering system rescheduled!', 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
+	}
+
+	/**
+	 * Clear temporary files that are older than the defined threshold.
+	 *
+	 * @param array $data
+	 * @return void
+	 * @see ajax_process_settings_debug_tools()
+	 */
+	private function clear_tmp( array $data ): void {
+		$output  = WPO_WCPDF()->get_instance( 'main' )->temporary_files_cleanup( time() );
+		$message = reset( $output );
+
+		switch ( key( $output ) ) {
+			case 'error':
+				wcpdf_log_error( $message );
+				wp_send_json_error( compact( 'message' ) );
+				break;
+			case 'success':
+				wcpdf_log_error( $message, 'info' );
+				wp_send_json_success( compact( 'message' ) );
+				break;
+			default:
+				exit;
+		}
+	}
+
+	/**
+	 * Clear released semaphore locks.
+	 *
+	 * @param array $data
+	 * @return void
+	 * @see ajax_process_settings_debug_tools()
+	 */
+	private function clear_released_semaphore_locks( array $data ): void {
+		Semaphore::cleanup_released_locks();
+
+		$message = esc_html__( 'Released semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
+	}
+
+	/**
+	 * Clear released legacy semaphore locks that might be left from previous versions.
+	 *
+	 * @param array $data
+	 * @return void
+	 * @see ajax_process_settings_debug_tools()
+	 */
+	private function clear_released_legacy_semaphore_locks( array $data ): void {
+		Semaphore::cleanup_released_locks( true );
+
+		$message = esc_html__( 'Released legacy semaphore locks have been cleaned up!', 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
+	}
+
+	/**
+	 * Clear the extensions license cache.
+	 *
+	 * @param array $data
+	 * @return void
+	 * @see ajax_process_settings_debug_tools()
+	 */
+	private function clear_extensions_license_cache( array $data ): void {
+		WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'upgrade' )->clear_extensions_license_cache();
+
+		$message = __( "Extensions' license cache cleared successfully!", 'woocommerce-pdf-invoices-packing-slips' );
+		wcpdf_log_error( $message, 'info' );
+		wp_send_json_success( compact( 'message' ) );
+	}
+
+	/**
+	 * Get the premium plugins data.
+	 *
+	 * @return array
+	 */
+	private function get_free_extensions(): array {
+		$free_extensions = apply_filters(
+			'wpo_ips_free_extensions',
+			array(
+				'woocommerce-pdf-ips-barcode-font/woocommerce-pdf-ips-barcode-font.php',
+				'woocommerce-pdf-ips-mpdf/wcpdf-mpdf.php',
+				'woocommerce-pdf-ips-mpdf-cjk/woocommerce-pdf-ips-cjk.php',
+				'woocommerce-pdf-ips-cancelled-credit-notes/woocommerce-pdf-ips-cancelled-credit-notes.php',
+				'woocommerce-pdf-ips-csv-exporter/woocommerce-pdf-ips-csv-exporter.php',
+				'woocommerce-pdf-ips-custom-font/woocommerce-pdf-ips-custom-font.php',
+				'woocommerce-pdf-ips-thai/woocommerce-pdf-ips-thai.php',
+				'woocommerce-pdf-ips-unicode/woocommerce-pdf-ips-unicode.php',
+				'wcpdf-taxes-summary/wcpdf-taxes-summary.php',
+				'wcpdf-shipping-and-fees-item/wcpdf-shipping-item.php',
+				'wcpdf-quotation/wcpdf-quotation.php',
+			)
+		);
+
+		$plugins_data = \wpo_ips_get_plugins_data( $free_extensions );
+
+		return (array) apply_filters(
+			'wpo_ips_free_extensions_data',
+			$plugins_data
+		);
+	}
+
+	/**
+	 * Get multilingual plugins data.
+	 *
+	 * @return array
+	 */
+	private function get_multilingual_plugins(): array {
+		$multilingual_plugins = apply_filters(
+			'wpo_ips_multilingual_plugins',
+			array(
+				'wpml-media-translation/plugin.php',
+				'woocommerce-multilingual/wpml-woocommerce.php',
+				'sitepress-multilingual-cms/sitepress.php',
+				'wpml-string-translation/plugin.php',
+				'polylang/polylang.php',
+				'polylang-wc/polylang-wc.php',
+				'polylang-pro/polylang.php',
+				'translatepress-multilingual/index.php',
+				'weglot/weglot.php',
+				'gtranslate/gtranslate.php',
+				'loco-translate/loco.php',
+			)
+		);
+
+		$plugins_data = \wpo_ips_get_plugins_data( $multilingual_plugins );
+
+		return (array) apply_filters(
+			'wpo_ips_multilingual_plugins_data',
+			$plugins_data
+		);
+	}
+
+	/**
+	 * Get recent log excerpts for key handles.
+	 *
+	 * @param int $limit Number of lines per log file.
+	 * @return array
+	 */
+	protected function get_recent_logs( int $limit = 100 ): array {
+		if ( ! defined( 'WC_LOG_DIR' ) || ! is_dir( WC_LOG_DIR ) ) {
+			return array();
+		}
+
+		$handles = apply_filters( 'wpo_ips_log_handles', array(
+			'fatal-errors',
+			'wpo-wcpdf',
+			'wpo-ips-edi',
+			'wpo-ips-semaphore',
+		) );
+
+		$results = array();
+
+		foreach ( $handles as $handle ) {
+			$pattern = trailingslashit( WC_LOG_DIR ) . $handle . '-*.log';
+			$files   = glob( $pattern );
+
+			if ( empty( $files ) ) {
+				continue;
+			}
+
+			usort(
+				$files,
+				static function ( $a, $b ) {
+					return filemtime( $b ) <=> filemtime( $a );
+				}
+			);
+
+			$file  = $files[0];
+			$lines = @file( $file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES );
+
+			if ( ! is_array( $lines ) ) {
+				continue;
+			}
+
+			$total_lines = count( $lines );
+			if ( $limit > 0 && $total_lines > $limit ) {
+				$lines = array_slice( $lines, -$limit );
+			}
+
+			$results[ $handle ] = array(
+				'file'  => basename( $file ),
+				'lines' => $lines,
+			);
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Get database server details.
+	 *
+	 * @return array{
+	 *     type: string|null,
+	 *     version: string|null,
+	 *     server_info: string|null,
+	 * }
+	 */
+	protected function get_database_details(): array {
+		global $wpdb;
+
+		$type        = null;
+		$version     = null;
+		$server_info = null;
+
+		if ( ! isset( $wpdb ) || ! is_object( $wpdb ) ) {
+			return array(
+				'type'        => null,
+				'version'     => null,
+				'server_info' => null,
+			);
+		}
+
+		$server_info = is_callable( array( $wpdb, 'db_server_info' ) ) ? (string) $wpdb->db_server_info() : '';
+		$version     = is_callable( array( $wpdb, 'db_version' ) ) ? (string) $wpdb->db_version() : '';
+
+		if ( false !== stripos( $server_info, 'MariaDB' ) ) {
+			$type = 'MariaDB';
+		} elseif ( false !== stripos( $server_info, 'SQLite' ) ) {
+			$type = 'SQLite';
+		} elseif ( false !== stripos( $server_info, 'MySQL' ) || ! empty( $version ) ) {
+			// Default to MySQL when using core wpdb and no MariaDB marker is present.
+			$type = 'MySQL';
+		}
+
+		// Fallback for SQLite integrations that may not expose db_server_info cleanly.
+		if ( empty( $type ) && method_exists( $wpdb, 'get_var' ) ) {
+			$sqlite_version = $wpdb->get_var( 'SELECT sqlite_version()' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+
+			if ( ! empty( $sqlite_version ) ) {
+				$type    = 'SQLite';
+				$version = $version ?: (string) $sqlite_version;
+			}
+		}
+
+		return array(
+			'type'        => $type,
+			'version'     => $version ?: null,
+			'server_info' => $server_info ?: null,
+		);
 	}
 
 }

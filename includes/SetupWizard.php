@@ -9,23 +9,27 @@ if ( ! class_exists( '\\WPO\\IPS\\SetupWizard' ) ) :
 
 class SetupWizard {
 
-	/** @var string Current Step */
-	private $step   = '';
+	private string $step              = '';
+	private array $steps              = array();
+	protected static ?self $_instance = null;
 
-	/** @var array Steps for the setup wizard */
-	private $steps  = array();
-
-	protected static $_instance = null;
-
-	public static function instance() {
+	/**
+	 * Singleton instance accessor.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		if ( WPO_WCPDF()->settings->user_can_manage_settings() ) {
+		if ( WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			add_action( 'admin_menu', array( $this, 'admin_menus' ) );
 			remove_all_actions( 'admin_init' ); // prevents other plugins from adding their own actions
 			add_action( 'admin_init', array( $this, 'setup_wizard' ) );
@@ -34,8 +38,10 @@ class SetupWizard {
 
 	/**
 	 * Add admin menus/screens.
+	 * 
+	 * @return void
 	 */
-	public function admin_menus() {
+	public function admin_menus(): void {
 		add_dashboard_page( '', '', 'manage_options', 'wpo-wcpdf-setup', '' );
 	}
 
@@ -56,32 +62,32 @@ class SetupWizard {
 
 		$this->steps = array(
 			'shop-name' => array(
-				'name'	=> __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/shop-name.php',
+				'name' => __( 'Shop Name', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/shop-name.php',
 			),
 			'logo' => array(
-				'name'	=> __( 'Your logo', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/logo.php',
+				'name' => __( 'Your logo', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/logo.php',
 			),
 			'attach-to' => array(
-				'name'	=> __( 'Attachments', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/attach-to.php',
+				'name' => __( 'Attachments', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/attach-to.php',
 			),
 			'display-options' => array(
-				'name'	=> __( 'Display options', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/display-options.php',
+				'name' => __( 'Display options', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/display-options.php',
 			),
 			'paper-format' => array(
-				'name'	=> __( 'Paper format', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/paper-format.php',
+				'name' => __( 'Paper format', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/paper-format.php',
 			),
 			'show-action-buttons' => array(
-				'name'	=> __( 'Action buttons', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/show-action-buttons.php',
+				'name' => __( 'Action buttons', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/show-action-buttons.php',
 			),
 			'good-to-go' => array(
-				'name'	=> __( 'Ready!', 'woocommerce-pdf-invoices-packing-slips' ),
-				'view'	=> WPO_WCPDF()->plugin_path() . '/views/setup-wizard/good-to-go.php',
+				'name' => __( 'Ready!', 'woocommerce-pdf-invoices-packing-slips' ),
+				'view' => WPO_WCPDF()->plugin_path() . '/views/setup-wizard/good-to-go.php',
 			),
 		);
 		$this->step = isset( $request['step'] ) ? sanitize_text_field( $request['step'] ) : current( array_keys( $this->steps ) );
@@ -113,7 +119,8 @@ class SetupWizard {
 			'wpo-wcpdf-media-upload',
 			WPO_WCPDF()->plugin_url() . '/assets/js/media-upload' . $suffix . '.js',
 			array( 'jquery', 'media-editor', 'mce-view' ),
-			WPO_WCPDF_VERSION
+			WPO_WCPDF_VERSION,
+			true
 		);
 
 		wp_localize_script(
@@ -126,7 +133,8 @@ class SetupWizard {
 			'wpo-wcpdf-setup',
 			WPO_WCPDF()->plugin_url() . '/assets/js/setup-wizard' . $suffix . '.js',
 			array( 'jquery', 'wpo-wcpdf-media-upload' ),
-			WPO_WCPDF_VERSION
+			WPO_WCPDF_VERSION,
+			true
 		);
 		
 		wp_localize_script(
@@ -134,6 +142,7 @@ class SetupWizard {
 			'wpo_wcpdf_setup',
 			array(
 				'ajaxurl'                       => admin_url( 'admin-ajax.php' ),
+				'nonce'                         => wp_create_nonce( 'wpo_wcpdf_setup_nonce' ),
 				'shop_country_changed_messages' => array(
 					'loading' => __( 'Loading', 'woocommerce-pdf-invoices-packing-slips' ) . '...',
 					'empty'   => __( 'No states available', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -141,26 +150,36 @@ class SetupWizard {
 				),
 			)
 		);
-
-		if ( ! wp_script_is( 'jquery-blockui', 'enqueued' ) ) {
-			wp_register_script(
-				'jquery-blockui',
-				WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI' . $suffix . '.js',
-				array( 'jquery' ),
-				WC_VERSION
-			);
+		
+		$woo_dependencies = array(
+			0 => array(
+				'handle' => version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				'url'    => WC()->plugin_url() . '/assets/js/jquery-blockui/jquery.blockUI.min.js',
+				'deps'   => array(
+					'jquery',
+				),
+			),
+			1 => array(
+				'handle' => version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-select2' : 'select2',
+				'url'    => WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
+				'deps'   => array(
+					'jquery',
+					version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
+				),
+			),
+		);
+		
+		foreach ( $woo_dependencies as $dep ) {
+			if ( ! wp_script_is( $dep['handle'], 'registered' ) ) {
+				wp_register_script(
+					$dep['handle'],
+					$dep['url'],
+					$dep['deps'],
+					WC_VERSION,
+					true
+				);
+			}
 		}
-
-		if ( ! wp_script_is( 'select2', 'enqueued' ) ) {
-			wp_register_script(
-				'select2',
-				WC()->plugin_url() . '/assets/js/select2/select2.full.min.js',
-				array( 'jquery', 'jquery-blockui' ),
-				WC_VERSION
-			);
-		}
-
-		wp_enqueue_media();
 
 		$step_keys = array_keys( $this->steps );
 		if ( end( $step_keys ) === $this->step ) {
@@ -168,9 +187,12 @@ class SetupWizard {
 				'wpo-wcpdf-setup-confetti',
 				WPO_WCPDF()->plugin_url() . '/assets/js/confetti' . $suffix . '.js',
 				array( 'jquery' ),
-				WPO_WCPDF_VERSION
+				WPO_WCPDF_VERSION,
+				true
 			);
 		}
+		
+		wp_enqueue_media();
 
 		if ( ! empty( $request['save_step'] ) ) {
 			$this->save_step();
@@ -189,8 +211,10 @@ class SetupWizard {
 
 	/**
 	 * Setup Wizard Header.
+	 * 
+	 * @return void
 	 */
-	public function setup_wizard_header() {
+	public function setup_wizard_header(): void {
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?> class="wpo-wizard">
@@ -200,7 +224,8 @@ class SetupWizard {
 			<title>PDF Invoices & Packing Slips for WooCommerce &rsaquo; <?php esc_html_e( 'Setup Wizard', 'woocommerce-pdf-invoices-packing-slips' ); ?></title>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup' ); ?>
 			<?php wp_print_scripts( 'wpo-wcpdf-setup-confetti' ); ?>
-			<?php wp_print_scripts( 'select2' ); ?>
+			<?php wp_print_scripts( wp_script_is( 'wc-select2', 'registered' ) ? 'wc-select2' : 'select2' ); ?>
+			<?php remove_action( 'admin_print_styles', 'print_emoji_styles' ); ?>
 			<?php do_action( 'admin_print_styles' ); ?>
 			<?php do_action( 'admin_head' ); ?>
 		</head>
@@ -212,8 +237,10 @@ class SetupWizard {
 
 	/**
 	 * Output the steps.
+	 * 
+	 * @return void
 	 */
-	public function setup_wizard_steps() {
+	public function setup_wizard_steps(): void {
 		$output_steps = $this->steps;
 		// array_shift( $output_steps );
 		?>
@@ -235,8 +262,10 @@ class SetupWizard {
 
 	/**
 	 * Output the content for the current step.
+	 * 
+	 * @return void
 	 */
-	public function setup_wizard_content() {
+	public function setup_wizard_content(): void {
 		echo '<div class="wpo-setup-content">';
 		include( $this->steps[ $this->step ]['view'] );
 		echo '</div>';
@@ -244,8 +273,10 @@ class SetupWizard {
 
 	/**
 	 * Setup Wizard Footer.
+	 * 
+	 * @return void
 	 */
-	public function setup_wizard_footer() {
+	public function setup_wizard_footer(): void {
 		?>
 						<input type="hidden" name="wpo_wcpdf_step" value="<?php echo esc_attr( $this->step ); ?>">
 						<div class="wpo-setup-buttons">
@@ -269,7 +300,13 @@ class SetupWizard {
 		<?php
 	}
 
-	public function get_step_link( $step ) {
+	/**
+	 * Get the link for a specific step.
+	 *
+	 * @param string $step Step key to get the link for.
+	 * @return string URL for the specified step.
+	 */
+	public function get_step_link( string $step ): string {
 		$step_keys = array_keys( $this->steps );
 		if ( end( $step_keys ) === $this->step && empty( $step ) ) {
 			return admin_url('admin.php?page=wpo_wcpdf_options_page&tab=general');
@@ -277,30 +314,50 @@ class SetupWizard {
 		return esc_url_raw( add_query_arg( 'step', $step ) );
 	}
 
-
-	public function get_step( $delta ) {
-		$step_keys = array_keys( $this->steps );
+	/**
+	 * Get the next or previous step key.
+	 *
+	 * @param int $delta Direction to move in the steps array (1 for next, -1 for previous).
+	 * @return string|false The key of the next/previous step, or false if there is no such step.
+	 */
+	public function get_step( int $delta ): string|false {
+		$step_keys        = array_keys( $this->steps );
 		$current_step_pos = array_search( $this->step, $step_keys );
-		$new_step_pos = $current_step_pos + $delta;
-		if ( isset( $step_keys[$new_step_pos] ) ) {
-			return $step_keys[$new_step_pos];
+		$new_step_pos     = $current_step_pos + $delta;
+		
+		if ( isset( $step_keys[ $new_step_pos ] ) ) {
+			return $step_keys[ $new_step_pos ];
 		} else {
 			return false;
 		}
 	}
 
-	public function save_step() {
-		$request = stripslashes_deep( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	/**
+	 * Save the current step's data.
+	 * 
+	 * @return void
+	 */
+	public function save_step(): void {
+		if ( ! WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), '', array( 'response' => 403 ) );
+		}
+
+		check_admin_referer( 'wpo-wcpdf-setup' );
+		$request = stripslashes_deep( $_POST );
 
 		if ( isset( $this->steps[ $this->step ]['handler'] ) ) {
-			check_admin_referer( 'wpo-wcpdf-setup' );
 			// for doing more than just saving an option value
 			call_user_func( $this->steps[ $this->step ]['handler'] );
 		} else {
 			if ( ! empty( $request['wcpdf_settings'] ) && is_array( $request['wcpdf_settings'] ) ) {
-				check_admin_referer( 'wpo-wcpdf-setup' );
+				// only the plugin options rendered by the wizard can be saved
+				$allowed_options = array( 'wpo_wcpdf_settings_general', 'wpo_wcpdf_documents_settings_invoice' );
 
 				foreach ( $request['wcpdf_settings'] as $option => $settings ) {
+					if ( ! in_array( $option, $allowed_options, true ) || ! is_array( $settings ) ) {
+						continue;
+					}
+
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
 						if ( 'attach_to_email_ids' === $key ) {
@@ -330,11 +387,10 @@ class SetupWizard {
 					}
 
 					$new_settings = $settings + $current_settings;
-					
 					update_option( $option, $new_settings );
 				}
 			} elseif ( ! empty( $request['wpo_wcpdf_step'] ) && 'show-action-buttons' === $request['wpo_wcpdf_step'] ) {
-				$orders_column_hidden_key = WPO_WCPDF()->order_util->custom_orders_table_usage_is_enabled()
+				$orders_column_hidden_key = WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled()
 					? 'managewoocommerce_page_wc-orderscolumnshidden'
 					: 'manageedit-shop_ordercolumnshidden';
 
@@ -358,7 +414,7 @@ class SetupWizard {
 			}
 		}
 
-		wp_redirect( esc_url_raw( $this->get_step_link( $this->get_step(1) ) ) );
+		wp_safe_redirect( $this->get_step_link( $this->get_step(1) ) );
 	}
 
 }

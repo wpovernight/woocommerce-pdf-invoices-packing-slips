@@ -9,26 +9,40 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsUpgrade' ) ) :
 
 class SettingsUpgrade {
 
-	public           $extensions;
-	protected static $_instance = null;
+	public array $extensions          = array( 'pro', 'templates' );
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		$this->extensions = array( 'pro', 'templates' );
-
+		// IPS
 		add_action( 'wpo_wcpdf_before_settings_page', array( $this, 'extensions_license_cache_notice' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_settings_page', array( $this, 'extension_overview' ), 10, 2 );
 		add_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing', array( $this, 'clear_extensions_license_cache' ) );
 	}
 
-	public function extensions_license_cache_notice( $tab, $active_section ) {
-		if ( 'upgrade' === $tab && WPO_WCPDF()->settings->upgrade->get_extensions_license_data() ) {
+	/**
+	 * Display a notice about the extensions license cache on the upgrade tab
+	 *
+	 * @param string $tab
+	 * @param string $active_section
+	 * @return void
+	 */
+	public function extensions_license_cache_notice( string $tab, string $active_section ): void {
+		if ( 'upgrade' === $tab && $this->get_extensions_license_data() ) {
 			$message = sprintf(
 				/* translators: 1. open anchor tag, 2. close anchor tag */
 				__( 'Kindly be aware that the extensions\' license data is currently stored in cache, impeding the instant update of the information displayed below. To access the latest details, we recommend clearing the cache %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -39,7 +53,14 @@ class SettingsUpgrade {
 		}
 	}
 
-	public function extension_overview( $tab, $section ) {
+	/**
+	 * Display an overview of the extensions on the upgrade tab
+	 *
+	 * @param string $tab
+	 * @param string $section
+	 * @return void
+	 */
+	public function extension_overview( string $tab, string $section ): void {
 		if ( 'upgrade' === $tab ) {
 			$features = array(
 				array(
@@ -54,7 +75,7 @@ class SettingsUpgrade {
 				),
 				array(
 					'label'       => __( 'Cloud storage upload', 'woocommerce-pdf-invoices-packing-slips' ),
-					'description' => __( 'Automatically upload your documents via FTP/SFTP or to Dropbox.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => __( 'Automatically upload your documents via FTP, SFTP, Dropbox or Google Drive.', 'woocommerce-pdf-invoices-packing-slips' ),
 					'extensions'  => array( 'pro', 'bundle' ),
 				),
 				array(
@@ -132,42 +153,42 @@ class SettingsUpgrade {
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/wc-reminder-emails-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Smart Reminder Emails', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Automatically schedule and send Reminder Emails for WooCommerce orders.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=reminder-emails-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=reminder-emails-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-address-labels/woocommerce-address-labels.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-address-labels-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Print Address Labels', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Print out address labels for selected orders straight from WooCommerce.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-address-labels?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=address-labels-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-address-labels?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=address-labels-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-printnode/print-orders.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-printnode-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Automatic Printing - PrintNode', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'A plugin to automatically print completed orders via PrintNode.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=order-printing-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-automatic-order-printing-printnode?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=order-printing-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-ultimate-barcodes/woocommerce-ultimate-barcodes.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-ultimate-barcodes-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Ultimate Barcodes', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Generate barcodes (ZATCA, QR-codes, C128, EAN-13 and more) for your orders, products and even invoices & packing slips.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-ultimate-barcodes?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=ultimate-barcodes-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-ultimate-barcodes?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=ultimate-barcodes-cross'
 				),
 				array(
 					'plugin_path' => 'woocommerce-order-list/woocommerce-order-list.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/woocommerce-order-list-thumbnail-400x400.jpg',
 					'title'       => __( 'WooCommerce Print Order List', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'This plugin lets you quickly print a list of your WooCommerce orders. Great for order picking.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-order-list?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=order-list-cross'
+					'url'         => 'https://wpovernight.com/downloads/woocommerce-print-order-list?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=order-list-cross'
 				),
 				array(
 					'plugin_path' => 'wp-menu-cart-pro/wp-menu-cart-pro.php',
 					'thumbnail'   => WPO_WCPDF()->plugin_url().'/assets/images/wp-menu-cart-pro-thumbnail-400x400.jpg',
 					'title'       => __( 'Menu Cart Pro', 'woocommerce-pdf-invoices-packing-slips' ),
 					'description' => __( 'Integrates seamlessly with WooCommerce to add a shopping cart to your menu.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'url'         => 'https://wpovernight.com/downloads/menu-cart-pro?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&content=menu-cart-pro-cross'
+					'url'         => 'https://wpovernight.com/downloads/menu-cart-pro?utm_medium=plugin&utm_source=ips&utm_campaign=upgrade-tab&utm_content=menu-cart-pro-cross'
 				),
 			);
 
@@ -191,14 +212,14 @@ class SettingsUpgrade {
 	/**
 	 * Check if a PDF extension is enabled
 	 *
-	 * @param  string  $extension  can be 'pro' or 'templates'
-	 * @return boolean
+	 * @param string $extension  can be 'pro' or 'templates'
+	 * @return bool
 	 */
-	public function extension_is_enabled( $extension ) {
+	public function extension_is_enabled( string $extension ): bool {
 		$is_enabled = false;
 
-		if ( ! empty( $extension ) || ! in_array( $extension, $this->extensions ) ) {
-			$extension_main_function = "WPO_WCPDF_".ucfirst( $extension );
+		if ( ! empty( $extension ) && in_array( $extension, $this->extensions, true ) ) {
+			$extension_main_function = "WPO_WCPDF_" . ucfirst( $extension );
 			if ( function_exists( $extension_main_function ) ) {
 				$is_enabled = true;
 			}
@@ -210,10 +231,10 @@ class SettingsUpgrade {
 	/**
 	 * Get PDF extensions license info
 	 *
-	 * @param  bool  $ignore_cache
+	 * @param bool $ignore_cache
 	 * @return array
 	 */
-	public function get_extension_license_infos( $ignore_cache = false ) {
+	public function get_extension_license_infos( bool $ignore_cache = false ): array {
 		$extensions   = $this->extensions;
 		$license_info = ! $ignore_cache ? $this->get_extensions_license_data( 'cached' ) : array();
 
@@ -362,7 +383,7 @@ class SettingsUpgrade {
 	 *
 	 * @return void
 	 */
-	public function clear_extensions_license_cache() {
+	public function clear_extensions_license_cache(): void {
 		delete_option( 'wpo_wcpdf_extensions_license_cache' );
 	}
 
@@ -395,7 +416,7 @@ class SettingsUpgrade {
 	 *
 	 * @return bool
 	 */
-	public function are_any_extensions_installed() {
+	public function are_any_extensions_installed(): bool {
 		$installed = false;
 
 		foreach ( $this->extensions as $extension ) {

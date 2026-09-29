@@ -2,7 +2,7 @@ span.wpo-warning {
 	display: inline-block;
 	border: 1px solid red;
 	border-left: 4px solid red;
-	padding: 5px 15px;
+	padding: 0.3125em 0.9375em;
 	background-color: white;
 }
 .wcpdf-extensions-ad,
@@ -11,9 +11,9 @@ span.wpo-warning {
 	min-height: 90px;
 	border: 1px solid #6e1edc;
 	background-color: #f1e9fc;
-	padding: 15px;
+	padding: 0.9375em;
 	padding-left: 100px;
-	margin-top: 30px;
+	margin-top: 1.875em;
 }
 
 img.wpo-helper {
@@ -25,28 +25,28 @@ img.wpo-helper {
 .wcpdf-extensions-ad h3,
 .wcpdf-promo-ad h3 {
 	margin: 0;
-	padding: 20px;
+	padding: 1.25em;
 	font-weight: normal;
 	font-family: serif;
-	letter-spacing: -1px;
+	letter-spacing: -0.0625em;
 	font-size: 2.25em;
 }
 
 .wcpdf-promo-ad p {
 	margin: 0;
-	padding: 0 20px;
+	padding: 0 1.25em;
 	font-size: 1.15em;
 }
 
 .wcpdf-promo-ad p.upgrade-tab {
-	margin-top: 30px;
+	margin-top: 1.875em;
 	font-style: italic;
 	font-size: 1em;
 }
 
 .wcpdf-promo-ad p.expiration {
 	font-size: 0.8em;
-	padding-top: 8px;
+	padding-top: 0.5em;
 }
 
 .wcpdf-extensions-ad a,
@@ -56,7 +56,7 @@ img.wpo-helper {
 
 .wcpdf-extensions-ad a.dismiss,
 .wcpdf-promo-ad a.dismiss {
-	padding: 10px 20px;
+	padding: 0.625em 1.25em;
 }
 
 .wcpdf-promo-ad p strong.code {
@@ -70,13 +70,13 @@ img.wpo-helper {
 }
 
 .wcpdf-extensions-ad i {
-	padding-left: 20px;
+	padding-left: 1.25em;
 }
 
 .wcpdf-extensions-ad ul,
 .wcpdf-promo-ad ul {
 	margin: 0;
-	margin-left: 40px;
+	margin-left: 2.5em;
 }
 
 .wcpdf-extensions li {
@@ -113,7 +113,7 @@ img.wpo-helper {
 }
 
 .wcpdf-extensions .more {
-	padding: 10px;
+	padding: 0.625em;
 	background-color: white;
 	border: 1px solid #ccc;
 	border-radius: 5px;
@@ -125,12 +125,12 @@ img.wpo-helper {
 
 .dropbox-logo {
 	margin-bottom: -10px;
-	margin-right: 10px;
+	margin-right: 0.625em;
 }
 .cloud-logo {
 	margin-bottom: -10px;
 	margin-top: -5px;
-	margin-right: 10px;
+	margin-right: 0.625em;
 }
 
 #img-header_logo {
@@ -159,7 +159,7 @@ table.wcpdf_documents_settings_list tr.odd {
 }
 
 table.wcpdf_documents_settings_list td {
-	padding: 5px;
+	padding: 0.3125em;
 }
 
 table.wcpdf_documents_settings_list a {
@@ -180,7 +180,7 @@ table.wcpdf_documents_settings_list td.title {
 
 .wcpdf-settings-sections ul li {
 	float: left;
-	margin-right: 10px;
+	margin-right: 0.625em;
 }
 
 .wcpdf-settings-sections ul li a {
@@ -200,32 +200,54 @@ table.wcpdf_documents_settings_list td.title {
 
 .wcpdf_document_settings_sections {
 	position: relative;
+	width: 100%;
+	max-width: none;
+	box-sizing: border-box;
+}
+
+.wcpdf_document_settings_sections > span {
+	display: inline-block;
+	margin-bottom: 0.5em;
+	font-size: 0.875em;
+	font-weight: 600;
+	color: #3c434a;
 }
 
 .wcpdf_document_settings_sections > h2 {
-	cursor: pointer;
-	padding: 1em 0.8em;
 	margin: 0;
+	padding: 0.9333em 1.0667em;
+	width: 100%;
+	box-sizing: border-box;
 	border: 1px solid #c3c4c7;
-	background: #ffffff;
+	border-radius: 0.5333em;
+	background: #fff;
+	font-size: 0.9375em;
+	font-weight: 600;
+	line-height: 1.4;
+	color: #1d2327;
+	cursor: pointer;
+	position: relative;
+	z-index: 101;
 }
 
 .wcpdf_document_settings_sections ul {
-	background: white;
-	list-style: none;
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	display: block;
-	height: auto;
 	display: none;
-	box-sizing: border-box;
 	position: absolute;
-	border-left: 1px solid #c3c4c7;
-	border-right: 1px solid #c3c4c7;
-	z-index: 1000;
-	box-shadow: 0 35px 35px -8px rgba(0, 0, 0, 0.1);
-	-webkit-box-shadow: 0 35px 35px -8px rgba(0, 0, 0, 0.1);
+	top: 100%;
+	left: 0;
+	right: 0;
+	width: 100%;
+	box-sizing: border-box;
+	z-index: 100;
+	margin: -1px 0 0;
+	padding: 0;
+	list-style: none;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-top: none;
+	border-radius: 0 0 8px 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+	overflow: hidden auto;
 }
 
 .wcpdf_document_settings_sections ul.active {
@@ -233,60 +255,51 @@ table.wcpdf_documents_settings_list td.title {
 }
 
 .wcpdf_document_settings_sections ul li {
-	box-sizing: border-box;
+	margin: 0;
 	padding: 0;
-	margin-bottom: 0;
-	border-bottom: 1px solid #eaeaea;
-	font-size: 1.1em;
+	border-bottom: 1px solid #f0f0f1;
 }
 
 .wcpdf_document_settings_sections ul li:last-child {
-	border-color: #c3c4c7;
-}
-
-.wcpdf_document_settings_sections ul li:hover {
-	cursor: pointer;
-	background: #51266b;
-	color: white;
-}
-
-.wcpdf_document_settings_sections ul li:hover a {
-	color: white;
+	border-bottom: none;
 }
 
 .wcpdf_document_settings_sections ul li a {
-	color: black;
-	text-decoration: none;
-	padding: 1.2em 1.6em;
 	display: block;
+	padding: 0.625em 1em;
+	color: #1e1e1e;
+	text-decoration: none;
+	line-height: 1.4;
+}
+
+.wcpdf_document_settings_sections ul li a:hover,
+.wcpdf_document_settings_sections ul li a:focus {
+	background-color: #f0f0f1;
+	color: #1d2327;
+	outline: none;
 }
 
 .wcpdf_document_settings_sections .arrow-down {
-	font-size: 0.7em;
-	color: #999;
-	margin-left: 8px;
+	font-size: 0.75em;
+	color: #646970;
+	margin-left: 0.5em;
 	font-weight: normal;
 	float: right;
 }
 
-.wcpdf_document_settings_sections p:hover,
-.wcpdf_document_settings_sections p:hover > .arrow-down {
-	color: #222;
-}
-
 .wcpdf_advanced_numbers_choose_table {
-	margin-top: 20px;
+	margin-top: 1.25em;
 }
 
 .wcpdf_advanced_numbers_choose_table .number-table-data-info {
 	border-top: 1px solid #eaeaea;
-	margin-bottom: 20px;
+	margin-bottom: 1.25em;
 }
 
 .wcpdf_advanced_numbers_choose_table .item-number {
 	background-color: #d63638;
 	color: white;
-	padding: 3px 6px;
+	padding: 0.1875em 0.375em;
 	border-radius: 3px;
 }
 
@@ -303,7 +316,7 @@ table.wcpdf_documents_settings_list td.title {
 }
 
 .wcpdf_document_settings_document_output_formats {
-	margin-bottom: 30px;
+	margin-bottom: 1.875em;
 }
 
 .edit-next-number {
@@ -318,7 +331,7 @@ table.wcpdf_documents_settings_list td.title {
 
 .wpo-wcpdf-pointer.wp-pointer-top .wp-pointer-arrow,
 .wpo-wcpdf-pointer.wp-pointer-top .wp-pointer-arrow-inner {
-		border-bottom-color: #51266b;
+	border-bottom-color: #51266b;
 }
 
 .wpo-wcpdf-pointer .wp-pointer-content h3 {
@@ -337,12 +350,12 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .wrap [class$="icon32"] + h2 {
-	font-size: 18px;
+	font-size: 1.125em;
 	padding: 1em;
 }
 
 .wrap .notice {
-	margin: 15px 0 0;
+	margin: 0.9375em 0 0;
 }
 
 .nav-tab-wrapper a.nav-tab {
@@ -351,7 +364,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-bottom: 3px solid transparent;
 	padding-bottom: 0.5em;
 	margin: 0 1.2em;
-	font-size: 15px;
+	font-size: 0.9375em;
 }
 
 .nav-tab-wrapper a.nav-tab.nav-tab-active {
@@ -368,7 +381,156 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .wcpdf-settings-sub-sections a.nav-tab {
-	font-size: 13px;
+	font-size: 0.8125em;
+}
+
+.doc-output-toggle-group {
+	display: inline-flex;
+	list-style: none;
+	margin: 1em 0;
+	padding: 0;
+	border-radius: 6px;
+	border: 1px solid #d1d5db;
+	overflow: hidden;
+	background-color: #fff;
+	color: #1d2327;
+	font-size: 1.3em;
+	font-weight: 600;
+}
+
+.doc-output-toggle-item {
+	margin: 0;
+	padding: 0;
+}
+
+.doc-output-toggle-item + .doc-output-toggle-item .doc-output-toggle {
+	border-left: 1px solid #e5e7eb;
+}
+
+.doc-output-toggle {
+	display: inline-block;
+	padding: 0.375em 1em;
+	font-size: 0.875em;
+	text-decoration: none;
+	border: none;
+	background-color: #fff;
+	color: #374151;
+	font-weight: 500;
+	line-height: 1.4;
+	cursor: pointer;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+.doc-output-toggle.active {
+	background-color: #f9fafb;
+	color: #111827;
+	font-weight: 700;
+}
+
+.doc-output-toggle:hover,
+.doc-output-toggle:focus,
+.doc-output-toggle.active:hover,
+.doc-output-toggle.active:focus {
+	background-color: inherit;
+	color: inherit;
+	outline: none;
+	box-shadow: none;
+}
+
+/* EDI Tax Defaults Card */
+.edi-tax-defaults-card {
+	background: #F9F9F9;
+	border: 1px solid #D5D7DA;
+	border-radius: 8px;
+	padding: 1.25em;
+	margin: 1.25em 0;
+}
+
+.edi-tax-defaults-card h3 {
+	margin: 0 0 0.625em;
+	font-size: 1em;
+	font-weight: 600;
+}
+
+.edi-tax-defaults-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 1.25em;
+	margin-top: 1.25em;
+}
+
+.edi-tax-defaults-field {
+	display: flex;
+	flex-direction: column;
+}
+
+.edi-tax-defaults-field h4 {
+	margin-bottom: 0.375em;
+	font-size: 0.8125em;
+	font-weight: 500;
+	color: #1d2327;
+}
+
+.edi-tax-defaults-control select {
+	width: 100%;
+	max-width: 100%;
+	padding: 0.375em 2em 0.375em 0.5em;
+	border: 1px solid #d1d5db;
+	border-radius: 4px;
+	background-color: #fff;
+	font-size: 0.8125em;
+}
+
+.edi-tax-defaults-control .current {
+	margin-top: 0.375em;
+}
+
+.edi-tax-defaults-control .current code {
+	background: #D5D7DA;
+	padding: 0.125em 0.375em;
+	border-radius: 4px;
+	font-size: 0.75em;
+	color: #414651;
+}
+
+/* EDI tax table */
+.edi-tax-class-table table {
+	border: 0;
+	box-shadow: none;
+}
+
+.edi-tax-class-table table > tbody > tr {
+	background-color: transparent !important;
+}
+
+.edi-tax-class-table table > thead > tr > th {
+	background-color: #fafafa;
+	border-bottom: 1px solid #E9EAEB !important;
+	padding: 1em;
+}
+
+.edi-tax-class-table table > tbody > tr > td {
+	border-bottom: 1px solid #E9EAEB !important;
+	padding: 1em;
+}
+
+.edi-tax-class-table table > tbody > tr > td > select {
+	width: 100%;
+	max-width: 100%;
+	padding: 0.375em 2em 0.375em 0.5em;
+	border: 1px solid #d1d5db;
+	border-radius: 4px;
+	background-color: #fff;
+	font-size: 0.8125em;
+}
+
+.edi-tax-class-table table > tbody > tr > td code {
+	background: #D5D7DA;
+	padding: 0.125em 0.375em;
+	border-radius: 4px;
+	font-size: 0.75em;
+	color: #414651;
+	white-space: nowrap;
 }
 
 #wpo-wcpdf-preview-wrapper {
@@ -390,7 +552,94 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	box-sizing: border-box;
 	background: transparent;
 	flex: 0 0 35%;
-	overflow-x: hidden;
+	overflow-x: clip;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search {
+	margin-bottom: 2em;
+	position: sticky;
+	top: 2em;
+	z-index: 100;
+	background: #fff;
+	padding: 2em 0 1em;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar > .settings-search {
+	margin-left: 2em;
+	width: calc(100% - 4em);
+	max-width: 50vw;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search > input {
+	width: 100%;
+	padding: 0 0.4em 0 2.6em;
+	font-size: 1em;
+	border: 1px solid #c3c4c7;
+	border-radius: 0.5em;
+	background-repeat: no-repeat;
+	background-size: 1.1em 1.1em;
+	background-position: 0.75em center;
+	background-image: url(data:image/svg+xml,%3Csvg%20width%3D%2217%22%20height%3D%2217%22%20viewBox%3D%220%200%2017%2017%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20d%3D%22M15.8334%2015.8334L12.2084%2012.2084M14.1667%207.50004C14.1667%2011.1819%2011.1819%2014.1667%207.50004%2014.1667C3.81814%2014.1667%200.833374%2011.1819%200.833374%207.50004C0.833374%203.81814%203.81814%200.833374%207.50004%200.833374C11.1819%200.833374%2014.1667%203.81814%2014.1667%207.50004Z%22%20stroke%3D%22%23717680%22%20stroke-width%3D%221.66667%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%0A%3C%2Fsvg%3E);
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-dropdown {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 0.5em;
+	max-height: 23em;
+	overflow: hidden auto;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+	padding: 0;
+	list-style: none;
+	margin: -1em 0 0;
+	scrollbar-color: #c3c4c7 transparent;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75em;
+	padding: 0.6em 1em;
+	margin: 0;
+	cursor: pointer;
+	color: #1e1e1e;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item .settings-search-item-label {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item .settings-search-item-section {
+	flex: 0 0 auto;
+	color: #757575;
+	font-size: 0.85em;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 45%;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item:last-child {
+	border-bottom: none;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item:hover,
+#wpo-wcpdf-preview-wrapper .sidebar .settings-search-item.active {
+	background-color: #f0f0f1;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr.settings-search-highlight {
+	background-color: #D9E0FF;
+	transition: background-color 0.3s;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form {
@@ -401,6 +650,10 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	box-sizing: border-box;
 	width: calc(100% - 4em);
 	max-width: 50vw;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar > form.taxes {
+	max-width: none;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar > form.editor {
@@ -417,17 +670,22 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding: 0;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th {
-	padding-bottom: 0.6em;
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr {
+	padding: 2em !important;
+	box-sizing: border-box;
 }
 
-#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr:not(:last-child) > td {
-	padding-bottom: 2.4em;
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > th {
+	padding-bottom: 0.6em;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td p.description {
 	font-size: 0.85em;
 	padding-top: 0.7em;
+}
+
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td p.description > code {
+	font-size: inherit;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td p.description > span.wpo-warning {
@@ -447,9 +705,15 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	}
 }
 
+#wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td > label {
+	font-weight: 600;
+	font-size: 0.85em;
+	display: inline-block;
+}
+
 #wpo-wcpdf-preview-wrapper .sidebar .form-table > tbody > tr > td .wpo-wcpdf-input-wrapper {
 	display: flex;
-	gap: 5px;
+	gap: 0.3125em;
 	position: relative;
 }
 
@@ -480,8 +744,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	position: absolute;
 	background-color: #555;
 	color: #fff;
-	padding: 5px 8px;
-	font-size: 12px;
+	padding: 0.3125em 0.5em;
+	font-size: 0.75em;
 	border-radius: 4px;
 	white-space: nowrap;
 	opacity: 0;
@@ -537,7 +801,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper .sidebar .settings_category h2 {
 	border-bottom: 1px solid #c3c4c7;
-	padding: 1em 0 1em 5px;
+	padding: 1em 0 1em 0.3125em;
 	margin: 0;
 	font-weight: normal;
 	color: #222;
@@ -555,16 +819,15 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-left: 1px solid #c3c4c7;
 	border-right: 1px solid #c3c4c7;
 	border-bottom: 1px solid #c3c4c7;
-	padding: 2em;
 	margin-top: 0;
 	background: #ffffff;
-	margin-bottom: 20px;
+	margin-bottom: 1.25em;
 }
 
 #wpo-wcpdf-preview-wrapper .sidebar .settings_category h2::after {
 	content: '\f347';
 	font-family: 'dashicons';
-	font-size: 16px;
+	font-size: 1em;
 	color: #82878c;
 	position: absolute;
 	right: 5px;
@@ -586,8 +849,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-settings .form-table .ui-tabs-nav {
-	padding-left: 0!important;
-	margin-left: 0!important;
+	padding-left: 0 !important;
+	margin-left: 0 !important;
 }
 
 #wpo-wcpdf-settings .translations input,
@@ -615,8 +878,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-settings table#document-link-access-type td {
 	padding-top: 0;
-	padding-bottom: 6px;
-	font-size: 12px;
+	padding-bottom: 0.375em;
+	font-size: 0.75em;
 }
 
 #wpo-wcpdf-settings .system-status-table,
@@ -624,7 +887,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	margin-top: 2em;
 }
 
-#wpo-wcpdf-settings.status caption {
+#wpo-wcpdf-settings.status caption,
+#wpo-wcpdf-settings.edi caption {
 	font-size: 1.3em;
 	font-weight: bold;
 	line-height: 1.3em;
@@ -632,9 +896,31 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	text-align: left;
 }
 
-#wpo-wcpdf-settings.status caption > a {
-	margin-left: 6px;
+#wpo-wcpdf-settings.status caption > a,
+#wpo-wcpdf-settings.edi caption > a {
+	margin-left: 0.375em;
 	text-decoration: none;
+}
+
+#wpo-wcpdf-settings.edi .form-table label:has( + select.wpo-wcpdf-enhanced-select ) {
+	display: block;
+}
+
+#wpo-wcpdf-settings.edi .form-table td:has( select.wpo-wcpdf-enhanced-select ) {
+	min-width: 0;
+}
+
+#wpo-wcpdf-settings.edi select.wpo-wcpdf-enhanced-select + .select2-container {
+	display: block;
+	width: 100% !important;
+	min-width: 0 !important;
+	max-width: 100%;
+	margin: 0;
+}
+
+#wpo-wcpdf-settings.edi table.form-table > tbody > tr.edi-multiple label {
+	display: block;
+	margin-bottom: 0.3125em;
 }
 
 #wpo-wcpdf-settings .system-status-table > tbody > tr:nth-of-type(even) {
@@ -661,12 +947,98 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	background-color: #dedede;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar {
-	flex: 0 0 100%;
+#wpo-wcpdf-settings .edi-tax-class-group {
+	margin: 1em 0;
 }
 
-#wpo-wcpdf-preview-wrapper[data-preview-states="1"].ubl .sidebar > form {
+/* Select2 appends dropdowns to the body; keep them below the WordPress admin bar. */
+body.woocommerce_page_wpo_wcpdf_options_page .select2-drop,
+body.woocommerce_page_wpo_wcpdf_options_page .select2-dropdown {
+	z-index: 9990 !important;
+}
+
+button.button-wpo.button,
+.button.button-wpo.button-primary {
+	height: 36px !important;
+	min-height: 36px !important;
+	padding: 0 0.875em !important;
+	line-height: normal !important;
+	background-color: #6E1EDC !important;
+	color: #fff !important;
+	border-color: #6E1EDC !important;
+	border-radius: 8px !important;
+
+	/* kill WP visual effects that distort the corners */
+	background-image: none !important;
+	box-shadow: none !important;
+	text-shadow: none !important;
+	background-clip: padding-box !important;
+
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+}
+
+.button-wpo:focus {
+	outline: none !important;
+	box-shadow: 0 0 0 3px rgba(110, 30, 220, .25) !important;
+}
+
+button.button-edi-save-taxes {
+	margin-top: 2em !important;
+}
+
+#wpo-wcpdf-settings .edi-customer-identifiers {
+	margin-top: 1em;
+}
+
+#wpo-wcpdf-settings .edi-customer-identifiers table thead td {
+	vertical-align: middle;
+}
+
+#wpo-wcpdf-settings .edi-customer-identifiers .edi-search-wrap {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.5em;
+}
+
+#wpo-wcpdf-settings .edi-customer-identifiers input[type="text"]{
+	max-width: 120px;
+	padding: 0 0.375em;
+}
+
+#wpo-wcpdf-preview-wrapper .preview-document {
+	padding: 2em 0 0 0;
+	box-sizing: border-box;
+	position: sticky;
+	top: 2.4em;
+	flex: 0 0 60%;
+	min-width: 0;
+	overflow-x: hidden;
+}
+
+#wpo-wcpdf-preview-wrapper .preview {
+	min-width: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#wpo-wcpdf-preview-wrapper .preview pre[class*="language-"] {
+	margin: 0;
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: auto;
+	white-space: pre;
+}
+
+#wpo-wcpdf-preview-wrapper .preview canvas {
+	display: block;
 	max-width: 100%;
+}
+
+#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar {
+	flex: 0 0 100%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"][data-preview-state="closed"] .sidebar {
@@ -692,14 +1064,6 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="3"][data-from-preview-state="full"] .sidebar {
 	transition-delay: .4s;
-}
-
-#wpo-wcpdf-preview-wrapper .preview-document {
-	padding: 0;
-	box-sizing: border-box;
-	position: sticky;
-	top: 2.4em;
-	flex: 0 0 60%;
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="1"] .preview-document {
@@ -737,24 +1101,24 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	padding-right: 5%;
 }
 
-.preview-document .preview > #preview-ubl {
+.preview-document .preview > pre {
 	width: 100%;
 	height: 100%;
 	overflow-wrap: anywhere;
 	background-color: #222;
 	color: white;
 	padding: 2em;
+	border-radius: 4px;
 }
 
 .preview-document .preview > #preview-canvas {
 	display: block;
 	max-width: 800px;
 	max-height: 85vh;
-	width: auto!important;
-	margin: 0 auto;
+	width: auto !important;
+	margin: 2em auto;
 	background: white;
-	box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1), -8px -8px 8px rgba(0, 0, 0, 0.02);
-	-webkit-box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.1), -8px -8px 8px rgba(0, 0, 0, 0.02);
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-states="2"] #preview-canvas {
@@ -778,10 +1142,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .preview-document .preview-data-wrapper .preview-order-data,
 .preview-document .preview-data-wrapper .preview-document-type {
 	float: right;
-}
-
-.preview-document .preview-data-wrapper .preview-document-type {
-	margin-right: 30px;
+	margin-right: 1.625em;
+	position: relative;
 }
 
 .preview-document .preview-data-wrapper .preview-document-type ul > li {
@@ -874,7 +1236,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .preview-document .preview-data ul {
 	position: absolute;
 	right: 0;
-	top: 4em;
+	top: 100%;
 	background: white;
 	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	-webkit-box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
@@ -915,7 +1277,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 .preview-document .preview-data .arrow-down {
 	font-size: 0.8em;
 	color: #999;
-	margin-left: 8px;
+	margin-left: 0.5em;
 }
 
 .preview-document .preview-data p:hover,
@@ -927,11 +1289,11 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	display: none;
 	position: absolute;
 	right: 0;
-	top: 4em;
+	top: 100%;
 	width: 300px;
 	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	-webkit-box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
-	padding: 20px 0;
+	padding: 1.25em 0;
 	background-color: white;
 	z-index: 99;
 }
@@ -942,8 +1304,8 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	border-right: 1px solid #999;
 	border-top: 1px solid #999;
 	color: #000;
-	padding: 10px;
-	margin: 0 20px;
+	padding: 0.625em;
+	margin: 0 1.25em;
 	text-decoration: none;
 	cursor: pointer;
 }
@@ -963,7 +1325,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 .preview-document .preview-data #preview-order-search-results .date,
 .preview-document .preview-data #preview-order-search-results .total {
-	margin-top: 6px;
+	margin-top: 0.375em;
 	display: inline-block;
 }
 
@@ -972,7 +1334,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 .preview-document .preview-data #preview-order-search-results .error {
-	margin: 0 20px;
+	margin: 0 1.25em;
 }
 
 .preview-document .preview-order-search-wrapper {
@@ -1021,13 +1383,13 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper .slider.slide-left {
 	text-align: right;
-	padding-right: 10px;
+	padding-right: 0.625em;
 	border-right: 1px solid #ccc;
 }
 
 #wpo-wcpdf-preview-wrapper .slider.slide-right {
 	text-align: left;
-	padding-left: 10px;
+	padding-left: 0.625em;
 	border-left: 1px solid #ccc;
 	display: none;
 }
@@ -1091,11 +1453,11 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 
 #wpo-wcpdf-preview-wrapper.static .preview-document,
 #wpo-wcpdf-preview-wrapper.static .gutter {
-	position: static!important;
+	position: static !important;
 }
 
 #wpo-wcpdf-preview-wrapper.static .sidebar {
-	height: 170vh!important;
+	height: 170vh !important;
 	overflow: hidden;
 }
 
@@ -1107,11 +1469,7 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 }
 
 #wpo-wcpdf-preview-wrapper[data-preview-state="sidebar"] .select2.select2-container {
-	width: 100%!important;
-}
-
-.wcpdf_ubl_settings_sections {
-	margin-bottom: 4em;
+	width: 100% !important;
 }
 
 #wpo-wcpdf-preview-wrapper input#due_date_days {
@@ -1123,11 +1481,11 @@ body.woocommerce_page_wpo_wcpdf_options_page {
 	color: #999;
 }
 
-sup.wcpdf_beta {
+sup.wcpdf_pro {
 	background-color: #51266b;
 	color: white;
 	font-size: 7pt;
-	padding: 1px 2px;
+	padding: 0.0625em 0.125em;
 	border-radius: 2px;
 }
 
@@ -1135,11 +1493,11 @@ sup.wcpdf_beta {
 	font-size: 0.8em !important;
 }
 
-/* UBL Taxes */
-#wpo-wcpdf-preview-wrapper #wpo-wcpdf-settings ul#ubl-standard-changelog {
+/* EDI Taxes */
+#wpo-wcpdf-settings ul#edi-standard-changelog {
 	display: none;
 	list-style: disc;
-	padding-left: 20px;
+	padding-left: 1.25em;
 }
 
 @media screen and (min-width: 1920px) {
@@ -1154,7 +1512,7 @@ sup.wcpdf_beta {
 	}
 
 	.preview-document .preview > #preview-canvas {
-		width: 80vw!important;
+		width: 80vw !important;
 	}
 
 	#wpo-wcpdf-preview-wrapper .sidebar > form {
@@ -1162,7 +1520,7 @@ sup.wcpdf_beta {
 	}
 
 	#wpo-wcpdf-preview-wrapper[data-preview-state="closed"] .select2.select2-container {
-		width: 100%!important;
+		width: 100% !important;
 	}
 
 	#wpo-wcpdf-preview-wrapper[data-preview-states="1"] .sidebar .form-table > tbody > tr,
@@ -1198,7 +1556,7 @@ sup.wcpdf_beta {
 	#wpo-wcpdf-preview-wrapper .multiple-text-input tr td:nth-child(2),
 	#wpo-wcpdf-preview-wrapper .multiple-text-input tr td:nth-child(3) {
 		float: left;
-		margin-bottom: 10px;
+		margin-bottom: 0.625em;
 	}
 
 	#wpo-wcpdf-preview-wrapper .multiple-text-input tr td .woocommerce-help-tip:after {
@@ -1219,17 +1577,17 @@ sup.wcpdf_beta {
 
 /* Upgrade tab */
 
-div.upgrade-table-description {
+#plugin-recommendations {
 	padding: 0 0 3em 1em;
 }
 
-div.upgrade-table-description h1 {
+#plugin-recommendations h1 {
 	font-family: serif;
-	letter-spacing: -1px;
+	letter-spacing: -0.0625em;
 	font-size: 3em;
 }
 
-div.upgrade-table-description p {
+#plugin-recommendations p {
 	font-size: 1.1em;
 }
 
@@ -1270,7 +1628,7 @@ div.upgrade-table-description p {
 
 #upgrade-table td.feature-label span.description {
 	display: inline-block;
-	padding-top: 10px;
+	padding-top: 0.625em;
 	font-size: 0.8em;
 	line-height: 1.4em;
 	font-weight: normal;
@@ -1289,7 +1647,6 @@ div.upgrade-table-description a,
 #upgrade-table a {
 	color: #6e1edc;
 	white-space: nowrap;
-
 }
 
 #upgrade-table .upgrade-links h4 {
@@ -1306,6 +1663,7 @@ div.upgrade-table-description a,
 #plugin-recommendations a.upgrade_button {
 	display: inline-block;
 	background: white;
+	color: #6e1edc;
 	padding: 1em 3em 1em 2em;
 	border-radius: 12px;
 	border: 1px solid #6e1edc;
@@ -1340,16 +1698,16 @@ div.upgrade-table-description a,
 
 #plugin-recommendations {
 	border-radius: 8px;
-    background-color: #f1e9fc;
+	background-color: #f1e9fc;
 	padding: 4em 3em;
 }
 
 #plugin-recommendations .card-container {
 	max-width: 1100px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-gap: 3em;
-    padding: 2em 0;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-gap: 3em;
+	padding: 2em 0;
 }
 
 #plugin-recommendations .recommendation-card {
@@ -1358,7 +1716,7 @@ div.upgrade-table-description a,
 	background-color: white;
 	box-shadow: 0 0 25px -10px rgba(0,0,0,0.2);
 	box-sizing: border-box;
-	font-size: 15px;
+	font-size: 0.9375em;
 	overflow: hidden;
 	transition: 0.2s;
 }
@@ -1385,15 +1743,15 @@ div.upgrade-table-description a,
 
 #plugin-recommendations .recommendation-card h5 {
 	text-align: left;
-    font-size: 1.4em;
+	font-size: 1.4em;
 	line-height: 1.3em;
-    font-weight: bold;
+	font-weight: bold;
 	margin: 1em 0;
 }
 
 #plugin-recommendations .recommendation-card p {
 	text-align: left;
-	padding-bottom: 10px;
+	padding-bottom: 0.625em;
 }
 
 #plugin-recommendations .recommendation-card a.upgrade_button {
@@ -1414,7 +1772,7 @@ div.upgrade-table-description a,
 	background: #6e1edc;
 	color: #fff;
 	font-size: 0.6em;
-	padding: 4px 9px;
+	padding: 0.25em 0.5625em;
 	border-radius: 16px;
 	line-height: 1;
 	margin: 0 1em;
@@ -1445,7 +1803,7 @@ div.upgrade-table-description a,
 	}
 
 	#upgrade-table td.feature-label span.description {
-		padding-top: 6px;
+		padding-top: 0.375em;
 	}
 
 	#plugin-recommendations .card-container {
@@ -1501,7 +1859,7 @@ div.upgrade-table-description a,
 
 	#upgrade-table th,
 	#upgrade-table td {
-		padding: 0.5em 0.8em!important;
+		padding: 0.5em 0.8em !important;
 	}
 
 	#upgrade-table td span.feature-available {

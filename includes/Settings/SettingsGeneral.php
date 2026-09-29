@@ -9,29 +9,48 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsGeneral' ) ) :
 
 class SettingsGeneral {
 
-	protected $option_name = 'wpo_wcpdf_settings_general';
+	protected string $option_name            = 'wpo_wcpdf_settings_general';
+	protected ?array $missing_template_files = null;
+	protected static ?self $_instance        = null;
 
-	protected static $_instance = null;
-
-	public static function instance() {
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
-	public function __construct()	{
-		add_action( 'admin_init', array( $this, 'init_settings' ) );
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		// WP
+		if ( \wpo_ips_is_settings_page() ) {
+			add_action( 'admin_init', array( $this, 'init_settings' ) );
+		}
+		
+		// IPS
 		add_action( 'wpo_wcpdf_settings_output_general', array( $this, 'output' ), 10, 2 );
 		add_action( 'wpo_wcpdf_before_settings', array( $this, 'attachment_settings_hint' ), 10, 2 );
+		
+		// AJAX
 		add_action( 'wp_ajax_wcpdf_get_country_states', array( $this, 'ajax_get_shop_country_states' ) );
-
-		// Display an admin notice if shop address fields are empty.
-		add_action( 'admin_notices', array( $this, 'display_admin_notice_for_shop_address' ) );
 	}
 
-	public function output( $section, $nonce ) {
-		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+	/**
+	 * Output the general settings.
+	 *
+	 * @param string $section
+	 * @param string $nonce
+	 * @return void
+	 */
+	public function output( string $section, string $nonce ): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			return;
 		}
 
@@ -41,17 +60,53 @@ class SettingsGeneral {
 		submit_button();
 	}
 
-	public function init_settings() {
+	/**
+	 * Initialize general settings.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
 		$page = $option_group = $option_name = $this->option_name;
 
-		$template_base_path     = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
-		$theme_template_path    = get_stylesheet_directory() . '/' . $template_base_path;
-		$wp_content_dir         = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
-		$theme_template_path    = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
-		$plugin_template_path   = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
-		$requires_pro           = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
-		$states                 = wpo_wcpdf_get_country_states( $this->get_setting( 'shop_address_country' ) );
-		$missing_template_files = $this->get_missing_template_files();
+		$template_base_path                = ( defined( 'WC_TEMPLATE_PATH' ) ? WC_TEMPLATE_PATH : $GLOBALS['woocommerce']->template_url );
+		$theme_template_path               = get_stylesheet_directory() . '/' . $template_base_path;
+		$wp_content_dir                    = defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) ? str_replace( ABSPATH, '', WP_CONTENT_DIR ) : '';
+		$theme_template_path               = substr( $theme_template_path, strpos( $theme_template_path, $wp_content_dir ) ) . 'pdf/yourtemplate';
+		$plugin_template_path              = "{$wp_content_dir}/plugins/woocommerce-pdf-invoices-packing-slips/templates/Simple";
+		$requires_pro                      = function_exists( 'WPO_WCPDF_Pro' ) ? '' : sprintf( /* translators: 1. open anchor tag, 2. close anchor tag */ __( 'Requires the %1$sProfessional extension%2$s.', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=upgrade' ) ) . '">', '</a>' );
+		$shop_country                      = $this->get_setting( 'shop_address_country' );
+		$states                            = \wpo_wcpdf_get_country_states( $shop_country );
+		$company_registration_number_label = \wpo_ips_edi_get_identifier_mappings( $shop_country, 'registration_number', 'label' );
+		$missing_template_files            = $this->get_missing_template_files();
+		$has_vat_plugin_active             = \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active();
+		$vat_plugin_notice                 = '';
+		$settings_instance                 = \WPO_WCPDF()->get_instance( 'settings' );
+		$checkout_field_type               = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_type();
+
+		$checkout_field_default_label = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label(
+			$checkout_field_type,
+			$shop_country
+		);
+
+		$registration_mappings = array_filter(
+			\wpo_ips_edi_get_identifier_mappings(),
+			static fn( $country_mapping ) => ! empty( $country_mapping['mappings']['registration_number'][0]['label'] )
+		);
+		$registration_labels = array();
+		foreach ( array_merge( array( '' ), array_keys( $registration_mappings ) ) as $country_code ) {
+			$label = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'registration_number', $country_code );
+			$registration_labels[ $country_code ] = array(
+				'label' => $label,
+				/* translators: %s: company registration number label */
+				'shop'  => sprintf( __( 'Shop %s', 'woocommerce-pdf-invoices-packing-slips' ), $label ),
+			);
+		}
+
+		if ( $has_vat_plugin_active ) {
+			$vat_plugin_notice = '<div class="notice notice-info inline notice-wpo"><p>'
+				. esc_html__( 'A VAT plugin is currently active. When the field type is set to VAT number, this checkout field will not be displayed to avoid conflicts and duplicate VAT fields. Other field types remain available.', 'woocommerce-pdf-invoices-packing-slips' )
+				. '</p></div>';
+		}
 
 		$settings_fields = array(
 			array(
@@ -84,8 +139,8 @@ class SettingsGeneral {
 				'args'     => array(
 					'option_name'      => $option_name,
 					'id'               => 'template_path',
-					'options_callback' => array( $this, 'get_installed_templates_list' ),
-					'description' => sprintf(
+					'options_callback' => array( $settings_instance, 'get_installed_templates_list' ),
+					'description'      => sprintf(
 						/* translators: 1: plugin template path, 2: theme template path */
 						_n(
 							'Want to use your own template? Copy the file from %1$s to your (child) theme in %2$s to customize it.',
@@ -97,6 +152,45 @@ class SettingsGeneral {
 						'<code>' . esc_html( $theme_template_path ) . '</code>'
 					) . $this->render_missing_template_files_notice( $missing_template_files ),
 				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'template_ink_saving',
+				'title'    => __( 'Ink saving mode', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => 'template_ink_saving',
+					'description'       => __( 'Apply ink-saving styles for this template, replacing dark backgrounds and colors with lighter alternatives.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'   => $option_name . '[template_path]',
+						'data-show_for_option_values' => wp_json_encode( apply_filters( 'wpo_ips_ink_saving_supported_templates', array( 'default/Simple' ) ) ),
+					),
+				),
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'template_color',
+				'title'    => __( 'Template color', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => 'template_color',
+					'type'              => 'color',
+					'default'           => apply_filters( 'wpo_ips_template_color_defaults_map', array() )[ WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'general' )['template_path'] ?? '' ] ?? '',
+					'default_if_empty'  => true,
+					'description'       => __( 'Sets the primary color used across supported templates.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'custom_attributes' => array(
+						'data-show_for_option_name'    => $option_name . '[template_path]',
+						'data-show_for_option_values'  => wp_json_encode( apply_filters( 'wpo_ips_template_color_supported_templates', array() ) ),
+						'data-keep_current_value'      => 'true',
+						'data-template_color_defaults' => wp_json_encode( apply_filters( 'wpo_ips_template_color_defaults_map', array() ) ),
+						// Browsers render empty color inputs as #000000, so we store the actual saved value separately for JS to read.
+						'data-saved_value'             => WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'general' )['template_color'] ?? '',
+					),
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -212,7 +306,11 @@ class SettingsGeneral {
 			array(
 				'type'     => 'setting',
 				'id'       => 'coc_number',
-				'title'    => __( 'Shop Chamber of Commerce Number', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'    => sprintf(
+					/* translators: %s: company registration number label */
+					__( 'Shop %s', 'woocommerce-pdf-invoices-packing-slips' ),
+					$company_registration_number_label
+				),
 				'callback' => 'text_input',
 				'section'  => 'general_settings',
 				'args'     => array(
@@ -377,7 +475,12 @@ class SettingsGeneral {
 					'width'        => '72',
 					'height'       => '8',
 					'translatable' => true,
-					'description'  => __( 'Any additional info about your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'  => sprintf(
+						'%s<br><strong>%s</strong>: %s',
+						__( 'Any additional info about your business location.', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				)
 			),
 			array(
@@ -392,6 +495,11 @@ class SettingsGeneral {
 					'width'        => '72',
 					'height'       => '4',
 					'translatable' => true,
+					'description'  => sprintf(
+						'<strong>%s</strong>: %s',
+						__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
 				)
 			),
 			array(
@@ -411,9 +519,18 @@ class SettingsGeneral {
 					'id'           => 'extra_1',
 					'width'        => '72',
 					'height'       => '8',
-					'description'  => __( 'This is footer column 1 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
 					'translatable' => true,
-				)
+					'description'  => sprintf(
+						'%s<br><strong>%s</strong>: %s',
+						sprintf(
+							/* translators: %d: footer column number */
+							__( 'This is footer column %d in the Modern (Premium) template.', 'woocommerce-pdf-invoices-packing-slips' ),
+							1
+						),
+						__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -426,9 +543,18 @@ class SettingsGeneral {
 					'id'           => 'extra_2',
 					'width'        => '72',
 					'height'       => '8',
-					'description'  => __( 'This is footer column 2 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
 					'translatable' => true,
-				)
+					'description'  => sprintf(
+						'%s<br><strong>%s</strong>: %s',
+						sprintf(
+							/* translators: %d: footer column number */
+							__( 'This is footer column %d in the Modern (Premium) template.', 'woocommerce-pdf-invoices-packing-slips' ),
+							2
+						),
+						__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+				),
 			),
 			array(
 				'type'     => 'setting',
@@ -441,9 +567,111 @@ class SettingsGeneral {
 					'id'           => 'extra_3',
 					'width'        => '72',
 					'height'       => '8',
-					'description'  => __( 'This is footer column 3 in the <i>Modern (Premium)</i> template', 'woocommerce-pdf-invoices-packing-slips' ),
 					'translatable' => true,
+					'description'  => sprintf(
+						'%s<br><strong>%s</strong>: %s',
+						sprintf(
+							/* translators: %d: footer column number */
+							__( 'This is footer column %d in the Modern (Premium) template.', 'woocommerce-pdf-invoices-packing-slips' ),
+							3
+						),
+						__( 'Note', 'woocommerce-pdf-invoices-packing-slips' ),
+						__( 'You may use plain text and basic formatting such as line breaks, bold, italic, and links. Advanced formatting and styling may not be supported.', 'woocommerce-pdf-invoices-packing-slips' ),
+					),
+				),
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_enable',
+				'title'    => __( 'Enable', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_enable',
+					'description' => __( 'Enable an optional custom field at checkout to collect customer identification data, such as tax IDs, company registration numbers, purchase order numbers, or internal customer references.', 'woocommerce-pdf-invoices-packing-slips' ),
 				)
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_type',
+				'title'    => __( 'Field type', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'       => $option_name,
+					'id'                => 'checkout_field_type',
+					'default'           => 'custom',
+					'options'           => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_type_options(),
+					'custom_attributes' => array(
+						'data-registration-labels' => wp_json_encode( $registration_labels ),
+						'data-custom-label'        => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'custom', $shop_country ),
+						'data-vat-label'           => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'vat_number', $shop_country ),
+						'data-registration-label'  => \WPO_WCPDF()->get_instance( 'checkout_field' )->get_default_label( 'registration_number', $shop_country ),
+					),
+					'description' => __( 'Choose how the checkout field should be interpreted.', 'woocommerce-pdf-invoices-packing-slips' ) . '<br>' . sprintf(
+						/* translators: %s: WooCommerce EU VAT Compliance plugin link */
+						__( 'For advanced VAT validation, reporting, and full compliance with EU VAT rules, we recommend using %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="https://wpovernight.com/downloads/woocommerce-eu-vat-compliance/?utm_medium=plugin&utm_source=ips&utm_campaign=general-tab&utm_content=woocommerce-eu-vat-compliance-cross" target="_blank" rel="noopener noreferrer">WooCommerce EU VAT Compliance</a>'
+					) . $vat_plugin_notice,
+				),
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_label',
+				'title'    => __( 'Label', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'text_input',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_label',
+					'placeholder' => $checkout_field_default_label,
+					'description' => __( 'Customize the label displayed at checkout. Leave empty to use the default label for the selected field type.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_alternative_type',
+				'title'    => __( 'Foreign customer field type', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_alternative_type',
+					'default'     => '',
+					'options'     => array(
+						'' => __( 'None', 'woocommerce-pdf-invoices-packing-slips' ),
+					) + \WPO_WCPDF()->get_instance( 'checkout_field' )->get_type_options(),
+					'description' => __( 'Choose the field type to use for foreign customers. The default label for this field type will be used.', 'woocommerce-pdf-invoices-packing-slips' ) . $vat_plugin_notice,
+				),
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_countries',
+				'title'    => __( 'Display in countries', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'select',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name'     => $option_name,
+					'id'              => 'checkout_field_countries',
+					'options'         => WC()->countries->get_countries(),
+					'multiple'        => true,
+					'enhanced_select' => true,
+					'placeholder'     => __( 'All countries', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description'     => __( 'Show the checkout field only for these billing countries. Leave empty to show it in all countries. Country restrictions in the Checkout Block require WooCommerce 9.9 or newer.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
+			),
+			array(
+				'type'     => 'setting',
+				'id'       => 'checkout_field_enable_my_account',
+				'title'    => __( 'Editable in My Account', 'woocommerce-pdf-invoices-packing-slips' ),
+				'callback' => 'checkbox',
+				'section'  => 'general_settings',
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'checkout_field_enable_my_account',
+					'description' => __( 'Allow customers to edit the custom checkout field on their account details page. The value is saved to the customer profile and used for future checkouts only.', 'woocommerce-pdf-invoices-packing-slips' ),
+				),
 			),
 		);
 
@@ -494,10 +722,18 @@ class SettingsGeneral {
 
 		// allow plugins to alter settings fields
 		$settings_fields = apply_filters( 'wpo_wcpdf_settings_fields_general', $settings_fields, $page, $option_group, $option_name, $this );
-		WPO_WCPDF()->settings->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
+		
+		$settings_instance->add_settings_fields( $settings_fields, $page, $option_group, $option_name );
 	}
 
-	public function attachment_settings_hint( $active_tab, $active_section ) {
+	/**
+	 * Display a hint to set up attachments for invoice emails if no attachments are set, and allow hiding the hint
+	 *
+	 * @param string $active_tab
+	 * @param string $active_section
+	 * @return void
+	 */
+	public function attachment_settings_hint( string $active_tab, string $active_section ): void {
 		// save or check option to hide attachments settings hint
 		if ( isset( $_REQUEST['wpo_wcpdf_hide_attachments_hint'] ) && isset( $_REQUEST['_wpnonce'] ) ) {
 			// validate nonce
@@ -512,49 +748,18 @@ class SettingsGeneral {
 			$hide_hint = get_option( 'wpo_wcpdf_hide_attachments_hint' );
 		}
 
-		if ( $active_tab == 'general' && ! $hide_hint ) {
-			$documents = WPO_WCPDF()->documents->get_documents();
+		if ( 'general' === $active_tab && ! $hide_hint ) {
+			$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
 
 			foreach ( $documents as $document ) {
-				if ( $document->get_type() == 'invoice' ) {
+				if ( 'invoice' === $document->get_type() ) {
 					$invoice_email_ids = $document->get_attach_to_email_ids();
 					if ( empty( $invoice_email_ids ) ) {
-						include_once( WPO_WCPDF()->plugin_path() . '/views/attachment-settings-hint.php' );
+						include_once WPO_WCPDF()->plugin_path() . '/views/attachment-settings-hint.php';
 					}
 				}
 			}
 		}
-	}
-
-	public function get_installed_templates_list() {
-		$installed_templates = WPO_WCPDF()->settings->get_installed_templates();
-		$template_list = array();
-		foreach ( $installed_templates as $path => $template_id ) {
-			$template_name = basename( $template_id );
-			$group         = dirname( $template_id );
-
-			// check if this is an extension template
-			if ( false !== strpos( $group, 'extension::' ) ) {
-				$extension = explode( '::', $group );
-				$group     = 'extension';
-			}
-
-			switch ( $group ) {
-				case 'default':
-				case 'premium_plugin':
-					// no suffix
-					break;
-				case 'extension':
-					$template_name = sprintf( '%s (%s) [%s]', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ), $extension[1] );
-					break;
-				case 'theme':
-				default:
-					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
-					break;
-			}
-			$template_list[ $template_id ] = $template_name;
-		}
-		return $template_list;
 	}
 
 	/**
@@ -565,16 +770,18 @@ class SettingsGeneral {
 	public function get_settings_categories(): array {
 		$settings_categories = array(
 			'display' => array(
-				'title' => __( 'Display Settings', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Display Settings', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'download_display',
 					'paper_size',
 					'template_path',
+					'template_ink_saving',
+					'template_color',
 					'test_mode',
 				),
 			),
 			'shop_information' => array(
-				'title' => __( 'Shop Information', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Shop Information', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'header_logo',
 					'header_logo_height',
@@ -594,7 +801,7 @@ class SettingsGeneral {
 				)
 			),
 			'advanced_formatting' => array(
-				'title' => __( 'Advanced Formatting', 'woocommerce-pdf-invoices-packing-slips' ),
+				'title'   => __( 'Advanced Formatting', 'woocommerce-pdf-invoices-packing-slips' ),
 				'members' => array(
 					'font_subsetting',
 					'currency_font',
@@ -602,6 +809,17 @@ class SettingsGeneral {
 					'extra_2',
 					'extra_3',
 				)
+			),
+			'checkout_field' => array(
+				'title'   => __( 'Checkout Field', 'woocommerce-pdf-invoices-packing-slips' ),
+				'members' => array(
+					'checkout_field_enable',
+					'checkout_field_type',
+					'checkout_field_label',
+					'checkout_field_alternative_type',
+					'checkout_field_countries',
+					'checkout_field_enable_my_account',
+				),
 			),
 		);
 
@@ -631,14 +849,19 @@ class SettingsGeneral {
 			);
 		}
 
-		return apply_filters( 'wpo_wcpdf_general_settings_categories', $settings_categories, $this );
+		return (array) apply_filters(
+			'wpo_wcpdf_general_settings_categories',
+			$settings_categories,
+			$this
+		);
 	}
 
 	/**
 	 * List templates in plugin folder, theme folder & child theme folder
-	 * @return array		template path => template name
+	 * 
+	 * @return array
 	 */
-	public function find_templates() {
+	public function find_templates(): array {
 		$installed_templates = array();
 		// get base paths
 		$template_base_path  = ( function_exists( 'WC' ) && is_callable( array( WC(), 'template_path' ) ) ) ? WC()->template_path() : apply_filters( 'woocommerce_template_path', 'woocommerce/' );
@@ -681,39 +904,29 @@ class SettingsGeneral {
 			$installed_templates[ $simple_template_path ] = 'Simple';
 		}
 
-		return apply_filters( 'wpo_wcpdf_templates', $installed_templates );
+		return (array) apply_filters(
+			'wpo_wcpdf_templates',
+			$installed_templates
+		);
 	}
-
-	public function display_admin_notice_for_shop_address(): void {
-		// Return if the notice has been dismissed.
-		if ( get_option( 'wpo_wcpdf_dismiss_shop_address_notice', false ) ) {
-			return;
-		}
-
-		// Handle dismissal action.
-		if ( isset( $_GET['wpo_dismiss_shop_address_notice'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'dismiss_shop_address_notice' ) ) {
-				update_option( 'wpo_wcpdf_dismiss_shop_address_notice', true );
-				wp_redirect( remove_query_arg( array( 'wpo_dismiss_shop_address_notice', '_wpnonce' ) ) );
-				exit;
-			} else {
-				wcpdf_log_error( 'You do not have sufficient permissions to perform this action: wpo_dismiss_requirements_notice' );
-				return;
-			}
-		}
-
-		$general_settings = WPO_WCPDF()->settings->general;
-		$display_notice   = false;
-		$languages_data   = wpo_wcpdf_get_multilingual_languages();
-		$languages        = $languages_data ? array_keys( $languages_data ) : array( 'default' );
+	
+	/**
+	 * Check if the shop address is incomplete.
+	 *
+	 * @return bool True if the shop address is incomplete, false otherwise.
+	 */
+	public function maybe_shop_address_is_incomplete(): bool {
+		$incomplete     = false;
+		$languages_data = \wpo_wcpdf_get_multilingual_languages();
+		$languages      = $languages_data ? array_keys( $languages_data ) : array( 'default' );
 
 		foreach ( $languages as $language ) {
-			$line_1   = $general_settings->get_setting( 'shop_address_line_1', $language ) ?? '';
-			$country  = $general_settings->get_setting( 'shop_address_country', $language ) ?? '';
-			$states   = wpo_wcpdf_get_country_states( $country );
-			$state    = ! empty( $states ) ? $general_settings->get_setting( 'shop_address_state', $language ) : '';
-			$city     = $general_settings->get_setting( 'shop_address_city', $language ) ?? '';
-			$postcode = $general_settings->get_setting( 'shop_address_postcode', $language ) ?? '';
+			$line_1   = $this->get_setting( 'shop_address_line_1', $language ) ?? '';
+			$country  = $this->get_setting( 'shop_address_country', $language ) ?? '';
+			$states   = \wpo_wcpdf_get_country_states( $country );
+			$state    = ! empty( $states ) ? $this->get_setting( 'shop_address_state', $language ) : '';
+			$city     = $this->get_setting( 'shop_address_city', $language ) ?? '';
+			$postcode = $this->get_setting( 'shop_address_postcode', $language ) ?? '';
 
 			if (
 				empty( $line_1 ) ||
@@ -722,42 +935,28 @@ class SettingsGeneral {
 				empty( $city ) ||
 				empty( $postcode )
 			) {
-				$display_notice = true;
+				$incomplete = true;
 				break;
 			}
 		}
-
-		if ( $display_notice ) {
-			$general_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
-			$dismiss_url      = wp_nonce_url( add_query_arg( 'wpo_dismiss_shop_address_notice', true ), 'dismiss_shop_address_notice' );
-			$notice_message   = sprintf(
-				/* translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag */
-				__( '%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-				'<strong>PDF Invoices & Packing Slips for WooCommerce</strong>',
-				'<a href="' . esc_url( $general_page_url ) . '">',
-				'</a>'
-			);
-
-			?>
-
-			<div class="notice notice-warning">
-				<p><?php echo wp_kses_post( $notice_message ); ?></p>
-				<p><a href="<?php echo esc_url( $dismiss_url ); ?>"
-					  class="wpo-wcpdf-dismiss"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a>
-				</p>
-			</div>
-
-			<?php
-		}
-
+		
+		return $incomplete;
 	}
 
 	/**
 	 * Get the states for a given country code via AJAX.
+	 * 
+	 * @return void
 	 */
-	public function ajax_get_shop_country_states() {
-		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
-		
+	public function ajax_get_shop_country_states(): void {
+		// Accept either the settings nonce or the setup-wizard nonce.
+		$valid = check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security', false )
+			|| check_ajax_referer( 'wpo_wcpdf_setup_nonce', 'security', false );
+
+		if ( ! $valid ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
+		}
+
 		$request = stripslashes_deep( $_POST );
 
 		if ( empty( $request['country'] ) ) {
@@ -779,11 +978,11 @@ class SettingsGeneral {
 	/**
 	 * Get a general setting key value, optionally using a locale-specific sub-key.
 	 *
-	 * @param string $key     The key of the setting to retrieve.
-	 * @param string $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
-	 * @return string The value of the setting.
+	 * @param string $key          The key of the setting to retrieve.
+	 * @param string|null $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
+	 * @return string              The value of the setting.
 	 */
-	private function get_setting( string $key, string $locale = '' ): string {
+	public function get_setting( string $key, ?string $locale = '' ): string {
 		if ( empty( $key ) ) {
 			return '';
 		}
@@ -807,7 +1006,7 @@ class SettingsGeneral {
 			}
 		}
 
-		return apply_filters(
+		return (string) apply_filters(
 			'wpo_wcpdf_get_general_setting',
 			wptexturize( trim( $setting_text ) ),
 			$key,
@@ -815,18 +1014,21 @@ class SettingsGeneral {
 			$general_settings
 		);
 	}
-	
+
 	/**
 	 * Collect documents whose template files are missing.
 	 *
 	 * @return string[] Array of document titles.
 	 */
 	private function get_missing_template_files(): array {
-		$template_path       = WPO_WCPDF()->settings->get_template_path();
-		$template_path_array = explode( '/', $template_path );
-		$template_name       = end( $template_path_array );
-		$enabled_documents   = WPO_WCPDF()->documents->get_documents( 'enabled' );
-		$missing             = array();
+		if ( null !== $this->missing_template_files ) {
+			return $this->missing_template_files;
+		}
+
+		$template_path     = WPO_WCPDF()->get_instance( 'settings' )->get_template_path();
+		$template_name     = basename( wp_normalize_path( $template_path ) );
+		$enabled_documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'enabled' );
+		$missing           = array();
 
 		foreach ( $enabled_documents as $doc ) {
 			$filename         = $doc->get_type() . '.php';
@@ -835,7 +1037,7 @@ class SettingsGeneral {
 			// If using Simple OR the located template is not inside /Simple/, and the file exists, skip.
 			if (
 				( 'Simple' === $template_name || false === strpos( $located_template, '/Simple/' ) ) &&
-				WPO_WCPDF()->file_system->exists( $located_template )
+				WPO_WCPDF()->get_instance( 'file_system' )->exists( $located_template )
 			) {
 				continue;
 			}
@@ -843,7 +1045,9 @@ class SettingsGeneral {
 			$missing[] = $doc->get_title();
 		}
 
-		return $missing;
+		$this->missing_template_files = $missing;
+
+		return $this->missing_template_files;
 	}
 
 	/**
@@ -877,7 +1081,7 @@ class SettingsGeneral {
 
 		// Premium Templates guidance (only if bundle license missing/invalid)
 		if ( function_exists( 'WPO_WCPDF_Templates' ) ) {
-			$license_info = WPO_WCPDF()->settings->upgrade->get_extension_license_infos();
+			$license_info = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'upgrade' )->get_extension_license_infos();
 			$info         = $license_info['bundle'] ?? null;
 
 			if ( empty( $info['status'] ) || 'valid' !== $info['status'] ) {

@@ -9,22 +9,40 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings\\SettingsDocuments' ) ) :
 
 class SettingsDocuments {
 
-	protected static $_instance = null;
+	protected static ?self $_instance = null;
 
-	public static function instance() {
+	/**
+	 * Get the singleton instance.
+	 *
+	 * @return self
+	 */
+	public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
 		return self::$_instance;
 	}
 
-	public function __construct()	{
-		add_action( 'admin_init', array( $this, 'init_settings' ) );
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		// WP
+		if ( \wpo_ips_is_settings_page() ) {
+			add_action( 'admin_init', array( $this, 'init_settings' ) );
+		}
+		
+		// IPS
 		add_action( 'wpo_wcpdf_settings_output_documents', array( $this, 'output' ), 10, 2 );
 	}
 
-	public function init_settings() {
-		$documents = WPO_WCPDF()->documents->get_documents( 'all' );
+	/**
+	 * Initialize document settings.
+	 *
+	 * @return void
+	 */
+	public function init_settings(): void {
+		$documents = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 		foreach ( $documents as $document ) {
 			if ( is_callable( array( $document, 'init_settings' ) ) ) {
 				$document->init_settings();
@@ -32,22 +50,25 @@ class SettingsDocuments {
 		}
 	}
 
-	public function output( $section, $nonce ) {
-		if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
+	/**
+	 * Output the document settings.
+	 *
+	 * @param string $section
+	 * @param string $nonce
+	 * @return void
+	 */
+	public function output( string $section, string $nonce ): void {
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			return;
 		}
-		
-		$section          = ! empty( $section ) ? $section : 'invoice';
-		$documents        = WPO_WCPDF()->documents->get_documents( 'all' );
-		$output_format    = 'pdf';
+
+		$section          = ! empty( $section ) ? sanitize_key( $section ) : 'invoice';
+		$option_name      = "wpo_wcpdf_documents_settings_{$section}";
+		$documents        = WPO_WCPDF()->get_instance( 'documents' )->get_documents( 'all' );
 		$section_document = null;
 
-		if ( ! empty( $_REQUEST['output_format'] ) ) {
-			$output_format = sanitize_text_field( wp_unslash( $_REQUEST['output_format'] ) );
-		}
-
 		foreach ( $documents as $document ) {
-			if ( $document->get_type() == $section ) {
+			if ( $document->get_type() === $section ) {
 				$section_document = $document;
 				break;
 			}
@@ -58,70 +79,54 @@ class SettingsDocuments {
 		}
 		?>
 		<div class="wcpdf_document_settings_sections">
-			<?php echo '<h2>'.esc_html( $section_document->get_title() ).'<span class="arrow-down">&#9660;</span></h2>'; ?>
+			<span><?php esc_html_e( 'Choose document', 'woocommerce-pdf-invoices-packing-slips' ); ?></span>
+
+			<h2>
+				<?php echo esc_html( $section_document->get_title() ); ?>
+				<span class="arrow-down">&#9660;</span>
+			</h2>
+
 			<ul>
-				<?php
-				foreach ( $documents as $document ) {
-					if( $document->get_type() != $section ) {
-						$title = wp_strip_all_tags( $document->get_title() );
-						if ( empty( trim( $title ) ) ) {
-							$title = '['.__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ).']';
-						}
-						$active = $document->get_type() == $section ? 'active' : '';
-						printf( '<li class="%2$s"><a href="%1$s" class="%2$s">%3$s</a></li>', esc_url( add_query_arg( 'section', $document->get_type() ) ), esc_attr( $active ), esc_html( $title ) );
+				<?php foreach ( $documents as $document ) : ?>
+					<?php
+					if ( $document->get_type() === $section ) {
+						continue;
 					}
-				}
-				?>
+
+					$title = wp_strip_all_tags( $document->get_title() );
+
+					if ( '' === trim( $title ) ) {
+						$title = '[' . esc_html__( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ) . ']';
+					}
+					?>
+					<li>
+						<a href="<?php echo esc_url( add_query_arg( 'section', $document->get_type() ) ); ?>">
+							<?php echo esc_html( $title ); ?>
+						</a>
+					</li>
+				<?php endforeach; ?>
 			</ul>
-			<?php if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) : ?>
-			<p>
+		</div>
+
+		<?php if ( ! function_exists( 'WPO_WCPDF_Pro' ) ) : ?>
+			<p class="wcpdf_document_settings_more_documents">
 				<i>
 					<?php
 						printf(
-							/* translators: 1. open anchor tag, 2. close anchor tag */
+							/* translators: 1. opening anchor tag, 2. closing anchor tag */
 							esc_html__( 'Looking for more documents? Learn more %1$shere%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
-							'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/more-document-types/" target="_blank">',
+							'<a href="https://docs.wpovernight.com/woocommerce-pdf-invoices-packing-slips/more-document-types/" target="_blank" rel="noopener noreferrer">',
 							'</a>'
 						);
 					?>
 				</i>
 			</p>
-			<?php endif; ?>
-		</div>
-		<div class="wcpdf_document_settings_document_output_formats">
-			<?php
-				if ( ! empty( $section_document->output_formats ) ) {
-					?>
-					<h2 class="nav-tab-wrapper">
-						<?php
-							foreach ( $section_document->output_formats as $document_output_format ) {
-								if ( ! wcpdf_is_ubl_available() && 'ubl' === $document_output_format ) {
-									continue;
-								}
+		<?php endif; ?>
 
-								$active    = ( $output_format == $document_output_format ) || ( 'pdf' !== $output_format && ! in_array( $output_format, $section_document->output_formats ) ) ? 'nav-tab-active' : '';
-								$tab_title = strtoupper( esc_html( $document_output_format ) );
-								// if ( 'ubl' === $document_output_format ) {
-								// 	$tab_title .= ' <sup class="wcpdf_beta">beta</sup>';
-								// }
-								printf( '<a href="%1$s" class="nav-tab nav-tab-%2$s %3$s">%4$s</a>', esc_url( add_query_arg( 'output_format', $document_output_format ) ), esc_attr( $document_output_format ), esc_attr( $active ), wp_kses_post( $tab_title ) );
-							}
-						?>
-					</h2>
-					<?php
-				}
-			?>
-		</div>
 		<?php
-			$output_format_compatible = false;
-			if ( 'pdf' !== $output_format && in_array( $output_format, $section_document->output_formats ) ) {
-				$output_format_compatible = true;
-			}
-
-			$option_name = ( 'pdf' === $output_format || ! $output_format_compatible ) ? "wpo_wcpdf_documents_settings_{$section}" : "wpo_wcpdf_documents_settings_{$section}_{$output_format}";
-			settings_fields( $option_name );
-			do_settings_sections( $option_name );
-			submit_button();
+		settings_fields( $option_name );
+		do_settings_sections( $option_name );
+		submit_button();
 	}
 
 }
