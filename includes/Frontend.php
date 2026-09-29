@@ -66,6 +66,7 @@ class Frontend {
 		if ( wpo_ips_is_checkout_request() && \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			// Classic checkout hooks
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_display_classic_checkout_field' ), 10, 1 );
+			add_action( 'woocommerce_before_order_notes', array( $this, 'checkout_field_render_classic_checkout_field' ) );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
 			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
@@ -657,7 +658,7 @@ class Frontend {
 	}
 
 	/**
-	 * Display optional checkout field in the Classic Checkout page.
+	 * Register optional checkout fields in the Classic Checkout order field group.
 	 *
 	 * @param mixed $fields
 	 * @return array
@@ -690,6 +691,32 @@ class Frontend {
 		}
 
 		return $fields;
+	}
+
+	/**
+	 * Render optional Classic Checkout fields when WooCommerce skips the order field group.
+	 *
+	 * @param \WC_Checkout $checkout
+	 * @return void
+	 */
+	public function checkout_field_render_classic_checkout_field( \WC_Checkout $checkout ): void {
+		if ( apply_filters( 'woocommerce_enable_order_notes_field', 'yes' === get_option( 'woocommerce_enable_order_comments', 'yes' ) ) ) {
+			return;
+		}
+
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+		if ( ! $checkout_field->is_enabled() ) {
+			return;
+		}
+
+		$field_types = $checkout_field->get_field_types();
+
+		// Reuse the filtered fields so customizations and field priority are preserved.
+		foreach ( $checkout->get_checkout_fields( 'order' ) as $key => $field ) {
+			if ( isset( $field_types[ $key ] ) && $checkout_field->is_enabled( $field_types[ $key ] ) ) {
+				woocommerce_form_field( $key, $field, $checkout->get_value( $key ) );
+			}
+		}
 	}
 
 	/**
