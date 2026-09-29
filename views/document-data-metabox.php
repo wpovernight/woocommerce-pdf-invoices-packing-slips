@@ -4,8 +4,7 @@
 	class="wcpdf-data-fields"
 	data-document="<?php echo esc_attr( $document->get_type() ); ?>"
 	data-order_id="<?php echo esc_attr( $document->order->get_id() ); ?>"
-	data-document_number="<?php echo esc_attr( $document->get_number() ); ?>"
-	data-is_pending="<?php echo wc_bool_to_string( $in_process ); ?>">
+	data-is_pending="<?php echo esc_attr( wc_bool_to_string( $in_process ) ); ?>">
 	<section class="wcpdf-data-fields-section number-date">
 		<!-- Title -->
 		<h4>
@@ -25,7 +24,7 @@
 						printf(
 							/* translators: %s: document title */
 							esc_html__( 'The %s is being generated in the background. Please reload the page to see the document data.', 'woocommerce-pdf-invoices-packing-slips' ),
-							$document->get_title()
+							esc_html( $document->get_title() )
 						);
 					?>
 				</p>
@@ -83,14 +82,14 @@
 				<?php if ( $this->user_can_manage_document( $document->get_type() ) ) : ?>
 					<?php if ( $document_data_editing_enabled ) : ?>
 						<span class="wpo-wcpdf-set-date-number button">
-									<?php
-									printf(
-									/* translators: document title */
-										esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
-										esc_html( $document->get_title() )
-									);
-									?>
-								</span>
+							<?php
+							printf(
+								/* translators: document title */
+								esc_html__( 'Set %s number & date', 'woocommerce-pdf-invoices-packing-slips' ),
+								esc_html( $document->get_title() )
+							);
+							?>
+						</span>
 					<?php else : ?>
 						<?php $this->document_data_editing_disabled_notice( $document ); ?>
 					<?php endif; ?>
@@ -121,7 +120,7 @@
 											'<strong>[' . esc_html( $document->slug ) . '_month]</strong>'
 										)
 									);
-									echo wc_help_tip( wp_kses_post( $tip_text ), true );
+									echo wc_help_tip( wp_kses_post( $tip_text ), true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									?>
 								</label>
 								<input type="text" class="short" name="<?php echo esc_attr( $data['number']['prefix']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['prefix']['name'] ); ?>" value="<?php echo esc_html( $data['number']['prefix']['value'] ); ?>" disabled="disabled">
@@ -141,7 +140,7 @@
 											'<strong>[' . esc_html( $document->slug ) . '_month]</strong>'
 										)
 									);
-									echo wc_help_tip( wp_kses_post( $tip_text ), true );
+									echo wc_help_tip( wp_kses_post( $tip_text ), true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									?>
 								</label>
 								<input type="text" class="short" name="<?php echo esc_attr( $data['number']['suffix']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['suffix']['name'] ); ?>" value="<?php echo esc_html( $data['number']['suffix']['value'] ); ?>" disabled="disabled">
@@ -158,7 +157,7 @@
 										'<code>123</code>',
 										'<code>000123</code>'
 									);
-									echo wc_help_tip( wp_kses_post( $tip_text ), true );
+									echo wc_help_tip( wp_kses_post( $tip_text ), true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 									?>
 								</label>
 								<input type="number" min="1" step="1" class="short" name="<?php echo esc_attr( $data['number']['padding']['name'] ); ?>" id="<?php echo esc_attr( $data['number']['padding']['name'] ); ?>" value="<?php echo absint( $data['number']['padding']['value'] ); ?>" disabled="disabled">
@@ -197,7 +196,7 @@
 							<div class="row-note">
 								<?php echo wp_kses_post( sprintf(
 								/* translators: %1$s: open anchor tag, %2$s: close anchor tag */
-									__( 'Manually changing the document\'s plain number also requires updating the next document number in the %1$sdocument settings%2$s.' ),
+									__( 'Manually changing the document\'s plain number also requires updating the next document number in the %1$sdocument settings%2$s.', 'woocommerce-pdf-invoices-packing-slips' ),
 									'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=documents&section=' . $document->get_type() ) ) . '#next_' . $document->slug . '_number" target="_blank">',
 									'</a>'
 								) ); ?>

@@ -76,8 +76,7 @@ class Admin {
 		add_action( 'wp_ajax_wpo_wcpdf_save_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_preview_formatted_number', array( $this, 'ajax_preview_formatted_number' ) );
 		add_action( 'wp_ajax_wpo_ips_edi_save_order_customer_peppol_identifiers', array( $this, 'ajax_edi_save_order_customer_peppol_identifiers' ) );
-
-		add_action( 'wp_ajax_wpo_fetch_document_data', array( $this, 'ajax_fetch_pdf_document_data' ) );
+		add_action( 'wp_ajax_wpo_wcpdf_fetch_document_data', array( $this, 'ajax_fetch_pdf_document_data' ) );
 	}
 
 	/**
@@ -538,27 +537,25 @@ class Admin {
 
 		$this->disable_storing_document_settings();
 
-		$meta_box_actions = array();
-		$documents        = $this->get_documents_cached( 'enabled', 'pdf' );
+		$meta_box_actions  = array();
+		$documents         = $this->get_documents_cached( 'enabled', 'pdf' );
+		$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 
 		foreach ( $documents as $document ) {
-			$document = wcpdf_get_document( $document->get_type(), $order );$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
+			$document = wcpdf_get_document( $document->get_type(), $order );
 
 			if ( ! $document ) {
 				continue;
 			}
 
-			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
-
-			$document_title        = $document->get_title();
 			$document_url          = $endpoint_instance->get_document_link( $order, $document->get_type() );
-			$document_title        = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
+			$document_title        = $document->get_title();
 			$document_exists       = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
 			$document_printed      = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
 			$document_printed_data = $document_exists && $document_printed && is_callable( array( $document, 'get_printed_data' ) ) ? $document->get_printed_data() : array();
 			$document_settings     = get_option( 'wpo_wcpdf_documents_settings_' . $document->get_type() ); // $document-settings might be not updated with the last settings
-			$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? WPO_WCPDF()->endpoint->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
-			$manually_mark_printed = WPO_WCPDF()->main->document_can_be_manually_marked_printed( $document );
+			$unmark_printed_url    = ! empty( $document_printed_data ) && isset( $document_settings['unmark_printed'] ) ? $endpoint_instance->get_document_printed_link( 'unmark', $order, $document->get_type() ) : false;
+			$manually_mark_printed = WPO_WCPDF()->get_instance( 'main' )->document_can_be_manually_marked_printed( $document );
 			$mark_printed_url      = $manually_mark_printed ? $endpoint_instance->get_document_printed_link( 'mark', $order, $document->get_type() ) : false;
 			$class                 = array( $document->get_type() );
 
@@ -571,8 +568,8 @@ class Admin {
 
 			$meta_box_actions[ $document->get_type() ] = array(
 				'url'                   => esc_url( $document_url ),
-				'alt'                   => 'PDF ' . $document_title,
-				'title'                 => 'PDF ' . $document_title,
+				'alt'                   => $document_title,
+				'title'                 => $document_title,
 				'exists'                => $document_exists,
 				'printed'               => $document_printed,
 				'printed_data'          => $document_printed_data,
@@ -597,7 +594,7 @@ class Admin {
 				$manually_mark_printed = isset( $data['manually_mark_printed'] ) && $data['manually_mark_printed'] && ! empty( $data['mark_printed_url'] ) ? '<p class="printed-data">&#x21b3; <a href="' . $data['mark_printed_url'] . '">' . __( 'Mark printed', 'woocommerce-pdf-invoices-packing-slips' ) . '</a></p>' : '';
 				$printed               = isset( $data['printed'] ) && $data['printed'] ? '<svg class="icon-printed" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M8 4H16V6H8V4ZM18 6H22V18H18V22H6V18H2V6H6V2H18V6ZM20 16H18V14H6V16H4V8H20V16ZM8 16H16V20H8V16ZM8 10H6V12H8V10Z"></path></svg>' : '';
 				$unmark_printed        = isset( $data['unmark_printed_url'] ) && $data['unmark_printed_url'] ? '<a class="unmark_printed" href="' . $data['unmark_printed_url'] . '">' . __( 'Unmark', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>' : '';
-				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( 'Y/m/d H:i:s', (int) $data['printed_data']['date'] )  . '' . $unmark_printed . '</p>' : '';
+				$printed_data          = isset( $data['printed'] ) && $data['printed'] && ! empty( $data['printed_data']['date'] ) ? '<p class="printed-data">&#x21b3; ' . $printed . '' . date_i18n( 'Y/m/d H:i:s', (int) $data['printed_data']['date'] ) . '' . $unmark_printed . '</p>' : '';
 
 				$allowed_tags = array(
 					'svg' => array(
@@ -1090,8 +1087,8 @@ class Admin {
 	 * @param array $data The data to be displayed and edited.
 	 * @return void
 	 */
-	public function output_number_date_edit_fields( OrderDocument $document, array $data ): void {
-		if ( empty( $document ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
+	public function output_number_date_edit_fields( OrderDocument $document, array $data = array() ): void {
+		if ( empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
 			return;
 		}
 
@@ -1139,9 +1136,9 @@ class Admin {
 		$independent_documents = apply_filters( 'wpo_wcpdf_document_data_meta_box_independent_documents', array( 'invoice', 'packing-slip' ) );
 		$data                  = apply_filters( 'wpo_wcpdf_document_data_meta_box_document_data_fields', $data, $document );
 		$data                  = $this->get_current_values_for_document_data( $document, $data );
-		$in_process            = as_next_scheduled_action( 'wpo_wcpdf_generate_document_on_order_status', array(
+		$in_process            = function_exists( 'as_next_scheduled_action' ) && false !== as_next_scheduled_action( 'wpo_wcpdf_generate_document_on_order_status', array(
 			'document_type' => $document->get_type(),
-			'order_id'      => $document->order->get_id()
+			'order_id'      => $document->order->get_id(),
 		) );
 
 		// Prevent displaying setup for documents that are not independent, and don't exist, or are not in process,
@@ -1158,7 +1155,7 @@ class Admin {
 		$settings_instance = \WPO_WCPDF()->get_instance( 'settings' );
 
 		$document_data_editing_enabled = $settings_instance->user_can_manage_settings() &&
-										 ( ! empty( $settings_instance->get_settings( 'debug' )['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ), true ) );
+			( ! empty( $settings_instance->get_settings( 'debug' )['enable_document_data_editing'] ) || ! in_array( $document->get_type(), array( 'invoice', 'credit-note' ), true ) );
 
 		include WPO_WCPDF()->plugin_path() . '/views/document-data-metabox.php';
 	}
@@ -2206,32 +2203,51 @@ class Admin {
 	 * @return void
 	 */
 	public function ajax_fetch_pdf_document_data(): void {
-		if ( ! isset( $_REQUEST['security'] ) || ! wp_verify_nonce( $_REQUEST['security'], 'generate_wpo_wcpdf' ) ) {
+		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Invalid or expired nonce!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		if ( empty( $_REQUEST['document_types'] ) || empty( $_REQUEST['order_id'] ) ) {
+		$documents = isset( $_POST['documents'] ) && is_array( $_POST['documents'] )
+			? wp_unslash( $_POST['documents'] )
+			: array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+		if ( empty( $documents ) ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Incomplete or incorrect request!', 'woocommerce-pdf-invoices-packing-slips' ),
 			) );
 		}
 
-		$order_id       = (int) $_REQUEST['order_id'];
-		$document_types = array_map( 'sanitize_text_field', $_REQUEST['document_types'] );
 		$documents_data = array();
 
-		foreach ( $document_types as $document_type ) {
-			if ( ! wpo_wcpdf_is_document_type_valid( $document_type ) ) {
+		foreach ( $documents as $pending_document ) {
+			$document_type = isset( $pending_document['type'] ) ? sanitize_text_field( $pending_document['type'] ) : '';
+			$order_id      = isset( $pending_document['order_id'] ) ? absint( $pending_document['order_id'] ) : 0;
+
+			if (
+				empty( $document_type ) ||
+				empty( $order_id ) ||
+				! wpo_wcpdf_is_document_type_valid( $document_type ) ||
+				! $this->user_can_manage_document( $document_type )
+			) {
 				continue;
 			}
 
-			$document = wcpdf_get_document( $document_type, wc_get_order( $order_id ) );
+			$order = wc_get_order( $order_id );
+			if ( ! $order ) {
+				continue;
+			}
+
+			$document = wcpdf_get_document( $document_type, $order );
 			if ( $document && $document->exists() ) {
 				ob_start();
 				$this->output_number_date_edit_fields( $document );
-				$documents_data[ $document_type ] = ob_get_clean();
+				$documents_data[] = array(
+					'type'     => $document_type,
+					'order_id' => $order_id,
+					'html'     => ob_get_clean(),
+				);
 			}
 		}
 

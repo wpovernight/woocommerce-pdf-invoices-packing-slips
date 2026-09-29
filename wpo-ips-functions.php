@@ -791,6 +791,7 @@ function wpo_wcpdf_is_document_type_valid( string $document_type ): bool {
 
 	return false;
 }
+
 /**
  * Get image mime type
  *
@@ -2729,6 +2730,7 @@ function wpo_ips_is_ajax_request(): bool {
 			'wpo_wcpdf_preview',
 			'wpo_wcpdf_preview_order_search',
 			'wpo_wcpdf_preview_formatted_number',
+			'wpo_wcpdf_fetch_document_data',
 			'wpo_wcpdf_set_next_number',
 			'wpo_wcpdf_get_media_upload_setting_html',
 			'wpo_wcpdf_sync_address',

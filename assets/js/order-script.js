@@ -381,54 +381,60 @@ jQuery( function( $ ) {
 	} );
 
 	function get_pending_documents() {
-		let pending_documents = [];
-		$( '.wcpdf-data-fields' ).each( function () {
-			if ( 'yes' === $( this ).attr( 'data-is_pending' ) ) {
-				pending_documents.push( $( this ).data( 'document' ) );
-			}
+		const pending_documents = [];
+
+		$( '#wpo_wcpdf-data-input-box .wcpdf-data-fields[data-is_pending="yes"]' ).each( function () {
+			pending_documents.push( {
+				type:     $( this ).data( 'document' ),
+				order_id: $( this ).data( 'order_id' ),
+			} );
 		} );
 
 		return pending_documents;
 	}
 
-	// Fetch data for pending documents if documents were pending and now are generated.
-	let pending_documents = get_pending_documents();
-	let ajax_count          = 0;
-	const ajax_max_count    = 3;		// Limit the frequency of this AJAX request to prevent a performance burden.
-	const ajax_interval     = 3000;
-	const ajax_timer        = function() {
+	// Fetch data for documents that were being generated in the background on page load.
+	let ajax_count       = 0;
+	const ajax_max_count = 3; // Limit the number of requests to prevent a performance burden.
+	const ajax_interval  = 3000;
+	const fetch_pending_documents_data = function () {
+		const pending_documents = get_pending_documents();
+
 		if ( pending_documents.length <= 0 ) {
 			return;
 		}
 
-		$.ajax( {
-			url:     wpo_wcpdf_ajax.ajaxurl,
-			type:    'POST',
-			data:    {
-				action:         'wpo_fetch_document_data',
-				security:       wpo_wcpdf_ajax.nonce,
-				document_types: pending_documents,
-				order_id:       woocommerce_admin_meta_boxes.post_id,
-			},
-			success: function ( response ) {
-				$.each( response.data, function ( key, value ) {
-					$( '.wcpdf-data-fields[data-document="' + key + '"]' ).replaceWith( value );
-				} );
-
-				// Update pending document to prevent reloading data that is already loaded.
-				pending_documents = get_pending_documents();
-			},
-			error:   function ( response ) {
-				console.log( response.message );
-			}
-		} );
-
 		ajax_count++;
-		if ( ajax_count < ajax_max_count ) {
-			setTimeout( ajax_timer, ajax_interval );
-		}
-	}
 
-	setTimeout( ajax_timer, ajax_interval );
+		$.ajax( {
+			url:  wpo_wcpdf_ajax.ajaxurl,
+			type: 'POST',
+			data: {
+				action:    'wpo_wcpdf_fetch_document_data',
+				security:  wpo_wcpdf_ajax.nonce,
+				documents: pending_documents,
+			},
+		} )
+			.done( function ( response ) {
+				if ( ! response || ! response.success || ! Array.isArray( response.data ) ) {
+					return;
+				}
+
+				$.each( response.data, function ( i, document_data ) {
+					$( '#wpo_wcpdf-data-input-box .wcpdf-data-fields[data-document="' + document_data.type + '"][data-order_id="' + document_data.order_id + '"]' ).replaceWith( document_data.html );
+				} );
+			} )
+			.fail( function ( xhr ) {
+				console.error( xhr.responseText );
+			} )
+			.always( function () {
+				// Schedule the next request only after the current one finished, to avoid overlapping requests.
+				if ( ajax_count < ajax_max_count ) {
+					setTimeout( fetch_pending_documents_data, ajax_interval );
+				}
+			} );
+	};
+
+	setTimeout( fetch_pending_documents_data, ajax_interval );
 
 } );
