@@ -298,11 +298,13 @@ class Frontend {
 		}
 
 		// Get $order
-		$order = null;
+		$order             = null;
+		$is_order_received = false;
 
 		if ( ! $has_explicit_order_id ) {
 			if ( is_checkout() && is_wc_endpoint_url( 'order-received' ) && isset( $wp->query_vars['order-received'] ) ) {
-				$order = wc_get_order( $wp->query_vars['order-received'] );
+				$order             = wc_get_order( $wp->query_vars['order-received'] );
+				$is_order_received = true;
 			} elseif ( \wpo_ips_is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
 				$order = wc_get_order( $wp->query_vars['view-order'] );
 			}
@@ -314,7 +316,17 @@ class Frontend {
 			return '';
 		}
 
-		if ( ! $this->current_user_can_access_shortcode_order( $order, $values['document_type'] ) ) {
+		$can_access_order = $this->current_user_can_access_shortcode_order( $order, $values['document_type'] );
+
+		// Guests must already have the order key; an order ID alone must never expose a download link.
+		if ( ! $can_access_order && $is_order_received && ! is_user_logged_in() && $order instanceof \WC_Order ) {
+			$order_key   = $order->get_order_key();
+			$request_key = isset( $_GET['key'] ) && is_string( $_GET['key'] ) ? wc_clean( wp_unslash( $_GET['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			$can_access_order = '' !== $order_key && '' !== $request_key && hash_equals( $order_key, $request_key );
+		}
+
+		if ( ! $can_access_order ) {
 			return '';
 		}
 
@@ -989,17 +1001,13 @@ class Frontend {
 	}
 
 	/**
-	 * Check shortcode access using the configured document link access type.
+	 * Check whether the current user may obtain a document link for this order.
 	 *
 	 * @param \WC_Abstract_Order $order
 	 * @param string             $document_type
 	 * @return bool
 	 */
 	protected function current_user_can_access_shortcode_order( \WC_Abstract_Order $order, string $document_type ): bool {
-		if ( 'full' === WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link_access_type() ) {
-			return true;
-		}
-
 		if ( WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( $document_type ) ) {
 			return true;
 		}
