@@ -35,6 +35,9 @@ abstract class OrderDocument {
 	 * @param int|object|null $order Order to init.
 	 */
 	public function __construct( $order = 0 ) {
+		// Register template hooks before reading document data or resolving settings.
+		WPO_WCPDF()->get_instance( 'main' )->load_template_functions();
+
 		if ( is_numeric( $order ) && $order > 0 ) {
 			$this->order_id = absint( $order );
 			$this->order    = wc_get_order( $this->order_id ) ?: null;
