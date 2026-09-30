@@ -1035,7 +1035,7 @@ class Frontend {
 	 * @return bool
 	 */
 	protected function current_user_can_access_shortcode_order( \WC_Abstract_Order $order, string $document_type ): bool {
-		if ( WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( $document_type ) ) {
+		if ( Admin::user_can_manage_document( $document_type ) ) {
 			return true;
 		}
 
