@@ -65,7 +65,7 @@ class Frontend {
 
 		if ( wpo_ips_is_checkout_request() && \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			// Classic checkout hooks
-			add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_display_classic_checkout_field' ), 10, 1 );
+			add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_register_classic_checkout_field' ), 10, 1 );
 			add_action( 'woocommerce_before_order_notes', array( $this, 'checkout_field_render_classic_checkout_field' ) );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
@@ -663,7 +663,7 @@ class Frontend {
 	 * @param mixed $fields
 	 * @return array
 	 */
-	public function checkout_field_display_classic_checkout_field( $fields ): array {
+	public function checkout_field_register_classic_checkout_field( $fields ): array {
 		if ( ! is_array( $fields ) ) {
 			$fields = array();
 		}
