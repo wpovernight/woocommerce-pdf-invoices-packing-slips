@@ -28,6 +28,7 @@ abstract class OrderDocument {
 	protected array $linked_documents        = array();
 	protected array $data                    = array();
 	protected array $resolved_settings_cache = array();
+	protected ?array $rendered_resource_urls = null;
 
 	/**
 	 * Init/load the order object.
@@ -2066,12 +2067,23 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Get remote resource URLs emitted while rendering the HTML.
+	 *
+	 * @return string[]|null Null means the HTML has not been rendered.
+	 */
+	public function get_rendered_resource_urls(): ?array {
+		return null === $this->rendered_resource_urls ? null : array_keys( $this->rendered_resource_urls );
+	}
+
+	/**
 	 * Get the HTML content for the document.
 	 *
 	 * @param array $args
 	 * @return string
 	 */
 	public function get_html( array $args = array() ): string {
+		$this->rendered_resource_urls = array();
+
 		\WPO_WCPDF()->get_instance( 'main' )->load_template_functions();
 
 		// temporarily apply filters that need to be removed again after the html is generated

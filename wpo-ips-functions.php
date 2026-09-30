@@ -2874,6 +2874,13 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 		$urls[] = (string) wp_get_attachment_image_url( $settings_document->get_header_logo_id(), 'full' );
 	}
 
+	// Rendered documents recorded their remote sources, including each order in a bulk document.
+	$rendered_urls = is_object( $document ) && is_callable( array( $document, 'get_rendered_resource_urls' ) ) ? $document->get_rendered_resource_urls() : null;
+
+	if ( null !== $rendered_urls ) {
+		return array_values( array_unique( array_filter( array_merge( $urls, $rendered_urls ) ) ) );
+	}
+
 	// Each invoice in a bulk PDF can retain a different logo in its historical settings.
 	if ( $document instanceof \WPO\IPS\Documents\BulkDocument ) {
 		foreach ( array_filter( $document->order_ids ) as $order_id ) {
@@ -2908,20 +2915,39 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 
 				if ( '' !== $thumbnail ) {
 					// Use the rendered source, including CDN filters and thumbnail-size overrides.
-					$html = new \DOMDocument();
-					$html->loadHTML( '<?xml encoding="UTF-8">' . $thumbnail, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
-					foreach ( $html->getElementsByTagName( 'img' ) as $image ) {
-						$src = $image->getAttribute( 'src' );
-						if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
-							$urls[] = $src;
-						}
-					}
+					$urls = array_merge( $urls, wpo_ips_get_remote_image_urls( $thumbnail ) );
 				}
 			}
 		}
 	}
 
 	return array_values( array_unique( array_filter( $urls ) ) );
+}
+
+/**
+ * Get the remote (http, https or protocol-relative) image sources in an HTML fragment.
+ *
+ * @param string $html
+ * @return string[]
+ */
+function wpo_ips_get_remote_image_urls( string $html ): array {
+	// Local paths never contain '//', so skip parsing them.
+	if ( ! str_contains( $html, '//' ) ) {
+		return array();
+	}
+
+	$urls = array();
+	$dom  = new \DOMDocument();
+	$dom->loadHTML( '<?xml encoding="UTF-8">' . $html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
+
+	foreach ( $dom->getElementsByTagName( 'img' ) as $image ) {
+		$src = $image->getAttribute( 'src' );
+		if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
+			$urls[] = $src;
+		}
+	}
+
+	return $urls;
 }
 
 /**

@@ -1149,6 +1149,13 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$thumbnail = '';
 		}
 
+		// Record remote sources so the PDF maker can trust them without rendering the thumbnails again.
+		if ( '' !== $thumbnail && null !== $this->rendered_resource_urls ) {
+			foreach ( wpo_ips_get_remote_image_urls( $thumbnail ) as $url ) {
+				$this->rendered_resource_urls[ $url ] = true;
+			}
+		}
+
 		// die($thumbnail);
 		return $thumbnail;
 	}
