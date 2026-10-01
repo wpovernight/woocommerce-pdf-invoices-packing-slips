@@ -322,9 +322,9 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * Load the translation / textdomain files
+	 * Load translations from WordPress.org language packs.
 	 * 
-	 * @param bool $force_reload
+	 * @param bool $force_reload Reload translations after a locale change, such as when generating email attachments.
 	 * @return void
 	 */
 	public function translations( bool $force_reload = false ): void {
@@ -348,11 +348,8 @@ class WPO_WCPDF {
 		$locale = $this->determine_locale();
 		$dir    = trailingslashit( WP_LANG_DIR );
 
-		load_textdomain( $textdomain, $dir . 'woocommerce-pdf-invoices-packing-slips/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
-		load_textdomain( $textdomain, $dir . 'plugins/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
-		load_plugin_textdomain( $textdomain, false, dirname( $this->plugin_basename ) . '/languages' );
-
-		$loaded = true;
+		// Keep explicit loading to support the plugin_locale filter when reloading email attachment translations.
+		$loaded = load_textdomain( $textdomain, $dir . 'plugins/' . $textdomain . '-' . $locale . '.mo' );
 	}
 
 	/**
