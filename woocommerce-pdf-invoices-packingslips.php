@@ -47,7 +47,7 @@ class WPO_WCPDF {
 	public string $version_wp                      = '5.3';
 	public ?string $plugin_basename                = null;
 	public array $legacy_addons                    = array();
-	
+
 	public ?ThirdPartyPlugins $third_party_plugins = null;
 	public ?VatPlugins $vat_plugins                = null;
 	public ?OrderUtil $order_util                  = null;
@@ -68,14 +68,14 @@ class WPO_WCPDF {
 
 	protected ?bool $dependencies_ready            = null;
 	protected ?bool $woocommerce_activated         = null;
-	
+
 	protected static ?self $_instance              = null;
 
 	/**
 	 * Main Plugin Instance
 	 *
 	 * Ensures only one instance of plugin is loaded or can be loaded.
-	 * 
+	 *
 	 * @return self
 	 */
 	public static function instance(): self {
@@ -167,10 +167,10 @@ class WPO_WCPDF {
 			4
 		);
 	}
-	
+
 	/**
 	 * Load the main plugin classes and functions
-	 * 
+	 *
 	 * @return void
 	 */
 	public function includes(): void {
@@ -204,8 +204,11 @@ class WPO_WCPDF {
 		// Document-related runtime
 		if ( $is_document_context ) {
 			$this->get_instance( 'file_system' );
-			$this->get_instance( 'third_party_plugins' );
 			$this->get_instance( 'font_synchronizer' );
+		}
+
+		if ( $is_document_context || $is_admin_like ) {
+			$this->get_instance( 'third_party_plugins' );
 		}
 
 		// Admin/UI/runtime AJAX
@@ -245,7 +248,7 @@ class WPO_WCPDF {
 			$this->get_instance( 'peppol' );
 		}
 	}
-	
+
 	/**
 	 * Get a plugin class instance by slug.
 	 *
@@ -303,7 +306,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Is the dependency version supported?
-	 * 
+	 *
 	 * @param string $dependency
 	 * @return bool
 	 */
@@ -323,7 +326,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Load the translation / textdomain files
-	 * 
+	 *
 	 * @param bool $force_reload
 	 * @return void
 	 */
@@ -357,7 +360,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Instantiate classes when woocommerce is activated
-	 * 
+	 *
 	 * @return void
 	 */
 	public function load_classes(): void {
@@ -379,7 +382,7 @@ class WPO_WCPDF {
 		if ( null !== $this->dependencies_ready ) {
 			return $this->dependencies_ready;
 		}
-	
+
 		// Check if WooCommerce is activated and meets the minimum version
 		if ( ! $this->is_woocommerce_activated() || ! $this->is_dependency_version_supported( 'woo' ) ) {
 			Notices::maybe_add_admin_notice( array( Notices::class, 'need_woocommerce_notice' ) );
@@ -428,7 +431,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Show plugin changes. Code adapted from W3 Total Cache.
-	 * 
+	 *
 	 * @param array $args Update message args.
 	 * @return void
 	 */
@@ -583,7 +586,7 @@ class WPO_WCPDF {
 
 		return $actions;
 	}
-	
+
 	/**
 	 * Get transient name for legacy addon notice based on the addon filename.
 	 *
@@ -629,7 +632,7 @@ class WPO_WCPDF {
 
 	/**
 	 * Get the plugin url.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function plugin_url(): string {
@@ -638,16 +641,16 @@ class WPO_WCPDF {
 
 	/**
 	 * Get the plugin path.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function plugin_path(): string {
 		return untrailingslashit( plugin_dir_path( __FILE__ ) );
 	}
-	
+
 	/**
 	 * Define constant if not already set
-	 * 
+	 *
 	 * @param  string $name
 	 * @param  mixed $value
 	 * @return void
@@ -657,10 +660,10 @@ class WPO_WCPDF {
 			define( $name, $value );
 		}
 	}
-	
+
 	/**
 	 * Determine the site locale
-	 * 
+	 *
 	 * @return string
 	 */
 	private function determine_locale(): string {
@@ -676,7 +679,7 @@ class WPO_WCPDF {
 			'woocommerce-pdf-invoices-packing-slips'
 		);
 	}
-	
+
 	/**
 	 * Parse update notice from readme file.
 	 *
@@ -721,10 +724,10 @@ class WPO_WCPDF {
 
 		return wp_kses_post( $upgrade_notice );
 	}
-	
+
 	/**
 	 * Get an array of all active plugins, including multisite
-	 * 
+	 *
 	 * @return array active plugin paths
 	 */
 	private function get_active_plugins(): array {
@@ -740,7 +743,7 @@ class WPO_WCPDF {
 
 		return $active_plugins;
 	}
-	
+
 	/**
 	 * Check whether a plugin is active.
 	 *
