@@ -606,6 +606,13 @@ function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ):
 							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice::class,
 						),
 					),
+					'cii-d22b' => array(
+						'name'      => 'CII D22B',
+						'hybrid'    => false,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD22B\Invoice::class,
+						),
+					),
 					'factur-x-1p0' => array(
 						'name'      => 'Factur-X 1.0',
 						'hybrid'    => true,
@@ -625,6 +632,13 @@ function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ):
 						'hybrid'    => true,
 						'documents' => array(
 							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p0\Invoice::class,
+						),
+					),
+					'zugferd-2p5' => array(
+						'name'      => 'ZUGFeRD 2.5',
+						'hybrid'    => true,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p5\Invoice::class,
 						),
 					),
 				),
