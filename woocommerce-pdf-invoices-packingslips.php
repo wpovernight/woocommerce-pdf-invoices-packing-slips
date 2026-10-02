@@ -4,7 +4,7 @@
  * Requires Plugins:     woocommerce
  * Plugin URI:           https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
  * Description:          Create, print & email PDF or Electronic Invoices & PDF Packing Slips for WooCommerce orders.
- * Version:              6.0.0-beta.5
+ * Version:              6.0.0-beta.7
  * Requires PHP:         8.1
  * Author:               WP Overnight
  * Author URI:           https://www.wpovernight.com
@@ -41,7 +41,7 @@ if ( ! class_exists( 'WPO_WCPDF' ) ) :
 
 class WPO_WCPDF {
 
-	public string $version                         = '6.0.0-beta.5';
+	public string $version                         = '6.0.0-beta.7';
 	public string $version_php                     = '8.1';
 	public string $version_woo                     = '4.0';
 	public string $version_wp                      = '5.3';
@@ -322,9 +322,9 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * Load the translation / textdomain files
+	 * Load translations from WordPress.org language packs.
 	 * 
-	 * @param bool $force_reload
+	 * @param bool $force_reload Reload translations after a locale change, such as when generating email attachments.
 	 * @return void
 	 */
 	public function translations( bool $force_reload = false ): void {
@@ -348,11 +348,8 @@ class WPO_WCPDF {
 		$locale = $this->determine_locale();
 		$dir    = trailingslashit( WP_LANG_DIR );
 
-		load_textdomain( $textdomain, $dir . 'woocommerce-pdf-invoices-packing-slips/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
-		load_textdomain( $textdomain, $dir . 'plugins/woocommerce-pdf-invoices-packing-slips-' . $locale . '.mo' );
-		load_plugin_textdomain( $textdomain, false, dirname( $this->plugin_basename ) . '/languages' );
-
-		$loaded = true;
+		// Keep explicit loading to support the plugin_locale filter when reloading email attachment translations.
+		$loaded = load_textdomain( $textdomain, $dir . 'plugins/' . $textdomain . '-' . $locale . '.mo' );
 	}
 
 	/**

@@ -1541,7 +1541,7 @@ class Settings {
 			'debug'   => $this->debug_settings,
 			'edi'     => $this->edi_settings,
 			default   => throw new \InvalidArgumentException(
-				sprintf( 'Unknown settings type: %s', $type )
+				sprintf( 'Unknown settings type: %s', esc_html( $type ) )
 			),
 		};
 	}

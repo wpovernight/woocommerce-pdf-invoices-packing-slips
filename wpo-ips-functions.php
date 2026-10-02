@@ -873,7 +873,7 @@ function wpo_wcpdf_get_image_mime_type( string $src ): string {
 
 	// Last chance, determine from file extension
 	if ( empty( $mime_type ) ) {
-		$path      = parse_url( $src, PHP_URL_PATH );
+		$path      = wp_parse_url( $src, PHP_URL_PATH );
 		$extension = strtolower( pathinfo( $path, PATHINFO_EXTENSION ) );
 
 		switch ( $extension ) {
@@ -2666,7 +2666,7 @@ function wpo_ips_matches_wc_page_request( string $page_name, string $endpoint = 
 
 	// Plain permalinks fallback.
 	if ( isset( $_GET['page_id'] ) && absint( wp_unslash( $_GET['page_id'] ) ) === $page_id ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( '' === $endpoint || isset( $_GET[ $endpoint ] ) ) {
+		if ( '' === $endpoint || isset( $_GET[ $endpoint ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return true;
 		}
 	}
@@ -2699,7 +2699,7 @@ function wpo_ips_matches_wc_page_request( string $page_name, string $endpoint = 
  * @return string
  */
 function wpo_ips_current_request_action(): string {
-	$action = $_REQUEST['action'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$action = $_REQUEST['action'] ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 	if ( ! is_scalar( $action ) ) {
 		return '';
@@ -2788,6 +2788,7 @@ function wpo_ips_is_document_download_request(): bool {
  * @return bool
  */
 function wpo_ips_is_checkout_request(): bool {
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
 	if (
 		isset( $_GET['wc-ajax'] ) &&
 		is_scalar( $_GET['wc-ajax'] ) &&
@@ -2795,6 +2796,7 @@ function wpo_ips_is_checkout_request(): bool {
 	) {
 		return true;
 	}
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 	if ( ! wpo_ips_is_frontend_page_request() || ! function_exists( 'wc_get_page_id' ) ) {
 		return false;

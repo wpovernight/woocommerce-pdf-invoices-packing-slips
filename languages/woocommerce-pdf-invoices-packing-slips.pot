@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-beta.5\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-beta.7\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-29T09:10:07+00:00\n"
+"POT-Creation-Date: 2026-10-02T07:52:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2780,7 +2780,7 @@ msgstr ""
 
 #: includes/Documents/Invoice.php:20
 #: includes/Documents/Invoice.php:72
-#: includes/Frontend.php:93
+#: includes/Frontend.php:94
 #: includes/Settings/SettingsDebug.php:985
 #: views/settings-page.php:180
 msgid "Invoice"
@@ -3293,16 +3293,16 @@ msgid "Upgrade to our Professional extension to attach packing slips to any emai
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Frontend.php:294
+#: includes/Frontend.php:295
 #, php-format
 msgid "Download %s (PDF)"
 msgstr ""
 
-#: includes/Frontend.php:839
+#: includes/Frontend.php:866
 msgid "Please include the country prefix (for example NL123456789)."
 msgstr ""
 
-#: includes/Frontend.php:954
+#: includes/Frontend.php:981
 msgid "Please enter a VAT number including a valid country prefix (for example PT123456789)."
 msgstr ""
 
@@ -6248,16 +6248,16 @@ msgid "Visit shop"
 msgstr ""
 
 #. translators: %s: legacy add-on name
-#: woocommerce-pdf-invoices-packingslips.php:493
+#: woocommerce-pdf-invoices-packingslips.php:490
 #, php-format
 msgid "The legacy %s add-on cannot be activated because it is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:511
+#: woocommerce-pdf-invoices-packingslips.php:508
 msgid "Plugin activation blocked"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:581
+#: woocommerce-pdf-invoices-packingslips.php:578
 msgid "Legacy add-on — activation unavailable"
 msgstr ""
 
@@ -6316,26 +6316,26 @@ msgstr ""
 msgid "Unnamed account"
 msgstr ""
 
-#: wpo-ips-functions.php:2817
+#: wpo-ips-functions.php:2819
 msgid "Order details"
 msgstr ""
 
-#: wpo-ips-functions.php:2818
+#: wpo-ips-functions.php:2820
 msgid "Order meta"
 msgstr ""
 
-#: wpo-ips-functions.php:2819
+#: wpo-ips-functions.php:2821
 msgid "Before order table"
 msgstr ""
 
-#: wpo-ips-functions.php:2820
+#: wpo-ips-functions.php:2822
 msgid "After order table"
 msgstr ""
 
-#: wpo-ips-functions.php:2821
+#: wpo-ips-functions.php:2823
 msgid "Customer address section"
 msgstr ""
 
-#: wpo-ips-functions.php:2822
+#: wpo-ips-functions.php:2824
 msgid "Customer details"
 msgstr ""
