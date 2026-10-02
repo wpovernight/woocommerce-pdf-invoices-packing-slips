@@ -5,6 +5,7 @@ use WPO\IPS\Vendor\Dompdf\Dompdf;
 use WPO\IPS\Vendor\Dompdf\Options;
 use WPO\IPS\EDI\Document as EDI_Document;
 use WPO\IPS\EDI\SabreBuilder as EDI_SabreBuilder;
+use WPO\IPS\EDI\Interfaces\HybridFormatInterface;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -93,6 +94,10 @@ class PDFMaker {
 		try {
 			if ( $hybrid ) {
 				$hybrid_file = $this->set_pdfa_file( $dompdf, $tmp_path );
+
+				if ( empty( $hybrid_file ) ) {
+					return null;
+				}
 			}
 
 			$dompdf->render();
@@ -242,8 +247,8 @@ class PDFMaker {
 		if (
 			! function_exists( 'wpo_ips_edi_get_current_format' ) ||
 			! function_exists( 'wpo_ips_edi_get_current_syntax' ) ||
-			! class_exists( 'WPO\IPS\EDI\Document' ) ||
-			! class_exists( 'WPO\IPS\EDI\SabreBuilder' )
+			! class_exists( EDI_Document::class ) ||
+			! class_exists( EDI_SabreBuilder::class )
 		) {
 			wcpdf_log_error( 'Required functions or classes are not available for setting the hybrid EDI file.' );
 			return null;
@@ -268,7 +273,13 @@ class PDFMaker {
 		try {
 			$edi_document = new EDI_Document( $syntax, $format, $this->document );
 			$builder      = new EDI_SabreBuilder();
-			$content      = $builder->build( $edi_document );
+
+			$content = apply_filters(
+				'wpo_ips_edi_contents',
+				$builder->build( $edi_document ),
+				$edi_document,
+				$this->document
+			);
 
 			if ( empty( $content ) ) {
 				wcpdf_log_error( 'EDI document content is empty.' );
@@ -277,11 +288,7 @@ class PDFMaker {
 
 			$edi_format_document = $edi_document->get_format_document();
 
-			if (
-				! $edi_format_document ||
-				! is_callable( array( $edi_format_document, 'get_document_filename' ) ) ||
-				! is_callable( array( $edi_format_document, 'get_rdf_metadata' ) )
-			) {
+			if ( ! $edi_format_document instanceof HybridFormatInterface ) {
 				wcpdf_log_error( 'EDI format document does not support hybrid PDF metadata.' );
 				return null;
 			}

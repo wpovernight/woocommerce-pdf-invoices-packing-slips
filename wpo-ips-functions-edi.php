@@ -408,7 +408,8 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	$edi_document = new \WPO\IPS\EDI\Document( $syntax, $format, $document );
 	$builder      = new \WPO\IPS\EDI\SabreBuilder();
 
-	$contents = apply_filters( 'wpo_ips_edi_contents',
+	$contents = apply_filters(
+		'wpo_ips_edi_contents',
 		$builder->build( $edi_document ),
 		$edi_document,
 		$document
