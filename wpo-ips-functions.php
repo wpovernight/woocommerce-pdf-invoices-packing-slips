@@ -704,11 +704,11 @@ function wpo_wcpdf_sanitize_phone_number( string $text ): string {
 /**
  * Safe redirect or die.
  *
- * @param  string          $url
+ * @param  string|null     $url
  * @param  string|\WP_Error $message
  * @return void
  */
-function wcpdf_safe_redirect_or_die( string $url = '', string|\WP_Error $message = '' ): void {
+function wcpdf_safe_redirect_or_die( ?string $url = '', string|\WP_Error $message = '' ): void {
 	if ( ! empty( $url ) ) {
 		wp_safe_redirect( $url );
 		exit;
@@ -2750,7 +2750,11 @@ function wpo_ips_is_pretty_document_link_request(): bool {
 		'/'
 	);
 
-	return $request_path === $identifier || 0 === strpos( $request_path . '/', $identifier . '/' );
+	// Document links are relative to the home URL, which may include a subdirectory.
+	$home_path     = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+	$endpoint_path = ltrim( $home_path . '/' . $identifier, '/' );
+
+	return $request_path === $endpoint_path || 0 === strpos( $request_path . '/', $endpoint_path . '/' );
 }
 
 /**
@@ -2870,6 +2874,30 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 		$urls[] = (string) wp_get_attachment_image_url( $settings_document->get_header_logo_id(), 'full' );
 	}
 
+	// Rendered documents recorded their remote sources, including each order in a bulk document.
+	$rendered_urls = is_object( $document ) && is_callable( array( $document, 'get_rendered_resource_urls' ) ) ? $document->get_rendered_resource_urls() : null;
+
+	if ( null !== $rendered_urls ) {
+		return array_values( array_unique( array_filter( array_merge( $urls, $rendered_urls ) ) ) );
+	}
+
+	// Each invoice in a bulk PDF can retain a different logo in its historical settings.
+	if ( $document instanceof \WPO\IPS\Documents\BulkDocument ) {
+		foreach ( array_filter( $document->order_ids ) as $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( ! $order ) {
+				continue;
+			}
+
+			$order_document = wcpdf_get_document( $document->get_type(), $order );
+
+			if ( $order_document && is_callable( array( $order_document, 'get_header_logo_id' ) ) && $order_document->get_header_logo_id() ) {
+				$urls[] = (string) wp_get_attachment_image_url( $order_document->get_header_logo_id(), 'full' );
+			}
+		}
+	}
+
 	// Product thumbnails, e.g. the Premium Templates thumbnail column.
 	if ( $settings_document && is_callable( array( $settings_document, 'get_thumbnail' ) ) ) {
 		$order_ids = $document->order_ids ?? array( $document->order_id ?? 0 );
@@ -2887,20 +2915,39 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 
 				if ( '' !== $thumbnail ) {
 					// Use the rendered source, including CDN filters and thumbnail-size overrides.
-					$html = new \DOMDocument();
-					$html->loadHTML( '<?xml encoding="UTF-8">' . $thumbnail, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
-					foreach ( $html->getElementsByTagName( 'img' ) as $image ) {
-						$src = $image->getAttribute( 'src' );
-						if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
-							$urls[] = $src;
-						}
-					}
+					$urls = array_merge( $urls, wpo_ips_get_remote_image_urls( $thumbnail ) );
 				}
 			}
 		}
 	}
 
 	return array_values( array_unique( array_filter( $urls ) ) );
+}
+
+/**
+ * Get the remote (http, https or protocol-relative) image sources in an HTML fragment.
+ *
+ * @param string $html
+ * @return string[]
+ */
+function wpo_ips_get_remote_image_urls( string $html ): array {
+	// Local paths never contain '//', so skip parsing them.
+	if ( ! str_contains( $html, '//' ) ) {
+		return array();
+	}
+
+	$urls = array();
+	$dom  = new \DOMDocument();
+	$dom->loadHTML( '<?xml encoding="UTF-8">' . $html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
+
+	foreach ( $dom->getElementsByTagName( 'img' ) as $image ) {
+		$src = $image->getAttribute( 'src' );
+		if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
+			$urls[] = $src;
+		}
+	}
+
+	return $urls;
 }
 
 /**

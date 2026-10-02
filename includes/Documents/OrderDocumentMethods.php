@@ -1149,6 +1149,13 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$thumbnail = '';
 		}
 
+		// Record remote sources so the PDF maker can trust them without rendering the thumbnails again.
+		if ( '' !== $thumbnail && null !== $this->rendered_resource_urls ) {
+			foreach ( wpo_ips_get_remote_image_urls( $thumbnail ) as $url ) {
+				$this->rendered_resource_urls[ $url ] = true;
+			}
+		}
+
 		// die($thumbnail);
 		return $thumbnail;
 	}
@@ -1702,9 +1709,9 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * Legacy function (v3.7.2 or inferior)
 	 * Use $this->get_number() instead.
 	 * 
-	 * @return string
+	 * @return string|null
 	 */
-	public function get_invoice_number(): string {
+	public function get_invoice_number(): ?string {
 		wcpdf_log_error( 'The method get_invoice_number() is deprecated since version 3.7.3, please use the method get_number() instead.' );
 
 		if ( is_callable( array( $this, 'get_number' ) ) ) {
@@ -1734,9 +1741,9 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * Legacy function (v3.7.2 or inferior)
 	 * Use $this->get_date() instead.
 	 * 
-	 * @return string
+	 * @return string|null
 	 */
-	public function get_invoice_date(): string {
+	public function get_invoice_date(): ?string {
 		wcpdf_log_error( 'The method get_invoice_date() is deprecated since version 3.7.3, please use the method get_date() instead.' );
 
 		if ( is_callable( array( $this, 'get_date' ) ) ) {
