@@ -3,6 +3,8 @@ namespace WPO\IPS\Makers;
 
 use WPO\IPS\Vendor\Dompdf\Dompdf;
 use WPO\IPS\Vendor\Dompdf\Options;
+use WPO\IPS\EDI\Document as EDI_Document;
+use WPO\IPS\EDI\SabreBuilder as EDI_SabreBuilder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -55,6 +57,8 @@ class PDFMaker {
 			return null;
 		}
 
+		$hybrid = $this->is_hybrid_format();
+
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
 			'tempDir'                 => $tmp_path,
@@ -68,6 +72,10 @@ class PDFMaker {
 			'isFontSubsettingEnabled' => (bool) $this->settings['font_subsetting'],
 		) ) );
 
+		if ( $hybrid ) {
+			$options->setIsPdfAEnabled( true );
+		}
+
 		$this->restrict_remote_resources( $options );
 		
 		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_debug'] ) ) {
@@ -79,10 +87,23 @@ class PDFMaker {
 		$dompdf->loadHtml( $this->html );
 		$dompdf->setPaper( $this->settings['paper_size'], $this->settings['paper_orientation'] );
 		$dompdf = apply_filters( 'wpo_wcpdf_before_dompdf_render', $dompdf, $this->html, $options, $this->document );
-		$dompdf->render();
-		$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html, $options, $this->document );
-		
-		return $dompdf->output();
+
+		$hybrid_file = null;
+
+		try {
+			if ( $hybrid ) {
+				$hybrid_file = $this->set_pdfa_file( $dompdf, $tmp_path );
+			}
+
+			$dompdf->render();
+			$dompdf = apply_filters( 'wpo_wcpdf_after_dompdf_render', $dompdf, $this->html, $options, $this->document );
+
+			return $dompdf->output();
+		} finally {
+			if ( ! empty( $hybrid_file ) ) {
+				WPO_WCPDF()->get_instance( 'file_system' )->delete( $hybrid_file );
+			}
+		}
 	}
 	
 	/**
@@ -181,6 +202,146 @@ class PDFMaker {
 		$hosts          = (array) apply_filters( 'wpo_ips_allowed_remote_hosts', $hosts, $this->document );
 
 		return array_values( array_unique( array_filter( $hosts, 'is_string' ) ) );
+	}
+
+	/**
+	 * Check whether the current document requires a hybrid PDF.
+	 *
+	 * @return bool
+	 */
+	private function is_hybrid_format(): bool {
+		if ( ! function_exists( 'wpo_ips_edi_is_available' ) || ! wpo_ips_edi_is_available() ) {
+			return false;
+		}
+
+		$format = wpo_ips_edi_get_current_format( true );
+
+		if ( ! is_array( $format ) || empty( $format['hybrid'] ) ) {
+			return false;
+		}
+
+		$document_types = isset( $format['documents'] ) && is_array( $format['documents'] )
+			? array_keys( $format['documents'] )
+			: array();
+
+		$document_type = $this->document && is_callable( array( $this->document, 'get_type' ) )
+			? $this->document->get_type()
+			: '';
+
+		return in_array( $document_type, $document_types, true );
+	}
+
+	/**
+	 * Add the hybrid EDI document and RDF metadata to the PDF.
+	 *
+	 * @param Dompdf $dompdf
+	 * @param string $tmp_path
+	 * @return string|null Temporary EDI file path.
+	 */
+	private function set_pdfa_file( Dompdf $dompdf, string $tmp_path ): ?string {
+		if (
+			! function_exists( 'wpo_ips_edi_get_current_format' ) ||
+			! function_exists( 'wpo_ips_edi_get_current_syntax' ) ||
+			! class_exists( 'WPO\IPS\EDI\Document' ) ||
+			! class_exists( 'WPO\IPS\EDI\SabreBuilder' )
+		) {
+			wcpdf_log_error( 'Required functions or classes are not available for setting the hybrid EDI file.' );
+			return null;
+		}
+
+		$format = wpo_ips_edi_get_current_format();
+
+		if ( empty( $format ) || ! is_string( $format ) ) {
+			wcpdf_log_error( 'EDI format is not available.' );
+			return null;
+		}
+
+		$syntax = wpo_ips_edi_get_current_syntax();
+
+		if ( empty( $syntax ) ) {
+			wcpdf_log_error( 'EDI syntax is not available.' );
+			return null;
+		}
+
+		$temp_file = null;
+
+		try {
+			$edi_document = new EDI_Document( $syntax, $format, $this->document );
+			$builder      = new EDI_SabreBuilder();
+			$content      = $builder->build( $edi_document );
+
+			if ( empty( $content ) ) {
+				wcpdf_log_error( 'EDI document content is empty.' );
+				return null;
+			}
+
+			$edi_format_document = $edi_document->get_format_document();
+
+			if (
+				! $edi_format_document ||
+				! is_callable( array( $edi_format_document, 'get_document_filename' ) ) ||
+				! is_callable( array( $edi_format_document, 'get_rdf_metadata' ) )
+			) {
+				wcpdf_log_error( 'EDI format document does not support hybrid PDF metadata.' );
+				return null;
+			}
+
+			$canvas = $dompdf->getCanvas();
+
+			if ( ! is_callable( array( $canvas, 'get_cpdf' ) ) ) {
+				wcpdf_log_error( 'Dompdf CPDF backend is not available.' );
+				return null;
+			}
+
+			$cpdf = $canvas->get_cpdf();
+
+			if (
+				! is_callable( array( $cpdf, 'addEmbeddedFile' ) ) ||
+				! is_callable( array( $cpdf, 'setAdditionalXmpRdf' ) )
+			) {
+				wcpdf_log_error( 'Required Dompdf methods are not available for setting the hybrid EDI file.' );
+				return null;
+			}
+
+			$temp_file = tempnam( $tmp_path, 'wpo-edi-' );
+
+			if ( false === $temp_file ) {
+				wcpdf_log_error( 'Could not create temporary EDI file.' );
+				return null;
+			}
+
+			$file_system = WPO_WCPDF()->get_instance( 'file_system' );
+
+			if ( false === $file_system->put_contents( $temp_file, $content, FS_CHMOD_FILE ) ) {
+				$file_system->delete( $temp_file );
+				wcpdf_log_error( 'Could not write temporary EDI file.' );
+				return null;
+			}
+
+			$cpdf->addEmbeddedFile(
+				$temp_file,
+				$edi_format_document->get_document_filename(),
+				$format,
+				'text/xml',
+				array(
+					$cpdf->catalogId => 'Alternative',
+				)
+			);
+
+			$cpdf->setAdditionalXmpRdf(
+				$edi_format_document->get_rdf_metadata()
+			);
+
+			return $temp_file;
+		} catch ( \Throwable $e ) {
+			if ( ! empty( $temp_file ) ) {
+				WPO_WCPDF()->get_instance( 'file_system' )->delete( $temp_file );
+			}
+
+			wcpdf_log_error( 'Could not add the hybrid EDI file to the PDF.', 'error', $e );
+
+			return null;
+		}
 	}
 
 }
