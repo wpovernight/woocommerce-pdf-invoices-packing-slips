@@ -2789,15 +2789,20 @@ abstract class OrderDocument {
 	/**
 	 * Get the checkout field value.
 	 *
+	 * The filter only refines a stored value: without a stored type there is no label to show it under.
+	 *
 	 * @return string
 	 */
 	public function get_checkout_field_value(): string {
-		$type  = $this->get_checkout_field_type();
-		$value = $type
-			? (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_value( $this->order, $type )
-			: '';
+		$type = $this->get_checkout_field_type();
 
-		return (string) apply_filters( 'wpo_ips_document_checkout_field_value', $value, $type, $this );
+		if ( ! $type ) {
+			return '';
+		}
+
+		$value = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_value( $this->order, $type );
+
+		return (string) apply_filters( 'wpo_ips_checkout_field_document_value', $value, $type, $this );
 	}
 
 	/**
