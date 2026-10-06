@@ -2227,7 +2227,10 @@ class Main {
 	}
 
 	/**
-	 * Display checkout field table row in the order data section for templates that don't render it themselves.
+	 * Display checkout field table row in the order data section.
+	 *
+	 * This is the only place the row is rendered, for every template (Simple included),
+	 * so it never depends on which template file ends up being used.
 	 *
 	 * @param null|string $document_type
 	 * @param null|\WC_Abstract_Order $order
@@ -2236,13 +2239,6 @@ class Main {
 	 */
 	public function display_checkout_field_table_row( ?string $document_type = null, ?\WC_Abstract_Order $order = null ): void {
 		if ( empty( $order ) || empty( $document_type ) ) {
-			return;
-		}
-
-		$current_template_path = explode( '/', WPO_WCPDF()->get_instance( 'settings' )->get_template_path() );
-		$current_template      = end( $current_template_path );
-
-		if ( 'Simple' === $current_template ) {
 			return;
 		}
 
