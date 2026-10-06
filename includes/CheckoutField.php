@@ -290,6 +290,54 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
+		 * Get the field types that have a value on the order.
+		 *
+		 * Configured types come first (foreign customers may have filled in the alternative type instead of the primary one),
+		 * then every other type, so values stored under a type that is no longer configured are still found.
+		 *
+		 * @param \WC_Abstract_Order $order Order object.
+		 * @return string[]
+		 */
+		public function get_order_types( \WC_Abstract_Order $order ): array {
+			$types = array_unique(
+				array_merge(
+					array_values( $this->get_field_types() ),
+					$this->get_types()
+				)
+			);
+
+			return array_values(
+				array_filter(
+					$types,
+					fn( string $type ): bool => null !== $this->get_order_value( $order, $type )
+				)
+			);
+		}
+
+		/**
+		 * Get the label for a field type on an order.
+		 *
+		 * Configured types use the configured label. Types that are no longer configured
+		 * use their default label for the order's billing country, because the configured
+		 * label belongs to another type.
+		 *
+		 * @param \WC_Abstract_Order $order Order object.
+		 * @param string             $type  Field type.
+		 * @return string
+		 */
+		public function get_order_label( \WC_Abstract_Order $order, string $type ): string {
+			if ( in_array( $type, $this->get_field_types(), true ) ) {
+				return $this->get_label( $type );
+			}
+
+			$country = is_callable( array( $order, 'get_billing_country' ) )
+				? (string) $order->get_billing_country()
+				: '';
+
+			return $this->get_default_label( $type, $country );
+		}
+
+		/**
 		 * Save an order value.
 		 *
 		 * @param \WC_Abstract_Order $order Order object.

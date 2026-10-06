@@ -1231,17 +1231,10 @@ abstract class OrderDocument {
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
 				break;
 			case 'checkout_field':
-				$type           = $this->get_checkout_field_type();
-				$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
-
-				if ( ! $type ) {
-					$title = '';
-				} elseif ( in_array( $type, $checkout_field->get_field_types(), true ) ) {
-					$title = $checkout_field->get_label( $type ) . ':';
-				} else {
-					// The configured label belongs to another type, so use this type's default label.
-					$title = $checkout_field->get_default_label( $type, $this->order->get_billing_country() ) . ':';
-				}
+				$type  = $this->get_checkout_field_type();
+				$title = $type
+					? \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_label( $this->order, $type ) . ':'
+					: '';
 				break;
 			default:
 				$title = '';
@@ -2781,7 +2774,7 @@ abstract class OrderDocument {
 	}
 
 	/**
-	 * Get the configured checkout field type that has a value on the order.
+	 * Get the checkout field type that has a value on the order, preferring configured types.
 	 *
 	 * @return string Empty when the order has no checkout field value.
 	 */
@@ -2790,24 +2783,7 @@ abstract class OrderDocument {
 			return '';
 		}
 
-		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
-
-		// Configured types first (foreign customers may have filled in the alternative type instead of the primary one),
-		// then every other type, so values stored under a type that is no longer configured still show.
-		$types = array_unique(
-			array_merge(
-				array_values( $checkout_field->get_field_types() ),
-				$checkout_field->get_types()
-			)
-		);
-
-		foreach ( $types as $type ) {
-			if ( null !== $checkout_field->get_order_value( $this->order, $type ) ) {
-				return $type;
-			}
-		}
-
-		return '';
+		return \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_types( $this->order )[0] ?? '';
 	}
 
 	/**
