@@ -361,6 +361,26 @@ class Invoice extends OrderDocumentMethods {
 			),
 			array(
 				'type'     => 'setting',
+				'id'       => 'display_checkout_field',
+				'title'    => sprintf(
+					/* translators: %s: checkout field label */
+					esc_html__( 'Display %s', 'woocommerce-pdf-invoices-packing-slips' ),
+					esc_html( \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label() )
+				),
+				'callback' => 'checkbox',
+				'section'  => $this->type,
+				'args'     => array(
+					'option_name' => $option_name,
+					'id'          => 'display_checkout_field',
+					'description' => sprintf(
+						/* translators: %s: General settings link */
+						__( 'Display the value customers enter in the checkout field, configured in the %s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general#checkout_field' ) ) . '" target="_blank">' . esc_html__( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+					),
+				)
+			),
+			array(
+				'type'     => 'setting',
 				'id'       => 'display_date',
 				'title'    => __( 'Display invoice date', 'woocommerce-pdf-invoices-packing-slips' ),
 				'callback' => 'select',
@@ -729,6 +749,7 @@ class Invoice extends OrderDocumentMethods {
 						'display_email',
 						'display_phone',
 						'display_customer_notes',
+						'display_checkout_field',
 						'display_shipping_address',
 						'display_number',
 						'next_invoice_number', // this should follow 'display_number'
@@ -755,7 +776,7 @@ class Invoice extends OrderDocumentMethods {
 						'unmark_printed',
 						'disable_free',
 						'use_latest_settings',
-					)
+					),
 				),
 			),
 		);

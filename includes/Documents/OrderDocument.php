@@ -1144,6 +1144,24 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Get the checkout field title
+	 *
+	 * @return string
+	 */
+	public function get_checkout_field_title(): string {
+		return $this->get_title_for( 'checkout_field' );
+	}
+
+	/**
+	 * Print the checkout field title
+	 *
+	 * @return void
+	 */
+	public function checkout_field_title(): void {
+		echo esc_html( $this->get_checkout_field_title() );
+	}
+
+	/**
 	 * Get the title for a specific slug
 	 *
 	 * @param string $slug
@@ -1211,6 +1229,12 @@ abstract class OrderDocument {
 				break;
 			case 'customer_notes':
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'checkout_field':
+				$type  = $this->get_checkout_field_type();
+				$title = $type
+					? \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label( $type ) . ':'
+					: '';
 				break;
 			default:
 				$title = '';
@@ -2747,6 +2771,60 @@ abstract class OrderDocument {
 	 */
 	public function show_due_date(): bool {
 		return $this->get_due_date() > 0;
+	}
+
+	/**
+	 * Get the configured checkout field type that has a value on the order.
+	 *
+	 * @return string Empty when the order has no checkout field value.
+	 */
+	public function get_checkout_field_type(): string {
+		if ( empty( $this->order ) ) {
+			return '';
+		}
+
+		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+
+		// Foreign customers may have filled in the alternative field type instead of the primary one.
+		foreach ( array_unique( $checkout_field->get_field_types() ) as $type ) {
+			if ( null !== $checkout_field->get_order_value( $this->order, $type ) ) {
+				return $type;
+			}
+		}
+
+		return '';
+	}
+
+	/**
+	 * Get the checkout field value.
+	 *
+	 * @return string
+	 */
+	public function get_checkout_field_value(): string {
+		$type  = $this->get_checkout_field_type();
+		$value = $type
+			? (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_value( $this->order, $type )
+			: '';
+
+		return (string) apply_filters( 'wpo_ips_document_checkout_field_value', $value, $type, $this );
+	}
+
+	/**
+	 * Print the checkout field value.
+	 *
+	 * @return void
+	 */
+	public function checkout_field_value(): void {
+		echo esc_html( $this->get_checkout_field_value() );
+	}
+
+	/**
+	 * Check if the checkout field should be shown.
+	 *
+	 * @return bool
+	 */
+	public function show_checkout_field(): bool {
+		return ! empty( $this->get_setting( 'display_checkout_field' ) ) && '' !== $this->get_checkout_field_value();
 	}
 	
 	/**
