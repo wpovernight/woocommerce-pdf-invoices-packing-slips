@@ -168,7 +168,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Get the document filename.
-	 * 
+	 *
 	 * @param string $context
 	 * @param array $args
 	 * @return string
@@ -217,7 +217,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Initialise settings
-	 * 
+	 *
 	 * @return void
 	 */
 	public function init_settings(): void {
@@ -250,7 +250,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * PDF settings fields
-	 * 
+	 *
 	 * @param string $option_name
 	 * @return array
 	 */
@@ -364,7 +364,7 @@ class Invoice extends OrderDocumentMethods {
 				'id'       => 'display_checkout_field',
 				'title'    => sprintf(
 					/* translators: %s: checkout field label */
-					esc_html__( 'Display %s', 'woocommerce-pdf-invoices-packing-slips' ),
+					esc_html__( 'Display %s (Checkout Field)', 'woocommerce-pdf-invoices-packing-slips' ),
 					esc_html( \WPO_WCPDF()->get_instance( 'checkout_field' )->get_label() )
 				),
 				'callback' => 'checkbox',
@@ -788,7 +788,7 @@ class Invoice extends OrderDocumentMethods {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Legacy function < v3.8.0
 	 *
