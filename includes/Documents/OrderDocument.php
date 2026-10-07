@@ -1153,15 +1153,6 @@ abstract class OrderDocument {
 	}
 
 	/**
-	 * Print the checkout field title
-	 *
-	 * @return void
-	 */
-	public function checkout_field_title(): void {
-		echo esc_html( $this->get_checkout_field_title() );
-	}
-
-	/**
 	 * Get the title for a specific slug
 	 *
 	 * @param string $slug
@@ -2803,15 +2794,6 @@ abstract class OrderDocument {
 		$value = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_value( $this->order, $type );
 
 		return (string) apply_filters( 'wpo_ips_checkout_field_document_value', $value, $type, $this );
-	}
-
-	/**
-	 * Print the checkout field value.
-	 *
-	 * @return void
-	 */
-	public function checkout_field_value(): void {
-		echo esc_html( $this->get_checkout_field_value() );
 	}
 
 	/**
