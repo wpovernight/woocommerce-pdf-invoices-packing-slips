@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-08T08:28:26+00:00\n"
+"POT-Creation-Date: 2026-10-08T09:10:06+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2781,7 +2781,7 @@ msgstr ""
 #: includes/Documents/Invoice.php:75
 #: includes/Frontend.php:81
 #: includes/Settings/SettingsDebug.php:1001
-#: views/settings-page.php:179
+#: views/settings-page.php:181
 msgid "Invoice"
 msgstr ""
 
