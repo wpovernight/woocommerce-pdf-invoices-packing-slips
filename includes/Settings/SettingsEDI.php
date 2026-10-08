@@ -178,15 +178,6 @@ class SettingsEDI {
 				strtoupper( trim( $syntax ) )
 			);
 
-			if ( 'cii' === strtolower( trim( $syntax ) ) && ! class_exists( 'WCPDF_Custom_PDF_Maker_mPDF' ) ) {
-				$description .= ' ' . sprintf(
-					/* translators: %1$s: open link anchor, %2$s: close link anchor */
-					__( 'The %1$smPDF extension%2$s is required for hybrid formats. Please install or enable it.', 'woocommerce-pdf-invoices-packing-slips' ),
-					'<a href="https://github.com/wpovernight/woocommerce-pdf-ips-mpdf/releases/latest" target="_blank" rel="noopener noreferrer">',
-					'</a>'
-				);
-			}
-
 			$settings_format[] = array(
 				'type'     => 'setting',
 				'id'       => "{$syntax}_format",
