@@ -149,7 +149,9 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 									}
 
 									$format           = wpo_ips_edi_get_current_format( true );
-									$format_doc_types = is_array( $format['documents'] ) ? array_keys( $format['documents'] ) : array();
+									$format_doc_types = is_array( $format['documents'] ?? null )
+										? array_keys( $format['documents'] )
+										: array();
 
 									if ( ! in_array( $document_type, $format_doc_types, true ) ) {
 										continue;
