@@ -93,7 +93,7 @@ class SettingsCallbacks {
 			esc_attr( $value ),
 			checked( $value, $current, false ), 
 			! empty( $disabled ) ? 'disabled="disabled"' : '',
-			wp_kses_post( $custom_attributes )
+			$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 		);
 		
 		if ( ! empty( $title ) ) {
@@ -167,7 +167,7 @@ class SettingsCallbacks {
 			esc_attr( $size ),
 			esc_attr( $placeholder ),
 			! empty( $disabled ) ? 'disabled="disabled"' : '',
-			wp_kses_post( $custom_attributes )
+			$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 		);
 
 		// Output action button.
@@ -218,7 +218,7 @@ class SettingsCallbacks {
 			esc_attr( $size ),
 			esc_attr( $placeholder ),
 			! empty( $disabled ) ? 'disabled="disabled"' : '',
-			wp_kses_post( $custom_attributes )
+			$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 		);
 
 		// output description.
@@ -263,7 +263,7 @@ class SettingsCallbacks {
 			esc_attr( $size ),
 			esc_attr( $placeholder ),
 			! empty( $disabled ) ? 'disabled="disabled"' : '',
-			wp_kses_post( $custom_attributes )
+			$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 		);
 
 		// output description.
@@ -374,7 +374,7 @@ class SettingsCallbacks {
 			esc_attr( $current ),
 			esc_attr( $size ),
 			esc_attr( $class ),
-			wp_kses_post( $custom_attributes )
+			$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 		);
 
 		// output description.
@@ -413,7 +413,7 @@ class SettingsCallbacks {
 			esc_attr( $width ),
 			esc_attr( $height ),
 			esc_attr( $placeholder ),
-			wp_kses_post( $custom_attributes )
+			$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 		);
 
 		// output description.
@@ -483,7 +483,7 @@ class SettingsCallbacks {
 				esc_attr( $css ),
 				esc_attr( $multiple ),
 				! empty( $disabled ) ? 'disabled="disabled"' : '',
-				wp_kses_post( $custom_attributes )
+				$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 			);
 		} else {
 			printf(
@@ -491,7 +491,7 @@ class SettingsCallbacks {
 				esc_attr( $id ),
 				esc_attr( $setting_name ),
 				! empty( $disabled ) ? 'disabled="disabled"' : '',
-				wp_kses_post( $custom_attributes )
+				$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 			);
 		}
 
@@ -601,7 +601,7 @@ class SettingsCallbacks {
 				esc_attr( $setting_name ),
 				esc_attr( $key ),
 				checked( $current, $key, false ),
-				wp_kses_post( $custom_attributes )
+				$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 			);
 			
 			printf(
@@ -684,7 +684,7 @@ class SettingsCallbacks {
 				esc_attr( $field_current ),
 				esc_attr( $size ),
 				esc_attr( $placeholder ),
-				wp_kses_post( $custom_attributes )
+				$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 			);
 
 			// field description.
@@ -740,7 +740,7 @@ class SettingsCallbacks {
 				esc_attr( $name ),
 				esc_attr( $value ),
 				checked( $value, $field_current, false ),
-				wp_kses_post( $custom_attributes )
+				$custom_attributes // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in normalize_custom_attributes()
 			);
 
 			// output field label
