@@ -208,7 +208,7 @@ class Peppol {
 
 		$user_id = get_current_user_id();
 
-		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
+		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request, true );
 
 		wc_add_notice( __( 'Peppol settings saved.', 'woocommerce-pdf-invoices-packing-slips' ), 'success' );
 		wp_safe_redirect( wc_get_account_endpoint_url( 'peppol' ) );

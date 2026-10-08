@@ -901,8 +901,8 @@ class Admin {
 
 		$customer_id = is_callable( array( $order, 'get_customer_id' ) ) ? (int) $order->get_customer_id() : 0;
 
-		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values );
-		wpo_ips_edi_maybe_save_order_peppol_data( $order, $values );
+		wpo_ips_edi_peppol_save_customer_identifiers( $customer_id, $values, true );
+		wpo_ips_edi_maybe_save_order_peppol_data( $order, $values, true );
 
 		wp_send_json_success(
 			array(
