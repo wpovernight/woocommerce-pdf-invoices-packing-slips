@@ -110,6 +110,13 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.16.4 (2026-10-08) =
+- Fix: PHP warning on settings page when no EDI format is selected
+- Fix: Permission check in the document number preview AJAX handler
+- Fix: Prevent a fatal error when a refund ID is passed to the refund lookup
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 11.2
+
 = 5.16.3 (2026-09-22) =
 - Fix: Use V5 admin accessor in backported security fix
 - Translations: Updated translation template (POT)
