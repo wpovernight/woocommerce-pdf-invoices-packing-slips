@@ -21,6 +21,9 @@ jQuery( function( $ ) {
 		}
 
 		const countryLabels = labels[ $( this ).val() ] || labels[ '' ];
+		if ( ! countryLabels ) {
+			return;
+		}
 		$( '#coc_number' ).closest( 'tr' ).children( 'th' ).text( countryLabels.shop );
 		$field.data( 'registration-label', countryLabels.label );
 		$field.triggerHandler( 'change' );
