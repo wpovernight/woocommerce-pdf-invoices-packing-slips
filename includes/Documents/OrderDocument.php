@@ -24,10 +24,10 @@ abstract class OrderDocument {
 	public bool $enabled;
 	public array $output_formats             = array();
 
-	
 	protected array $linked_documents        = array();
 	protected array $data                    = array();
 	protected array $resolved_settings_cache = array();
+	protected array $escaped_prices          = array(); // V5 compatibility
 
 	/**
 	 * Init/load the order object.
@@ -1254,7 +1254,8 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function language_attributes(): void {
-		echo esc_html( $this->get_language_attributes() );
+		// Attribute string (e.g. lang="en-US"); strip any tags a filter may have introduced.
+		echo wp_strip_all_tags( $this->get_language_attributes() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attribute string, tags stripped
 	}
 
 	/**
@@ -1465,7 +1466,7 @@ abstract class OrderDocument {
 
 		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
 
-		echo esc_textarea( $css );
+		echo wp_strip_all_tags( $css ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS; tags stripped so the style block cannot be closed
 	}
 
 	/**
@@ -1480,7 +1481,7 @@ abstract class OrderDocument {
 
 		$css = apply_filters( 'wpo_wcpdf_template_custom_styles', ob_get_clean(), $this );
 
-		echo esc_html( $css );
+		echo wp_strip_all_tags( $css ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS; tags stripped so the style block cannot be closed
 	}
 
 	/**
@@ -1693,7 +1694,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_line_1(): string {
-		return $this->get_settings_text( 'shop_address_line_1' );
+		return $this->get_settings_text( 'shop_address_line_1', '', false );
 	}
 	
 	/**
@@ -1711,7 +1712,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_line_2(): string {
-		return $this->get_settings_text( 'shop_address_line_2' );
+		return $this->get_settings_text( 'shop_address_line_2', '', false );
 	}
 	
 	/**
@@ -1765,7 +1766,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_state(): string {
-		return $this->get_settings_text( 'shop_address_state' );
+		return $this->get_settings_text( 'shop_address_state', '', false );
 	}
 	
 	/**
@@ -1783,7 +1784,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_city(): string {
-		return $this->get_settings_text( 'shop_address_city' );
+		return $this->get_settings_text( 'shop_address_city', '', false );
 	}
 	
 	/**
@@ -1801,7 +1802,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_postcode(): string {
-		return $this->get_settings_text( 'shop_address_postcode' );
+		return $this->get_settings_text( 'shop_address_postcode', '', false );
 	}
 	
 	/**
@@ -1868,7 +1869,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address(): void {
-		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
+		echo wpo_wcpdf_sanitize_html_content( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -2092,9 +2093,17 @@ abstract class OrderDocument {
 			$html = $this->wrap_html_content( $html );
 		}
 
-		// clean up special characters
-		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
-			$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
+		// Restore price markup escaped by pre-6.0.0 custom templates. Exact-match only:
+		// the replacement values are our own wc_price() output, never request data.
+		if ( ! empty( $this->escaped_prices ) ) {
+			$html = str_replace( array_keys( $this->escaped_prices ), array_values( $this->escaped_prices ), $html );
+		}
+
+		// Convert non-ASCII characters to HTML entities for the PDF renderer.
+		// Never decode entities here: this runs on the assembled document, after
+		// every field sanitizer, so decoding would revive sanitized markup.
+		if ( apply_filters( 'wpo_wcpdf_convert_encoding', true ) ) {
+			$html = wcpdf_convert_encoding( $html );
 		}
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
