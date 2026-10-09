@@ -2992,18 +2992,21 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected =
 }
 
 /**
- * Sanitize formatted price HTML for document output.
- * Allows only the markup wc_price() and WooCommerce price formatting produce.
+ * Sanitize formatted price and totals HTML for document output.
+ * Allows only the markup wc_price() and WooCommerce order totals produce.
  *
  * @param string $price_html
  * @return string
  */
 function wpo_ips_kses_price( string $price_html ): string {
 	return wp_kses( $price_html, array(
-		'span'  => array( 'class' => true, 'translate' => true, 'dir' => true ),
-		'bdi'   => array( 'class' => true, 'dir' => true ),
-		'del'   => array( 'class' => true ),
-		'ins'   => array( 'class' => true ),
-		'small' => array( 'class' => true ),
+		'span'   => array( 'class' => true, 'translate' => true, 'dir' => true ),
+		'bdi'    => array( 'class' => true, 'dir' => true ),
+		'del'    => array( 'class' => true ),
+		'ins'    => array( 'class' => true ),
+		'small'  => array( 'class' => true ),
+		'p'      => array( 'class' => true ),
+		'br'     => array(),
+		'strong' => array(),
 	) );
 }
