@@ -1643,8 +1643,8 @@ function wpo_wcpdf_format_address( array $address ): string {
 		$formatted_address .= "\n" . $address['additional'];
 	}
 
-	// Convert to HTML line breaks. Escape first: the <br /> tags below are ours, not data.
-	$formatted_address = nl2br( esc_html( ltrim( $formatted_address, "\r\n" ) ) );
+	// Convert to HTML line breaks.
+	$formatted_address = nl2br( ltrim( $formatted_address, "\r\n" ) );
 
 	// Remove any new lines.
 	$formatted_address = str_replace( "\n", '', $formatted_address );
