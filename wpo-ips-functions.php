@@ -1643,13 +1643,13 @@ function wpo_wcpdf_format_address( array $address ): string {
 		$formatted_address .= "\n" . $address['additional'];
 	}
 
-	// Convert to HTML line breaks.
-	$formatted_address = nl2br( ltrim( $formatted_address, "\r\n" ) );
+	// Convert to HTML line breaks. Escape first: the <br /> tags below are ours, not data.
+	$formatted_address = nl2br( esc_html( ltrim( $formatted_address, "\r\n" ) ) );
 
 	// Remove any new lines.
 	$formatted_address = str_replace( "\n", '', $formatted_address );
 
-	return esc_html( $formatted_address );
+	return $formatted_address;
 }
 
 /**
@@ -2989,4 +2989,21 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected =
 	}
 
 	return array_values( array_unique( $normalized ) );
+}
+
+/**
+ * Sanitize formatted price HTML for document output.
+ * Allows only the markup wc_price() and WooCommerce price formatting produce.
+ *
+ * @param string $price_html
+ * @return string
+ */
+function wpo_ips_kses_price( string $price_html ): string {
+	return wp_kses( $price_html, array(
+		'span'  => array( 'class' => true, 'translate' => true, 'dir' => true ),
+		'bdi'   => array( 'class' => true, 'dir' => true ),
+		'del'   => array( 'class' => true ),
+		'ins'   => array( 'class' => true ),
+		'small' => array( 'class' => true ),
+	) );
 }

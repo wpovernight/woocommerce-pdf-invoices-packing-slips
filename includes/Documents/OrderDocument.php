@@ -1868,7 +1868,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address(): void {
-		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
+		echo wpo_wcpdf_sanitize_html_content( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -2092,9 +2092,11 @@ abstract class OrderDocument {
 			$html = $this->wrap_html_content( $html );
 		}
 
-		// clean up special characters
-		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
-			$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
+		// Convert non-ASCII characters to HTML entities for the PDF renderer.
+		// Never decode entities here: this runs on the assembled document, after
+		// every field sanitizer, so decoding would revive sanitized markup.
+		if ( apply_filters( 'wpo_wcpdf_convert_encoding', true ) ) {
+			$html = wcpdf_convert_encoding( $html );
 		}
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
