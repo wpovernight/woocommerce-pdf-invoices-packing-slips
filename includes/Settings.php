@@ -26,9 +26,9 @@ class Settings {
 	public ?SettingsEDI $edi                 = null;
 	
 	public string|false $options_page_hook   = false;
-	public array $general_settings;
-	public array $debug_settings;
-	public array $edi_settings;
+	public array $general_settings           = array();
+	public array $debug_settings             = array();
+	public array $edi_settings               = array();
 
 	private array $installed_templates       = array();
 	private array $installed_templates_cache = array();
