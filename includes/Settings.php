@@ -710,6 +710,37 @@ class Settings {
 	}
 
 	/**
+	 * Get the normalized group of a template ID (e.g. 'theme/MyTemplate' => 'theme').
+	 *
+	 * @param string $template_id
+	 * @return string One of 'default', 'premium_plugin', 'extension' or 'theme'.
+	 */
+	public function get_template_group( string $template_id ): string {
+		$group = dirname( $template_id );
+
+		if ( false !== strpos( $group, 'extension::' ) ) {
+			return 'extension';
+		}
+
+		if ( in_array( $group, array( 'default', 'premium_plugin' ), true ) ) {
+			return $group;
+		}
+
+		return 'theme';
+	}
+
+	/**
+	 * Whether the selected template is a custom (theme) template.
+	 *
+	 * @return bool
+	 */
+	public function is_custom_template(): bool {
+		$selected = $this->get_settings( 'general' )['template_path'] ?? '';
+
+		return ! empty( $selected ) && 'theme' === $this->get_template_group( $selected );
+	}
+
+	/**
 	 * Get installed templates list as options.
 	 *
 	 * @return array
@@ -720,23 +751,16 @@ class Settings {
 
 		foreach ( $installed_templates as $path => $template_id ) {
 			$template_name = basename( $template_id );
-			$group         = dirname( $template_id );
 
-			// check if this is an extension template
-			if ( false !== strpos( $group, 'extension::' ) ) {
-				$extension = explode( '::', $group );
-				$group     = 'extension';
-			}
-
-			switch ( $group ) {
+			switch ( $this->get_template_group( $template_id ) ) {
 				case 'default':
 				case 'premium_plugin':
 					// no suffix
 					break;
 				case 'extension':
+					$extension     = explode( '::', dirname( $template_id ) );
 					$template_name = sprintf( '%s (%s) [%s]', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ), $extension[1] );
 					break;
-				case 'theme':
 				default:
 					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
 					break;

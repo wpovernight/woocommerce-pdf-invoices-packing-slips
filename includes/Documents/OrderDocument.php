@@ -24,10 +24,10 @@ abstract class OrderDocument {
 	public bool $enabled;
 	public array $output_formats             = array();
 
-	
 	protected array $linked_documents        = array();
 	protected array $data                    = array();
 	protected array $resolved_settings_cache = array();
+	protected array $escaped_prices          = array(); // V5 compatibility
 
 	/**
 	 * Init/load the order object.
@@ -2091,6 +2091,12 @@ abstract class OrderDocument {
 
 		if ( $args['wrap_html_content'] ) {
 			$html = $this->wrap_html_content( $html );
+		}
+
+		// Restore price markup escaped by pre-6.0.0 custom templates. Exact-match only:
+		// the replacement values are our own wc_price() output, never request data.
+		if ( ! empty( $this->escaped_prices ) ) {
+			$html = str_replace( array_keys( $this->escaped_prices ), array_values( $this->escaped_prices ), $html );
 		}
 
 		// Convert non-ASCII characters to HTML entities for the PDF renderer.

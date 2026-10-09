@@ -1288,7 +1288,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		$shipping_cost = $this->order->get_shipping_total();
 		$shipping_tax  = $this->order->get_shipping_tax();
 
-		if ($tax == 'excl' ) {
+		if ( 'excl' === $tax ) {
 			$formatted_shipping_cost = $this->format_price( $shipping_cost );
 		} else {
 			$formatted_shipping_cost = $this->format_price( $shipping_cost + $shipping_tax );
@@ -1523,14 +1523,22 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 	/**
 	 * Wrapper for wc_price, ensuring currency is always passed
-	 * 
+	 *
 	 * @param float $price
 	 * @param array $args
 	 * @return string
 	 */
 	public function format_price( float $price, array $args = array() ): string {
 		$args['currency'] = $this->order->get_currency();
-		return wc_price( $price, $args );
+		$price_html       = wc_price( $price, $args );
+
+		// Custom templates copied before 6.0.0 run esc_html() on price markup.
+		// Record the escaped form so get_html() can restore it.
+		if ( \WPO_WCPDF()->get_instance( 'settings' )->is_custom_template() ) {
+			$this->escaped_prices[ esc_html( $price_html ) ] = $price_html;
+		}
+
+		return $price_html;
 	}
 
 	/**
