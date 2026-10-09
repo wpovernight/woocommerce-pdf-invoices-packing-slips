@@ -1254,7 +1254,8 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function language_attributes(): void {
-		echo $this->get_language_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attribute string from WP get_language_attributes()
+		// Attribute string (e.g. lang="en-US"); strip any tags a filter may have introduced.
+		echo wp_strip_all_tags( $this->get_language_attributes() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attribute string, tags stripped
 	}
 
 	/**
