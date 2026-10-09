@@ -3010,3 +3010,62 @@ function wpo_ips_kses_price( string $price_html ): string {
 		'strong' => array(),
 	) );
 }
+
+/**
+ * Sanitize document content HTML for output in templates.
+ * Covers item cells, meta and other rendered document markup.
+ *
+ * @param string $html
+ * @return string
+ */
+function wpo_ips_kses_document_content( string $html ): string {
+	$allowed = array(
+		// price & totals markup
+		'span'       => array( 'class' => true, 'style' => true, 'translate' => true, 'dir' => true ),
+		'bdi'        => array( 'class' => true, 'dir' => true ),
+		'del'        => array( 'class' => true ),
+		'ins'        => array( 'class' => true ),
+		'small'      => array( 'class' => true ),
+		// item cell & meta markup
+		'img'        => array( 'src' => true, 'alt' => true, 'width' => true, 'height' => true, 'class' => true, 'style' => true ),
+		'div'        => array( 'class' => true, 'style' => true ),
+		'p'          => array( 'class' => true, 'style' => true ),
+		'br'         => array(),
+		'strong'     => array( 'class' => true ),
+		'b'          => array( 'class' => true ),
+		'em'         => array( 'class' => true ),
+		'i'          => array( 'class' => true ),
+		'u'          => array( 'class' => true ),
+		'ul'         => array( 'class' => true ),
+		'ol'         => array( 'class' => true ),
+		'li'         => array( 'class' => true ),
+		'dl'         => array( 'class' => true ),
+		'dt'         => array( 'class' => true ),
+		'dd'         => array( 'class' => true ),
+		'table'      => array( 'class' => true, 'style' => true, 'border' => true, 'cellspacing' => true, 'cellpadding' => true ),
+		'thead'      => array( 'class' => true ),
+		'tbody'      => array( 'class' => true ),
+		'tfoot'      => array( 'class' => true ),
+		'tr'         => array( 'class' => true ),
+		'th'         => array( 'class' => true, 'style' => true, 'colspan' => true, 'rowspan' => true, 'scope' => true ),
+		'td'         => array( 'class' => true, 'style' => true, 'colspan' => true, 'rowspan' => true ),
+		'h1'         => array( 'class' => true ),
+		'h2'         => array( 'class' => true ),
+		'h3'         => array( 'class' => true ),
+		'h4'         => array( 'class' => true ),
+		'h5'         => array( 'class' => true ),
+		'h6'         => array( 'class' => true ),
+		'hr'         => array( 'class' => true ),
+		'sup'        => array( 'class' => true ),
+		'sub'        => array( 'class' => true ),
+		'abbr'       => array( 'class' => true, 'title' => true ),
+		'code'       => array( 'class' => true ),
+		'pre'        => array( 'class' => true ),
+		'blockquote' => array( 'class' => true ),
+		'figure'     => array( 'class' => true ),
+		'figcaption' => array( 'class' => true ),
+		'a'          => array( 'href' => true, 'class' => true, 'title' => true ),
+	);
+
+	return wp_kses( $html, apply_filters( 'wpo_ips_kses_document_content_allowed_html', $allowed ) );
+}
