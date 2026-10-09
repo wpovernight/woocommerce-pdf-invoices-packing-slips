@@ -208,7 +208,7 @@ class Peppol {
 
 		$user_id = get_current_user_id();
 
-		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request );
+		wpo_ips_edi_peppol_save_customer_identifiers( $user_id, $request, true );
 
 		wc_add_notice( __( 'Peppol settings saved.', 'woocommerce-pdf-invoices-packing-slips' ), 'success' );
 		wp_safe_redirect( wc_get_account_endpoint_url( 'peppol' ) );
@@ -724,6 +724,39 @@ class Peppol {
 	}
 
 	/**
+	 * Derive a Peppol Endpoint ID from an order VAT number.
+	 *
+	 * Uses the order billing country and VAT number to build the available
+	 * Peppol Endpoint ID candidates and returns the first participant found
+	 * in the Peppol Directory.
+	 *
+	 * @param \WC_Order $order WooCommerce order object.
+	 * @return array|\WP_Error Derived endpoint data on success, or WP_Error on failure.
+	 */
+	public function peppol_derive_endpoint_from_order( \WC_Order $order ): array|\WP_Error {
+		$billing_country = trim( (string) $order->get_billing_country() );
+		$vat_number      = trim( (string) wpo_wcpdf_get_order_customer_vat_number( $order ) );
+
+		if ( empty( $billing_country ) || empty( $vat_number ) ) {
+			return new \WP_Error(
+				'peppol_endpoint_missing_data',
+				__( 'Missing billing country or VAT number.', 'woocommerce-pdf-invoices-packing-slips' )
+			);
+		}
+
+		$result = $this->peppol_find_valid_endpoint_from_vat( $billing_country, $vat_number );
+
+		if ( empty( $result['endpoint_id'] ) || empty( $result['eas'] ) ) {
+			return new \WP_Error(
+				'peppol_endpoint_not_found',
+				__( 'No valid Peppol Endpoint ID could be derived from the VAT number.', 'woocommerce-pdf-invoices-packing-slips' )
+			);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Handle automatic Peppol Endpoint ID derivation on new order creation.
 	 *
 	 * @param \WC_Order $order
@@ -740,37 +773,37 @@ class Peppol {
 			return;
 		}
 
-		$order->read_meta_data( true );
-
-		$billing_country = $order->get_billing_country();
-		$vat_number      = wpo_wcpdf_get_order_customer_vat_number( $order );
-
-		if ( empty( $billing_country ) || empty( $vat_number ) ) {
-			wpo_ips_edi_log(
-				sprintf(
-					'Automatic Peppol Endpoint ID derivation skipped for order #%d: missing billing country or VAT number.',
-					$order_id
-				)
-			);
-
-			return;
-		}
-
 		wpo_ips_edi_log(
 			sprintf(
-				'Attempting automatic Peppol Endpoint ID derivation for order #%d using billing country "%s".',
-				$order_id,
-				$billing_country
+				'Attempting automatic Peppol Endpoint ID derivation for order #%d.',
+				$order_id
 			)
 		);
 
-		$result = $this->peppol_find_valid_endpoint_from_vat( $billing_country, $vat_number );
+		$order->read_meta_data( true );
 
-		if ( empty( $result['endpoint_id'] ) || empty( $result['eas'] ) ) {
+		$result = $this->peppol_derive_endpoint_from_order( $order );
+
+		if ( is_wp_error( $result ) ) {
+			if ( 'peppol_endpoint_missing_data' === $result->get_error_code() ) {
+				wpo_ips_edi_log(
+					sprintf(
+						'Automatic Peppol Endpoint ID derivation skipped for order #%d with error code "%s": %s',
+						$order_id,
+						$result->get_error_code(),
+						$result->get_error_message()
+					)
+				);
+
+				return;
+			}
+
 			wpo_ips_edi_log(
 				sprintf(
-					'Automatic Peppol Endpoint ID derivation failed for order #%d: no valid Endpoint ID or EAS was found.',
-					$order_id
+					'Automatic Peppol Endpoint ID derivation failed for order #%d with error code "%s": %s',
+					$order_id,
+					$result->get_error_code(),
+					$result->get_error_message()
 				),
 				'warning'
 			);
