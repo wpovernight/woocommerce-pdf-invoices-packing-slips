@@ -1254,7 +1254,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function language_attributes(): void {
-		echo esc_html( $this->get_language_attributes() );
+		echo $this->get_language_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attribute string from WP get_language_attributes()
 	}
 
 	/**
@@ -1465,7 +1465,7 @@ abstract class OrderDocument {
 
 		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
 
-		echo esc_textarea( $css );
+		echo wp_strip_all_tags( $css ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS; tags stripped so the style block cannot be closed
 	}
 
 	/**
@@ -1480,7 +1480,7 @@ abstract class OrderDocument {
 
 		$css = apply_filters( 'wpo_wcpdf_template_custom_styles', ob_get_clean(), $this );
 
-		echo esc_html( $css );
+		echo wp_strip_all_tags( $css ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS; tags stripped so the style block cannot be closed
 	}
 
 	/**
@@ -1693,7 +1693,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_line_1(): string {
-		return $this->get_settings_text( 'shop_address_line_1' );
+		return $this->get_settings_text( 'shop_address_line_1', '', false );
 	}
 	
 	/**
@@ -1711,7 +1711,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_line_2(): string {
-		return $this->get_settings_text( 'shop_address_line_2' );
+		return $this->get_settings_text( 'shop_address_line_2', '', false );
 	}
 	
 	/**
@@ -1765,7 +1765,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_state(): string {
-		return $this->get_settings_text( 'shop_address_state' );
+		return $this->get_settings_text( 'shop_address_state', '', false );
 	}
 	
 	/**
@@ -1783,7 +1783,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_city(): string {
-		return $this->get_settings_text( 'shop_address_city' );
+		return $this->get_settings_text( 'shop_address_city', '', false );
 	}
 	
 	/**
@@ -1801,7 +1801,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_postcode(): string {
-		return $this->get_settings_text( 'shop_address_postcode' );
+		return $this->get_settings_text( 'shop_address_postcode', '', false );
 	}
 	
 	/**

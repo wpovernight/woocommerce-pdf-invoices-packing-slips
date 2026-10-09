@@ -1275,7 +1275,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function order_subtotal( string $tax = 'excl', string $discount = 'incl' ): void {
 		$subtotal = $this->get_order_subtotal( $tax, $discount );
-		echo esc_html( $subtotal['value'] );
+		echo wpo_ips_kses_price( $subtotal['value'] );
 	}
 
 	/**
@@ -1316,7 +1316,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function order_shipping( string $tax = 'excl' ): void {
 		$shipping = $this->get_order_shipping( $tax );
-		echo esc_html( $shipping['value'] );
+		echo wpo_ips_kses_price( $shipping['value'] );
 	}
 
 	/**
@@ -1373,7 +1373,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	public function order_discount( string $type = 'total', string $tax = 'incl' ): void {
 		$discount = $this->get_order_discount( $type, $tax );
 		if ( $discount ) {
-			echo esc_html( $discount['value'] );
+			echo wpo_ips_kses_price( $discount['value'] );
 		}
 	}
 
@@ -1477,7 +1477,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function order_grand_total( string $tax = 'incl' ): void {
 		$grand_total = $this->get_order_grand_total( $tax );
-		echo esc_html( $grand_total['value'] );
+		echo wpo_ips_kses_price( $grand_total['value'] );
 	}
 
 	/**
