@@ -14,7 +14,9 @@ class BulkDocument {
 	public array $order_ids;
 	public bool $is_bulk;
 	public array $output_formats;
-	public ?object $wrapper_document = null;
+	public ?object $wrapper_document         = null;
+
+	protected ?array $rendered_resource_urls = null;
 
 	/**
 	 * Constructor.
@@ -109,6 +111,8 @@ class BulkDocument {
 	 * @return string
 	 */
 	public function get_html( array $args = array() ): string {
+		$this->rendered_resource_urls = null;
+
 		\WPO_WCPDF()->get_instance( 'main' )->load_template_functions();
 
 		// temporarily apply filters that need to be removed again after the html is generated
@@ -117,7 +121,9 @@ class BulkDocument {
 
 		do_action( 'wpo_wcpdf_before_html', $this->get_type(), $this );
 
-		$html_content = array();
+		$html_content  = array();
+		$resource_urls = array();
+
 		foreach ( $this->order_ids as $key => $order_id ) {
 			do_action( 'wpo_wcpdf_process_template_order', $this->get_type(), $order_id );
 
@@ -125,6 +131,11 @@ class BulkDocument {
 
 			if ( $document = wcpdf_get_document( $this->get_type(), $order, true ) ) {
 				$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false ) );
+
+				// Keep only URLs, so large exports do not retain every order and document.
+				foreach ( wpo_ips_get_trusted_resource_urls( $document ) as $url ) {
+					$resource_urls[ $url ] = true;
+				}
 			}
 		}
 
@@ -140,12 +151,23 @@ class BulkDocument {
 			$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
 		}
 
+		$this->rendered_resource_urls = array_keys( $resource_urls );
+
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 
 		// remove temporary filters
 		\wpo_ips_remove_filters( $html_filters );
 
 		return $html;
+	}
+
+	/**
+	 * Get resource URLs collected during the last completed HTML render.
+	 *
+	 * @return string[]|null Null means the bulk HTML has not finished rendering.
+	 */
+	public function get_rendered_resource_urls(): ?array {
+		return $this->rendered_resource_urls;
 	}
 
 	/**

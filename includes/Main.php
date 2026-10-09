@@ -469,7 +469,7 @@ class Main {
 		}
 
 		// check the user privileges
-		$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( $document_type );
+		$full_permission = Admin::user_can_manage_document( $document_type );
 
 		// multi-order only allowed with full permissions
 		if ( ! $full_permission && ( count( $order_ids ) > 1 || isset( $request['bulk'] ) ) ) {
@@ -646,7 +646,7 @@ class Main {
 		$order_ids = array_map( 'absint', (array) wp_unslash( $_POST['order_ids'] ) );
 
 		// Check the user privileges
-		$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( 'credit-note' );
+		$full_permission = Admin::user_can_manage_document( 'credit-note' );
 
 		if ( ! $full_permission ) {
 			foreach ( $order_ids as $order_id ) {
@@ -1905,7 +1905,7 @@ class Main {
 
 		if ( ! empty( $data['action'] ) && $data['action'] == "printed_wpo_wcpdf" && ! empty( $data['event'] ) && ! empty( $data['document_type'] ) && ! empty( $data['order_id'] ) && ! empty( $data['trigger'] ) ) {
 			$document        = wcpdf_get_document( esc_attr( $data['document_type'] ), esc_attr( $data['order_id'] ) );
-			$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( esc_attr( $data['document_type'] ) );
+			$full_permission = Admin::user_can_manage_document( esc_attr( $data['document_type'] ) );
 
 			if ( ! empty( $document ) && ! empty( $document->order ) && $full_permission ) {
 				$order = $document->order;

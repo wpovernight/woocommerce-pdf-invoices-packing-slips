@@ -1280,8 +1280,15 @@ class Peppol {
 		$base_url = 'https://directory.peppol.eu/search/1.0/json';
 
 		$query_args['beautify'] = 'true';
+		ksort( $query_args );
 
-		$url = $base_url . '?' . http_build_query( $query_args, '', '&', PHP_QUERY_RFC3986 );
+		$url       = $base_url . '?' . http_build_query( $query_args, '', '&', PHP_QUERY_RFC3986 );
+		$cache_key = 'wpo_ips_peppol_directory_' . md5( $url );
+		$cached    = get_transient( $cache_key );
+
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
 
 		$response = wp_remote_get(
 			$url,
@@ -1323,6 +1330,10 @@ class Peppol {
 				__( 'Peppol Directory returned an invalid JSON response.', 'woocommerce-pdf-invoices-packing-slips' )
 			);
 		}
+
+		// Reuse successful responses across requests; retry missing participants sooner.
+		$expiration = empty( $data['matches'] ) ? MINUTE_IN_SECONDS : 15 * MINUTE_IN_SECONDS;
+		set_transient( $cache_key, $data, $expiration );
 
 		return $data;
 	}
@@ -1376,7 +1387,14 @@ class Peppol {
 				continue;
 			}
 
-			if ( $this->peppol_directory_participant_exists( (string) $candidate['endpoint_id'] ) ) {
+			$exists = $this->peppol_directory_participant_exists( (string) $candidate['endpoint_id'] );
+
+			// A directory failure is not a missing participant. Stop further requests for this lookup.
+			if ( is_wp_error( $exists ) ) {
+				return array();
+			}
+
+			if ( $exists ) {
 				return $candidate;
 			}
 		}
@@ -1388,13 +1406,13 @@ class Peppol {
 	 * Check whether a Peppol participant exists in the Directory.
 	 *
 	 * @param string $endpoint_id Endpoint ID.
-	 * @return bool
+	 * @return bool|\WP_Error
 	 */
-	private function peppol_directory_participant_exists( string $endpoint_id ): bool {
+	private function peppol_directory_participant_exists( string $endpoint_id ): bool|\WP_Error {
 		$data = $this->peppol_directory_request_by_participant( $endpoint_id );
 
 		if ( is_wp_error( $data ) ) {
-			return false;
+			return $data;
 		}
 
 		$matches     = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
