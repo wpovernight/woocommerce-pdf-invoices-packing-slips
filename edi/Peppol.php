@@ -734,8 +734,6 @@ class Peppol {
 	 * @return array|\WP_Error Derived endpoint data on success, or WP_Error on failure.
 	 */
 	public function peppol_derive_endpoint_from_order( \WC_Order $order ): array|\WP_Error {
-		$order->read_meta_data( true );
-
 		$billing_country = trim( (string) $order->get_billing_country() );
 		$vat_number      = trim( (string) wpo_wcpdf_get_order_customer_vat_number( $order ) );
 
@@ -781,6 +779,8 @@ class Peppol {
 				$order_id
 			)
 		);
+
+		$order->read_meta_data( true );
 
 		$result = $this->peppol_derive_endpoint_from_order( $order );
 
