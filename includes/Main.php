@@ -178,6 +178,11 @@ class Main {
 							continue;
 						}
 
+						if ( ! $document->exists() ) {
+							wcpdf_log_error( "Document initialization failed for email attachment. document type: {$document_type}, output format: {$output_format}, email order ID: #{$email_order_id}", 'critical' );
+							continue;
+						}
+
 						$attachment = wcpdf_get_document_file( $document, $output_format );
 
 						if ( $attachment ) {
@@ -237,63 +242,81 @@ class Main {
 
 	public function get_document_pdf_attachment( $document, $tmp_path ) {
 		$filename         = $document->get_filename();
-		$pdf_path         = $tmp_path . $filename;
 		$document_type    = $document->get_type();
 		$order_id         = isset( $document->order ) ? $document->order->get_id() : 0;
 		$lock_file        = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
 		$reuse_attachment = apply_filters( 'wpo_wcpdf_reuse_document_attachment', true, $document );
 		$max_reuse_age    = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
 		$lock_acquired    = false;
+		$writing_file     = false;
+
+		if ( $order_id <= 0 || empty( $filename ) || wp_basename( str_replace( '\\', '/', $filename ) ) !== $filename || in_array( $filename, array( '.', '..' ), true ) ) {
+			wcpdf_log_error( 'Cannot create a PDF attachment without an order ID and a valid filename.', 'critical' );
+			return false;
+		}
+
+		// Custom filenames are not necessarily unique. Keep each order/document in its own directory.
+		$identity  = hash( 'sha256', get_current_blog_id() . '|' . $document_type . '|' . $order_id );
+		$tmp_path  = trailingslashit( $tmp_path ) . 'document-' . $identity . '/';
+		$pdf_path  = $tmp_path . $filename;
+		$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_id}", $max_reuse_age );
 
 		try {
+			// Lock before checking the cache so an unfinished write cannot be reused.
+			if ( $lock_file ) {
+				$lock_acquired = $semaphore->lock();
+
+				if ( ! $lock_acquired ) {
+					$semaphore->log( "Couldn't get the lock for the PDF attachment", 'critical' );
+					return false;
+				}
+			}
+
+			// Another request may have created the directory between the check and mkdir.
+			if ( ! WPO_WCPDF()->file_system->is_dir( $tmp_path ) && ! WPO_WCPDF()->file_system->mkdir( $tmp_path ) && ! WPO_WCPDF()->file_system->is_dir( $tmp_path ) ) {
+				wcpdf_log_error( "Couldn't create the PDF attachment directory {$tmp_path}", 'critical' );
+				return false;
+			}
+
 			// Check if the file can be reused
 			if ( WPO_WCPDF()->file_system->exists( $pdf_path ) && $reuse_attachment && $max_reuse_age > 0 ) {
 				$filemtime = WPO_WCPDF()->file_system->mtime( $pdf_path );
+
 				if ( $filemtime && ( time() - $filemtime < $max_reuse_age ) ) {
 					return $pdf_path;
 				}
 			}
 
-			// Get PDF data and set up the Semaphore
-			$pdf_data  = $document->get_pdf();
-			$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_id}", $max_reuse_age );
-
-			// Attempt to acquire the lock if needed
-			if ( $lock_file ) {
-				$lock_acquired = $semaphore->lock();
+			$pdf_data = $document->get_pdf();
+			if ( empty( $pdf_data ) ) {
+				wcpdf_log_error( "Couldn't generate the PDF attachment for order #{$order_id} ({$document_type}).", 'critical' );
+				return false;
 			}
 
-			$write_file = ( $lock_file && $lock_acquired ) || ! $lock_file;
-
-			// Write the file
-			if ( $write_file ) {
-				$file_written = WPO_WCPDF()->file_system->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
-				$semaphore->log( "PDF attachment written to {$pdf_path}", 'info' );
-			} else {
-				$semaphore->log( "PDF attachment not written to {$pdf_path} because the lock was not acquired", 'info' );
+			$writing_file = true;
+			$file_written = WPO_WCPDF()->file_system->put_contents( $pdf_path, $pdf_data, FS_CHMOD_FILE );
+			if ( ! $file_written || ( is_int( $file_written ) && strlen( $pdf_data ) !== $file_written ) ) {
+				// Do not leave a partial file available for the next cache lookup.
+				WPO_WCPDF()->file_system->delete( $pdf_path );
+				wcpdf_log_error( "Couldn't write the PDF attachment to {$pdf_path}", 'critical' );
+				return false;
 			}
 
-			// Log if the lock was not acquired
-			if ( $lock_file && ! $lock_acquired ) {
-				$semaphore->log( "Couldn't get the lock for the PDF attachment", 'critical' );
+			$semaphore->log( "PDF attachment written to {$pdf_path}", 'info' );
+
+		} catch ( \Throwable $e ) {
+			if ( $writing_file ) {
+				WPO_WCPDF()->file_system->delete( $pdf_path );
 			}
-		} catch ( \Exception $e ) {
 			wcpdf_log_error( "Exception occurred: " . $e->getMessage(), 'critical' );
 			return false;
+
 		} finally {
 			// Release the lock if it was acquired
 			if ( $lock_acquired ) {
 				$semaphore->release();
 				$semaphore->log( 'Lock released for the PDF attachment.', 'info' );
 			}
-		}
-
-		// Check if the file was written successfully
-		if ( ! $file_written ) {
-			$message = "Couldn't write the PDF attachment to {$pdf_path}";
-			$semaphore->log( $message, 'critical' );
-			wcpdf_log_error( $message, 'critical' );
-			return false;
 		}
 
 		return $pdf_path;
@@ -827,7 +850,9 @@ class Main {
 		);
 
 		try {
-			$iterator = new \FilesystemIterator( $tmp_path, \FilesystemIterator::SKIP_DOTS );
+			$iterator = 'attachments' === $subfolder
+				? new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( $tmp_path, \FilesystemIterator::SKIP_DOTS ) )
+				: new \FilesystemIterator( $tmp_path, \FilesystemIterator::SKIP_DOTS );
 
 			foreach ( $iterator as $file ) {
 				// If we don't have a file extension restriction, return true immediately
@@ -1288,15 +1313,19 @@ class Main {
 			'log.htm',
 		) );
 		apply_filters_deprecated( 'wpo_wcpdf_cleanup_folders_level', array( 3 ), '3.9.1', '', 'This filter is no longer necessary.' );
-		$files            = array();
-		$success          = 0;
-		$error            = 0;
-		$output           = array();
+
+		$files       = array();
+		$directories = array();
+		$success     = 0;
+		$error       = 0;
+		$output      = array();
 
 		// Gather all files from the paths
-		foreach ( $paths_to_cleanup as $path ) {
+		while ( ! empty( $paths_to_cleanup ) ) {
+			$path = array_pop( $paths_to_cleanup );
+
 			if ( WPO_WCPDF()->file_system->is_dir( $path ) ) {
-				$listed_files = WPO_WCPDF()->file_system->dirlist( $path, true, true );
+				$listed_files = WPO_WCPDF()->file_system->dirlist( $path );
 
 				if ( $listed_files ) {
 					foreach ( $listed_files as $fileinfo ) {
@@ -1304,19 +1333,22 @@ class Main {
 						$file_path = trailingslashit( $path ) . $name;
 						$basename  = wp_basename( $file_path );
 
-						// Exclude specific files before adding to list
-						if ( ! in_array( $basename, $excluded_files ) && WPO_WCPDF()->file_system->exists( $file_path ) && ! WPO_WCPDF()->file_system->is_dir( $file_path ) ) {
+						if ( in_array( $basename, $excluded_files, true ) ) {
+							continue;
+						}
+
+						// Include only the attachment directories created by this plugin, without following symlinks.
+						if ( preg_match( '/^document-[a-f0-9]{64}$/D', $basename ) && ! is_link( $file_path ) && WPO_WCPDF()->file_system->is_dir( $file_path ) ) {
+							$paths_to_cleanup[]         = $file_path;
+							$directories[ $file_path ] = WPO_WCPDF()->file_system->mtime( $file_path );
+						}
+
+						if ( WPO_WCPDF()->file_system->exists( $file_path ) && ! WPO_WCPDF()->file_system->is_dir( $file_path ) ) {
 							$files[] = $file_path;
 						}
 					}
 				}
 			}
-		}
-
-		// No files to delete
-		if ( empty( $files ) ) {
-			$output['success'] = esc_html__( 'Nothing to delete!', 'woocommerce-pdf-invoices-packing-slips' );
-			return $output;
 		}
 
 		// Process and delete files
@@ -1331,6 +1363,32 @@ class Main {
 					$error++;
 				}
 			}
+		}
+
+		foreach ( $directories as $directory => $modified ) {
+			if ( $modified && $modified < $delete_before ) {
+				$contents = WPO_WCPDF()->file_system->dirlist( $directory );
+				if ( false === $contents ) {
+					continue;
+				}
+
+				$contents = array_filter( $contents, static function( $entry ) {
+					$name = is_array( $entry ) ? $entry['name'] : $entry;
+					return ! in_array( $name, array( '.', '..' ), true );
+				} );
+
+				if ( ! empty( $contents ) ) {
+					continue;
+				}
+
+				// Non-recursive removal preserves any files created by a concurrent request.
+				WPO_WCPDF()->file_system->rmdir( $directory );
+			}
+		}
+
+		if ( empty( $files ) ) {
+			$output['success'] = esc_html__( 'Nothing to delete!', 'woocommerce-pdf-invoices-packing-slips' );
+			return $output;
 		}
 
 		if ( $error > 0 ) {
