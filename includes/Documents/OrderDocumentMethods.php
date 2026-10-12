@@ -119,7 +119,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
-		$address = apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		$address = apply_filters( 'wpo_wcpdf_billing_address', $address, $this );
 
 		if ( is_null( $address ) ) {
 			$address = '';
@@ -137,7 +137,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return void
 	 */
 	public function billing_address(): void {
-		echo wp_kses_post( $this->get_billing_address() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_billing_address(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -281,7 +281,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 		}
 
-		$address = apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		$address = apply_filters( 'wpo_wcpdf_shipping_address', $address, $this );
 
 		if ( is_null( $address ) ) {
 			$address = '';
@@ -299,7 +299,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return void
 	 */
 	public function shipping_address(): void {
-		echo wp_kses_post( $this->get_shipping_address() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shipping_address(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
