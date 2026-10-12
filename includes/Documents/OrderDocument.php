@@ -2083,11 +2083,23 @@ abstract class OrderDocument {
 		);
 		$args = $args + $default_args;
 
+		// Custom templates copied before 6.0.0 run esc_html() on price markup.
+		// Record every price rendered so it can be restored below.
+		$record_prices = \WPO_WCPDF()->get_instance( 'settings' )->is_custom_template();
+
+		if ( $record_prices ) {
+			add_filter( 'wc_price', array( $this, 'record_escaped_price' ), 9999 );
+		}
+
 		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ), array(
-				'order'    => $this->order,
-				'order_id' => $this->order_id,
-			)
+			'order'    => $this->order,
+			'order_id' => $this->order_id,
+		)
 		);
+
+		if ( $record_prices ) {
+			remove_filter( 'wc_price', array( $this, 'record_escaped_price' ), 9999 );
+		}
 
 		if ( $args['wrap_html_content'] ) {
 			$html = $this->wrap_html_content( $html );
@@ -2222,6 +2234,22 @@ abstract class OrderDocument {
 				'is_bulk' => $is_bulk,
 			)
 		);
+	}
+
+	/**
+	 * Record the escaped form of a price string so get_html() can restore it.
+	 *
+	 * Hooked onto 'wc_price' only while rendering a custom template, so every
+	 * price string is captured regardless of whether the plugin or WooCommerce
+	 * formatted it.
+	 *
+	 * @param string $price_html
+	 * @return string
+	 */
+	public function record_escaped_price( string $price_html ): string {
+		$this->escaped_prices[ esc_html( $price_html ) ] = $price_html;
+
+		return $price_html;
 	}
 
 	/**

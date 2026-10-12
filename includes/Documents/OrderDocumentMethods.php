@@ -1530,15 +1530,8 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function format_price( float $price, array $args = array() ): string {
 		$args['currency'] = $this->order->get_currency();
-		$price_html       = wc_price( $price, $args );
 
-		// Custom templates copied before 6.0.0 run esc_html() on price markup.
-		// Record the escaped form so get_html() can restore it.
-		if ( \WPO_WCPDF()->get_instance( 'settings' )->is_custom_template() ) {
-			$this->escaped_prices[ esc_html( $price_html ) ] = $price_html;
-		}
-
-		return $price_html;
+		return wc_price( $price, $args );
 	}
 
 	/**
