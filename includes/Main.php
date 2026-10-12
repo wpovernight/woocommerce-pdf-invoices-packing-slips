@@ -76,6 +76,11 @@ class Main {
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_wpo_ips_get_refund_order_ids', array( $this, 'get_refund_order_ids_ajax' ) );
 		add_action( 'wp_ajax_printed_wpo_wcpdf', array( $this, 'document_printed_ajax' ) );
+
+		// Settings need template hooks before fields are registered on admin_init.
+		if ( \wpo_ips_is_settings_page() ) {
+			$this->load_template_functions();
+		}
 	}
 
 	/**
