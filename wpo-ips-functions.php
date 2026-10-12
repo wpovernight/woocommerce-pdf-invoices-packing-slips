@@ -621,17 +621,37 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	}
 
 	// Default allowed tags.
-	$allow_tags = array_merge(
-		apply_filters(
-			'wpo_wcpdf_sanitize_html_default_allow_tags',
+	$default_tags = array(
+		'br'     => array(),
+		'em'     => array(),
+		'strong' => array(),
+		'p'      => array(),
+	);
+
+	// Addresses carry formatting from the address customization setting and from
+	// extensions that label fields, so they allow a wider set. Every tag here is
+	// inert: no URLs, no scripting, no event-capable attributes.
+	if ( 'address' === $context ) {
+		$default_tags = array_merge(
+			$default_tags,
 			array(
-				'br'     => array(),
-				'em'     => array(),
-				'strong' => array(),
-				'p'      => array(),
-			),
-			$context
-		),
+				'b'    => array(),
+				'i'    => array(),
+				'u'    => array(),
+				'h1'   => array(),
+				'h2'   => array(),
+				'h3'   => array(),
+				'h4'   => array(),
+				'h5'   => array(),
+				'h6'   => array(),
+				'span' => array( 'class', 'style' ),
+				'div'  => array( 'class', 'style' ),
+			)
+		);
+	}
+
+	$allow_tags = array_merge(
+		apply_filters( 'wpo_wcpdf_sanitize_html_default_allow_tags', $default_tags, $context ),
 		$allow_tags
 	);
 
