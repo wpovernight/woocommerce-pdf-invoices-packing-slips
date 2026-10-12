@@ -263,6 +263,22 @@ class FileSystem {
 	}
 
 	/**
+	 * Remove an empty directory without deleting its contents.
+	 *
+	 * @param string $path Directory path.
+	 * @return bool
+	 */
+	public function rmdir( string $path ): bool {
+		if ( empty( $path ) ) {
+			return false;
+		}
+
+		return $this->is_wp_filesystem() ?
+			$this->wp_filesystem->rmdir( $path, false ) :
+			( $this->suppress_errors ? @rmdir( $path ) : rmdir( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir
+	}
+
+	/**
 	 * Check if file is writable
 	 * 
 	 * @param string $filename
