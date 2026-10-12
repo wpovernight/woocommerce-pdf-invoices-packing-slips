@@ -1259,13 +1259,14 @@ abstract class OrderDocument {
 
 		// Rebuild from well-formed name="value" pairs only, so a filter cannot
 		// break out of the <html> tag or add an event handler.
-		if ( preg_match_all( '/([a-zA-Z][a-zA-Z0-9:_.-]*)\s*=\s*"([^"<>]*)"/', $attributes, $matches, PREG_SET_ORDER ) ) {
+		if ( preg_match_all( '/([a-zA-Z][a-zA-Z0-9:_.-]*)\s*=\s*(?:"([^"<>]*)"|\'([^\'<>]*)\')/', $attributes, $matches, PREG_SET_ORDER ) ) {
 			foreach ( $matches as $match ) {
 				if ( 0 === stripos( $match[1], 'on' ) ) {
 					continue; // event handler
 				}
 
-				$safe[] = sprintf( '%s="%s"', strtolower( $match[1] ), esc_attr( $match[2] ) );
+				$value  = ( isset( $match[3] ) && '' !== $match[3] ) ? $match[3] : $match[2];
+				$safe[] = sprintf( '%s="%s"', strtolower( $match[1] ), esc_attr( $value ) );
 			}
 		}
 
