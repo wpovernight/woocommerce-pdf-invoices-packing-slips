@@ -1254,8 +1254,22 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function language_attributes(): void {
-		// Attribute string (e.g. lang="en-US"); strip any tags a filter may have introduced.
-		echo wp_strip_all_tags( $this->get_language_attributes() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attribute string, tags stripped
+		$attributes = $this->get_language_attributes();
+		$safe       = array();
+
+		// Rebuild from well-formed name="value" pairs only, so a filter cannot
+		// break out of the <html> tag or add an event handler.
+		if ( preg_match_all( '/([a-zA-Z][a-zA-Z0-9:_.-]*)\s*=\s*"([^"<>]*)"/', $attributes, $matches, PREG_SET_ORDER ) ) {
+			foreach ( $matches as $match ) {
+				if ( 0 === stripos( $match[1], 'on' ) ) {
+					continue; // event handler
+				}
+
+				$safe[] = sprintf( '%s="%s"', strtolower( $match[1] ), esc_attr( $match[2] ) );
+			}
+		}
+
+		echo implode( ' ', $safe ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- rebuilt from an allowlist, values escaped
 	}
 
 	/**
@@ -2091,14 +2105,18 @@ abstract class OrderDocument {
 			add_filter( 'wc_price', array( $this, 'record_escaped_price' ), 9999 );
 		}
 
-		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ), array(
-			'order'    => $this->order,
-			'order_id' => $this->order_id,
-		)
-		);
-
-		if ( $record_prices ) {
-			remove_filter( 'wc_price', array( $this, 'record_escaped_price' ), 9999 );
+		try {
+			$html = $this->render_template(
+				$this->locate_template_file( "{$this->type}.php" ),
+				array(
+					'order'    => $this->order,
+					'order_id' => $this->order_id,
+				)
+			);
+		} finally {
+			if ( $record_prices ) {
+				remove_filter( 'wc_price', array( $this, 'record_escaped_price' ), 9999 );
+			}
 		}
 
 		if ( $args['wrap_html_content'] ) {
@@ -2342,6 +2360,7 @@ abstract class OrderDocument {
 		if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $file ) ) {
 			include( $file );
 		}
+
 		return ob_get_clean();
 	}
 
