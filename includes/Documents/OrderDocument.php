@@ -2134,10 +2134,15 @@ abstract class OrderDocument {
 			$html = $this->wrap_html_content( $html );
 		}
 
-		// Restore price markup escaped by pre-6.0.0 custom templates. Exact-match only:
-		// the replacement values are our own wc_price() output, never request data.
+		// Restore markup escaped by pre-6.0.0 custom templates.
 		if ( ! empty( $this->escaped_prices ) ) {
-			$html = str_replace( array_keys( $this->escaped_prices ), array_values( $this->escaped_prices ), $html );
+			$escaped_prices = $this->escaped_prices;
+
+			uksort( $escaped_prices, static function ( string $a, string $b ): int {
+				return strlen( $b ) <=> strlen( $a );
+			} );
+
+			$html = str_replace( array_keys( $escaped_prices ), array_values( $escaped_prices ), $html );
 		}
 
 		// Convert non-ASCII characters to HTML entities for the PDF renderer.
