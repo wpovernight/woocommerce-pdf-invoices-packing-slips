@@ -2102,8 +2102,16 @@ abstract class OrderDocument {
 		// Record every price rendered so it can be restored below.
 		$record_prices = \WPO_WCPDF()->get_instance( 'settings' )->is_custom_template();
 
+		$price_filters = array(
+			'wc_price'                                  => array( $this, 'record_escaped_markup' ),
+			'woocommerce_order_formatted_line_subtotal' => array( $this, 'record_escaped_markup' ),
+			'woocommerce_get_order_item_totals'         => array( $this, 'record_escaped_total_rows' ),
+		);
+
 		if ( $record_prices ) {
-			add_filter( 'wc_price', array( $this, 'record_escaped_price' ), 9999 );
+			foreach ( $price_filters as $hook => $callback ) {
+				add_filter( $hook, $callback, 9999 );
+			}
 		}
 
 		try {
@@ -2116,7 +2124,9 @@ abstract class OrderDocument {
 			);
 		} finally {
 			if ( $record_prices ) {
-				remove_filter( 'wc_price', array( $this, 'record_escaped_price' ), 9999 );
+				foreach ( $price_filters as $hook => $callback ) {
+					remove_filter( $hook, $callback, 9999 );
+				}
 			}
 		}
 
@@ -2256,19 +2266,33 @@ abstract class OrderDocument {
 	}
 
 	/**
-	 * Record the escaped form of a price string so get_html() can restore it.
+	 * Record the escaped form of rendered markup so get_html() can restore it.
 	 *
-	 * Hooked onto 'wc_price' only while rendering a custom template, so every
-	 * price string is captured regardless of whether the plugin or WooCommerce
-	 * formatted it.
-	 *
-	 * @param string $price_html
+	 * @param string $html
 	 * @return string
 	 */
-	public function record_escaped_price( string $price_html ): string {
-		$this->escaped_prices[ esc_html( $price_html ) ] = $price_html;
+	public function record_escaped_markup( string $html ): string {
+		if ( '' !== $html ) {
+			$this->escaped_prices[ esc_html( $html ) ] = $html;
+		}
 
-		return $price_html;
+		return $html;
+	}
+
+	/**
+	 * Record each value of a WooCommerce order totals row set.
+	 *
+	 * @param array $total_rows
+	 * @return array
+	 */
+	public function record_escaped_total_rows( $total_rows ) {
+		foreach ( (array) $total_rows as $row ) {
+			if ( isset( $row['value'] ) && is_string( $row['value'] ) ) {
+				$this->record_escaped_markup( $row['value'] );
+			}
+		}
+
+		return $total_rows;
 	}
 
 	/**
