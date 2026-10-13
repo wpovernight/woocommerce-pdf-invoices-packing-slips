@@ -2147,7 +2147,7 @@ abstract class OrderDocument {
 			$html = str_replace( array_keys( $escaped_prices ), array_values( $escaped_prices ), $html );
 		}
 
-		$html = wpo_ips_prepare_document_html( $htm
+		$html = wpo_ips_prepare_document_html( $html );
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 
