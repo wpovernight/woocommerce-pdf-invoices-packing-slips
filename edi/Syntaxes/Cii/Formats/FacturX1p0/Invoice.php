@@ -3,13 +3,13 @@
 namespace WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX1p0;
 
 use WPO\IPS\EDI\Interfaces\HybridFormatInterface;
-use WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice as CiiD16BInvoice;
+use WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD22B\Invoice as CiiD22BInvoice;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Invoice extends CiiD16BInvoice implements HybridFormatInterface {
+class Invoice extends CiiD22BInvoice implements HybridFormatInterface {
 
 	public string $slug = 'factur-x-invoice-1p0';
 	public string $name = 'Factur-X Invoice 1.0';
