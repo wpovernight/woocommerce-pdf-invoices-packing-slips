@@ -223,30 +223,37 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 		$address_city   = wpo_ips_edi_sanitize_string( $order->get_billing_city() ?: '' );
 
 		// Postal Address
+		$postal_address = array(
+			array(
+				'name'  => 'ram:PostcodeCode',
+				'value' => $postcode,
+			),
+			array(
+				'name'  => 'ram:LineOne',
+				'value' => $address_line_1,
+			),
+		);
+
+		if ( ! empty( $address_line_2 ) ) {
+			$postal_address[] = array(
+				'name'  => 'ram:LineTwo',
+				'value' => $address_line_2,
+			);
+		}
+
+		$postal_address[] = array(
+			'name'  => 'ram:CityName',
+			'value' => $address_city,
+		);
+
+		$postal_address[] = array(
+			'name'  => 'ram:CountryID',
+			'value' => $country_code,
+		);
+
 		$buyer_trade_party['value'][] = array(
 			'name'  => 'ram:PostalTradeAddress',
-			'value' => array(
-				array(
-					'name'  => 'ram:PostcodeCode',
-					'value' => $postcode,
-				),
-				array(
-					'name'  => 'ram:LineOne',
-					'value' => $address_line_1,
-				),
-				array(
-					'name'  => 'ram:LineTwo',
-					'value' => $address_line_2,
-				),
-				array(
-					'name'  => 'ram:CityName',
-					'value' => $address_city,
-				),
-				array(
-					'name'  => 'ram:CountryID',
-					'value' => $country_code,
-				),
-			),
+			'value' => $postal_address,
 		);
 
 		// VAT number
