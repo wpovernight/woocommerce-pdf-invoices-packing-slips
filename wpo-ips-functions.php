@@ -609,6 +609,9 @@ function wcpdf_convert_encoding( string $string, string $tool = 'mb_convert_enco
 /**
  * Sanitize HTML content, prevents XSS attacks.
  *
+ * For text entered by users or shop managers: addresses, notes, custom fields.
+ * Deliberately excludes img and a, and $safe_tags caps what extensions may add.
+ *
  * @param string $html
  * @param string $context
  * @param array  $allow_tags
@@ -3033,7 +3036,9 @@ function wpo_ips_kses_price( string $price_html ): string {
 
 /**
  * Sanitize document content HTML for output in templates.
- * Covers item cells, meta and other rendered document markup.
+ *
+ * For markup the plugin and its extensions generate: item cells, price markup,
+ * thumbnails. Allows img and a, which the user-input sanitizer must never allow.
  *
  * @param string $html
  * @return string
@@ -3087,5 +3092,10 @@ function wpo_ips_kses_document_content( string $html ): string {
 		'a'          => array( 'href' => true, 'class' => true, 'title' => true ),
 	);
 
-	return wp_kses( $html, apply_filters( 'wpo_ips_kses_document_content_allowed_html', $allowed ) );
+	$protocols = apply_filters(
+		'wpo_ips_kses_document_content_allowed_protocols',
+		array( 'http', 'https', 'data', 'mailto', 'tel' )
+	);
+
+	return wp_kses( $html, apply_filters( 'wpo_ips_kses_document_content_allowed_html', $allowed ), $protocols );
 }
