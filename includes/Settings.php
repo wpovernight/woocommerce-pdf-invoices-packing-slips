@@ -743,15 +743,23 @@ class Settings {
 	/**
 	 * Whether rendered markup escaped by an older template needs restoring.
 	 *
+	 * Templates that predate 6.0.0 run esc_html() on markup the plugin generates.
+	 *
 	 * @return bool
 	 */
 	public function template_needs_markup_restore(): bool {
+		// Custom templates copied from an older version.
 		if ( $this->is_custom_template() ) {
 			return true;
 		}
 
 		// Premium Templates below the version that stopped escaping document markup.
 		if ( function_exists( 'WPO_WCPDF_Templates' ) && version_compare( WPO_WCPDF_Templates()->version, '2.28.0', '<' ) ) {
+			return true;
+		}
+
+		// Order Proposal below the version that stopped escaping document markup.
+		if ( class_exists( 'WC_Order_Proposal' ) && version_compare( \WC_Order_Proposal::ORDER_PROPOSAL_VERSION, '2.5.0', '<' ) ) {
 			return true;
 		}
 
