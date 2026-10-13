@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-i1625.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-beta.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-08T11:14:47+00:00\n"
+"POT-Creation-Date: 2026-10-13T06:46:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -174,63 +174,71 @@ msgstr ""
 msgid "Invalid Endpoint Scheme."
 msgstr ""
 
-#: edi/Peppol.php:872
-#: edi/Peppol.php:940
+#: edi/Peppol.php:743
+msgid "Missing billing country or VAT number."
+msgstr ""
+
+#: edi/Peppol.php:752
+msgid "No valid Peppol Endpoint ID could be derived from the VAT number."
+msgstr ""
+
+#: edi/Peppol.php:905
+#: edi/Peppol.php:973
 msgid "Override (edit manually)"
 msgstr ""
 
-#: edi/Peppol.php:1039
+#: edi/Peppol.php:1072
 #: includes/Admin.php:2399
 msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
 msgstr ""
 
-#: edi/Peppol.php:1053
-#: edi/Peppol.php:1151
+#: edi/Peppol.php:1086
+#: edi/Peppol.php:1184
 msgid "Peppol Endpoint ID is empty."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:1075
+#: edi/Peppol.php:1108
 #, php-format
 msgid "The identifier \"%1$s\" was found without a scheme. Please enter it in \"scheme:value\" format. You can search for the correct scheme and identifier in the %2$s."
 msgstr ""
 
-#: edi/Peppol.php:1080
-#: edi/Peppol.php:1106
-#: edi/Peppol.php:1129
+#: edi/Peppol.php:1113
+#: edi/Peppol.php:1139
+#: edi/Peppol.php:1162
 msgid "Peppol Directory"
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:1101
+#: edi/Peppol.php:1134
 #, php-format
 msgid "No Peppol participant was found for \"%1$s\". Please confirm the scheme and identifier in the %2$s."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:1124
+#: edi/Peppol.php:1157
 #, php-format
 msgid "We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the %2$s. Below are participants found for this identifier value:"
 msgstr ""
 
 #. translators: %s: error message
-#: edi/Peppol.php:1265
+#: edi/Peppol.php:1298
 #, php-format
 msgid "Peppol Directory request failed: %s"
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: edi/Peppol.php:1279
+#: edi/Peppol.php:1312
 #, php-format
 msgid "Peppol Directory returned an unexpected status code: %d"
 msgstr ""
 
-#: edi/Peppol.php:1290
+#: edi/Peppol.php:1323
 msgid "Peppol Directory returned an invalid JSON response."
 msgstr ""
 
 #. translators: %s: endpoint ID
-#: edi/Peppol.php:1402
+#: edi/Peppol.php:1435
 #, php-format
 msgid "We found the following participant(s) related to \"%s\":"
 msgstr ""
@@ -2196,14 +2204,14 @@ msgstr ""
 #: includes/Admin.php:2041
 #: includes/Assets.php:372
 #: includes/Documents/Invoice.php:405
-#: includes/Main.php:1596
+#: includes/Main.php:1658
 #: views/setup-wizard/display-options.php:83
 msgid "Invoice Number"
 msgstr ""
 
 #: includes/Admin.php:246
 #: includes/Documents/Invoice.php:373
-#: includes/Main.php:1597
+#: includes/Main.php:1659
 #: views/setup-wizard/display-options.php:62
 msgid "Invoice Date"
 msgstr ""
@@ -2768,8 +2776,8 @@ msgstr ""
 
 #: includes/CheckoutField.php:60
 #: includes/CheckoutField.php:249
-#: wpo-ips-functions-edi.php:1102
-#: wpo-ips-functions-edi.php:1178
+#: wpo-ips-functions-edi.php:1111
+#: wpo-ips-functions-edi.php:1187
 msgid "VAT number"
 msgstr ""
 
@@ -3156,7 +3164,7 @@ msgid "%s Date:"
 msgstr ""
 
 #: includes/Documents/OrderDocument.php:1179
-#: includes/Main.php:2218
+#: includes/Main.php:2280
 msgid "Due Date:"
 msgstr ""
 
@@ -3307,42 +3315,42 @@ msgid "Please enter a VAT number including a valid country prefix (for example P
 msgstr ""
 
 #. translators: 1. output format, 2. document title, 3. email title
-#: includes/Main.php:185
+#: includes/Main.php:195
 #, php-format
 msgid "%1$s %2$s successfully attached to the %3$s email."
 msgstr ""
 
-#: includes/Main.php:398
+#: includes/Main.php:426
 msgid "You do not have sufficient permissions to access this page. Reason: empty access key"
 msgstr ""
 
-#: includes/Main.php:404
+#: includes/Main.php:432
 msgid "You do not have sufficient permissions to access this page. Reason: empty action"
 msgstr ""
 
-#: includes/Main.php:410
+#: includes/Main.php:438
 msgid "You do not have sufficient permissions to access this page. Reason: invalid nonce"
 msgstr ""
 
-#: includes/Main.php:420
+#: includes/Main.php:448
 msgid "You haven't selected any orders"
 msgstr ""
 
-#: includes/Main.php:425
+#: includes/Main.php:453
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-#: includes/Main.php:444
+#: includes/Main.php:472
 msgid "You have to save the order before generating a PDF document for it."
 msgstr ""
 
 #. translators: %s: Order ID
-#: includes/Main.php:449
+#: includes/Main.php:477
 #, php-format
 msgid "Could not find the order #%s."
 msgstr ""
 
-#: includes/Main.php:527
+#: includes/Main.php:555
 #: includes/Settings.php:290
 #: includes/Settings.php:480
 #: includes/SetupWizard.php:342
@@ -3350,34 +3358,34 @@ msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #. translators: document type
-#: includes/Main.php:596
+#: includes/Main.php:624
 #, php-format
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr ""
 
-#: includes/Main.php:633
+#: includes/Main.php:661
 msgid "Invalid request. Nonce check failed."
 msgstr ""
 
-#: includes/Main.php:641
-#: includes/Main.php:667
+#: includes/Main.php:669
+#: includes/Main.php:695
 msgid "No orders were provided."
 msgstr ""
 
-#: includes/Main.php:656
+#: includes/Main.php:684
 msgid "You do not have permission to access one or more of these orders."
 msgstr ""
 
-#: includes/Main.php:677
+#: includes/Main.php:705
 msgid "No refunds found for the selected orders."
 msgstr ""
 
-#: includes/Main.php:1488
+#: includes/Main.php:1564
 msgid "Nothing to delete!"
 msgstr ""
 
 #. translators: %1$d is the number of files that couldn't be deleted, %2$d is the number of successfully deleted files
-#: includes/Main.php:1509
+#: includes/Main.php:1571
 #, php-format
 msgid "Unable to delete %1$d file! (deleted %2$d)"
 msgid_plural "Unable to delete %1$d files! (deleted %2$d)"
@@ -3385,80 +3393,80 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d is the number of files successfully deleted
-#: includes/Main.php:1522
+#: includes/Main.php:1584
 #, php-format
 msgid "Successfully deleted %d file!"
 msgid_plural "Successfully deleted %d files!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Main.php:1657
-#: includes/Main.php:1687
+#: includes/Main.php:1719
+#: includes/Main.php:1749
 msgid "User"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1665
+#: includes/Main.php:1727
 #, php-format
 msgid "PDF %1$s created via %2$s."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1694
+#: includes/Main.php:1756
 #, php-format
 msgid "PDF %s deleted."
 msgstr ""
 
-#: includes/Main.php:1711
+#: includes/Main.php:1773
 msgid "manually"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1717
+#: includes/Main.php:1779
 #, php-format
 msgid "%1$s document marked as printed via %2$s."
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1732
+#: includes/Main.php:1794
 #, php-format
 msgid "%1$s document unmark printed."
 msgstr ""
 
-#: includes/Main.php:1819
+#: includes/Main.php:1881
 msgid "single order action"
 msgstr ""
 
-#: includes/Main.php:1820
+#: includes/Main.php:1882
 msgid "bulk order action"
 msgstr ""
 
-#: includes/Main.php:1821
+#: includes/Main.php:1883
 msgid "my account"
 msgstr ""
 
-#: includes/Main.php:1822
+#: includes/Main.php:1884
 msgid "order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Main.php:1826
+#: includes/Main.php:1888
 msgid "email attachment"
 msgstr ""
 
 #. translators: 1. document type, 2. mark/unmark
-#: includes/Main.php:1938
+#: includes/Main.php:2000
 #, php-format
 msgid "Document of type %1$s for the selected order could not be marked as printed."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:2089
+#: includes/Main.php:2151
 #, php-format
 msgid "Order %s Saved"
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Main.php:2332
+#: includes/Main.php:2394
 #, php-format
 msgid "View %s (PDF)"
 msgstr ""
@@ -4757,8 +4765,8 @@ msgid "Postcode / ZIP"
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:1136
-#: wpo-ips-functions-edi.php:1087
-#: wpo-ips-functions-edi.php:1163
+#: wpo-ips-functions-edi.php:1096
+#: wpo-ips-functions-edi.php:1172
 msgid "City"
 msgstr ""
 
@@ -6255,44 +6263,44 @@ msgstr ""
 msgid "Legacy add-on — activation unavailable"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1072
-#: wpo-ips-functions-edi.php:1148
+#: wpo-ips-functions-edi.php:1081
+#: wpo-ips-functions-edi.php:1157
 msgid "Name"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1077
+#: wpo-ips-functions-edi.php:1086
 msgid "Street address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1082
-#: wpo-ips-functions-edi.php:1158
+#: wpo-ips-functions-edi.php:1091
+#: wpo-ips-functions-edi.php:1167
 msgid "Postcode"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1092
-#: wpo-ips-functions-edi.php:1168
+#: wpo-ips-functions-edi.php:1101
+#: wpo-ips-functions-edi.php:1177
 msgid "State"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1097
-#: wpo-ips-functions-edi.php:1173
+#: wpo-ips-functions-edi.php:1106
+#: wpo-ips-functions-edi.php:1182
 msgid "Country Code"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1112
-#: wpo-ips-functions-edi.php:1183
+#: wpo-ips-functions-edi.php:1121
+#: wpo-ips-functions-edi.php:1192
 msgid "Email"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1123
+#: wpo-ips-functions-edi.php:1132
 msgid "PEPPOL Endpoint ID"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1153
+#: wpo-ips-functions-edi.php:1162
 msgid "Address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1216
+#: wpo-ips-functions-edi.php:1225
 msgid "Endpoint ID"
 msgstr ""
 
