@@ -135,12 +135,7 @@ class BulkDocument {
 			true
 		);
 
-		// Convert non-ASCII characters to HTML entities for the PDF renderer.
-		// Never decode entities here: this runs on the assembled document, after
-		// every field sanitizer, so decoding would revive sanitized markup.
-		if ( apply_filters( 'wpo_wcpdf_convert_encoding', true ) ) {
-			$html = wcpdf_convert_encoding( $html );
-		}
+		$html = wpo_ips_prepare_document_html( $html );
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 

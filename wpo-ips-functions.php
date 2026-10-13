@@ -3099,3 +3099,21 @@ function wpo_ips_kses_document_content( string $html ): string {
 
 	return wp_kses( $html, apply_filters( 'wpo_ips_kses_document_content_allowed_html', $allowed ), $protocols );
 }
+
+/**
+ * Prepare an assembled document for the PDF renderer.
+ *
+ * Converts non-ASCII characters to HTML entities. Never decode entities here:
+ * this runs on the finished document, after every field sanitizer, so decoding
+ * would revive markup those sanitizers removed.
+ *
+ * @param string $html Assembled document HTML.
+ * @return string
+ */
+function wpo_ips_prepare_document_html( string $html ): string {
+	if ( apply_filters( 'wpo_wcpdf_convert_encoding', true ) ) {
+		$html = wcpdf_convert_encoding( $html );
+	}
+
+	return $html;
+}
