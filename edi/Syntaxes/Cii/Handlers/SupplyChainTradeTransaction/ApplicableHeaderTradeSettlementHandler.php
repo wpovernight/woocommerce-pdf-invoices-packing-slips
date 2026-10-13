@@ -176,7 +176,11 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				continue;
 			}
 
+			// Only emit exemption data for 0% non-Z with an explicit reason.
 			$has_exemption = 0.0 === $percent && 'Z' !== $category && 'NONE' !== $reason;
+			$reason_label  = $has_exemption
+				? ( ! empty( $tax_reasons[ $reason ] ) ? $tax_reasons[ $reason ] : $reason )
+				: '';
 
 			$node_value = array(
 				array(
@@ -189,9 +193,8 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				),
 			);
 
+			// ExemptionReason must precede BasisAmount in the CII TradeTaxType sequence.
 			if ( $has_exemption ) {
-				$reason_label = ! empty( $tax_reasons[ $reason ] ) ? $tax_reasons[ $reason ] : $reason;
-
 				$node_value[] = array(
 					'name'  => 'ram:ExemptionReason',
 					'value' => $reason_label,
@@ -208,6 +211,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 				'value' => $category,
 			);
 
+			// ExemptionReasonCode must precede RateApplicablePercent.
 			if ( $has_exemption ) {
 				$node_value[] = array(
 					'name'  => 'ram:ExemptionReasonCode',
