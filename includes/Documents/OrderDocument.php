@@ -2100,12 +2100,14 @@ abstract class OrderDocument {
 
 		// Custom templates copied before 6.0.0 run esc_html() on price markup.
 		// Record every price rendered so it can be restored below.
-		$record_prices = \WPO_WCPDF()->get_instance( 'settings' )->is_custom_template();
+		$record_prices = \WPO_WCPDF()->get_instance( 'settings' )->template_needs_markup_restore();
 
 		$price_filters = array(
 			'wc_price'                                  => array( $this, 'record_escaped_markup' ),
 			'woocommerce_order_formatted_line_subtotal' => array( $this, 'record_escaped_markup' ),
 			'woocommerce_get_order_item_totals'         => array( $this, 'record_escaped_total_rows' ),
+			'wpo_wcpdf_templates_table_body'            => array( $this, 'record_escaped_table_body' ),
+			'wpo_wcpdf_templates_totals'                => array( $this, 'record_escaped_total_rows' ),
 		);
 
 		if ( $record_prices ) {
@@ -2298,6 +2300,24 @@ abstract class OrderDocument {
 		}
 
 		return $total_rows;
+	}
+
+	/**
+	 * Record each cell of a Premium Templates item table body.
+	 *
+	 * @param array $body
+	 * @return array
+	 */
+	public function record_escaped_table_body( $body ) {
+		foreach ( (array) $body as $columns ) {
+			foreach ( (array) $columns as $column ) {
+				if ( isset( $column['data'] ) && is_string( $column['data'] ) ) {
+					$this->record_escaped_markup( $column['data'] );
+				}
+			}
+		}
+
+		return $body;
 	}
 
 	/**

@@ -741,6 +741,24 @@ class Settings {
 	}
 
 	/**
+	 * Whether rendered markup escaped by an older template needs restoring.
+	 *
+	 * @return bool
+	 */
+	public function template_needs_markup_restore(): bool {
+		if ( $this->is_custom_template() ) {
+			return true;
+		}
+
+		// Premium Templates below the version that stopped escaping document markup.
+		if ( function_exists( 'WPO_WCPDF_Templates' ) && version_compare( WPO_WCPDF_Templates()->version, '2.28.0', '<' ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get installed templates list as options.
 	 *
 	 * @return array
