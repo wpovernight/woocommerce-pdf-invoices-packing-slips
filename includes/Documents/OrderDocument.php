@@ -2109,6 +2109,7 @@ abstract class OrderDocument {
 			'woocommerce_get_order_item_totals'         => array( $this, 'record_escaped_total_rows' ),
 			'wpo_wcpdf_templates_table_body'            => array( $this, 'record_escaped_table_body' ),
 			'wpo_wcpdf_templates_totals'                => array( $this, 'record_escaped_total_rows' ),
+			'wpo_wcpdf_woocommerce_totals'              => array( $this, 'record_escaped_total_rows' ),
 		);
 
 		if ( $record_prices ) {
