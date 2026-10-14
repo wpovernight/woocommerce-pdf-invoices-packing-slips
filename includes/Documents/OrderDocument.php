@@ -2276,7 +2276,11 @@ abstract class OrderDocument {
 	 */
 	public function record_escaped_markup( string $html ): string {
 		if ( '' !== $html ) {
-			$this->escaped_prices[ esc_html( $html ) ] = $html;
+			$key = esc_html( $html );
+
+			if ( ! isset( $this->escaped_prices[ $key ] ) ) {
+				$this->escaped_prices[ $key ] = wpo_ips_kses_document_content( $html );
+			}
 		}
 
 		return $html;
