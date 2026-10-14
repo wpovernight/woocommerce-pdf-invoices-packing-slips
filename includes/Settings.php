@@ -744,10 +744,18 @@ class Settings {
 	 * Whether rendered markup escaped by an older template needs restoring.
 	 *
 	 * Templates that predate 6.0.0 run esc_html() on markup the plugin generates.
+	 * Any template we do not ship is assumed to be one of them, because a file can
+	 * be swapped in through wpo_wcpdf_template_file without changing the setting.
 	 *
+	 * @param string $template_file Resolved template file, when known.
 	 * @return bool
 	 */
-	public function template_needs_markup_restore(): bool {
+	public function template_needs_markup_restore( string $template_file = '' ): bool {
+		// Templates we do not ship, including files swapped in by a filter.
+		if ( '' !== $template_file && ! $this->is_known_template_file( $template_file ) ) {
+			return true;
+		}
+
 		// Custom templates copied from an older version.
 		if ( $this->is_custom_template() ) {
 			return true;
@@ -761,6 +769,33 @@ class Settings {
 		// Order Proposal below the version that stopped escaping document markup.
 		if ( class_exists( 'WC_Order_Proposal' ) && version_compare( \WC_Order_Proposal::ORDER_PROPOSAL_VERSION, '2.5.0', '<' ) ) {
 			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether a template file lives in a directory shipped by this plugin or a known extension.
+	 *
+	 * @param string $template_file
+	 * @return bool
+	 */
+	public function is_known_template_file( string $template_file ): bool {
+		$known = apply_filters(
+			'wpo_ips_known_template_paths',
+			array( WPO_WCPDF()->plugin_path() . '/templates/' )
+		);
+
+		$file = wp_normalize_path( $template_file );
+
+		foreach ( (array) $known as $path ) {
+			if ( ! is_string( $path ) || '' === $path ) {
+				continue;
+			}
+
+			if ( 0 === strpos( $file, trailingslashit( wp_normalize_path( $path ) ) ) ) {
+				return true;
+			}
 		}
 
 		return false;

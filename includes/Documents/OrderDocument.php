@@ -2100,7 +2100,8 @@ abstract class OrderDocument {
 
 		// Custom templates copied before 6.0.0 run esc_html() on price markup.
 		// Record every price rendered so it can be restored below.
-		$record_prices = \WPO_WCPDF()->get_instance( 'settings' )->template_needs_markup_restore();
+		$template_file = $this->locate_template_file( "{$this->type}.php" );
+		$record_prices = \WPO_WCPDF()->get_instance( 'settings' )->template_needs_markup_restore( $template_file );
 
 		$price_filters = array(
 			'wc_price'                                  => array( $this, 'record_escaped_markup' ),
@@ -2118,7 +2119,7 @@ abstract class OrderDocument {
 
 		try {
 			$html = $this->render_template(
-				$this->locate_template_file( "{$this->type}.php" ),
+				$template_file,
 				array(
 					'order'    => $this->order,
 					'order_id' => $this->order_id,
