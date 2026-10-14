@@ -2271,16 +2271,18 @@ abstract class OrderDocument {
 	/**
 	 * Record the escaped form of rendered markup so get_html() can restore it.
 	 *
-	 * @param string $html
-	 * @return string
+	 * @param mixed $html
+	 * @return mixed
 	 */
-	public function record_escaped_markup( string $html ): string {
-		if ( '' !== $html ) {
-			$key = esc_html( $html );
+	public function record_escaped_markup( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
 
-			if ( ! isset( $this->escaped_prices[ $key ] ) ) {
-				$this->escaped_prices[ $key ] = wpo_ips_kses_document_content( $html );
-			}
+		$key = esc_html( $html );
+
+		if ( ! isset( $this->escaped_prices[ $key ] ) ) {
+			$this->escaped_prices[ $key ] = wpo_ips_kses_document_content( $html );
 		}
 
 		return $html;

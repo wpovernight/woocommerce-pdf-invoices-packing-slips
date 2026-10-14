@@ -3018,11 +3018,15 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected =
  * Sanitize formatted price and totals HTML for document output.
  * Allows only the markup wc_price() and WooCommerce order totals produce.
  *
- * @param string $price_html
+ * @param mixed $price_html
  * @return string
  */
-function wpo_ips_kses_price( string $price_html ): string {
-	return wp_kses( $price_html, array(
+function wpo_ips_kses_price( $price_html ): string {
+	if ( ! is_scalar( $price_html ) && ! ( is_object( $price_html ) && method_exists( $price_html, '__toString' ) ) ) {
+		return '';
+	}
+
+	return wp_kses( (string) $price_html, array(
 		'span'   => array( 'class' => true, 'translate' => true, 'dir' => true ),
 		'bdi'    => array( 'class' => true, 'dir' => true ),
 		'del'    => array( 'class' => true ),
@@ -3040,10 +3044,15 @@ function wpo_ips_kses_price( string $price_html ): string {
  * For markup the plugin and its extensions generate: item cells, price markup,
  * thumbnails. Allows img and a, which the user-input sanitizer must never allow.
  *
- * @param string $html
+ * @param mixed $html
  * @return string
  */
-function wpo_ips_kses_document_content( string $html ): string {
+function wpo_ips_kses_document_content( $html ): string {
+	if ( ! is_scalar( $html ) && ! ( is_object( $html ) && method_exists( $html, '__toString' ) ) ) {
+		return '';
+	}
+
+	$html    = (string) $html;
 	$allowed = array(
 		// price & totals markup
 		'span'       => array( 'class' => true, 'style' => true, 'translate' => true, 'dir' => true ),
