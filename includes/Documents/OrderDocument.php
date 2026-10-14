@@ -1312,7 +1312,7 @@ abstract class OrderDocument {
 				return;
 			}
 
-			if ( is_a( $value, 'WC_DateTime' ) ) {
+			if ( is_a( $value, 'WC_DateTime', true ) ) {
 				$datetime = $value;
 			} elseif ( is_numeric( $value ) ) {
 				// Timestamps are handled as UTC timestamps in all cases.

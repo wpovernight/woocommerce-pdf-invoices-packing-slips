@@ -533,7 +533,7 @@ class ThirdPartyPlugins {
 			}
 		}
 
-		if ( empty( $product ) || ! is_a( $product, 'WC_Product' ) ) {
+		if ( empty( $product ) || ! is_a( $product, 'WC_Product', true ) ) {
 			return $classes;
 		}
 
