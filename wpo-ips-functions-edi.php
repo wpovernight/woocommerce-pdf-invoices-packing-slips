@@ -238,11 +238,20 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
  *
  * @param \WC_Abstract_Order $order
  * @param array              $data
+ * @param bool               $allow_clear Delete stored order meta when an empty peppol_endpoint_id is explicitly sent.
  * @return void
  */
-function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, array $data = array() ): void {
+function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, array $data = array(), bool $allow_clear = false ): void {
 	if ( ! wpo_ips_edi_peppol_is_available() ) {
 		return; // only save for Peppol formats
+	}
+
+	// Explicitly cleared: remove stored order identifier and scheme.
+	if ( $allow_clear && isset( $data['peppol_endpoint_id'] ) && is_string( $data['peppol_endpoint_id'] ) && '' === trim( sanitize_text_field( wp_unslash( $data['peppol_endpoint_id'] ) ) ) ) {
+		$order->delete_meta_data( '_peppol_endpoint_id' );
+		$order->delete_meta_data( '_peppol_endpoint_eas' );
+		$order->save_meta_data();
+		return;
 	}
 
 	$identifier     = '';
@@ -408,7 +417,8 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 	$edi_document = new \WPO\IPS\EDI\Document( $syntax, $format, $document );
 	$builder      = new \WPO\IPS\EDI\SabreBuilder();
 
-	$contents = apply_filters( 'wpo_ips_edi_contents',
+	$contents = apply_filters(
+		'wpo_ips_edi_contents',
 		$builder->build( $edi_document ),
 		$edi_document,
 		$document
@@ -606,6 +616,13 @@ function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ):
 							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B\Invoice::class,
 						),
 					),
+					'cii-d22b' => array(
+						'name'      => 'CII D22B',
+						'hybrid'    => false,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD22B\Invoice::class,
+						),
+					),
 					'factur-x-1p0' => array(
 						'name'      => 'Factur-X 1.0',
 						'hybrid'    => true,
@@ -625,6 +642,13 @@ function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ):
 						'hybrid'    => true,
 						'documents' => array(
 							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p0\Invoice::class,
+						),
+					),
+					'zugferd-2p5' => array(
+						'name'      => 'ZUGFeRD 2.5',
+						'hybrid'    => true,
+						'documents' => array(
+							'invoice' => \WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p5\Invoice::class,
 						),
 					),
 				),
@@ -1261,10 +1285,11 @@ function wpo_ips_edi_peppol_identifier_input_mode(): string {
  * - select mode: text = identifier; scheme from <select>
  *                (but if user typed scheme:identifier we respect that)
  *
- * @param int   $user_id User ID.
- * @param array $request $_POST / REST payload.
+ * @param int   $user_id     User ID.
+ * @param array $request     $_POST / REST payload.
+ * @param bool  $allow_clear Delete stored user meta when an empty identifier is explicitly sent.
  */
-function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $request ): void {
+function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $request, bool $allow_clear = false ): void {
 	if ( $user_id <= 0 ) {
 		return;
 	}
@@ -1285,6 +1310,14 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
 		}
 
 		$raw    = trim( sanitize_text_field( wp_unslash( $request[ $id_key ] ) ) );
+
+		// Explicitly cleared: remove stored identifier and scheme.
+		if ( $allow_clear && '' === $raw ) {
+			delete_user_meta( $user_id, $id_key );
+			delete_user_meta( $user_id, $scheme_key );
+			continue;
+		}
+
 		$scheme = $identifier = '';
 
 		// Determine parts
