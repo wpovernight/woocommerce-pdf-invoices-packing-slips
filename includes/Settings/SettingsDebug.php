@@ -1730,12 +1730,7 @@ class SettingsDebug {
 		$chunk_results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( empty( $chunk_results ) ) {
-			if ( function_exists( '\\as_unschedule_all_actions' ) ) {
-				\as_unschedule_all_actions( $hook );
-			} else {
-				wcpdf_log_error( 'Action Scheduler function not available. Cannot unschedule number table data fetch.', 'critical' );
-			}
-
+			// This fetch is complete; leave queued fetches for other stores untouched.
 			update_option( $option_name . '::last_time', time() );
 			return; // exit if no more results
 		}
