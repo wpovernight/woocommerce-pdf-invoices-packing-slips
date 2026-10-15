@@ -90,7 +90,7 @@ class FileSystem {
 
 		global $wp_filesystem;
 
-		if ( ! WP_Filesystem() || ! $wp_filesystem || ! is_a( $wp_filesystem, '\WP_Filesystem_Direct', true ) ) {
+		if ( ! WP_Filesystem() || ! $wp_filesystem || ! ($wp_filesystem instanceof \WP_Filesystem_Direct ) ) {
 			wcpdf_log_error( 'WP_Filesystem initialization failed or not using direct method. Falling back to PHP methods.', 'warning' );
 			$this->system_enabled = $this->change_setting_value( 'php' );
 			return;

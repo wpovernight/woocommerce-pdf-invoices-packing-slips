@@ -93,7 +93,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 			);
 
 			// Emit price-level allowance on the gross price for discounted product lines.
-			if ( $xml_unit_discount_f > 0 && $xml_gross_unit_f > 0 && is_a( $item, 'WC_Order_Item_Product', true ) ) {
+			if ( $xml_unit_discount_f > 0 && $xml_gross_unit_f > 0 && $item instanceof \WC_Order_Item_Product ) {
 				$gross_price_children[] = array(
 					'name'  => 'ram:AppliedTradeAllowanceCharge',
 					'value' => array(
