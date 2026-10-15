@@ -609,6 +609,9 @@ function wcpdf_convert_encoding( string $string, string $tool = 'mb_convert_enco
 /**
  * Sanitize HTML content, prevents XSS attacks.
  *
+ * For text entered by users or shop managers: addresses, notes, custom fields.
+ * Deliberately excludes img and a, and $safe_tags caps what extensions may add.
+ *
  * @param string $html
  * @param string $context
  * @param array  $allow_tags
@@ -621,17 +624,37 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	}
 
 	// Default allowed tags.
-	$allow_tags = array_merge(
-		apply_filters(
-			'wpo_wcpdf_sanitize_html_default_allow_tags',
+	$default_tags = array(
+		'br'     => array(),
+		'em'     => array(),
+		'strong' => array(),
+		'p'      => array(),
+	);
+
+	// Addresses carry formatting from the address customization setting and from
+	// extensions that label fields, so they allow a wider set. Every tag here is
+	// inert: no URLs, no scripting, no event-capable attributes.
+	if ( 'address' === $context ) {
+		$default_tags = array_merge(
+			$default_tags,
 			array(
-				'br'     => array(),
-				'em'     => array(),
-				'strong' => array(),
-				'p'      => array(),
-			),
-			$context
-		),
+				'b'    => array(),
+				'i'    => array(),
+				'u'    => array(),
+				'h1'   => array(),
+				'h2'   => array(),
+				'h3'   => array(),
+				'h4'   => array(),
+				'h5'   => array(),
+				'h6'   => array(),
+				'span' => array( 'class', 'style' ),
+				'div'  => array( 'class', 'style' ),
+			)
+		);
+	}
+
+	$allow_tags = array_merge(
+		apply_filters( 'wpo_wcpdf_sanitize_html_default_allow_tags', $default_tags, $context ),
 		$allow_tags
 	);
 
@@ -647,14 +670,14 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		'strong'     => array(),
 		'u'          => array(),
 		'ul'         => array(),
-		'span'       => array( 'style' ),
+		'span'       => array( 'class', 'style' ),
 		'h1'         => array(),
 		'h2'         => array(),
 		'h3'         => array(),
 		'h4'         => array(),
 		'h5'         => array(),
 		'h6'         => array(),
-		'div'        => array( 'style' ),
+		'div'        => array( 'class', 'style' ),
 		'table'      => array( 'border', 'cellspacing', 'cellpadding' ),
 		'tr'         => array(),
 		'td'         => array( 'colspan', 'rowspan' ),
@@ -1649,7 +1672,7 @@ function wpo_wcpdf_format_address( array $address ): string {
 	// Remove any new lines.
 	$formatted_address = str_replace( "\n", '', $formatted_address );
 
-	return esc_html( $formatted_address );
+	return $formatted_address;
 }
 
 /**
@@ -2989,4 +3012,117 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected =
 	}
 
 	return array_values( array_unique( $normalized ) );
+}
+
+/**
+ * Sanitize formatted price and totals HTML for document output.
+ * Allows only the markup wc_price() and WooCommerce order totals produce.
+ *
+ * @param mixed $price_html
+ * @return string
+ */
+function wpo_ips_kses_price( $price_html ): string {
+	if ( ! is_scalar( $price_html ) && ! ( is_object( $price_html ) && method_exists( $price_html, '__toString' ) ) ) {
+		return '';
+	}
+
+	return wp_kses( (string) $price_html, array(
+		'span'   => array( 'class' => true, 'translate' => true, 'dir' => true ),
+		'bdi'    => array( 'class' => true, 'dir' => true ),
+		'del'    => array( 'class' => true ),
+		'ins'    => array( 'class' => true ),
+		'small'  => array( 'class' => true ),
+		'p'      => array( 'class' => true ),
+		'br'     => array(),
+		'strong' => array(),
+	) );
+}
+
+/**
+ * Sanitize document content HTML for output in templates.
+ *
+ * For markup the plugin and its extensions generate: item cells, price markup,
+ * thumbnails. Allows img and a, which the user-input sanitizer must never allow.
+ *
+ * @param mixed $html
+ * @return string
+ */
+function wpo_ips_kses_document_content( $html ): string {
+	if ( ! is_scalar( $html ) && ! ( is_object( $html ) && method_exists( $html, '__toString' ) ) ) {
+		return '';
+	}
+
+	$html    = (string) $html;
+	$allowed = array(
+		// price & totals markup
+		'span'       => array( 'class' => true, 'style' => true, 'translate' => true, 'dir' => true ),
+		'bdi'        => array( 'class' => true, 'dir' => true ),
+		'del'        => array( 'class' => true ),
+		'ins'        => array( 'class' => true ),
+		'small'      => array( 'class' => true ),
+		// item cell & meta markup
+		'img'        => array( 'src' => true, 'alt' => true, 'width' => true, 'height' => true, 'class' => true, 'style' => true ),
+		'div'        => array( 'class' => true, 'style' => true ),
+		'p'          => array( 'class' => true, 'style' => true ),
+		'br'         => array(),
+		'strong'     => array( 'class' => true ),
+		'b'          => array( 'class' => true ),
+		'em'         => array( 'class' => true ),
+		'i'          => array( 'class' => true ),
+		'u'          => array( 'class' => true ),
+		'ul'         => array( 'class' => true ),
+		'ol'         => array( 'class' => true ),
+		'li'         => array( 'class' => true ),
+		'dl'         => array( 'class' => true ),
+		'dt'         => array( 'class' => true ),
+		'dd'         => array( 'class' => true ),
+		'table'      => array( 'class' => true, 'style' => true, 'border' => true, 'cellspacing' => true, 'cellpadding' => true ),
+		'thead'      => array( 'class' => true ),
+		'tbody'      => array( 'class' => true ),
+		'tfoot'      => array( 'class' => true ),
+		'tr'         => array( 'class' => true ),
+		'th'         => array( 'class' => true, 'style' => true, 'colspan' => true, 'rowspan' => true, 'scope' => true ),
+		'td'         => array( 'class' => true, 'style' => true, 'colspan' => true, 'rowspan' => true ),
+		'h1'         => array( 'class' => true ),
+		'h2'         => array( 'class' => true ),
+		'h3'         => array( 'class' => true ),
+		'h4'         => array( 'class' => true ),
+		'h5'         => array( 'class' => true ),
+		'h6'         => array( 'class' => true ),
+		'hr'         => array( 'class' => true ),
+		'sup'        => array( 'class' => true ),
+		'sub'        => array( 'class' => true ),
+		'abbr'       => array( 'class' => true, 'title' => true ),
+		'code'       => array( 'class' => true ),
+		'pre'        => array( 'class' => true ),
+		'blockquote' => array( 'class' => true ),
+		'figure'     => array( 'class' => true ),
+		'figcaption' => array( 'class' => true ),
+		'a'          => array( 'href' => true, 'class' => true, 'title' => true ),
+	);
+
+	$protocols = apply_filters(
+		'wpo_ips_kses_document_content_allowed_protocols',
+		array( 'http', 'https', 'data', 'mailto', 'tel' )
+	);
+
+	return wp_kses( $html, apply_filters( 'wpo_ips_kses_document_content_allowed_html', $allowed ), $protocols );
+}
+
+/**
+ * Prepare an assembled document for the PDF renderer.
+ *
+ * Converts non-ASCII characters to HTML entities. Never decode entities here:
+ * this runs on the finished document, after every field sanitizer, so decoding
+ * would revive markup those sanitizers removed.
+ *
+ * @param string $html Assembled document HTML.
+ * @return string
+ */
+function wpo_ips_prepare_document_html( string $html ): string {
+	if ( apply_filters( 'wpo_wcpdf_convert_encoding', true ) ) {
+		$html = wcpdf_convert_encoding( $html );
+	}
+
+	return $html;
 }
