@@ -2229,7 +2229,7 @@ class Admin {
 			return array();
 		}
 
-		$is_refund_order  = is_a( $order, 'WC_Order_Refund' );
+		$is_refund_order  = $order instanceof \WC_Order_Refund;
 		$document_url     = WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $document_type, array( 'output' => 'xml' ) );
 		$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
 		$class            = array( $document_type, 'xml', 'exists' );
