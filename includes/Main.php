@@ -42,11 +42,11 @@ class Main {
 
 		// register document link email hooks
 		$this->register_document_link_email_hooks();
-		
+
 		// WP
 		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );
 		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
-		
+
 		// Woo
 		add_filter( 'woocommerce_email_attachments', array( $this, 'attach_document_to_email' ), 99, 4 );
 		add_filter( 'woocommerce_privacy_remove_order_personal_data_meta', array( $this, 'remove_order_personal_data_meta' ), 10, 1 );
@@ -55,7 +55,7 @@ class Main {
 		add_filter( 'woocommerce_webhook_topics', array( $this, 'wc_webhook_topics' ) );
 		add_action( 'woocommerce_privacy_remove_order_personal_data', array( $this, 'remove_order_personal_data' ), 10, 1 );
 		add_action( 'woocommerce_privacy_export_order_personal_data_meta', array( $this, 'export_order_personal_data_meta' ), 10, 1 );
-		
+
 		// IPS
 		add_filter( 'wpo_wcpdf_document_is_allowed', array( $this, 'disable_free' ), 10, 2 );
 		add_filter( 'wpo_wcpdf_document_use_historical_settings', array( $this, 'test_mode_settings' ), 15, 2 );
@@ -69,8 +69,9 @@ class Main {
 		add_action( 'wpo_wcpdf_after_dompdf_render', array( $this, 'page_number_replacements' ), 9, 2 );
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date_table_row' ), 10, 2 );
+		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_checkout_field_table_row' ), 10, 2 );
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
-		
+
 		// AJAX
 		add_action( 'wp_ajax_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
 		add_action( 'wp_ajax_nopriv_generate_wpo_wcpdf', array( $this, 'generate_document_ajax' ) );
@@ -85,7 +86,7 @@ class Main {
 
 	/**
 	 * Attach document to WooCommerce email
-	 * 
+	 *
 	 * @param array           $attachments
 	 * @param string          $email_id
 	 * @param mixed           $order
@@ -716,7 +717,7 @@ class Main {
 
 	/**
 	 * Include template specific custom functions
-	 * 
+	 *
 	 * @return void
 	 */
 	public function load_template_functions(): void {
@@ -754,7 +755,7 @@ class Main {
 
 		$this->loaded_template_function_files[ $file ] = true;
 	}
-	
+
 	/**
 	 * Return tmp path for different plugin processes.
 	 *
@@ -823,7 +824,7 @@ class Main {
 
 		return $tmp_path;
 	}
-	
+
 	/**
 	 * Return the base tmp folder path.
 	 *
@@ -839,7 +840,7 @@ class Main {
 		// * UNLESS the 'UPLOADS' constant is defined in wp-config (http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder)
 		//
 		// May also be overridden by the wpo_wcpdf_tmp_path filter
-		
+
 		$cache_key = $append_random_string ? 'with_random' : 'without_random';
 
 		if ( array_key_exists( $cache_key, $this->tmp_base_cache ) ) {
@@ -850,7 +851,7 @@ class Main {
 
 		if ( $wp_upload_base ) {
 			$code = $this->get_random_string();
-			
+
 			if ( $append_random_string && $code ) {
 				$tmp_base = $wp_upload_base . 'wpo_wcpdf_' . $code . '/';
 			} else {
@@ -1002,7 +1003,7 @@ class Main {
 
 	/**
 	 * Generate random string
-	 * 
+	 *
 	 * @return void
 	 */
 	public function generate_random_string(): void {
@@ -1015,7 +1016,7 @@ class Main {
 		update_option( 'wpo_wcpdf_random_string', $code );
 		$this->clear_tmp_path_caches();
 	}
-	
+
 	/**
 	 * Regenerate random string and copy contents to new tmp folder.
 	 *
@@ -1058,7 +1059,7 @@ class Main {
 
 	/**
 	 * Get random string
-	 * 
+	 *
 	 * @return string|false
 	 */
 	public function get_random_string (): string|false {
@@ -1181,7 +1182,7 @@ class Main {
 
 	/**
 	 * checks if the plugin tmp folders exist and are writable
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function tmp_folders_exist_and_writable(): bool {
@@ -1198,7 +1199,7 @@ class Main {
 				return false;
 			}
 		}
-		
+
 		$this->clear_tmp_dir_error();
 
 		return true;
@@ -1206,7 +1207,7 @@ class Main {
 
 	/**
 	 * Copy DOMPDF fonts to wordpress tmp folder
-	 * 
+	 *
 	 * @param string $path
 	 * @param bool $merge_with_local Whether to merge with existing fonts in the destination folder (true) or to clear the destination folder before copying (false).
 	 * @return void
@@ -1275,7 +1276,7 @@ class Main {
 		if ( ! apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
 			return $allowed;
 		}
-	
+
 		if ( ! empty( $document->order ) && ! empty( $anonymized = $document->order->get_meta( '_anonymized' ) ) ) {
 			if ( apply_filters( 'wpo_wcpdf_disallow_anonymized_order_document', wc_string_to_bool( $anonymized ), $this ) ) {
 				$allowed = false;
@@ -1300,7 +1301,7 @@ class Main {
 
 	/**
 	 * Adds spans around placeholders to be able to make replacement (page count) and css (page number)
-	 * 
+	 *
 	 * @param string $html The HTML content of the document
 	 * @param OrderDocument $document The document being generated
 	 * @return string The modified HTML content with placeholders wrapped in spans
@@ -1315,7 +1316,7 @@ class Main {
 
 	/**
 	 * Replace {{PAGE_COUNT}} placeholder with total page count
-	 * 
+	 *
 	 * @param Dompdf $dompdf The Dompdf instance used for PDF generation
 	 * @param string $html The HTML content of the document
 	 * @return Dompdf The modified Dompdf instance with page count replaced
@@ -1325,7 +1326,7 @@ class Main {
 		// create placeholder version with ASCII 0 spaces (dompdf 0.8)
 		$placeholder_0     = '';
 		$placeholder_chars = str_split( $placeholder );
-		
+
 		foreach ( $placeholder_chars as $placeholder_char ) {
 			$placeholder_0 .= chr(0).$placeholder_char;
 		}
@@ -1381,7 +1382,7 @@ class Main {
 
 	/**
 	 * Use currency symbol font (when enabled in options)
-	 * 
+	 *
 	 * @param string $currency_symbol Currency symbol
 	 * @param string $currency        Currency
 	 * @return string Currency symbol
@@ -1392,7 +1393,7 @@ class Main {
 
 	/**
 	 * Set currency font CSS
-	 * 
+	 *
 	 * @return void
 	 */
 	public function currency_symbol_font_styles(): void {
@@ -1403,7 +1404,7 @@ class Main {
 
 	/**
 	 * Replace dompdf incompatible (RTL) currencies with the ISO currency code (when default dompdf is used)
-	 * 
+	 *
 	 * @param string $currency_symbol Currency symbol
 	 * @param string $currency        Currency
 	 * @return string Currency symbol
@@ -1426,7 +1427,7 @@ class Main {
 
 	/**
 	 * Apply header logo height from settings
-	 * 
+	 *
 	 * @param string $document_type The type of document being generated
 	 * @param OrderDocument|null $document The document object being generated (if available)
 	 * @return void
@@ -1446,48 +1447,48 @@ class Main {
 
 	/**
 	 * Schedule temporary files cleanup from paths older than 1 week (daily, hooked into wp_scheduled_delete )
-	 * 
+	 *
 	 * @return void
 	 */
 	public function schedule_temporary_files_cleanup(): void {
 		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
-		
+
 		if ( ! isset( $settings_instance->get_settings( 'debug' )['enable_cleanup'] ) ) {
 			return;
 		}
 
 		$cleanup_age_days = isset( $settings_instance->get_settings( 'debug' )['cleanup_days'] ) ? floatval( $settings_instance->get_settings( 'debug' )['cleanup_days'] ) : 7.0;
 		$delete_timestamp = time() - ( intval ( DAY_IN_SECONDS * $cleanup_age_days ) );
-		
+
 		$this->temporary_files_cleanup( $delete_timestamp );
 	}
 
 	/**
 	 * Temporary files cleanup from paths
-	 * 
+	 *
 	 * @param  int    $delete_timestamp timestamp of the date/time before which to clean up files
 	 * @return array  Output message
 	 */
 	public function temporary_files_cleanup( int $delete_timestamp = 0 ): array {
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
-		
+
 		$delete_before = ! empty( $delete_timestamp )
 			? intval( $delete_timestamp )
 			: time();
-		
+
 		$paths_to_cleanup = apply_filters( 'wpo_wcpdf_cleanup_tmp_paths', array(
 			$this->get_tmp_path( 'attachments' ),
 			$this->get_tmp_path( 'dompdf' ),
 		) );
-		
+
 		$excluded_files = apply_filters( 'wpo_wcpdf_cleanup_excluded_files', array(
 			'index.php',
 			'.htaccess',
 			'log.htm',
 		) );
-		
+
 		apply_filters_deprecated( 'wpo_wcpdf_cleanup_folders_level', array( 3 ), '3.9.1', '', 'This filter is no longer necessary.' );
-		
+
 		$files       = array();
 		$directories = array();
 		$success     = 0;
@@ -1597,7 +1598,7 @@ class Main {
 
 	/**
 	 * Remove all invoice data when requested
-	 * 
+	 *
 	 * @param array $meta_to_remove Array of meta keys to remove from the order when requested
 	 * @return array Modified array of meta keys to remove with WCPDF private meta keys added if applicable
 	 */
@@ -1605,14 +1606,14 @@ class Main {
 		if ( ! apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
 			return $meta_to_remove;
 		}
-		
+
 		$wcpdf_private_meta = array(
 			'_wcpdf_invoice_number'         => 'numeric_id',
 			'_wcpdf_invoice_number_data'    => 'array',
 			'_wcpdf_invoice_date'           => 'timestamp',
 			'_wcpdf_invoice_date_formatted' => 'date',
 		);
-		
+
 		return $meta_to_remove + $wcpdf_private_meta;
 	}
 
@@ -1626,7 +1627,7 @@ class Main {
 		if ( ! apply_filters( 'wpo_wcpdf_remove_order_personal_data', true ) ) {
 			return;
 		}
-		
+
 		global $wpdb;
 
 		// Remove order ID from number stores
@@ -1648,7 +1649,7 @@ class Main {
 
 	/**
 	 * Export all invoice data when requested
-	 * 
+	 *
 	 * @param array $meta_to_export Array of meta keys to export from the order when requested
 	 * @return array Modified array of meta keys to export with WCPDF private meta keys
 	 */
@@ -1666,7 +1667,7 @@ class Main {
 	 * This avoids issues with the presence of attachments affecting email address validation in some distros of PHP 7.3
 	 * See: https://wordpress.org/support/topic/invalid-address-setfrom/#post-11583815
 	 * Fixed in WP5.5 due to upgrade to newer PHPMailer
-	 * 
+	 *
 	 * @param array $mailArray The array of mail data being passed to PHPMailer
 	 * @return array The unmodified mail array, after setting the PHPMailer validator
 	 */
@@ -1674,15 +1675,15 @@ class Main {
 		if ( version_compare( get_bloginfo( 'version' ), '5.5-dev', '>=' ) ) {
 			return $mailArray;
 		}
-		
+
 		global $phpmailer;
-		
+
 		if ( ! $phpmailer instanceof \PHPMailer ) {
 			require_once ABSPATH . WPINC . '/class-phpmailer.php';
 			require_once ABSPATH . WPINC . '/class-smtp.php';
 			$phpmailer = new \PHPMailer( true );
 		}
-		
+
 		$phpmailer::$validator = 'php';
 
 		return $mailArray;
@@ -1971,7 +1972,7 @@ class Main {
 
 			if ( ! empty( $document ) && ! empty( $document->order ) && $full_permission ) {
 				$order = $document->order;
-				
+
 				switch ( esc_attr( $data['event'] ) ) {
 					case 'mark':
 						$this->mark_document_printed( $document, esc_attr( $data['trigger'] ) );
@@ -2068,7 +2069,7 @@ class Main {
 			$order = $document->order;
 			if ( 'shop_order' === $order->get_type() ) {
 				$printed_data = $order->get_meta( "_wcpdf_{$document->slug}_printed", true );
-				
+
 				$data = $printed_data
 					? $printed_data
 					: $data;
@@ -2288,6 +2289,38 @@ class Main {
 	}
 
 	/**
+	 * Display checkout field table row in the order data section.
+	 *
+	 * This is the only place the row is rendered, for every template (Simple included),
+	 * so it never depends on which template file ends up being used.
+	 *
+	 * @param null|string $document_type
+	 * @param null|\WC_Abstract_Order $order
+	 *
+	 * @return void
+	 */
+	public function display_checkout_field_table_row( ?string $document_type = null, ?\WC_Abstract_Order $order = null ): void {
+		if ( empty( $order ) || empty( $document_type ) ) {
+			return;
+		}
+
+		$document = wcpdf_get_document( $document_type, $order );
+
+		if (
+			! $document ||
+			! is_callable( array( $document, 'show_checkout_field' ) ) ||
+			! $document->show_checkout_field()
+		) {
+			return;
+		}
+
+		echo '<tr class="checkout-field">
+			<th>', esc_html( $document->get_checkout_field_title() ), '</th>
+			<td>', esc_html( $document->get_checkout_field_value() ), '</td>
+		</tr>';
+	}
+
+	/**
 	 * Handle document link in emails.
 	 *
 	 * @return void
@@ -2344,7 +2377,7 @@ class Main {
 	 */
 	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, $email ): void {
 		$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
-		
+
 		// Check if document access type is 'full'.
 		$is_full_access_type = 'full' === $endpoint_instance->get_document_link_access_type();
 
@@ -2468,7 +2501,7 @@ class Main {
 			}
 		}
 	}
-	
+
 	/**
 	 * Ensure a temporary directory exists and is writable.
 	 *
@@ -2498,10 +2531,10 @@ class Main {
 
 		return true;
 	}
-	
+
 	/**
 	 * Record an error related to the temporary directory and log it.
-	 * 
+	 *
 	 * @param string $path The path to the temporary directory that caused the error.
 	 * @param string $message The error message to log.
 	 * @return void
@@ -2519,7 +2552,7 @@ class Main {
 	private function clear_tmp_dir_error(): void {
 		delete_option( 'wpo_wcpdf_no_dir_error' );
 	}
-	
+
 	/**
 	 * Clear cached temporary paths.
 	 *
