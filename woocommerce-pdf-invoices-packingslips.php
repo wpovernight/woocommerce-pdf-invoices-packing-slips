@@ -196,10 +196,8 @@ class WPO_WCPDF {
 		$this->get_instance( 'vat_plugins' );
 		$this->get_instance( 'main' );
 
-		// Endpoint only matters for document links/downloads/admin generation
-		if ( $is_document_context || wpo_ips_is_pretty_document_link_request() ) {
-			$this->get_instance( 'endpoint' );
-		}
+		// Register document routing on every request so rewrite rebuilds retain its rule.
+		$this->get_instance( 'endpoint' );
 
 		// Document-related runtime
 		if ( $is_document_context ) {
@@ -216,6 +214,17 @@ class WPO_WCPDF {
 			$this->get_instance( 'notices' );
 		}
 
+		// Shortcodes can appear on any page; load their handler only when rendered.
+		foreach ( array( 'wcpdf_download_invoice', 'wcpdf_download_pdf', 'wcpdf_document_link' ) as $shortcode ) {
+			add_shortcode( $shortcode, function ( $atts, $content = null, $shortcode_tag = '' ) {
+				return $this->get_instance( 'frontend' )->generate_document_shortcode(
+					is_array( $atts ) ? $atts : array(),
+					$content,
+					$shortcode_tag
+				);
+			} );
+		}
+
 		// Frontend only where useful
 		if (
 			wpo_ips_is_account_page()        ||
@@ -226,9 +235,13 @@ class WPO_WCPDF {
 			$this->get_instance( 'frontend' );
 		}
 
-		// REST_REQUEST is not defined yet during normal init. Register fields before Store API routes.
+		// REST_REQUEST is not defined during normal init. Load services before REST routes.
 		add_action( 'rest_api_init', function () {
 			$this->get_instance( 'frontend' );
+
+			if ( wpo_ips_edi_peppol_is_available() ) {
+				$this->get_instance( 'peppol' );
+			}
 		}, 5 );
 
 		// Peppol only when enabled and relevant
