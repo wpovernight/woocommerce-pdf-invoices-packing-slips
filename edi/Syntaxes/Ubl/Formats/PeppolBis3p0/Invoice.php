@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Syntaxes\Ubl\Formats\PeppolBis3p0;
 
 use WPO\IPS\EDI\Syntaxes\Ubl\Abstracts\AbstractUblFormat;
@@ -15,47 +17,37 @@ class Invoice extends AbstractUblFormat {
 	public string $name = 'PEPPOL BIS 3.0 Invoice';
 
 	/**
-	 * Get the type code
-	 *
-	 * @return string
-	 */
-	public function get_type_code(): string {
+     * Get the type code
+     */
+    public function get_type_code(): string {
 		return '380';
 	}
 
 	/**
-	 * Get the quantity role
-	 *
-	 * @return string
-	 */
-	public function get_quantity_role(): string {
+     * Get the quantity role
+     */
+    public function get_quantity_role(): string {
 		return 'Invoiced';
 	}
 
 	/**
-	 * Get the format root element
-	 *
-	 * @return string
-	 */
-	public function get_root_element(): string {
+     * Get the format root element
+     */
+    public function get_root_element(): string {
 		return 'Invoice';
 	}
 
 	/**
-	 * Get the format additional attributes
-	 *
-	 * @return array
-	 */
-	public function get_additional_attributes(): array {
+     * Get the format additional attributes
+     */
+    public function get_additional_attributes(): array {
 		return array();
 	}
 
 	/**
-	 * Get the format namespaces
-	 *
-	 * @return array
-	 */
-	public function get_namespaces(): array {
+     * Get the format namespaces
+     */
+    public function get_namespaces(): array {
 		return array(
 			'cac' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2',
 			'cbc' => 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2',
@@ -64,11 +56,9 @@ class Invoice extends AbstractUblFormat {
 	}
 
 	/**
-	 * Get the format structure
-	 *
-	 * @return array
-	 */
-	public function get_structure(): array {
+     * Get the format structure
+     */
+    public function get_structure(): array {
 		return array(
 			'ubl_version_id' => array(
 				'enabled' => true,

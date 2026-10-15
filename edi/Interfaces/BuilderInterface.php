@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Interfaces;
 
 use WPO\IPS\EDI\Document;

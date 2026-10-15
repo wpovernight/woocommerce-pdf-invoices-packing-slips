@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ProfileIdHandler extends AbstractUblHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$profile_id = array(
 			'name'  => 'cbc:ProfileID',
 			'value' => 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0',

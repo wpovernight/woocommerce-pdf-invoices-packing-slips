@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class BuyerReferenceHandler extends AbstractUblHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$buyer_reference = array(
 			'name'  => 'cbc:BuyerReference',
 			'value' => $this->document->order->get_id(),

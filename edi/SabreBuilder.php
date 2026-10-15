@@ -47,15 +47,14 @@ class SabreBuilder implements BuilderInterface {
 	}
 
 	/**
-	 * Serialize the document to XML using Sabre's Writer.
-	 *
-	 * @param Writer $writer The Sabre XML writer.
-	 * @return void
-	 */
-	public function xmlSerialize( Writer $writer ): void {
+     * Serialize the document to XML using Sabre's Writer.
+     *
+     * @param Writer $writer The Sabre XML writer.
+     */
+    public function xmlSerialize( Writer $writer ): void {
 		$additional_attributes = $this->document->get_additional_attributes();
 
-		if ( ! empty( $additional_attributes ) ) {
+		if ( $additional_attributes !== [] ) {
 			$writer->writeAttributes( $additional_attributes );
 		}
 

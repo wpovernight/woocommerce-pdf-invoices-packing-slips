@@ -1,4 +1,4 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
+<?php defined( 'ABSPATH' ) || exit; ?>
 <div class="wpo-step-description">
 	<h2><?php esc_html_e( 'Attach to...', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 	<p><?php esc_html_e( 'Select to which emails you would like to attach your invoice.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>

@@ -1,4 +1,4 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
+<?php defined( 'ABSPATH' ) || exit; ?>
 <div class="wpo-step-description">
 	<h2><?php esc_html_e( 'Action buttons', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 	<p><?php esc_html_e( 'Would you like to display the action buttons in your WooCommerce order list? The action buttons allow you to manually create a PDF.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
@@ -25,7 +25,7 @@
 		$actions = false;
 	}
 	?>
-	<input id="show-action-buttons" type="checkbox" <?php echo $actions !== false ? 'checked' : ''; ?> name="wc_show_action_buttons" value="1">
+	<input id="show-action-buttons" type="checkbox" <?php echo $actions ? 'checked' : ''; ?> name="wc_show_action_buttons" value="1">
 	<label for="show-action-buttons" class="slider"></label>
 	<label for="show-action-buttons" class="checkbox"><?php esc_html_e( 'Show action buttons', 'woocommerce-pdf-invoices-packing-slips' ); ?></label>
 </div>

@@ -1,4 +1,4 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
+<?php defined( 'ABSPATH' ) || exit; ?>
 
 <div class="wcpdf-extensions-ad">
 	<?php $no_pro = ! class_exists( 'WooCommerce_PDF_IPS_Pro' ) && ! class_exists( 'WPO_WCPDF_Templates' ); ?>

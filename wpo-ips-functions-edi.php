@@ -9,13 +9,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 | EDI Document global functions
 |--------------------------------------------------------------------------
 */
-
 /**
  * Sanitizes a string for use in EDI documents by stripping all HTML tags and decoding HTML entities to plain text.
  *
- * @param string $string
  *
- * @return string
  */
 function wpo_ips_edi_sanitize_string( string $string ): string {
 	$string = wp_strip_all_tags( $string );
@@ -26,7 +23,6 @@ function wpo_ips_edi_sanitize_string( string $string ): string {
  * Determine whether the given category can be used for a zero-tax classification.
  *
  * @param string $category Category code.
- * @return bool
  */
 function wpo_ips_edi_is_zero_tax_category( string $category ): bool {
 	return (bool) apply_filters(
@@ -42,14 +38,13 @@ function wpo_ips_edi_is_zero_tax_category( string $category ): bool {
 
 /**
  * Get the preferred zero-tax row from the configured zero-rate settings.
- * 
+ *
  * Preference order:
  * 1. First specific zero-tax category that is not Z
  * 2. First generic Z row
  *
  * @param array  $edi_tax_settings EDI tax settings.
  * @param string $key              Can be category, scheme, or reason.
- * @return string
  */
 function wpo_ips_edi_get_preferred_zero_rate_tax_data( array $edi_tax_settings, string $key ): string {
 	$result = '';
@@ -114,7 +109,6 @@ function wpo_ips_edi_get_preferred_zero_rate_tax_data( array $edi_tax_settings, 
  * @param string                  $key      Can be category, scheme, or reason.
  * @param int|null                $rate_id  The tax rate ID.
  * @param \WC_Abstract_Order|null $order    The order object.
- * @return string
  */
 function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\WC_Abstract_Order $order ): string {
 	if ( ! in_array( $key, array( 'category', 'scheme', 'reason' ), true ) ) {
@@ -150,7 +144,7 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 	// For VAT-exempt orders, generic lookups should resolve from the zero-rate
 	// configuration instead of the standard class.
 	if ( $is_vat_exempt && is_null( $rate_id ) ) {
-		$result = (string) wpo_ips_edi_get_preferred_zero_rate_tax_data( $edi_tax_settings, $key );
+		$result = wpo_ips_edi_get_preferred_zero_rate_tax_data( $edi_tax_settings, $key );
 
 		if ( 'category' === $key && ! $is_empty_or_default( $result ) && ! wpo_ips_edi_is_zero_tax_category( $result ) ) {
 			$result = '';
@@ -168,7 +162,7 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 	}
 
 	if ( $is_vat_exempt ) {
-		$preferred_zero_rate = (string) wpo_ips_edi_get_preferred_zero_rate_tax_data( $edi_tax_settings, $key );
+		$preferred_zero_rate = wpo_ips_edi_get_preferred_zero_rate_tax_data( $edi_tax_settings, $key );
 
 		switch ( $key ) {
 			case 'category':
@@ -197,9 +191,6 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 
 /**
  * Save EDI order taxes
- *
- * @param \WC_Abstract_Order $order
- * @return void
  */
 function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 	foreach ( $order->get_taxes() as $item_id => $tax_item ) {
@@ -236,10 +227,7 @@ function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 /**
  * Maybe save EDI order Peppol data.
  *
- * @param \WC_Abstract_Order $order
- * @param array              $data
  * @param bool               $allow_clear Delete stored order meta when an empty peppol_endpoint_id is explicitly sent.
- * @return void
  */
 function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, array $data = array(), bool $allow_clear = false ): void {
 	if ( ! wpo_ips_edi_peppol_is_available() ) {
@@ -258,7 +246,7 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 	$scheme         = '';
 	$save_meta_data = false;
 
-	if ( ! empty( $data ) ) {
+	if ( $data !== [] ) {
 		$mode   = wpo_ips_edi_peppol_identifier_input_mode();
 		$raw    = trim( sanitize_text_field( wp_unslash( $data['peppol_endpoint_id'] ?? '' ) ) );
 		$scheme = $identifier = '';
@@ -309,8 +297,6 @@ function wpo_ips_edi_maybe_save_order_peppol_data( \WC_Abstract_Order $order, ar
 /**
  * Get EDI Maker
  * Use `wpo_ips_edi_maker` filter to change the EDI class (which can wrap another EDI library).
- *
- * @return WPO\IPS\Makers\EDIMaker|null
  */
 function wpo_ips_edi_get_maker(): ?WPO\IPS\Makers\EDIMaker {
 	$class = '\\WPO\\IPS\\Makers\\EDIMaker';
@@ -331,9 +317,6 @@ function wpo_ips_edi_get_maker(): ?WPO\IPS\Makers\EDIMaker {
 
 /**
  * Get EDI settings
- *
- * @param string|null $key
- * @return array|string|null
  */
 function wpo_ips_edi_get_settings( ?string $key = null ): array|string|null {
 	$settings = get_option( 'wpo_ips_edi_settings', array() );
@@ -342,8 +325,6 @@ function wpo_ips_edi_get_settings( ?string $key = null ): array|string|null {
 
 /**
  * Get EDI Tax settings
- *
- * @return array
  */
 function wpo_ips_edi_get_tax_settings(): array {
 	return get_option( 'wpo_ips_edi_tax_settings', array() );
@@ -351,8 +332,6 @@ function wpo_ips_edi_get_tax_settings(): array {
 
 /**
  * Check if EDI is available
- *
- * @return bool
  */
 function wpo_ips_edi_is_available(): bool {
 	// Check `sabre/xml` library here: https://packagist.org/packages/sabre/xml
@@ -364,8 +343,6 @@ function wpo_ips_edi_is_available(): bool {
 
 /**
  * Check if EDI Peppol is available
- *
- * @return bool
  */
 function wpo_ips_edi_peppol_is_available(): bool {
 	$format = wpo_ips_edi_get_current_format();
@@ -379,16 +356,12 @@ function wpo_ips_edi_peppol_is_available(): bool {
 /**
  * Write EDI file
  *
- * @param \WPO\IPS\Documents\OrderDocument $document
- * @param bool $attachment
- * @param bool $contents_only
  *
- * @return string|false
  */
 function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ): string|false {
 	$edi_maker = wpo_ips_edi_get_maker();
 
-	if ( ! $edi_maker ) {
+	if ( !$edi_maker instanceof \WPO\IPS\Makers\EDIMaker ) {
 		return wcpdf_error_handling( 'EDI Maker not available. Cannot write EDI file.' );
 	}
 
@@ -445,10 +418,6 @@ function wpo_ips_edi_write_file( \WPO\IPS\Documents\OrderDocument $document, boo
 
 /**
  * EDI file headers
- *
- * @param string $filename
- * @param int|false $size
- * @return void
  */
 function wpo_ips_edi_file_headers( string $filename, int|false $size ): void {
 	$charset = apply_filters( 'wpo_ips_edi_file_header_content_type_charset', 'UTF-8' );
@@ -467,8 +436,6 @@ function wpo_ips_edi_file_headers( string $filename, int|false $size ): void {
 
 /**
  * Get the current EDI syntax
- *
- * @return string|null
  */
 function wpo_ips_edi_get_current_syntax(): ?string {
 	$syntax = apply_filters(
@@ -485,7 +452,6 @@ function wpo_ips_edi_get_current_syntax(): ?string {
  * Get the current EDI format
  *
  * @param bool $full_details Optional. If true, returns full format details.
- * @return string|array|null
  */
 function wpo_ips_edi_get_current_format( bool $full_details = false ): string|array|null {
 	$syntax = wpo_ips_edi_get_settings( 'syntax' );
@@ -513,8 +479,6 @@ function wpo_ips_edi_get_current_format( bool $full_details = false ): string|ar
 
 /**
  * Check if EDI attachments should be sent
- *
- * @return bool
  */
 function wpo_ips_edi_send_attachments(): bool {
 	return ! empty( wpo_ips_edi_get_settings( 'send_attachments' ) );
@@ -522,8 +486,6 @@ function wpo_ips_edi_send_attachments(): bool {
 
 /**
  * Check if EDI encrypted PDF should be embedded
- *
- * @return bool
  */
 function wpo_ips_edi_embed_encrypted_pdf(): bool {
 	return (bool) apply_filters(
@@ -534,8 +496,6 @@ function wpo_ips_edi_embed_encrypted_pdf(): bool {
 
 /**
  * Check if EDI item meta should be included
- *
- * @return bool
  */
 function wpo_ips_edi_include_item_meta(): bool {
 	return (bool) apply_filters(
@@ -546,8 +506,6 @@ function wpo_ips_edi_include_item_meta(): bool {
 
 /**
  * Check if EDI preview is enabled
- *
- * @return bool
  */
 function wpo_ips_edi_preview_is_enabled(): bool {
 	return ! empty( wpo_ips_edi_get_settings( 'enabled_preview' ) );
@@ -555,8 +513,6 @@ function wpo_ips_edi_preview_is_enabled(): bool {
 
 /**
  * Get the list of syntaxes (slug ⇒ human‑readable name).
- *
- * @return array
  */
 function wpo_ips_edi_syntaxes(): array {
 	$syntaxes = array();
@@ -580,8 +536,6 @@ function wpo_ips_edi_syntaxes(): array {
  *
  * @param string $syntax Optional. Syntax key (e.g. 'ubl', 'cii').
  * @param string $format Optional. Format key (e.g. 'ubl‑2p1').
- *
- * @return array
  */
 function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ): array {
 	$map = apply_filters(
@@ -678,7 +632,6 @@ function wpo_ips_edi_syntax_formats( string $syntax = '', string $format = '' ):
  * @param string $message The log message.
  * @param string $level   The log level (default: 'info').
  * @param \Throwable|null $e Optional. Exception to log.
- * @return void
  */
 function wpo_ips_edi_log( string $message, string $level = 'info', ?\Throwable $e = null ): void {
 	if ( empty( wpo_ips_edi_get_settings( 'enabled_logs' ) ) ) {
@@ -735,7 +688,6 @@ function wpo_ips_edi_vat_number_has_country_prefix( string $vat_number ): bool {
  * Greece uses EL as VAT prefix, while WooCommerce stores the country as GR.
  *
  * @param string $country_code Country code.
- * @return string
  */
 function wpo_ips_edi_normalize_vat_country_code( string $country_code ): string {
 	$country_code = strtoupper( trim( $country_code ) );
@@ -751,7 +703,6 @@ function wpo_ips_edi_normalize_vat_country_code( string $country_code ): string 
  * Normalize a VAT number while keeping the country prefix if present.
  *
  * @param string $vat_number VAT number.
- * @return string
  */
 function wpo_ips_edi_normalize_vat_number( string $vat_number ): string {
 	$vat_number = wpo_ips_edi_sanitize_string( $vat_number );
@@ -773,7 +724,6 @@ function wpo_ips_edi_normalize_vat_number( string $vat_number ): string {
  * - "0203430576"   => array( 'country' => '',   'id' => '0203430576' )
  *
  * @param string $vat_number VAT number.
- * @return array
  */
 function wpo_ips_edi_split_vat_number( string $vat_number ): array {
 	$vat_number = wpo_ips_edi_normalize_vat_number( $vat_number );
@@ -809,7 +759,6 @@ function wpo_ips_edi_split_vat_number( string $vat_number ): array {
  *
  * @param string $vat_number      VAT number.
  * @param string $billing_country Billing country code.
- * @return string
  */
 function wpo_ips_edi_format_vat_number( string $vat_number, string $billing_country = '' ): string {
 	$parts = wpo_ips_edi_split_vat_number( $vat_number );
@@ -839,14 +788,13 @@ function wpo_ips_edi_format_vat_number( string $vat_number, string $billing_coun
  * Get the formatted customer VAT number for EDI output.
  *
  * @param \WC_Order $order Order object.
- * @return string|null
  */
 function wpo_ips_edi_get_order_customer_vat_number( \WC_Order $order ): ?string {
 	$vat_number = wpo_wcpdf_get_order_customer_vat_number( $order );
 
 	if ( ! empty( $vat_number ) ) {
 		$vat_number = wpo_ips_edi_format_vat_number(
-			(string) $vat_number,
+			$vat_number,
 			$order->get_billing_country()
 		);
 	}
@@ -866,14 +814,13 @@ function wpo_ips_edi_get_order_customer_vat_number( \WC_Order $order ): ?string 
  * Get the formatted customer company registration number for EDI output.
  *
  * @param \WC_Order $order Order object.
- * @return string|null
  */
 function wpo_ips_edi_get_order_customer_registration_number( \WC_Order $order ): ?string {
 	$registration_number = wpo_wcpdf_get_order_customer_registration_number( $order );
 
 	if ( ! empty( $registration_number ) ) {
 		$registration_number = wpo_ips_edi_format_registration_number(
-			(string) $registration_number,
+			$registration_number,
 			$order->get_billing_country()
 		);
 	}
@@ -894,7 +841,6 @@ function wpo_ips_edi_get_order_customer_registration_number( \WC_Order $order ):
  *
  * @param string $billing_country The billing country code (ISO 3166-1 alpha-2).
  * @param string $vat_number      The VAT number.
- * @return array
  */
 function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_country, string $vat_number ): array {
 	$billing_country = strtoupper( trim( $billing_country ) );
@@ -992,7 +938,7 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
 
 			$lengths = array_values( array_filter( array_map( 'absint', $lengths ) ) );
 
-			if ( ! empty( $lengths ) && ! in_array( strlen( $value ), $lengths, true ) ) {
+			if ( $lengths !== [] && ! in_array( strlen( $value ), $lengths, true ) ) {
 				continue;
 			}
 		}
@@ -1019,7 +965,6 @@ function wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( string $billing_
  * @param string $country Optional country code in ISO 3166-1 alpha-2 format.
  * @param string $type    Optional identifier type, e.g. 'vat_number' or 'registration_number'.
  * @param string $key     Optional mapping key, e.g. 'eas', 'icd' or 'label'.
- * @return array|string
  */
 function wpo_ips_edi_get_identifier_mappings( string $country = '', string $type = '', string $key = '' ): array|string {
 	return \WPO\IPS\EDI\IdentifierMappings::get( $country, $type, $key );
@@ -1034,7 +979,6 @@ function wpo_ips_edi_get_identifier_mappings( string $country = '', string $type
  *
  * @param string $registration_number Registration number to format.
  * @param string $country             Country code in ISO 3166-1 alpha-2 format.
- * @return string
  */
 function wpo_ips_edi_format_registration_number( string $registration_number, string $country = '' ): string {
 	$raw_registration_number = $registration_number;
@@ -1052,8 +996,6 @@ function wpo_ips_edi_format_registration_number( string $registration_number, st
 
 /**
  * Get supplier identifiers data for EDI.
- *
- * @return array
  */
 function wpo_ips_edi_get_supplier_identifiers_data(): array {
 	$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
@@ -1149,7 +1091,6 @@ function wpo_ips_edi_get_supplier_identifiers_data(): array {
  * Get order customer identifiers data for EDI.
  *
  * @param \WC_Order $order The order object.
- * @return array
  */
 function wpo_ips_edi_get_order_customer_identifiers_data( \WC_Order $order ): array {
 	$data = array(
@@ -1366,8 +1307,6 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
 
 /**
  * Get the parent order for refunds.
- *
- * @return \WC_Order
  */
 function wpo_ips_edi_get_parent_order( \WC_Abstract_Order $order ): \WC_Order {
 	if ( $order instanceof \WC_Order_Refund ) {
@@ -1386,12 +1325,7 @@ function wpo_ips_edi_get_parent_order( \WC_Abstract_Order $order ): \WC_Order {
 /**
  * Small helper to generate action button HTML.
  *
- * @param string $url
- * @param string $class
- * @param string $label
- * @param string $icon
  *
- * @return string
  */
 function wpo_ips_edi_generate_action_button_html( string $url, string $class, string $label, string $icon ): string {
 	if ( empty( $url ) ) {

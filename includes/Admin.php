@@ -18,15 +18,13 @@ class Admin {
 	protected array $order_list_document_cache         = array();
 	protected array $documents_cache                   = array();
 	protected bool $storing_document_settings_disabled = false;
-	
+
 	protected static ?self $_instance                  = null;
 
 	/**
-	 * Instance of this class.
-	 * 
-	 * @return self
-	 */
-	public static function instance(): self {
+     * Instance of this class.
+     */
+    public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -43,7 +41,7 @@ class Admin {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 		add_action( 'admin_bar_menu', array( $this, 'debug_enabled_warning' ), 999 );
-		
+
 		// Woo
 		add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 200 ); // WC 7.1+ (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
 		add_filter( 'manage_woocommerce_page_wc-orders_sortable_columns', array( $this, 'invoice_columns_sortable' ) ); // WC 7.1+
@@ -66,10 +64,10 @@ class Admin {
 		add_filter( 'woocommerce_hpos_admin_search_filters', array( $this, 'hpos_admin_search_filters' ) );
 		add_filter( 'woocommerce_shop_order_list_table_prepare_items_query_args', array( $this, 'invoice_number_query_args' ) );
 		add_action( 'woocommerce_admin_order_data_after_billing_address', array( $this, 'checkout_field_display_admin_billing' ), 10, 1 );
-		
+
 		// IPS
 		add_action( 'wpo_wcpdf_document_actions', array( $this, 'add_regenerate_document_button' ) );
-		
+
 		// AJAX
 		add_action( 'wp_ajax_wpo_wcpdf_delete_document', array( $this, 'ajax_crud_document' ) );
 		add_action( 'wp_ajax_wpo_wcpdf_regenerate_document', array( $this, 'ajax_crud_document' ) );
@@ -79,11 +77,9 @@ class Admin {
 	}
 
 	/**
-	 * Check if the setup wizard should be launched and launch it.
-	 *
-	 * @return void
-	 */
-	public function setup_wizard(): void {
+     * Check if the setup wizard should be launched and launch it.
+     */
+    public function setup_wizard(): void {
 		if ( ! empty( $_GET['page'] ) && 'wpo-wcpdf-setup' === $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			delete_transient( 'wpo_wcpdf_new_install' );
 			WPO_WCPDF()->get_instance( 'setup_wizard' );
@@ -91,12 +87,9 @@ class Admin {
 	}
 
 	/**
-	 * Add PDF actions to the orders listing
-	 * 
-	 * @param \WC_Abstract_Order $order
-	 * @return void
-	 */
-	public function add_listing_actions( \WC_Abstract_Order $order ): void {
+     * Add PDF actions to the orders listing
+     */
+    public function add_listing_actions( \WC_Abstract_Order $order ): void {
 		// do not show buttons for trashed orders
 		if ( 'trash' === $order->get_status() ) {
 			return;
@@ -114,7 +107,7 @@ class Admin {
 			$icon              = ! empty( $document->icon ) ? $document->icon : WPO_WCPDF()->plugin_url() . '/assets/images/generic_document.svg';
 			$document          = $this->get_cached_order_document( $document_type, $order );
 
-			if ( $document ) {
+			if ( $document instanceof \WPO\IPS\Documents\OrderDocument ) {
 				foreach ( $document->output_formats as $output_format ) {
 					switch ( $output_format ) {
 						default:
@@ -122,8 +115,8 @@ class Admin {
 							if ( $document->is_enabled( $output_format ) ) {
 								$document_url     = $endpoint_instance->get_document_link( $order, $document_type );
 								$document_title   = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-								$document_exists  = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
-								$document_printed = $document_exists && is_callable( array( $document, 'printed' ) ) ? $document->printed() : false;
+								$document_exists  = is_callable( array( $document, 'exists' ) ) && $document->exists();
+								$document_printed = $document_exists && is_callable( array( $document, 'printed' ) ) && $document->printed();
 								$class            = array( $document_type, $output_format );
 
 								if ( $document_exists ) {
@@ -148,7 +141,7 @@ class Admin {
 							if ( $document->is_enabled( $output_format ) && wpo_ips_edi_is_available() ) {
 								$document_url    = $endpoint_instance->get_document_link( $order, $document_type, array( 'output' => $output_format ) );
 								$document_title  = is_callable( array( $document, 'get_title' ) ) ? $document->get_title() : $document_title;
-								$document_exists = is_callable( array( $document, 'exists' ) ) ? $document->exists() : false;
+								$document_exists = is_callable( array( $document, 'exists' ) ) && $document->exists();
 								$class           = array( $document_type, $output_format );
 
 								if ( $document_exists ) {
@@ -229,7 +222,7 @@ class Admin {
 		if ( ! $this->invoice_columns_enabled() ) {
 			return $columns;
 		}
-		
+
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
 		if (
@@ -263,13 +256,12 @@ class Admin {
 	}
 
 	/**
-	 * Display Invoice Number/Date in Shop Order column (if available).
-	 *
-	 * @param string                          $column               Column slug.
-	 * @param \WC_Abstract_Order|\WP_Post|int $post_or_order_object Post object, order object, or order/post ID.
-	 * @return void
-	 */
-	public function invoice_columns_data( string $column, $post_or_order_object ): void {
+     * Display Invoice Number/Date in Shop Order column (if available).
+     *
+     * @param string                          $column               Column slug.
+     * @param \WC_Abstract_Order|\WP_Post|int $post_or_order_object Post object, order object, or order/post ID.
+     */
+    public function invoice_columns_data( string $column, $post_or_order_object ): void {
 		if ( ! $this->invoice_columns_enabled() ) {
 			return;
 		}
@@ -336,11 +328,9 @@ class Admin {
 	}
 
 	/**
-	 * Check if at least 1 of the invoice columns is enabled.
-	 * 
-	 * @return bool
-	 */
-	public function invoice_columns_enabled(): bool {
+     * Check if at least 1 of the invoice columns is enabled.
+     */
+    public function invoice_columns_enabled(): bool {
 		$is_enabled       = false;
 		$invoice_settings = $this->get_invoice_settings();
 		$invoice_columns  = [
@@ -359,13 +349,11 @@ class Admin {
 	}
 
 	/**
-	 * Check if the invoice number search is enabled.
-	 * 
-	 * @param  bool $check_partial Check if the partial search is enabled.
-	 * 
-	 * @return bool
-	 */
-	public function invoice_number_search_enabled( bool $check_partial = false ): bool {
+     * Check if the invoice number search is enabled.
+     *
+     * @param  bool $check_partial Check if the partial search is enabled.
+     */
+    public function invoice_number_search_enabled( bool $check_partial = false ): bool {
 		$invoice_settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
 		$setting_key      = $check_partial ? 'invoice_number_partial_search' : 'invoice_number_search';
 
@@ -383,7 +371,7 @@ class Admin {
 		if ( ! $this->invoice_columns_enabled() ) {
 			return $columns;
 		}
-		
+
 		$columns['invoice_number_column'] = 'invoice_number_column';
 		$columns['invoice_date_column']   = 'invoice_date_column';
 		return $columns;
@@ -421,13 +409,12 @@ class Admin {
 	}
 
 	/**
-	 * Add the meta boxes on the single order page
-	 *
-	 * @param string $wc_screen_id        Can be also $post_type
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
-	 * @return void
-	 */
-	public function add_meta_boxes( string $wc_screen_id, object $post_or_order_object ): void {
+     * Add the meta boxes on the single order page
+     *
+     * @param string $wc_screen_id        Can be also $post_type
+     * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
+     */
+    public function add_meta_boxes( string $wc_screen_id, object $post_or_order_object ): void {
 		if ( WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() ) {
 			$screen_id = wc_get_page_screen_id( 'shop-order' );
 		} else {
@@ -484,12 +471,11 @@ class Admin {
 	}
 
 	/**
-	 * Resend order emails
-	 * 
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
-	 * @return void
-	 */
-	public function send_order_email_meta_box( object $post_or_order_object ): void {
+     * Resend order emails
+     *
+     * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
+     */
+    public function send_order_email_meta_box( object $post_or_order_object ): void {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 		?>
 		<ul class="wpo_wcpdf_send_emails order_actions submitbox">
@@ -518,7 +504,7 @@ class Admin {
 			<li class="wide" style="border:0; padding-left:0; padding-right:0; padding-bottom:0; float:left;">
 				<input type="submit" class="button save_order button-primary" name="save" value="<?php esc_attr_e( 'Save order & send email', 'woocommerce-pdf-invoices-packing-slips' ); ?>" />
 				<?php
-				$url = esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' ) );
+				esc_url( wp_nonce_url( add_query_arg( 'wpo_wcpdf_action', 'resend_email' ), 'generate_wpo_wcpdf' ) );
 				?>
 			</li>
 		</ul>
@@ -526,12 +512,11 @@ class Admin {
 	}
 
 	/**
-	 * Create the PDF meta box content on the single order page
-	 * 
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
-	 * @return void
-	 */
-	public function pdf_actions_meta_box( object $post_or_order_object ): void {
+     * Create the PDF meta box content on the single order page
+     *
+     * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
+     */
+    public function pdf_actions_meta_box( object $post_or_order_object ): void {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		$this->disable_storing_document_settings();
@@ -583,7 +568,7 @@ class Admin {
 		?>
 		<ul class="wpo_wcpdf-actions">
 			<?php
-			foreach ( $meta_box_actions as $document_type => $data ) {
+			foreach ( $meta_box_actions as $data ) {
 
 				$url                   = isset( $data['url'] ) ? $data['url'] : '';
 				$class                 = isset( $data['class'] ) ? $data['class'] : '';
@@ -632,12 +617,11 @@ class Admin {
 	}
 
 	/**
-	 * Create the EDI meta box content on the single order page
-	 *
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
-	 * @return void
-	 */
-	public function edi_actions_meta_box( object $post_or_order_object ): void {
+     * Create the EDI meta box content on the single order page
+     *
+     * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
+     */
+    public function edi_actions_meta_box( object $post_or_order_object ): void {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		$this->disable_storing_document_settings();
@@ -661,14 +645,14 @@ class Admin {
 
 					$xml_action = $this->get_order_meta_box_document_xml_action( $document_type, $refund );
 
-					if ( ! empty( $xml_action ) ) {
+					if ( $xml_action !== [] ) {
 						$meta_box_actions[ $document_type . '::' . $refund->get_id() ] = $xml_action;
 					}
 				}
 			} else {
 				$xml_action = $this->get_order_meta_box_document_xml_action( $document_type, $order );
 
-				if ( ! empty( $xml_action ) ) {
+				if ( $xml_action !== [] ) {
 					$meta_box_actions[ $document_type . '::' . $order->get_id() ] = $xml_action;
 				}
 			}
@@ -708,7 +692,7 @@ class Admin {
 				</thead>
 				<tbody>
 					<?php
-						foreach ( $meta_box_actions as $document_type => $data ) {
+						foreach ( $meta_box_actions as $data ) {
 							$url             = $data['url']     ?? '';
 							$class           = $data['class']   ?? '';
 							$alt             = $data['alt']     ?? '';
@@ -841,11 +825,9 @@ class Admin {
 	}
 
 	/**
-	 * AJAX handler to save the EDI customer identifiers.
-	 *
-	 * @return void
-	 */
-	public function ajax_edi_save_order_customer_peppol_identifiers(): void {
+     * AJAX handler to save the EDI customer identifiers.
+     */
+    public function ajax_edi_save_order_customer_peppol_identifiers(): void {
 		// Nonce check.
 		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
 			wp_send_json_error(
@@ -869,7 +851,7 @@ class Admin {
 		$order_id = isset( $request['order_id'] ) ? absint( $request['order_id'] ) : 0;
 		$values   = isset( $request['values'] ) && is_array( $request['values'] ) ? $request['values'] : array();
 
-		if ( ! $order_id || empty( $values ) ) {
+		if ( ! $order_id || $values === [] ) {
 			wp_send_json_error(
 				array(
 					'message' => __( 'Invalid order ID or values.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -912,12 +894,11 @@ class Admin {
 	}
 
 	/**
-	 * Create the data input meta box content on the single order page
-	 *
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
-	 * @return void
-	 */
-	public function data_input_box_content( object $post_or_order_object ): void {
+     * Create the data input meta box content on the single order page
+     *
+     * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
+     */
+    public function data_input_box_content( object $post_or_order_object ): void {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		$this->disable_storing_document_settings();
@@ -1101,13 +1082,12 @@ class Admin {
 	}
 
 	/**
-	 * Output the number and date fields for editing in the meta box.
-	 *
-	 * @param OrderDocument $document The document instance.
-	 * @param array $data The data to be displayed and edited.
-	 * @return void
-	 */
-	public function output_number_date_edit_fields( OrderDocument $document, array $data ): void {
+     * Output the number and date fields for editing in the meta box.
+     *
+     * @param OrderDocument $document The document instance.
+     * @param array $data The data to be displayed and edited.
+     */
+    public function output_number_date_edit_fields( OrderDocument $document, array $data ): void {
 		if ( empty( $document ) || empty( $document->order ) || ! is_callable( array( $document->order, 'get_id' ) ) ) {
 			return;
 		}
@@ -1390,12 +1370,11 @@ class Admin {
 	}
 
 	/**
-	 * Add regenerate document button in the order documents meta box if the document is using historical settings or has the archive PDF setting enabled.
-	 *
-	 * @param OrderDocument $document The document instance.
-	 * @return void
-	 */
-	public function add_regenerate_document_button( OrderDocument $document ): void {
+     * Add regenerate document button in the order documents meta box if the document is using historical settings or has the archive PDF setting enabled.
+     *
+     * @param OrderDocument $document The document instance.
+     */
+    public function add_regenerate_document_button( OrderDocument $document ): void {
 		$document_settings = $document->get_settings( true );
 		if ( $document->use_historical_settings() || isset( $document_settings['archive_pdf'] ) ) {
 			printf( '<span class="wpo-wcpdf-regenerate-document dashicons dashicons-update-alt" data-nonce="%s" data-action="regenerate"></span>', esc_attr( wp_create_nonce( 'wpo_wcpdf_regenerate_document' ) ) );
@@ -1421,13 +1400,12 @@ class Admin {
 	}
 
 	/**
-	 * Save the invoice number and date when the order is saved in the admin.
-	 *
-	 * @param int                         $post_or_order_id     The order ID or post ID.
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object The order object or post object.
-	 * @return void
-	 */
-	public function save_invoice_number_date( int $post_or_order_id, \WC_Abstract_Order|\WP_Post $post_or_order_object ): void {
+     * Save the invoice number and date when the order is saved in the admin.
+     *
+     * @param int                         $post_or_order_id     The order ID or post ID.
+     * @param \WC_Abstract_Order|\WP_Post $post_or_order_object The order object or post object.
+     */
+    public function save_invoice_number_date( int $post_or_order_id, \WC_Abstract_Order|\WP_Post $post_or_order_object ): void {
 		$original_post_status = isset( $_POST['original_post_status'] )
 			? sanitize_text_field( wp_unslash( $_POST['original_post_status'] ) )
 			: '';
@@ -1478,7 +1456,7 @@ class Admin {
 			$form_data     = stripslashes_deep( $_POST );
 			$document_data = $this->process_order_document_form_data( (array) $form_data, $invoice );
 
-			if ( empty( $document_data ) ) {
+			if ( $document_data === [] ) {
 				return;
 			}
 
@@ -1505,13 +1483,11 @@ class Admin {
 	}
 
 	/**
-	 * Document objects are created in order to check for existence and retrieve data,
-	 * but we don't want to store the settings for uninitialized documents.
-	 * Only use in frontend/backed (page requests), otherwise settings will never be stored!
-	 * 
-	 * @return void
-	 */
-	public function disable_storing_document_settings(): void {
+     * Document objects are created in order to check for existence and retrieve data,
+     * but we don't want to store the settings for uninitialized documents.
+     * Only use in frontend/backed (page requests), otherwise settings will never be stored!
+     */
+    public function disable_storing_document_settings(): void {
 		if ( $this->storing_document_settings_disabled ) {
 			return;
 		}
@@ -1521,12 +1497,10 @@ class Admin {
 	}
 
 	/**
-	 * Restore the storing of document settings.
-	 * Only use in frontend/backed (page requests), otherwise settings will never be stored!
-	 * 
-	 * @return void
-	 */
-	public function restore_storing_document_settings(): void {
+     * Restore the storing of document settings.
+     * Only use in frontend/backed (page requests), otherwise settings will never be stored!
+     */
+    public function restore_storing_document_settings(): void {
 		if ( ! $this->storing_document_settings_disabled ) {
 			return;
 		}
@@ -1536,22 +1510,19 @@ class Admin {
 	}
 
 	/**
-	 * Prevent document settings from being stored during temporary document checks.
-	 *
-	 * @return bool
-	 */
-	public function prevent_storing_document_settings(): bool {
+     * Prevent document settings from being stored during temporary document checks.
+     */
+    public function prevent_storing_document_settings(): bool {
 		return false;
 	}
 
 	/**
-	 * Send emails manually
-	 * 
-	 * @param int $post_or_order_id The order ID or post ID.
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object The order object or order ID.
-	 * @return void
-	 */
-	public function send_emails( int $post_or_order_id, object $post_or_order_object ): void {
+     * Send emails manually
+     *
+     * @param int $post_or_order_id The order ID or post ID.
+     * @param \WC_Abstract_Order|\WP_Post $post_or_order_object The order object or order ID.
+     */
+    public function send_emails( int $post_or_order_id, object $post_or_order_object ): void {
 		$order = ( $post_or_order_object instanceof \WP_Post ) ? wc_get_order( $post_or_order_object->ID ) : $post_or_order_object;
 
 		// Check the nonce.
@@ -1606,7 +1577,7 @@ class Admin {
 		if ( ! $this->invoice_number_search_enabled() ) {
 			return $custom_fields;
 		}
-		
+
 		$custom_fields[] = '_wcpdf_invoice_number';
 		$custom_fields[] = '_wcpdf_formatted_invoice_number';
 		return $custom_fields;
@@ -1627,11 +1598,9 @@ class Admin {
 	}
 
 	/**
-	 * Save, regenerate or delete a document from AJAX request
-	 * 
-	 * @return void
-	 */
-	public function ajax_crud_document(): void {
+     * Save, regenerate or delete a document from AJAX request
+     */
+    public function ajax_crud_document(): void {
 		if ( check_ajax_referer( 'wpo_wcpdf_regenerate_document', 'security', false ) === false && check_ajax_referer( 'wpo_wcpdf_save_document', 'security', false ) === false && check_ajax_referer( 'wpo_wcpdf_delete_document', 'security', false ) === false ) {
 			wp_send_json_error( array(
 				'message' => esc_html__( 'Nonce expired!', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -1668,7 +1637,7 @@ class Admin {
 		parse_str( $request['form_data'], $form_data );
 
 		if ( is_array( $form_data ) ) {
-			foreach ( $form_data as $key => &$value ) {
+			foreach ( $form_data as &$value ) {
 				if ( is_array( $value ) && ! empty( $value[ $order_id ] ) ) {
 					$value = $value[ $order_id ];
 				}
@@ -1805,12 +1774,11 @@ class Admin {
 	}
 
 	/**
-	 * Show a warning in the admin bar if debug output is enabled.
-	 *
-	 * @param \WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance.
-	 * @return void
-	 */
-	public function debug_enabled_warning( \WP_Admin_Bar $wp_admin_bar ): void {
+     * Show a warning in the admin bar if debug output is enabled.
+     *
+     * @param \WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance.
+     */
+    public function debug_enabled_warning( \WP_Admin_Bar $wp_admin_bar ): void {
 		if ( isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_debug'] ) && current_user_can( 'administrator' ) ) {
 			$status_settings_url = 'admin.php?page=wpo_wcpdf_options_page&tab=debug';
 			$title               = __( 'DEBUG output enabled', 'woocommerce-pdf-invoices-packing-slips' );
@@ -1822,17 +1790,15 @@ class Admin {
 					esc_html( $title )
 				),
 			);
-			
+
 			$wp_admin_bar->add_node( $args );
 		}
 	}
 
 	/**
-	 * AJAX handler to preview a formatted number
-	 *
-	 * @return void
-	 */
-	public function ajax_preview_formatted_number(): void {
+     * AJAX handler to preview a formatted number
+     */
+    public function ajax_preview_formatted_number(): void {
 		if ( ! check_ajax_referer( 'generate_wpo_wcpdf', 'security', false ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid security token.', 'woocommerce-pdf-invoices-packing-slips' ) ) );
 		}
@@ -1899,7 +1865,7 @@ class Admin {
 
 			$message = __METHOD__ . ': The parameter passed is a string (legacy behavior). This method now requires a document object.';
 
-			if ( ! empty( $extension_needs_update ) ) {
+			if ( $extension_needs_update !== [] ) {
 				$message .= ' Please update the following extension' . ( count( $extension_needs_update ) > 1 ? 's' : '' ) . ': ' . implode( ' and ', $extension_needs_update ) . '.';
 			} else {
 				$message .= ' An outdated or third-party plugin or code snippet may be using the old method.';
@@ -2068,7 +2034,7 @@ class Admin {
 		if ( ! $this->invoice_columns_enabled() ) {
 			return $columns;
 		}
-		
+
 		$columns['invoice_date_column']   = 'invoice_date_column';
 		$columns['invoice_number_column'] = 'invoice_number_column';
 
@@ -2085,7 +2051,7 @@ class Admin {
 		if ( ! $this->invoice_columns_enabled() ) {
 			return $order_query_args;
 		}
-		
+
 		if ( 'invoice_number_column' === $order_query_args['orderby'] ) {
 			$is_numeric = $this->is_invoice_number_numeric();
 
@@ -2113,16 +2079,15 @@ class Admin {
 	}
 
 	/**
-	 * Adjust the main query on the admin order list to support sorting by invoice date and number.
-	 *
-	 * @param \WP_Query $query The WP_Query instance for the admin order list.
-	 * @return void
-	 */
-	public function sort_orders_by_numeric_invoice_number( \WP_Query $query ): void {
+     * Adjust the main query on the admin order list to support sorting by invoice date and number.
+     *
+     * @param \WP_Query $query The WP_Query instance for the admin order list.
+     */
+    public function sort_orders_by_numeric_invoice_number( \WP_Query $query ): void {
 		if ( ! $this->invoice_columns_enabled() ) {
 			return;
 		}
-		
+
 		if ( ! is_admin() || ! $query->is_main_query() || 'shop_order' !== $query->get( 'post_type' ) || '_wcpdf_invoice_number' !== $query->get( 'meta_key' ) ) {
 			return;
 		}
@@ -2131,12 +2096,11 @@ class Admin {
 	}
 
 	/**
-	 * Adds "Invoice numbers" filter to the search filters available in the admin order search.
-	 *
-	 * @param array $options List of available filters.
-	 * @return array
-	 */
-	public function hpos_admin_search_filters( array $options ): array {
+     * Adds "Invoice numbers" filter to the search filters available in the admin order search.
+     *
+     * @param array $options List of available filters.
+     */
+    public function hpos_admin_search_filters( array $options ): array {
 		if ( WPO_WCPDF()->get_instance( 'admin' )->invoice_number_search_enabled() ) {
 			$all = $options['all'];
 			unset( $options['all'] );
@@ -2149,12 +2113,11 @@ class Admin {
 	}
 
 	/**
-	 * Modifies the arguments passed to `wc_get_orders()` to support 'invoice_numbers' order search filter.
-	 *
-	 * @param array $order_query_args Arguments to be passed to `wc_get_orders()`.
-	 * @return array
-	 */
-	public function invoice_number_query_args( array $order_query_args ): array {
+     * Modifies the arguments passed to `wc_get_orders()` to support 'invoice_numbers' order search filter.
+     *
+     * @param array $order_query_args Arguments to be passed to `wc_get_orders()`.
+     */
+    public function invoice_number_query_args( array $order_query_args ): array {
 		if ( isset( $order_query_args['search_filter'] ) && 'invoice_numbers' === $order_query_args['search_filter'] && ! empty( $order_query_args['s'] ) ) {
 			$invoice_numbers = explode( ',', $order_query_args['s'] );
 			$invoice_numbers = array_map( function ( $number ) {
@@ -2193,12 +2156,9 @@ class Admin {
 	}
 
 	/**
-	 * Display the optional checkout field under the Billing address in wp-admin.
-	 *
-	 * @param \WC_Order $order
-	 * @return void
-	 */
-	public function checkout_field_display_admin_billing( \WC_Order $order ): void {
+     * Display the optional checkout field under the Billing address in wp-admin.
+     */
+    public function checkout_field_display_admin_billing( \WC_Order $order ): void {
 		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
 
 		foreach ( $checkout_field->get_types() as $type ) {
@@ -2216,13 +2176,9 @@ class Admin {
 	}
 
 	/**
-	 * Get XML document action for order meta box
-	 *
-	 * @param string             $document_type
-	 * @param \WC_Abstract_Order $order
-	 * @return array
-	 */
-	private function get_order_meta_box_document_xml_action( string $document_type, \WC_Abstract_Order $order ): array {
+     * Get XML document action for order meta box
+     */
+    private function get_order_meta_box_document_xml_action( string $document_type, \WC_Abstract_Order $order ): array {
 		$document = wcpdf_get_document( $document_type, $order );
 
 		if ( ! $document || ! $document->exists() ) {
@@ -2260,12 +2216,9 @@ class Admin {
 	}
 
 	/**
-	 * Get customer identifiers to display for the order.
-	 *
-	 * @param \WC_Order $order
-	 * @return void
-	 */
-	private function get_order_meta_box_customer_identifiers( \WC_Order $order ): void {
+     * Get customer identifiers to display for the order.
+     */
+    private function get_order_meta_box_customer_identifiers( \WC_Order $order ): void {
 		$identifiers_data   = wpo_ips_edi_get_order_customer_identifiers_data( $order );
 		$peppol_identifiers = array();
 
@@ -2358,7 +2311,7 @@ class Admin {
 					<?php endif; ?>
 				</table>
 			</div>
-			<?php if ( ! empty( $peppol_identifiers ) ) : ?>
+			<?php if ( $peppol_identifiers !== [] ) : ?>
 				<div class="edi-customer-identifiers peppol">
 					<table class="widefat">
 						<thead>
@@ -2410,12 +2363,10 @@ class Admin {
 	}
 
 	/**
-	 * Determines if the invoice number is numeric.
-	 * It evaluates the presence of non-numeric characters in the prefix and suffix of the invoice number.
-	 *
-	 * @return bool
-	 */
-	private function is_invoice_number_numeric(): bool {
+     * Determines if the invoice number is numeric.
+     * It evaluates the presence of non-numeric characters in the prefix and suffix of the invoice number.
+     */
+    private function is_invoice_number_numeric(): bool {
 		$invoice_settings = $this->get_invoice_settings();
 		$is_numeric       = ( empty( $invoice_settings['number_format']['prefix'] ) || ctype_digit( $invoice_settings['number_format']['prefix'] ) ) &&
 							( empty( $invoice_settings['number_format']['suffix'] ) || ctype_digit( $invoice_settings['number_format']['suffix'] ) );
@@ -2427,12 +2378,9 @@ class Admin {
 	}
 
 	/**
-	 * Document data editing disabled notice
-	 *
-	 * @param OrderDocument $document
-	 * @return void
-	 */
-	private function document_data_editing_disabled_notice( OrderDocument $document ): void {
+     * Document data editing disabled notice
+     */
+    private function document_data_editing_disabled_notice( OrderDocument $document ): void {
 		?>
 		<div class="notice notice-warning inline" style="margin:0;">
 			<p>
@@ -2459,13 +2407,11 @@ class Admin {
 		</div>
 		<?php
 	}
-	
+
 	/**
-	 * Get invoice settings with caching to avoid multiple calls to get_option() during the same request.
-	 * 
-	 * @return array
-	 */
-	private function get_invoice_settings(): array {
+     * Get invoice settings with caching to avoid multiple calls to get_option() during the same request.
+     */
+    private function get_invoice_settings(): array {
 		if ( null === $this->invoice_settings_cache ) {
 			$settings = get_option( 'wpo_wcpdf_documents_settings_invoice', array() );
 			$this->invoice_settings_cache = is_array( $settings ) ? $settings : array();
@@ -2473,15 +2419,11 @@ class Admin {
 
 		return $this->invoice_settings_cache;
 	}
-	
+
 	/**
-	 * Get cached document for the order list to avoid multiple instances of the same document during the same request.
-	 *
-	 * @param string $document_type
-	 * @param \WC_Abstract_Order $order
-	 * @return OrderDocument|null
-	 */
-	private function get_cached_order_document( string $document_type, \WC_Abstract_Order $order ): ?OrderDocument {
+     * Get cached document for the order list to avoid multiple instances of the same document during the same request.
+     */
+    private function get_cached_order_document( string $document_type, \WC_Abstract_Order $order ): ?OrderDocument {
 		$order_id = $order->get_id();
 
 		if ( ! isset( $this->order_list_document_cache[ $order_id ] ) ) {
@@ -2500,15 +2442,14 @@ class Admin {
 
 		return $this->order_list_document_cache[ $order_id ][ $document_type ];
 	}
-	
+
 	/**
-	 * Caches document objects per request to avoid repeated `get_documents()` calls.
-	 *
-	 * @param string|null $filter
-	 * @param string|null $output_format
-	 * @return array
-	 */
-	private function get_documents_cached( string $filter = 'enabled', string $output_format = 'pdf' ): array {
+     * Caches document objects per request to avoid repeated `get_documents()` calls.
+     *
+     * @param string|null $filter
+     * @param string|null $output_format
+     */
+    private function get_documents_cached( string $filter = 'enabled', string $output_format = 'pdf' ): array {
 		$cache_key = "{$filter}|{$output_format}";
 
 		if ( ! isset( $this->documents_cache[ $cache_key ] ) ) {

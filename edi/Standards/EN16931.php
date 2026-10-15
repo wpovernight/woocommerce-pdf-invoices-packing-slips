@@ -13,15 +13,12 @@ class EN16931 extends AbstractStandard {
 	public static string $slug    = 'en16931';
 	public static string $name    = 'EN16931';
 	public static string $version = '16.0'; // https://ec.europa.eu/digital-building-blocks/sites/spaces/DIGITAL/pages/467108974/Registry+of+supporting+artefacts+to+implement+EN16931
-
-	/**
-	 * Get the VAT category codes according to code list.
-	 *
-	 * - Column [VAT CAT]
-	 *
-	 * @return array
-	 */
-	public static function get_vat_cat(): array {
+    /**
+     * Get the VAT category codes according to code list.
+     *
+     * - Column [VAT CAT]
+     */
+    public static function get_vat_cat(): array {
 		$defaults = array(
 			'VAT' => __( 'Value added tax (VAT)', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
@@ -32,13 +29,11 @@ class EN16931 extends AbstractStandard {
 	}
 
 	/**
-	 * Get the Duty, tax or fee categories according to code list.
-	 *
-	 * - Column [5305]
-	 *
-	 * @return array
-	 */
-	public static function get_5305(): array {
+     * Get the Duty, tax or fee categories according to code list.
+     *
+     * - Column [5305]
+     */
+    public static function get_5305(): array {
 		$defaults = array(
 			'AE' => __( 'VAT Reverse Charge', 'woocommerce-pdf-invoices-packing-slips' ),
 			'E'  => __( 'Exempt from tax', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -57,13 +52,11 @@ class EN16931 extends AbstractStandard {
 	}
 
 	/**
-	 * Get the VAT exemption reason codes according to code list.
-	 *
-	 * - Column [VATEX]
-	 *
-	 * @return array
-	 */
-	public static function get_vatex(): array {
+     * Get the VAT exemption reason codes according to code list.
+     *
+     * - Column [VATEX]
+     */
+    public static function get_vatex(): array {
 		$defaults = array(
 			// EU VAT exemptions
 			'VATEX-EU-79-C'          => __( 'Exempt based on article 79, point c of Council Directive 2006/112/EC', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -164,13 +157,11 @@ class EN16931 extends AbstractStandard {
 	}
 
 	/**
-	 * Get VATEX remarks according to code list.
-	 *
-	 * - Column [VATEX]
-	 *
-	 * @return array
-	 */
-	public static function get_vatex_remarks(): array {
+     * Get VATEX remarks according to code list.
+     *
+     * - Column [VATEX]
+     */
+    public static function get_vatex_remarks(): array {
 		/* translators: %s: tax category code */
 		$reason_common_remark             = __( 'Only use with tax category code %s', 'woocommerce-pdf-invoices-packing-slips' );
 		$domestic_invoicing_france_remark = __( 'Only for domestic invoicing in France', 'woocommerce-pdf-invoices-packing-slips' );
@@ -225,13 +216,11 @@ class EN16931 extends AbstractStandard {
 	}
 
 	/**
-	 * Get the Electronic address scheme identifier according to code list.
-	 *
-	 * - Column [EAS]
-	 *
-	 * @return array
-	 */
-	public static function get_eas(): array {
+     * Get the Electronic address scheme identifier according to code list.
+     *
+     * - Column [EAS]
+     */
+    public static function get_eas(): array {
 		$defaults = array(
 			'0002' => __( 'System Information et Repertoire des Entreprise et des Etablissements: SIRENE', 'woocommerce-pdf-invoices-packing-slips' ),
 			'0007' => __( 'Organisationsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -339,13 +328,11 @@ class EN16931 extends AbstractStandard {
 	}
 
 	/**
-	 * Get the Identifier scheme code according to code list.
-	 *
-	 * - Column [ICD]
-	 *
-	 * @return array
-	 */
-	public static function get_icd(): array {
+     * Get the Identifier scheme code according to code list.
+     *
+     * - Column [ICD]
+     */
+    public static function get_icd(): array {
 		$defaults = array(
 			'0002' => __( 'System Information et Repertoire des Entreprise et des Etablissements: SIRENE', 'woocommerce-pdf-invoices-packing-slips' ),
 			'0003' => __( 'Codification Numerique des Etablissments Financiers En Belgique', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -594,13 +581,11 @@ class EN16931 extends AbstractStandard {
 	}
 
 	/**
-	 * Get the Payment Meanbs code according to code list.
-	 *
-	 * - Column [Payment]
-	 *
-	 * @return array
-	 */
-	public static function get_payment(): array {
+     * Get the Payment Meanbs code according to code list.
+     *
+     * - Column [Payment]
+     */
+    public static function get_payment(): array {
 		$defaults = array(
 			'1'   => __( 'Instrument not defined', 'woocommerce-pdf-invoices-packing-slips' ),
 			'2'   => __( 'Automated clearing house credit', 'woocommerce-pdf-invoices-packing-slips' ),

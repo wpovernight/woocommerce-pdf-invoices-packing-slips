@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Syntaxes\Ubl\Abstracts;
 
 use WPO\IPS\EDI\Abstracts\AbstractHandler;

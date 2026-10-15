@@ -117,7 +117,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ( $this->get_order_items() as $item_id => $item ) : ?>
+		<?php foreach ( $this->get_order_items() as $item ) : ?>
 			<tr class="<?php echo esc_attr( $item['row_class'] ); ?>">
 				<td class="product">
 					<p class="item-name"><?php echo esc_html( $item['name'] ); ?></p>

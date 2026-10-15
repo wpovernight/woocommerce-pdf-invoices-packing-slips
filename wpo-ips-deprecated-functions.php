@@ -6,7 +6,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Sanitizes a string for use in UBL documents by stripping all HTML tags and decoding HTML entities to plain text.
  *
- * @param string $string
  *
  * @deprecated 5.0.0 Use wpo_ips_edi_sanitize_string() instead.
  */
@@ -21,7 +20,6 @@ function wpo_ips_ubl_sanitize_string( string $string ): string {
  * @param string                  $key      Can be category, scheme, or reason
  * @param int|null                $rate_id  The tax rate ID
  * @param \WC_Abstract_Order|null $order    The order object
- * @return string
  *
  * @deprecated 5.0.0 Use wpo_ips_edi_get_tax_data_from_fallback() instead.
  */
@@ -33,9 +31,7 @@ function wpo_ips_ubl_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
 /**
  * Save UBL order taxes
  *
- * @param \WC_Abstract_Order $order
- * @return void
- * 
+ *
  * @deprecated 5.0.0 Use wpo_ips_edi_save_order_taxes() instead.
  */
 function wpo_ips_ubl_save_order_taxes( \WC_Abstract_Order $order ): void {
@@ -46,8 +42,7 @@ function wpo_ips_ubl_save_order_taxes( \WC_Abstract_Order $order ): void {
 /**
  * Check if the country format extension is active
  *
- * @return bool
- * 
+ *
  * @deprecated 5.0.0 Use wpo_ips_edi_save_order_taxes() instead.
  */
 function wpo_ips_ubl_is_country_format_extension_active(): bool {
@@ -70,8 +65,7 @@ function wcpdf_get_ubl_maker() {
 /**
  * Check if UBL is available
  *
- * @return bool
- * 
+ *
  * @deprecated 5.0.0 Use wpo_ips_edi_is_available() instead.
  */
 function wcpdf_is_ubl_available(): bool {
@@ -82,12 +76,9 @@ function wcpdf_is_ubl_available(): bool {
 /**
  * Write UBL file
  *
- * @param \WPO\IPS\Documents\OrderDocument $document
- * @param bool $attachment
- * @param bool $contents_only
  *
  * @return string|false
- * 
+ *
  * @deprecated 5.0.0 Use wpo_ips_edi_write_file() instead.
  */
 function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, bool $attachment = false, bool $contents_only = false ) {
@@ -100,8 +91,7 @@ function wpo_ips_write_ubl_file( \WPO\IPS\Documents\OrderDocument $document, boo
  *
  * @param string $filename
  * @param int|false $size
- * @return void
- * 
+ *
  * @deprecated 5.0.0 Use wpo_ips_edi_file_headers() instead.
  */
 function wcpdf_ubl_headers( $filename, $size ): void {
@@ -111,10 +101,8 @@ function wcpdf_ubl_headers( $filename, $size ): void {
 
 /**
  * Save order Peppol data
- * 
- * @param \WC_Abstract_Order $order
- * @return void
- * 
+ *
+ *
  * @deprecated 5.3.1 Use wpo_ips_edi_maybe_save_order_peppol_data() instead.
  */
 function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $order ): void {
@@ -125,8 +113,7 @@ function wpo_ips_edi_maybe_save_order_customer_peppol_data( \WC_Abstract_Order $
 /**
  * Check whether a VAT plugin is active.
  *
- * @return bool
- * 
+ *
  * @deprecated 5.8.0 Use \WPO_WCPDF()->get_instance( 'vat_plugins' )->has_active() instead.
  */
 function wpo_ips_has_vat_plugin_active(): bool {
@@ -137,9 +124,6 @@ function wpo_ips_has_vat_plugin_active(): bool {
 /**
  * Get the Invoice object for an order.
  *
- * @param mixed $order
- * @param bool $init
- * @return object|false
  *
  * @deprecated 4.6.3 Use wcpdf_get_document( 'invoice', $order, $init ) instead.
  */
@@ -151,9 +135,6 @@ function wcpdf_get_invoice( mixed $order, bool $init = false ): object|false {
 /**
  * Get the Packing Slip object for an order.
  *
- * @param mixed $order
- * @param bool $init
- * @return object|false
  *
  * @deprecated 4.6.3 Use wcpdf_get_document( 'packing-slip', $order, $init ) instead.
  */
@@ -165,9 +146,7 @@ function wcpdf_get_packing_slip( mixed $order, bool $init = false ): object|fals
 /**
  * Get the WP_Filesystem instance
  *
- * @return mixed
  * @throws RuntimeException
- *
  * @deprecated 4.2.0 Use \WPO\IPS\Compatibility\FileSystem::instance()->wp_filesystem instead.
  */
 function wpo_wcpdf_get_wp_filesystem(): mixed {
@@ -185,7 +164,6 @@ function wpo_wcpdf_get_wp_filesystem(): mixed {
 /**
  * Get Peppol VAT number mappings.
  *
- * @return array
  *
  * @deprecated 6.0.0 Use wpo_ips_edi_get_identifier_mappings() instead.
  */

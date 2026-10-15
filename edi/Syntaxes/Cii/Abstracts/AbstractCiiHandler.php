@@ -75,14 +75,14 @@ abstract class AbstractCiiHandler extends AbstractHandler {
 	 */
 	public function get_php_date_format_from_code( string $code ): string {
 		switch ( $code ) {
-			case '102': // Full date: YYYYMMDD
-				return 'Ymd';
+			case '102':
+            default:
+				// Full date: YYYYMMDD
+                return 'Ymd';
 			case '610': // Year + Month: YYYYMM
 				return 'Ym';
 			case '616': // Year + Week: YYYYWW (ISO)
-				return 'oW';
-			default:
-				return 'Ymd'; // Fallback
+				return 'oW'; // Fallback
 		}
 	}
 

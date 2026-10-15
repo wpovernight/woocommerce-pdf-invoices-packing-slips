@@ -1,4 +1,4 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
+<?php defined( 'ABSPATH' ) || exit; ?>
 
 <div class="wcpdf_document_settings_sections wcpdf_advanced_numbers_choose_table">
 	<?php

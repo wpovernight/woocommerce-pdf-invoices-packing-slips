@@ -10,16 +10,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class PaymentMeansHandler extends AbstractUblHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$payment = $this->get_payment_means_data();
 		
-		if ( ! $payment ) {
+		if ( $payment === [] ) {
 			wpo_ips_edi_log(
 				sprintf(
 					'UBL PaymentMeans: No payment means data in order %d',
@@ -57,7 +56,7 @@ class PaymentMeansHandler extends AbstractUblHandler {
 			$account_id = ! empty( $payment['iban'] )
 				? strtoupper( preg_replace( '/\s+/', '', $payment['iban'] ) )
 				: $payment['account_number'];
-				
+
 			$account = array(
 				'name'  => 'cac:PayeeFinancialAccount',
 				'value' => array(

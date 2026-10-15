@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class LineHandler extends AbstractUblHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$root_element         = $this->document->get_root_element();
 		$quantity_role        = $this->document->get_quantity_role();
 		$include_coupon_lines = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
@@ -152,8 +151,7 @@ class LineHandler extends AbstractUblHandler {
 			if ( wpo_ips_edi_include_item_meta() ) {
 				$meta_rows = $this->get_item_meta( $item );
 
-				if ( ! empty( $meta_rows ) ) {
-					foreach ( $meta_rows as $row ) {
+				foreach ( $meta_rows as $row ) {
 						$item_value[] = array(
 							'name'  => 'cac:AdditionalItemProperty',
 							'value' => array(
@@ -168,7 +166,6 @@ class LineHandler extends AbstractUblHandler {
 							),
 						);
 					}
-				}
 			}
 
 			$quantity_value = abs( (float) $parts['qty'] );
@@ -235,15 +232,10 @@ class LineHandler extends AbstractUblHandler {
 	}
 
 	/**
-	 * Create the Line array for a single coupon item.
-	 *
-	 * @param \WC_Order_Item_Coupon $coupon_item
-	 * @param int                   $fallback_id
-	 * @param string                $currency
-	 * @return array|null
-	 */
-	protected function build_coupon_line( \WC_Order_Item_Coupon $coupon_item, int $fallback_id, string $currency ): ?array {
-		if ( ! is_object( $coupon_item ) || ! method_exists( $coupon_item, 'get_discount' ) ) {
+     * Create the Line array for a single coupon item.
+     */
+    protected function build_coupon_line( \WC_Order_Item_Coupon $coupon_item, int $fallback_id, string $currency ): ?array {
+		if ( ! method_exists( $coupon_item, 'get_discount' ) ) {
 			return null;
 		}
 

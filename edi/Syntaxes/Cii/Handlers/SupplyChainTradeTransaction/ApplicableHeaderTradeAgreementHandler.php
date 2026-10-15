@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$applicable_header_trade_agreement = array(
 			'name'  => 'ram:ApplicableHeaderTradeAgreement',
 			'value' => array_filter( array(
@@ -32,11 +31,9 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	}
 	
 	/**
-	 * Get the seller trade party details.
-	 *
-	 * @return array|null
-	 */
-	public function get_seller_trade_party(): ?array {
+     * Get the seller trade party details.
+     */
+    public function get_seller_trade_party(): ?array {
 		$seller = apply_filters( 'wpo_ips_edi_cii_seller_data', array(
 			'name'         => wpo_ips_edi_sanitize_string( $this->get_supplier_identifiers_data( 'shop_name' ) ),
 			'vat_number'   => $this->get_supplier_identifiers_data( 'vat_number' ),
@@ -152,11 +149,9 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	}
 	
 	/**
-	 * Get the buyer trade party details.
-	 *
-	 * @return array|null
-	 */
-	public function get_buyer_trade_party(): ?array {
+     * Get the buyer trade party details.
+     */
+    public function get_buyer_trade_party(): ?array {
 		$order               = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$customer_party_name = $order ? $order->get_formatted_billing_full_name() : '';
 		$billing_company     = $order ? $order->get_billing_company() : '';
@@ -284,11 +279,9 @@ class ApplicableHeaderTradeAgreementHandler extends AbstractCiiHandler {
 	}
 	
 	/**
-	 * Get the contract referenced document.
-	 *
-	 * @return array|null
-	 */
-	public function get_contract_referenced_document(): ?array {
+     * Get the contract referenced document.
+     */
+    public function get_contract_referenced_document(): ?array {
 		$order        = $this->document->order;
 		$reference_id = apply_filters( 'wpo_ips_edi_cii_contract_reference_id', null, $order, $this );
 

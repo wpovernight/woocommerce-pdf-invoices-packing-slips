@@ -11,20 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPartyInterface {
 
 	/**
-	 * Cached supplier data after applying the single filter.
-	 *
-	 * @var array|null
-	 */
-	protected ?array $supplier_data = null;
+     * Cached supplier data after applying the single filter.
+     */
+    protected ?array $supplier_data = null;
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$accounting_supplier_party = array(
 			'name'  => 'cac:AccountingSupplierParty',
 			'value' => array(
@@ -38,11 +35,9 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	}
 
 	/**
-	 * Returns the supplier party details for the UBL document.
-	 *
-	 * @return array
-	 */
-	public function get_party(): array {
+     * Returns the supplier party details for the UBL document.
+     */
+    public function get_party(): array {
 		$this->get_supplier_data();
 
 		$supplier_party = array(
@@ -64,11 +59,9 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	}
 
 	/**
-	 * Returns the party name for the supplier.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_name(): ?array {
+     * Returns the party name for the supplier.
+     */
+    public function get_party_name(): ?array {
 		$supplier = $this->get_supplier_data();
 		$company  = $supplier['company'] ?? '';
 
@@ -97,11 +90,9 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	}
 
 	/**
-	 * Returns the party postal address for the supplier.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_postal_address(): ?array {
+     * Returns the party postal address for the supplier.
+     */
+    public function get_party_postal_address(): ?array {
 		$supplier = $this->get_supplier_data();
 
 		$address_line = wpo_ips_edi_sanitize_string( (string) ( $supplier['address_line_1'] ?? '' ) );
@@ -153,11 +144,9 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	}
 
 	/**
-	 * Returns the party tax scheme for the supplier.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_tax_scheme(): ?array {
+     * Returns the party tax scheme for the supplier.
+     */
+    public function get_party_tax_scheme(): ?array {
 		if ( $this->has_tax_category( 'O' ) ) {
 			return null;
 		}
@@ -207,11 +196,9 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	}
 
 	/**
-	 * Returns the party legal entity for the supplier.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_legal_entity(): ?array {
+     * Returns the party legal entity for the supplier.
+     */
+    public function get_party_legal_entity(): ?array {
 		$supplier     = $this->get_supplier_data();
 		$company      = (string) ( $supplier['company'] ?? '' );
 		$coc_number   = (string) ( $supplier['coc_number'] ?? '' );
@@ -273,11 +260,9 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	}
 
 	/**
-	 * Returns the party contact information for the supplier.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_contact(): ?array {
+     * Returns the party contact information for the supplier.
+     */
+    public function get_party_contact(): ?array {
 		$supplier       = $this->get_supplier_data();
 		$email_address  = (string) ( $supplier['email_address'] ?? '' );
 
@@ -308,11 +293,9 @@ class AccountingSupplierPartyHandler extends AbstractUblHandler implements UblPa
 	}
 	
 	/**
-	 * Build and filter supplier data in one go.
-	 *
-	 * @return array
-	 */
-	protected function get_supplier_data(): array {
+     * Build and filter supplier data in one go.
+     */
+    protected function get_supplier_data(): array {
 		if ( null !== $this->supplier_data ) {
 			return $this->supplier_data;
 		}

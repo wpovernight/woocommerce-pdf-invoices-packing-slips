@@ -11,11 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler {
 
 	/**
-	 * Returns the supplier party details for the UBL document.
-	 *
-	 * @return array
-	 */
-	public function get_party(): array {
+     * Returns the supplier party details for the UBL document.
+     */
+    public function get_party(): array {
 		$supplier_party = array(
 			'name'  => 'cac:Party',
 			'value' => array_filter( array(
@@ -37,11 +35,9 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	}
 
 	/**
-	 * Returns the endpoint ID for the supplier.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_endpoint_id(): ?array {
+     * Returns the endpoint ID for the supplier.
+     */
+    public function get_party_endpoint_id(): ?array {
 		$endpoint = $this->get_endpoint();
 
 		if ( ! $endpoint ) {
@@ -69,11 +65,9 @@ class AccountingSupplierPartyHandler extends BaseAccountingSupplierPartyHandler 
 	}
 
 	/**
-	 * Returns the seller identifier for VAT category O invoices.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_identification(): ?array {
+     * Returns the seller identifier for VAT category O invoices.
+     */
+    public function get_party_identification(): ?array {
 		if ( ! $this->has_tax_category( 'O' ) ) {
 			return null;
 		}

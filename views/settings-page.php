@@ -1,4 +1,4 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
+<?php defined( 'ABSPATH' ) || exit; ?>
 <?php
 
 if ( ! wp_verify_nonce( $nonce, 'wp_wcpdf_settings_page_nonce' ) ) {
@@ -67,10 +67,10 @@ $excluded_sections = apply_filters( 'wpo_wcpdf_settings_form_excluded_sections',
 	// }
 
 	// special temporary promo
-	include( 'promo.php' );
+	include( __DIR__ . '/promo.php' );
 
 	$preview_states      = isset( $settings_tabs[ $active_tab ]['preview_states'] ) ? $settings_tabs[ $active_tab ]['preview_states'] : 1;
-	$preview_states_lock = $preview_states == 3 ? false : true;
+	$preview_states_lock = $preview_states != 3;
 	?>
 	<div id="wpo-wcpdf-preview-wrapper" class="<?php echo esc_attr( $active_tab ); ?>" data-preview-states="<?php echo esc_attr( $preview_states ); ?>" data-preview-state="closed" data-from-preview-state="" data-preview-states-lock="<?php echo esc_attr( $preview_states_lock ); ?>">
 

@@ -10,14 +10,13 @@ if ( ! class_exists( '\\WPO\\IPS\\EDI\\IdentifierMappings' ) ) :
 class IdentifierMappings {
 
 	/**
-	 * Get identifier mappings by country.
-	 *
-	 * @param string $country Optional country code in ISO 3166-1 alpha-2 format.
-	 * @param string $type    Optional identifier type, e.g. 'vat_number' or 'registration_number'.
-	 * @param string $key     Optional mapping key, e.g. 'eas', 'icd' or 'label'.
-	 * @return array|string
-	 */
-	public static function get( string $country = '', string $type = '', string $key = '' ): array|string {
+     * Get identifier mappings by country.
+     *
+     * @param string $country Optional country code in ISO 3166-1 alpha-2 format.
+     * @param string $type    Optional identifier type, e.g. 'vat_number' or 'registration_number'.
+     * @param string $key     Optional mapping key, e.g. 'eas', 'icd' or 'label'.
+     */
+    public static function get( string $country = '', string $type = '', string $key = '' ): array|string {
 		static $base_mappings = array();
 
 		$locale = get_locale();
