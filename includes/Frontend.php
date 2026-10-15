@@ -10,7 +10,9 @@ if ( ! class_exists( '\\WPO\\IPS\\Frontend' ) ) :
 class Frontend {
 
 	protected static ?self $_instance = null;
+
 	private bool $checkout_field_rest_cleanup = false;
+	private array $checkout_fields_rendered   = array();
 
 	/**
 	 * Get the singleton instance of this class.
@@ -59,7 +61,8 @@ class Frontend {
 		if ( wpo_ips_is_checkout_request() && \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
 			// Classic checkout hooks
 			add_filter( 'woocommerce_checkout_fields', array( $this, 'checkout_field_register_classic_checkout_field' ), 10, 1 );
-			add_action( 'woocommerce_before_order_notes', array( $this, 'checkout_field_render_classic_checkout_field' ) );
+			add_filter( 'woocommerce_form_field', array( $this, 'checkout_field_track_classic_checkout_field_rendered' ), 9999, 4 );
+			add_action( 'woocommerce_after_order_notes', array( $this, 'checkout_field_render_classic_checkout_field' ) );
 			add_filter( 'woocommerce_checkout_get_value', array( $this, 'checkout_field_set_classic_checkout_field_value' ), 10, 2 );
 			add_action( 'woocommerce_after_checkout_validation', array( $this, 'checkout_field_validate_classic_checkout_field_value' ), 10, 2 );
 			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'checkout_field_save_classic_checkout_field' ), 10, 2 );
@@ -703,28 +706,49 @@ class Frontend {
 	}
 
 	/**
-	 * Render optional Classic Checkout fields when WooCommerce skips the order field group.
+	 * Track Classic Checkout fields rendered by WooCommerce.
+	 *
+	 * @param mixed  $html  Field HTML.
+	 * @param string $key   Field key.
+	 * @param array  $args  Field arguments.
+	 * @param mixed  $value Field value.
+	 * @return mixed
+	 */
+	public function checkout_field_track_classic_checkout_field_rendered( $html, string $key, array $args, $value ) {
+		$field_types = \WPO_WCPDF()->get_instance( 'checkout_field' )->get_field_types();
+
+		if ( isset( $field_types[ $key ] ) && is_string( $html ) && '' !== trim( $html ) ) {
+			$this->checkout_fields_rendered[ $key ] = true;
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Render Classic Checkout fields not already rendered by WooCommerce.
 	 *
 	 * @param \WC_Checkout $checkout
 	 * @return void
 	 */
 	public function checkout_field_render_classic_checkout_field( \WC_Checkout $checkout ): void {
-		if ( apply_filters( 'woocommerce_enable_order_notes_field', 'yes' === get_option( 'woocommerce_enable_order_comments', 'yes' ) ) ) {
-			return;
-		}
-
 		$checkout_field = \WPO_WCPDF()->get_instance( 'checkout_field' );
+
 		if ( ! $checkout_field->is_enabled() ) {
 			return;
 		}
 
 		$field_types = $checkout_field->get_field_types();
 
-		// Reuse the filtered fields so customizations and field priority are preserved.
 		foreach ( $checkout->get_checkout_fields( 'order' ) as $key => $field ) {
-			if ( isset( $field_types[ $key ] ) && $checkout_field->is_enabled( $field_types[ $key ] ) ) {
-				woocommerce_form_field( $key, $field, $checkout->get_value( $key ) );
+			if (
+				! isset( $field_types[ $key ] ) ||
+				! $checkout_field->is_enabled( $field_types[ $key ] ) ||
+				! empty( $this->checkout_fields_rendered[ $key ] )
+			) {
+				continue;
 			}
+
+			woocommerce_form_field( $key, $field, $checkout->get_value( $key ) );
 		}
 	}
 

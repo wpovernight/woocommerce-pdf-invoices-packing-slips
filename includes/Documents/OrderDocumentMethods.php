@@ -119,7 +119,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$address = __( 'N/A', 'woocommerce-pdf-invoices-packing-slips' );
 		}
 
-		$address = apply_filters( 'wpo_wcpdf_billing_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		$address = apply_filters( 'wpo_wcpdf_billing_address', $address, $this );
 
 		if ( is_null( $address ) ) {
 			$address = '';
@@ -137,7 +137,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return void
 	 */
 	public function billing_address(): void {
-		echo wp_kses_post( $this->get_billing_address() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_billing_address(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -281,7 +281,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 		}
 
-		$address = apply_filters( 'wpo_wcpdf_shipping_address', wpo_wcpdf_sanitize_html_content( $address, 'address' ), $this );
+		$address = apply_filters( 'wpo_wcpdf_shipping_address', $address, $this );
 
 		if ( is_null( $address ) ) {
 			$address = '';
@@ -299,7 +299,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return void
 	 */
 	public function shipping_address(): void {
-		echo wp_kses_post( $this->get_shipping_address() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shipping_address(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -1282,7 +1282,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function order_subtotal( string $tax = 'excl', string $discount = 'incl' ): void {
 		$subtotal = $this->get_order_subtotal( $tax, $discount );
-		echo esc_html( $subtotal['value'] );
+		echo wpo_ips_kses_price( $subtotal['value'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_ips_kses_price()
 	}
 
 	/**
@@ -1295,7 +1295,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		$shipping_cost = $this->order->get_shipping_total();
 		$shipping_tax  = $this->order->get_shipping_tax();
 
-		if ($tax == 'excl' ) {
+		if ( 'excl' === $tax ) {
 			$formatted_shipping_cost = $this->format_price( $shipping_cost );
 		} else {
 			$formatted_shipping_cost = $this->format_price( $shipping_cost + $shipping_tax );
@@ -1323,7 +1323,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function order_shipping( string $tax = 'excl' ): void {
 		$shipping = $this->get_order_shipping( $tax );
-		echo esc_html( $shipping['value'] );
+		echo wpo_ips_kses_price( $shipping['value'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_ips_kses_price()
 	}
 
 	/**
@@ -1380,7 +1380,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	public function order_discount( string $type = 'total', string $tax = 'incl' ): void {
 		$discount = $this->get_order_discount( $type, $tax );
 		if ( $discount ) {
-			echo esc_html( $discount['value'] );
+			echo wpo_ips_kses_price( $discount['value'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_ips_kses_price()
 		}
 	}
 
@@ -1484,7 +1484,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 */
 	public function order_grand_total( string $tax = 'incl' ): void {
 		$grand_total = $this->get_order_grand_total( $tax );
-		echo esc_html( $grand_total['value'] );
+		echo wpo_ips_kses_price( $grand_total['value'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_ips_kses_price()
 	}
 
 	/**
@@ -1530,13 +1530,14 @@ abstract class OrderDocumentMethods extends OrderDocument {
 
 	/**
 	 * Wrapper for wc_price, ensuring currency is always passed
-	 * 
+	 *
 	 * @param float $price
 	 * @param array $args
 	 * @return string
 	 */
 	public function format_price( float $price, array $args = array() ): string {
 		$args['currency'] = $this->order->get_currency();
+
 		return wc_price( $price, $args );
 	}
 
