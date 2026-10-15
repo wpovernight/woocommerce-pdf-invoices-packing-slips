@@ -1325,7 +1325,6 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function set_date( mixed $value, ?\WC_Abstract_Order $order = null ): void {
-		$order = empty( $order ) ? $this->order : $order;
 		try {
 			if ( empty( $value ) ) {
 				$this->data['date'] = null;
@@ -1408,8 +1407,6 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function set_notes( mixed $value, ?\WC_Abstract_Order $order = null ): void {
-		$order = empty( $order ) ? $this->order : $order;
-
 		try {
 			if ( empty( $value ) ) {
 				$this->data['notes'] = null;
@@ -1432,8 +1429,6 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function set_display_date( mixed $value, ?\WC_Abstract_Order $order = null ): void {
-		$order = empty( $order ) ? $this->order : $order;
-
 		try {
 			if ( empty( $value ) ) {
 				$this->data['display_date'] = null;
