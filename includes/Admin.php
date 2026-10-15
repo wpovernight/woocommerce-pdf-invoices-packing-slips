@@ -1621,7 +1621,7 @@ class Admin {
 	public static function user_can_manage_document( string $document_type ): bool {
 		return (bool) apply_filters(
 			'wpo_wcpdf_current_user_is_allowed',
-			( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_shop_orders' ) ),
+			( current_user_can( 'manage_woocommerce_orders' ) || current_user_can( 'edit_others_shop_orders' ) ),
 			$document_type
 		);
 	}
