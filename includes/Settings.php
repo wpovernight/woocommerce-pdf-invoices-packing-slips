@@ -718,7 +718,7 @@ class Settings {
 	public function get_template_group( string $template_id ): string {
 		$group = dirname( $template_id );
 
-		if ( false !== strpos( $group, 'extension::' ) ) {
+		if ( str_contains( $group, 'extension::' ) ) {
 			return 'extension';
 		}
 
@@ -782,7 +782,7 @@ class Settings {
 	 */
 	public function is_known_template_file( string $template_file ): bool {
 		$known = apply_filters(
-			'wpo_ips_known_template_paths',
+			'wpo_ips_unescaped_markup_template_paths',
 			array( WPO_WCPDF()->plugin_path() . '/templates/' )
 		);
 
