@@ -14,11 +14,9 @@ class ThirdPartyPlugins {
 	protected static ?self $_instance = null;
 
 	/**
-	 * Singleton instance
-	 *
-	 * @return self
-	 */
-	public static function instance(): self {
+     * Singleton instance
+     */
+    public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -155,20 +153,16 @@ class ThirdPartyPlugins {
 		foreach ( $custom_statuses as $status_slug => $status_name ) {
 			$emails[ $status_slug . '_email' ] = $status_name;
 		}
-		
+
 		return $emails;
 	}
 
 
 	/**
-	 * Aelia Currency Switcher compatibility
-	 * Applies decimal & Thousand separator settings
-	 * 
-	 * @param string $document_type
-	 * @param OrderDocument $document
-	 * @return void
-	 */
-	public function aelia_currency_formatting( string $document_type, OrderDocument $document ): void {
+     * Aelia Currency Switcher compatibility
+     * Applies decimal & Thousand separator settings
+     */
+    public function aelia_currency_formatting( string $document_type, OrderDocument $document ): void {
 		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
 	}
 
@@ -184,42 +178,30 @@ class ThirdPartyPlugins {
 			$args['decimal_separator']  = $cs_settings->get_currency_decimal_separator( $args['currency'] );
 			$args['thousand_separator'] = $cs_settings->get_currency_thousand_separator( $args['currency'] );
 		}
-		
+
 		return $args;
 	}
 
 	/**
-	 * Avoid double images from German Market
-	 * 
-	 * @param string $document_type
-	 * @param OrderDocument $document
-	 * @return void
-	 */
-	public function remove_wgm_thumbnails( string $document_type, OrderDocument $document ): void {
+     * Avoid double images from German Market
+     */
+    public function remove_wgm_thumbnails( string $document_type, OrderDocument $document ): void {
 		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 	}
 
 	/**
-	 * Restore above filter after document generation
-	 * 
-	 * @param string $document_type
-	 * @param OrderDocument $document
-	 * @return void
-	 */
-	public function restore_wgm_thumbnails( string $document_type, OrderDocument $document ): void {
+     * Restore above filter after document generation
+     */
+    public function restore_wgm_thumbnails( string $document_type, OrderDocument $document ): void {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
 	}
-	
+
 	/**
-	 * Filter callback to add Dokan vendor data as seller/supplier data for CII and UBL documents.
-	 *
-	 * @param array  $data
-	 * @param object $handler
-	 * @return array
-	 */
-	public function edi_dokan_vendor_data( array $data, object $handler ): array {
+     * Filter callback to add Dokan vendor data as seller/supplier data for CII and UBL documents.
+     */
+    public function edi_dokan_vendor_data( array $data, object $handler ): array {
 		// Dokan not active, bail out.
 		if ( ! function_exists( 'dokan_get_seller_id_by_order' ) || ! function_exists( 'dokan_get_store_info' ) || ! function_exists( 'dokan' ) ) {
 			return $data;
@@ -312,13 +294,11 @@ class ThirdPartyPlugins {
 
 		return $data;
 	}
-	
+
 	/**
-	 * Register hooks for WooCommerce Subscriptions compatibility
-	 * 
-	 * @return void
-	 */
-	private function register_subscriptions_hooks(): void {
+     * Register hooks for WooCommerce Subscriptions compatibility
+     */
+    private function register_subscriptions_hooks(): void {
 		if ( ! class_exists( 'WC_Subscriptions' ) ) {
 			return;
 		}
@@ -333,13 +313,11 @@ class ThirdPartyPlugins {
 			add_filter( 'wc_subscriptions_resubscribe_order_data', array( $this, 'wcs_renewal_order_meta' ), 10, 3 );
 		}
 	}
-	
+
 	/**
-	 * Register hooks to add CSS classes to item rows for compatibility with product bundles, chained products and composite products
-	 *
-	 * @return void
-	 */
-	private function register_item_row_class_hooks(): void {
+     * Register hooks to add CSS classes to item rows for compatibility with product bundles, chained products and composite products
+     */
+    private function register_item_row_class_hooks(): void {
 		$has_wc_bundles         = class_exists( 'WC_Bundles' );
 		$has_wpc_bundles        = class_exists( 'WPCleverWoosb' );
 		$has_yith_bundles       = class_exists( 'YITH_WCPB' ) || class_exists( 'YITH_WCPB_Frontend' );
@@ -374,11 +352,11 @@ class ThirdPartyPlugins {
 				}
 
 				if ( $has_wc_bundles ) {
-					$classes = $this->maybe_add_wc_bundles_classes( $classes, $order, $item_id );
+					$classes = $this->maybe_add_wc_bundles_classes( $classes, $item_id );
 				}
 
 				if ( $has_wpc_bundles ) {
-					$classes = $this->maybe_add_wpc_bundles_classes( $classes, $order, $item_id );
+					$classes = $this->maybe_add_wpc_bundles_classes( $classes, $item_id );
 				}
 
 				if ( $has_yith_bundles ) {
@@ -386,11 +364,11 @@ class ThirdPartyPlugins {
 				}
 
 				if ( $has_chained_products ) {
-					$classes = $this->maybe_add_chained_product_class( $classes, $order, $item_id );
+					$classes = $this->maybe_add_chained_product_class( $classes, $item_id );
 				}
 
 				if ( $has_composite_products ) {
-					$classes = $this->maybe_add_composite_product_class( $classes, $order, $item_id );
+					return $this->maybe_add_composite_product_class( $classes, $order, $item_id );
 				}
 
 				return $classes;
@@ -399,39 +377,33 @@ class ThirdPartyPlugins {
 			4
 		);
 	}
-	
+
 	/**
-	 * Register hooks for WooCommerce Order Status & Actions Manager compatibility
-	 * 
-	 * @return void
-	 */
-	private function register_order_status_hooks(): void {
+     * Register hooks for WooCommerce Order Status & Actions Manager compatibility
+     */
+    private function register_order_status_hooks(): void {
 		if ( ! class_exists( 'WC_Custom_Status' ) ) {
 			return;
 		}
 
 		add_filter( 'wpo_wcpdf_wc_emails', array( $this, 'wc_order_status_actions_emails' ), 10, 1 );
 	}
-	
+
 	/**
-	 * Register hooks for Aelia Currency Switcher compatibility
-	 * 
-	 * @return void
-	 */
-	private function register_aelia_hooks(): void {
+     * Register hooks for Aelia Currency Switcher compatibility
+     */
+    private function register_aelia_hooks(): void {
 		if ( empty( $GLOBALS['woocommerce-aelia-currencyswitcher'] ) ) {
 			return;
 		}
 
 		add_action( 'wpo_wcpdf_before_html', array( $this, 'aelia_currency_formatting' ), 10, 2 );
 	}
-	
+
 	/**
-	 * Register hooks for German Market compatibility
-	 * 
-	 * @return void
-	 */
-	private function register_german_market_hooks(): void {
+     * Register hooks for German Market compatibility
+     */
+    private function register_german_market_hooks(): void {
 		if ( ! class_exists( 'WGM_Product' ) ) {
 			return;
 		}
@@ -439,13 +411,11 @@ class ThirdPartyPlugins {
 		add_action( 'wpo_wcpdf_before_html', array( $this, 'remove_wgm_thumbnails' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_html', array( $this, 'restore_wgm_thumbnails' ), 10, 2 );
 	}
-	
+
 	/**
-	 * Register hooks for Dokan compatibility
-	 * 
-	 * @return void
-	 */
-	private function register_dokan_hooks(): void {
+     * Register hooks for Dokan compatibility
+     */
+    private function register_dokan_hooks(): void {
 		if (
 			! function_exists( 'dokan_get_seller_id_by_order' ) ||
 			! function_exists( 'dokan_get_store_info' )         ||
@@ -458,46 +428,34 @@ class ThirdPartyPlugins {
 
 		add_filter( 'wpo_ips_edi_cii_seller_data', array( $this, 'edi_dokan_vendor_data' ), 10, 2 );
 	}
-	
+
 	/**
-	 * WooCommerce Product Bundles
-	 * 
-	 * @param string             $classes
-	 * @param \WC_Abstract_Order $order
-	 * @param int                $item_id
-	 * @return string
-	 */
-	private function maybe_add_wc_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+     * WooCommerce Product Bundles
+     */
+    private function maybe_add_wc_bundles_classes( string $classes, int $item_id ): string {
 		$bundled_by    = wc_get_order_item_meta( $item_id, '_bundled_by', true );
 		$bundled_items = wc_get_order_item_meta( $item_id, '_bundled_items', true );
-
-		if ( $bundled_by ) {
-			$classes = $classes . ' bundled-item';
-			$hidden  = wc_get_order_item_meta( $item_id, '_bundled_item_hidden', true );
-
-			// check bundled item visibility
-			if ( $hidden ) {
-				$classes = $classes . ' hidden';
+        if ($bundled_by) {
+            $classes .= ' bundled-item';
+            $hidden  = wc_get_order_item_meta( $item_id, '_bundled_item_hidden', true );
+            // check bundled item visibility
+            if ( $hidden ) {
+				return $classes . ' hidden';
 			}
+            return $classes;
+        }
 
-			return $classes;
-			
-		} elseif ( $bundled_items ) {
-			return  $classes . ' product-bundle';
-		}
+		if ($bundled_items) {
+            return  $classes . ' product-bundle';
+        }
 
 		return $classes;
 	}
 
 	/**
-	 * WPC Product Bundles
-	 * 
-	 * @param string             $classes
-	 * @param \WC_Abstract_Order $order
-	 * @param int                $item_id
-	 * @return string
-	 */
-	private function maybe_add_wpc_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+     * WPC Product Bundles
+     */
+    private function maybe_add_wpc_bundles_classes( string $classes, int $item_id ): string {
 		// Add row classes
 		$refunded_item_id = wc_get_order_item_meta( $item_id, '_refunded_item_id', true );
 		$class_item_id    = ! empty( $refunded_item_id ) ? $refunded_item_id : $item_id;
@@ -505,23 +463,18 @@ class ThirdPartyPlugins {
 		$bundled_items    = wc_get_order_item_meta( $class_item_id, '_woosb_ids', true );
 
 		if ( $bundled_by ) {
-			$classes = $classes . ' bundled-item';
+			$classes .= ' bundled-item';
 		} elseif ( $bundled_items ) {
-			$classes = $classes . ' product-bundle';
+			$classes .= ' product-bundle';
 		}
 
 		return $classes;
 	}
 
 	/**
-	 * YITH WooCommerce Product Bundles compatibility
-	 *
-	 * @param string             $classes
-	 * @param \WC_Abstract_Order $order
-	 * @param int                $item_id
-	 * @return string
-	 */
-	private function maybe_add_yith_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+     * YITH WooCommerce Product Bundles compatibility
+     */
+    private function maybe_add_yith_bundles_classes( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
 		$product    = null;
 		$bundled_by = null;
 
@@ -547,14 +500,9 @@ class ThirdPartyPlugins {
 	}
 
 	/**
-	 * WooCommerce Chained Products
-	 * 
-	 * @param string             $classes
-	 * @param \WC_Abstract_Order $order
-	 * @param int                $item_id
-	 * @return string
-	 */
-	private function maybe_add_chained_product_class( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+     * WooCommerce Chained Products
+     */
+    private function maybe_add_chained_product_class( string $classes, int $item_id ): string {
 		$chained_product_of = wc_get_order_item_meta( $item_id, '_chained_product_of', true );
 
 		if ( $chained_product_of ) {
@@ -565,14 +513,9 @@ class ThirdPartyPlugins {
 	}
 
 	/**
-	 * WooCommerce Composite Products
-	 * 
-	 * @param string             $classes
-	 * @param \WC_Abstract_Order $order
-	 * @param int                $item_id
-	 * @return string
-	 */
-	private function maybe_add_composite_product_class( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+     * WooCommerce Composite Products
+     */
+    private function maybe_add_composite_product_class( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
 		// get order item object
 		$order_items = $order->get_items();
 		foreach ( $order_items as $order_item_id => $order_item ) {
@@ -588,7 +531,7 @@ class ThirdPartyPlugins {
 
 		return $classes;
 	}
-	
+
 	/**
 	 * Reset invoice data for a given order.
 	 *
@@ -608,7 +551,7 @@ class ThirdPartyPlugins {
 
 		$order->save_meta_data();
 	}
-	
+
 	/**
 	 * Backwards compatibility helper function: try to get item ID from row class
 	 * 
@@ -627,11 +570,10 @@ class ThirdPartyPlugins {
 		// if still empty, we lost the item id somewhere :(
 		if ( empty( $item_id ) ) {
 			return false;
-		} else {
-			return $item_id;
 		}
+        return $item_id;
 	}
-	
+
 }
 
 

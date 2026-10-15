@@ -11,13 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPartyInterface {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$accounting_customer_party = array(
 			'name'  => 'cac:AccountingCustomerParty',
 			'value' => array(
@@ -31,11 +30,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	}
 
 	/**
-	 * Returns the customer party details for the UBL document.
-	 *
-	 * @return array
-	 */
-	public function get_party(): array {
+     * Returns the customer party details for the UBL document.
+     */
+    public function get_party(): array {
 		$customer_party = array(
 			'name'  => 'cac:Party',
 			'value' => array_filter( array(
@@ -55,11 +52,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	}
 	
 	/**
-	 * Returns the party name for the customer.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_name(): ?array {
+     * Returns the party name for the customer.
+     */
+    public function get_party_name(): ?array {
 		$order               = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$customer_party_name = $order->get_formatted_billing_full_name();
 		$billing_company     = $order->get_billing_company();
@@ -91,11 +86,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	}
 	
 	/**
-	 * Returns the party postal address for the customer.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_postal_address(): ?array {
+     * Returns the party postal address for the customer.
+     */
+    public function get_party_postal_address(): ?array {
 		$order       = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$address_1   = wpo_ips_edi_sanitize_string( $order->get_billing_address_1() );
 		$address_2   = wpo_ips_edi_sanitize_string( $order->get_billing_address_2() );
@@ -148,11 +141,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	}
 	
 	/**
-	 * Returns the party tax scheme for the customer.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_tax_scheme(): ?array {
+     * Returns the party tax scheme for the customer.
+     */
+    public function get_party_tax_scheme(): ?array {
 		if ( $this->has_tax_category( 'O' ) ) {
 			return null;
 		}
@@ -207,11 +198,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	}
 	
 	/**
-	 * Returns the party legal entity for the customer.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_legal_entity(): ?array {
+     * Returns the party legal entity for the customer.
+     */
+    public function get_party_legal_entity(): ?array {
 		$order               = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$billing_company     = $order->get_billing_company();
 		$billing_name        = $order->get_formatted_billing_full_name();
@@ -274,11 +263,9 @@ class AccountingCustomerPartyHandler extends AbstractUblHandler implements UblPa
 	}
 	
 	/**
-	 * Returns the party contact information for the customer.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_contact(): ?array {
+     * Returns the party contact information for the customer.
+     */
+    public function get_party_contact(): ?array {
 		$order = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$name  = wpo_ips_edi_sanitize_string( $order->get_formatted_billing_full_name() );
 		$email = sanitize_email( $order->get_billing_email() );

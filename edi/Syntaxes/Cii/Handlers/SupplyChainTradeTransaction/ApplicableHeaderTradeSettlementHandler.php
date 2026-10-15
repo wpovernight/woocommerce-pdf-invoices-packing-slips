@@ -11,13 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$applicable_header_trade_settlement = array(
 			'name'  => 'ram:ApplicableHeaderTradeSettlement',
 			'value' => array_filter( array(
@@ -35,11 +34,9 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	}
 
 	/**
-	 * Get the payment reference for the order.
-	 *
-	 * @return array|null
-	 */
-	public function get_payment_reference(): ?array {
+     * Get the payment reference for the order.
+     */
+    public function get_payment_reference(): ?array {
 		$order     = $this->document->order;
 		$reference = $order->get_order_number(); // Default to WooCommerce order number
 		$reference = apply_filters( 'wpo_ips_edi_cii_payment_reference', $reference, $order, $this );
@@ -72,11 +69,9 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	}
 
 	/**
-	 * Get the payment means data for the order.
-	 *
-	 * @return array|null
-	 */
-	public function get_payment_means(): ?array {
+     * Get the payment means data for the order.
+     */
+    public function get_payment_means(): ?array {
 		$payment = $this->get_payment_means_data();
 
 		// If no usable payment data, exit early
@@ -152,11 +147,9 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	}
 
 	/**
-	 * Get the trade tax data for the order.
-	 *
-	 * @return array|null
-	 */
-	public function get_trade_tax(): ?array {
+     * Get the trade tax data for the order.
+     */
+    public function get_trade_tax(): ?array {
 		$tax_reasons      = EN16931::get_vatex();
 		$grouped_tax_data = $this->get_grouped_order_tax_data();
 		$trade_tax        = array();
@@ -233,7 +226,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			);
 		}
 
-		if ( empty( $trade_tax ) ) {
+		if ( $trade_tax === [] ) {
 			return null;
 		}
 
@@ -249,11 +242,9 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	}
 
 	/**
-	 * Get the payment terms for the order.
-	 *
-	 * @return array|null
-	 */
-	public function get_payment_terms(): ?array {
+     * Get the payment terms for the order.
+     */
+    public function get_payment_terms(): ?array {
 		$due_date_timestamp = is_callable( array( $this->document->order_document, 'get_due_date' ) )
 			? $this->document->order_document->get_due_date()
 			: 0;
@@ -301,11 +292,9 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	}
 
 	/**
-	 * Get the monetary summation for the order.
-	 *
-	 * @return array|null
-	 */
-	public function get_monetary_summation(): ?array {
+     * Get the monetary summation for the order.
+     */
+    public function get_monetary_summation(): ?array {
 		$totals   = $this->get_order_payment_totals( $this->document->order );
 		$currency = $this->document->order->get_currency();
 

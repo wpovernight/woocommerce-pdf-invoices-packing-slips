@@ -198,7 +198,7 @@ class NumberStoreListTable extends \WP_List_Table {
 	public function get_numbers() {
 		$request                 = stripslashes_deep( $_GET ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$debug_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'debug' );
-		
+
 		extract( $debug_settings_instance->filter_fetch_request_data( $request ) );
 
 		$document_type                  = $debug_settings_instance->get_document_type_from_store_table_name( $table_name );
@@ -247,16 +247,16 @@ class NumberStoreListTable extends \WP_List_Table {
 						// Credit Notes store the number under the refund order
 						} elseif ( 'credit-note' === $doc_type ) {
 							$refund_order = wc_get_order( $order_id );
-							
+
 							if ( ! $refund_order instanceof \WC_Order_Refund ) {
 								continue;
 							}
-							
+
 							$refund_doc = wcpdf_get_document( $doc_type, $refund_order );
-								
+
 							if ( $refund_doc->exists() ) {
 								$refund_number_data = $refund_doc->get_number();
-								
+
 								if ( ! empty( $refund_number_data ) && isset( $refund_number_data->number ) && (int) $refund_number_data->number === (int) ( $result['id'] ?? 0 ) ) {
 									$document_types[] = $doc_type;
 								}
@@ -317,9 +317,8 @@ class NumberStoreListTable extends \WP_List_Table {
 	public function get_base_order( $order ) {
 		if ( is_callable( array( $order, 'get_type' ) ) && 'shop_order_refund' === $order->get_type() ) {
 			return wc_get_order( $order->get_parent_id() );
-		} else {
-			return $order;
 		}
+        return $order;
 	}
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Syntaxes\Ubl\Abstracts;
 
 use WPO\IPS\EDI\Interfaces\FormatInterface;
@@ -13,45 +15,33 @@ abstract class AbstractUblFormat implements FormatInterface {
 	public string $syntax = 'ubl';
 	
 	/**
-	 * Get the type code
-	 *
-	 * @return string
-	 */
-	abstract public function get_type_code(): string;
+     * Get the type code
+     */
+    abstract public function get_type_code(): string;
 	
 	/**
-	 * Get the quantity role
-	 *
-	 * @return string
-	 */
-	abstract public function get_quantity_role(): string;
+     * Get the quantity role
+     */
+    abstract public function get_quantity_role(): string;
 
 	/**
-	 * Get the format root element
-	 *
-	 * @return string
-	 */
-	abstract public function get_root_element(): string;
+     * Get the format root element
+     */
+    abstract public function get_root_element(): string;
 	
 	/**
-	 * Get the format additional attributes
-	 *
-	 * @return array
-	 */
-	abstract public function get_additional_attributes(): array;
+     * Get the format additional attributes
+     */
+    abstract public function get_additional_attributes(): array;
 
 	/**
-	 * Get the format namespaces
-	 *
-	 * @return array
-	 */
-	abstract public function get_namespaces(): array;
+     * Get the format namespaces
+     */
+    abstract public function get_namespaces(): array;
 	
 	/**
-	 * Get the format structure
-	 *
-	 * @return array
-	 */
-	abstract public function get_structure(): array;
+     * Get the format structure
+     */
+    abstract public function get_structure(): array;
 
 }

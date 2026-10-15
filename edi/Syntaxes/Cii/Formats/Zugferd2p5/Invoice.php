@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd2p5;
 
 use WPO\IPS\EDI\Syntaxes\Cii\Formats\FacturX1p0\Invoice as FacturXInvoice;

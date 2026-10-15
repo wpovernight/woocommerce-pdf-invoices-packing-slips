@@ -1,4 +1,4 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
+<?php defined( 'ABSPATH' ) || exit; ?>
 <div class="wpo-step-description wpo-final">
 	<h1><?php esc_html_e( 'You are good to go!' , 'woocommerce-pdf-invoices-packing-slips' ); ?></h1>
 	<p><?php esc_html_e( 'If you have any questions please have a look at our documentation:', 'woocommerce-pdf-invoices-packing-slips' ); ?><br>

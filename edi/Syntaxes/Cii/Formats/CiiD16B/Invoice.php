@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Syntaxes\Cii\Formats\CiiD16B;
 
 use WPO\IPS\EDI\Syntaxes\Cii\Abstracts\AbstractCiiFormat;
@@ -15,47 +17,37 @@ class Invoice extends AbstractCiiFormat {
 	public string $name = 'CII Invoice D16B';
 	
 	/**
-	 * Get the context
-	 *
-	 * @return string
-	 */
-	public function get_context(): string {
+     * Get the context
+     */
+    public function get_context(): string {
 		return 'urn:cen.eu:en16931:2017';
 	}
 	
 	/**
-	 * Get the type code
-	 *
-	 * @return string
-	 */
-	public function get_type_code(): string {
+     * Get the type code
+     */
+    public function get_type_code(): string {
 		return '380';
 	}
 
 	/**
-	 * Get the root element
-	 *
-	 * @return string
-	 */
-	public function get_root_element(): string {
+     * Get the root element
+     */
+    public function get_root_element(): string {
 		return 'rsm:CrossIndustryInvoice';
 	}
 	
 	/**
-	 * Get the additional attributes
-	 *
-	 * @return array
-	 */
-	public function get_additional_attributes(): array {
+     * Get the additional attributes
+     */
+    public function get_additional_attributes(): array {
 		return array();
 	}
 	
 	/**
-	 * Get the namespaces
-	 *
-	 * @return array
-	 */
-	public function get_namespaces(): array {
+     * Get the namespaces
+     */
+    public function get_namespaces(): array {
 		return array(
 			'rsm' => 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
 			'qdt' => 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
@@ -65,11 +57,9 @@ class Invoice extends AbstractCiiFormat {
 	}
 	
 	/**
-	 * Get the structure
-	 *
-	 * @return array
-	 */
-	public function get_structure(): array {
+     * Get the structure
+     */
+    public function get_structure(): array {
 		return array(
 			// Exchanged Document Context
 			'exchanged_document_context' => array(

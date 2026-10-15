@@ -12,13 +12,11 @@ if ( ! class_exists( '\\WPO\\IPS\\Assets' ) ) :
 class Assets {
 
 	protected static ?self $_instance = null;
-	
+
 	/**
-	 * Singleton instance accessor.
-	 *
-	 * @return self
-	 */
-	public static function instance(): self {
+     * Singleton instance accessor.
+     */
+    public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -34,12 +32,9 @@ class Assets {
 	}
 
 	/**
-	 * Load styles & scripts
-	 * 
-	 * @param string $hook
-	 * @return void
-	 */
-	public function backend_scripts_styles( string $hook ): void {
+     * Load styles & scripts
+     */
+    public function backend_scripts_styles( string $hook ): void {
 		$suffix        = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$pdfjs_version = '4.3.136';
 
@@ -307,7 +302,7 @@ class Assets {
 						'forbidden'                       => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ),
 						'confirm_plugin_report_sensitive' => __( 'The report may contain sensitive data such as license keys and log contents. Are you sure you want to include this information?', 'woocommerce-pdf-invoices-packing-slips' ),
 						'danger_zone'                     => array(
-							'enabled' => isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_danger_zone_tools'] ) ? true : false,
+							'enabled' => isset( WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_danger_zone_tools'] ),
 							'message' => sprintf(
 								/* translators: 1. open anchor tag, 2. close anchor tag */
 								__( '<strong>Enabled</strong>: %1$sclick here%2$s to start using the tools.', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -377,12 +372,9 @@ class Assets {
 	}
 
 	/**
-	 * Build the search index for the current settings tab.
-	 *
-	 * @param string $tab
-	 * @return array
-	 */
-	private function get_settings_search_index( string $tab ): array {
+     * Build the search index for the current settings tab.
+     */
+    private function get_settings_search_index( string $tab ): array {
 		$page = '';
 
 		switch ( $tab ) {
@@ -412,17 +404,13 @@ class Assets {
 	}
 
 	/**
-	 * Adds the `data-manual` attribute to Prism's <script> tag so that Prism
-	 * stays in “manual” mode (i.e. it won't auto-highlight the entire page;
-	 * you will call `Prism.highlightElement()` yourself).
-	 *
-	 * @param string $tag
-	 * @param string $handle
-	 * @param string $src
-	 *
-	 * @return string
-	 */
-	public function edi_prism_add_data_manual_attr( string $tag, string $handle, string $src ): string {
+     * Adds the `data-manual` attribute to Prism's <script> tag so that Prism
+     * stays in “manual” mode (i.e. it won't auto-highlight the entire page;
+     * you will call `Prism.highlightElement()` yourself).
+     *
+     *
+     */
+    public function edi_prism_add_data_manual_attr( string $tag, string $handle, string $src ): string {
 		return ( $handle === 'wpo-ips-edi-prism-core' )
         	? str_replace( '<script ', '<script data-manual ', $tag )
         	: $tag;

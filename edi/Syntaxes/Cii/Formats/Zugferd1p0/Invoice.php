@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Syntaxes\Cii\Formats\Zugferd1p0;
 
 use WPO\IPS\EDI\Interfaces\HybridFormatInterface;

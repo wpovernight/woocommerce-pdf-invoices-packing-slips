@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ExchangedDocumentHandler extends AbstractCiiHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$date_format_code = $this->get_date_format_code();
 		$php_date_format  = $this->get_php_date_format_from_code( $date_format_code );
 		$number_instance  = $this->document->order_document->get_number();

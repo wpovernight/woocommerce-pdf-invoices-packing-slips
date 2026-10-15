@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ApplicableHeaderTradeSettlementHandler extends BaseApplicableHeaderTradeSettlementHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$applicable_header_trade_settlement = array(
 			'name'  => 'ram:ApplicableHeaderTradeSettlement',
 			'value' => array_filter( array(
@@ -35,11 +34,9 @@ class ApplicableHeaderTradeSettlementHandler extends BaseApplicableHeaderTradeSe
 	}
 	
 	/**
-	 * Get the invoice currency code.
-	 *
-	 * @return array|null
-	 */
-	public function get_invoice_currency_code(): ?array {
+     * Get the invoice currency code.
+     */
+    public function get_invoice_currency_code(): ?array {
 		$currency              = $this->document->order->get_currency();
 		$invoice_currency_code = array(
 			'name'  => 'ram:InvoiceCurrencyCode',

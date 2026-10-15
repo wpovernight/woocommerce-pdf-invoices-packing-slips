@@ -14,11 +14,9 @@ class SetupWizard {
 	protected static ?self $_instance = null;
 
 	/**
-	 * Singleton instance accessor.
-	 *
-	 * @return self
-	 */
-	public static function instance(): self {
+     * Singleton instance accessor.
+     */
+    public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -37,11 +35,9 @@ class SetupWizard {
 	}
 
 	/**
-	 * Add admin menus/screens.
-	 * 
-	 * @return void
-	 */
-	public function admin_menus(): void {
+     * Add admin menus/screens.
+     */
+    public function admin_menus(): void {
 		add_dashboard_page( '', '', 'manage_options', 'wpo-wcpdf-setup', '' );
 	}
 
@@ -136,7 +132,7 @@ class SetupWizard {
 			WPO_WCPDF_VERSION,
 			true
 		);
-		
+
 		wp_localize_script(
 			'wpo-wcpdf-setup',
 			'wpo_wcpdf_setup',
@@ -150,7 +146,7 @@ class SetupWizard {
 				),
 			)
 		);
-		
+
 		$woo_dependencies = array(
 			0 => array(
 				'handle' => version_compare( WC_VERSION, '10.3', '>=' ) ? 'wc-jquery-blockui' : 'jquery-blockui',
@@ -168,7 +164,7 @@ class SetupWizard {
 				),
 			),
 		);
-		
+
 		foreach ( $woo_dependencies as $dep ) {
 			if ( ! wp_script_is( $dep['handle'], 'registered' ) ) {
 				wp_register_script(
@@ -191,7 +187,7 @@ class SetupWizard {
 				true
 			);
 		}
-		
+
 		wp_enqueue_media();
 
 		if ( ! empty( $request['save_step'] ) ) {
@@ -210,11 +206,9 @@ class SetupWizard {
 	}
 
 	/**
-	 * Setup Wizard Header.
-	 * 
-	 * @return void
-	 */
-	public function setup_wizard_header(): void {
+     * Setup Wizard Header.
+     */
+    public function setup_wizard_header(): void {
 		?>
 		<!DOCTYPE html>
 		<html <?php language_attributes(); ?> class="wpo-wizard">
@@ -230,17 +224,15 @@ class SetupWizard {
 			<?php do_action( 'admin_head' ); ?>
 		</head>
 		<body class="wpo-wcpdf-setup wp-core-ui">
-			<?php if( $this->step == 'good-to-go' ) { echo "<div id='confetti'></div>"; } ?>
+			<?php if( $this->step === 'good-to-go' ) { echo "<div id='confetti'></div>"; } ?>
 			<form method="post">
 		<?php
 	}
 
 	/**
-	 * Output the steps.
-	 * 
-	 * @return void
-	 */
-	public function setup_wizard_steps(): void {
+     * Output the steps.
+     */
+    public function setup_wizard_steps(): void {
 		$output_steps = $this->steps;
 		// array_shift( $output_steps );
 		?>
@@ -261,22 +253,18 @@ class SetupWizard {
 	}
 
 	/**
-	 * Output the content for the current step.
-	 * 
-	 * @return void
-	 */
-	public function setup_wizard_content(): void {
+     * Output the content for the current step.
+     */
+    public function setup_wizard_content(): void {
 		echo '<div class="wpo-setup-content">';
 		include( $this->steps[ $this->step ]['view'] );
 		echo '</div>';
 	}
 
 	/**
-	 * Setup Wizard Footer.
-	 * 
-	 * @return void
-	 */
-	public function setup_wizard_footer(): void {
+     * Setup Wizard Footer.
+     */
+    public function setup_wizard_footer(): void {
 		?>
 						<input type="hidden" name="wpo_wcpdf_step" value="<?php echo esc_attr( $this->step ); ?>">
 						<div class="wpo-setup-buttons">
@@ -324,20 +312,17 @@ class SetupWizard {
 		$step_keys        = array_keys( $this->steps );
 		$current_step_pos = array_search( $this->step, $step_keys );
 		$new_step_pos     = $current_step_pos + $delta;
-		
+
 		if ( isset( $step_keys[ $new_step_pos ] ) ) {
 			return $step_keys[ $new_step_pos ];
-		} else {
-			return false;
 		}
+        return false;
 	}
 
 	/**
-	 * Save the current step's data.
-	 * 
-	 * @return void
-	 */
-	public function save_step(): void {
+     * Save the current step's data.
+     */
+    public function save_step(): void {
 		if ( ! WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), '', array( 'response' => 403 ) );
 		}

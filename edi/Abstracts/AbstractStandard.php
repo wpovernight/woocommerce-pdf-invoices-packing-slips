@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Abstracts;
 
 if ( ! defined( 'ABSPATH' ) ) {

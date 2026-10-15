@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class DeliveryHandler extends AbstractUblHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$has_k_category = $this->has_tax_category( 'K' );
 		$delivery_date  = '';
 		$country_code   = '';
@@ -68,7 +67,7 @@ class DeliveryHandler extends AbstractUblHandler {
 			);
 		}
 
-		if ( empty( $delivery_value ) ) {
+		if ( $delivery_value === [] ) {
 			return $data;
 		}
 

@@ -28,11 +28,9 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		protected static ?self $_instance = null;
 
 		/**
-		 * Get the singleton instance.
-		 *
-		 * @return self
-		 */
-		public static function instance(): self {
+         * Get the singleton instance.
+         */
+        public static function instance(): self {
 			if ( is_null( self::$_instance ) ) {
 				self::$_instance = new self();
 			}
@@ -41,20 +39,16 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the supported field types.
-		 *
-		 * @return array
-		 */
-		public function get_types(): array {
+         * Get the supported field types.
+         */
+        public function get_types(): array {
 			return array_keys( $this->get_type_options() );
 		}
 
 		/**
-		 * Get the supported field types with their translated labels.
-		 *
-		 * @return array
-		 */
-		public function get_type_options(): array {
+         * Get the supported field types with their translated labels.
+         */
+        public function get_type_options(): array {
 			return array(
 				self::TYPE_CUSTOM              => __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ),
 				self::TYPE_VAT_NUMBER          => __( 'VAT number', 'woocommerce-pdf-invoices-packing-slips' ),
@@ -63,11 +57,9 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the configured field type.
-		 *
-		 * @return string
-		 */
-		public function get_type(): string {
+         * Get the configured field type.
+         */
+        public function get_type(): string {
 			$general_settings = WPO_WCPDF()
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
@@ -105,21 +97,18 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the shop country used for checkout labels and type selection.
-		 *
-		 * @return string
-		 */
-		public function get_shop_country(): string {
+         * Get the shop country used for checkout labels and type selection.
+         */
+        public function get_shop_country(): string {
 			return \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' )->get_setting( 'shop_address_country' );
 		}
 
 		/**
-		 * Resolve the field type for a billing country.
-		 *
-		 * @param string $country Billing country code.
-		 * @return string
-		 */
-		public function get_checkout_type( string $country ): string {
+         * Resolve the field type for a billing country.
+         *
+         * @param string $country Billing country code.
+         */
+        public function get_checkout_type( string $country ): string {
 			$alternative = $this->get_alternative_type();
 
 			return $alternative && '' !== $country && $country !== $this->get_shop_country()
@@ -128,12 +117,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Map checkout field IDs to their types.
-		 *
-		 * @param bool $block Whether to return Checkout Block IDs.
-		 * @return array
-		 */
-		public function get_field_types( bool $block = false ): array {
+         * Map checkout field IDs to their types.
+         *
+         * @param bool $block Whether to return Checkout Block IDs.
+         */
+        public function get_field_types( bool $block = false ): array {
 			$fields      = array( ( $block ? self::BLOCK_FIELD_ID : self::CLASSIC_FIELD_KEY ) => $this->get_type() );
 			$alternative = $this->get_alternative_type();
 
@@ -145,22 +133,20 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Check whether the configured field has a specific type.
-		 *
-		 * @param string $type Field type.
-		 * @return bool
-		 */
-		public function is_type( string $type ): bool {
+         * Check whether the configured field has a specific type.
+         *
+         * @param string $type Field type.
+         */
+        public function is_type( string $type ): bool {
 			return $this->get_type() === $this->normalize_type( $type );
 		}
 
 		/**
-		 * Get the order meta key for a field type.
-		 *
-		 * @param string $type Field type. Defaults to the configured type.
-		 * @return string
-		 */
-		public function get_order_meta_key( string $type = '' ): string {
+         * Get the order meta key for a field type.
+         *
+         * @param string $type Field type. Defaults to the configured type.
+         */
+        public function get_order_meta_key( string $type = '' ): string {
 			$type = '' !== $type
 				? $this->normalize_type( $type )
 				: $this->get_type();
@@ -169,12 +155,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the user meta key for a field type.
-		 *
-		 * @param string $type Field type. Defaults to the configured type.
-		 * @return string
-		 */
-		public function get_user_meta_key( string $type = '' ): string {
+         * Get the user meta key for a field type.
+         *
+         * @param string $type Field type. Defaults to the configured type.
+         */
+        public function get_user_meta_key( string $type = '' ): string {
 			$type = '' !== $type
 				? $this->normalize_type( $type )
 				: $this->get_type();
@@ -195,24 +180,22 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Check whether the checkout field is displayed for a billing country.
-		 *
-		 * @param string $country Billing country code.
-		 * @return bool
-		 */
-		public function is_allowed_country( string $country ): bool {
+         * Check whether the checkout field is displayed for a billing country.
+         *
+         * @param string $country Billing country code.
+         */
+        public function is_allowed_country( string $country ): bool {
 			$countries = $this->get_countries();
 
-			return empty( $countries ) || in_array( $country, $countries, true );
+			return $countries === [] || in_array( $country, $countries, true );
 		}
 
 		/**
-		 * Get the field label, defaulting to the shop country label.
-		 *
-		 * @param string $type Field type. Defaults to the primary type.
-		 * @return string
-		 */
-		public function get_label( string $type = '' ): string {
+         * Get the field label, defaulting to the shop country label.
+         *
+         * @param string $type Field type. Defaults to the primary type.
+         */
+        public function get_label( string $type = '' ): string {
 			$general_settings = WPO_WCPDF()
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
@@ -233,13 +216,12 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the default label for a field type.
-		 *
-		 * @param string $type    Field type.
-		 * @param string $country Country code in ISO 3166-1 alpha-2 format.
-		 * @return string
-		 */
-		public function get_default_label( string $type = '', string $country = '' ): string {
+         * Get the default label for a field type.
+         *
+         * @param string $type    Field type.
+         * @param string $country Country code in ISO 3166-1 alpha-2 format.
+         */
+        public function get_default_label( string $type = '', string $country = '' ): string {
 			$type = '' !== $type
 				? $this->normalize_type( $type )
 				: $this->get_type();
@@ -264,13 +246,12 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get an order value for a field type.
-		 *
-		 * @param \WC_Abstract_Order $order Order object.
-		 * @param string             $type  Field type.
-		 * @return string|null
-		 */
-		public function get_order_value( \WC_Abstract_Order $order, string $type = '' ): ?string {
+         * Get an order value for a field type.
+         *
+         * @param \WC_Abstract_Order $order Order object.
+         * @param string             $type  Field type.
+         */
+        public function get_order_value( \WC_Abstract_Order $order, string $type = '' ): ?string {
 			$type = '' !== $type
 				? $this->normalize_type( $type )
 				: $this->get_type();
@@ -290,14 +271,13 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Save an order value.
-		 *
-		 * @param \WC_Abstract_Order $order Order object.
-		 * @param string             $value Field value.
-		 * @param string             $type  Field type.
-		 * @return void
-		 */
-		public function save_order_value( \WC_Abstract_Order $order, string $value, string $type = '' ): void {
+         * Save an order value.
+         *
+         * @param \WC_Abstract_Order $order Order object.
+         * @param string             $value Field value.
+         * @param string             $type  Field type.
+         */
+        public function save_order_value( \WC_Abstract_Order $order, string $value, string $type = '' ): void {
 			$type = '' !== $type
 				? $this->normalize_type( $type )
 				: $this->get_type();
@@ -319,13 +299,12 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get a user value for a field type.
-		 *
-		 * @param int    $user_id User ID.
-		 * @param string $type    Field type.
-		 * @return string|null
-		 */
-		public function get_user_value( int $user_id, string $type = '' ): ?string {
+         * Get a user value for a field type.
+         *
+         * @param int    $user_id User ID.
+         * @param string $type    Field type.
+         */
+        public function get_user_value( int $user_id, string $type = '' ): ?string {
 			$type = '' !== $type
 				? $this->normalize_type( $type )
 				: $this->get_type();
@@ -346,14 +325,13 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Save a user value.
-		 *
-		 * @param int    $user_id User ID.
-		 * @param string $value   Field value.
-		 * @param string $type    Field type.
-		 * @return void
-		 */
-		public function save_user_value( int $user_id, string $value, string $type = '' ): void {
+         * Save a user value.
+         *
+         * @param int    $user_id User ID.
+         * @param string $value   Field value.
+         * @param string $type    Field type.
+         */
+        public function save_user_value( int $user_id, string $value, string $type = '' ): void {
 			$type = '' !== $type
 				? $this->normalize_type( $type )
 				: $this->get_type();
@@ -373,12 +351,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Check whether the field should be treated as a VAT number.
-		 *
-		 * @param string $type Field type. Defaults to the primary type.
-		 * @return bool
-		 */
-		public function is_vat_number( string $type = '' ): bool {
+         * Check whether the field should be treated as a VAT number.
+         *
+         * @param string $type Field type. Defaults to the primary type.
+         */
+        public function is_vat_number( string $type = '' ): bool {
 			if ( ( $type ?: $this->get_type() ) !== self::TYPE_VAT_NUMBER ) {
 				return false;
 			}
@@ -389,12 +366,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Check whether the checkout field is enabled.
-		 *
-		 * @param string $type Field type. Empty checks both configured types.
-		 * @return bool
-		 */
-		public function is_enabled( string $type = '' ): bool {
+         * Check whether the checkout field is enabled.
+         *
+         * @param string $type Field type. Empty checks both configured types.
+         */
+        public function is_enabled( string $type = '' ): bool {
 			$general_settings = WPO_WCPDF()
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
@@ -414,11 +390,9 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Check whether the checkout field is enabled in My Account.
-		 *
-		 * @return bool
-		 */
-		public function is_my_account_enabled(): bool {
+         * Check whether the checkout field is enabled in My Account.
+         */
+        public function is_my_account_enabled(): bool {
 			if ( ! $this->is_enabled() ) {
 				return false;
 			}
@@ -451,12 +425,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Normalize a field type.
-		 *
-		 * @param string $type Field type.
-		 * @return string
-		 */
-		private function normalize_type( string $type ): string {
+         * Normalize a field type.
+         *
+         * @param string $type Field type.
+         */
+        private function normalize_type( string $type ): string {
 			$type = sanitize_key( $type );
 
 			return in_array( $type, $this->get_types(), true )
@@ -465,11 +438,9 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the original type of untyped values, independently of the current field.
-		 *
-		 * @return string
-		 */
-		private function get_legacy_type(): string {
+         * Get the original type of untyped values, independently of the current field.
+         */
+        private function get_legacy_type(): string {
 			$type = get_option( 'wpo_ips_checkout_field_legacy_type', false );
 
 			if ( false === $type ) {
@@ -485,13 +456,12 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the legacy order checkout field value.
-		 *
-		 * @param \WC_Abstract_Order $order Order object.
-		 * @param string             $type  Field type.
-		 * @return string|null
-		 */
-		private function get_legacy_order_value( \WC_Abstract_Order $order, string $type ): ?string {
+         * Get the legacy order checkout field value.
+         *
+         * @param \WC_Abstract_Order $order Order object.
+         * @param string             $type  Field type.
+         */
+        private function get_legacy_order_value( \WC_Abstract_Order $order, string $type ): ?string {
 			// Legacy values retain their original type when the checkout setting changes.
 			if ( $type !== $this->get_legacy_type() ) {
 				return null;
@@ -512,13 +482,12 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		}
 
 		/**
-		 * Get the legacy user checkout field value.
-		 *
-		 * @param int    $user_id User ID.
-		 * @param string $type    Field type.
-		 * @return string|null
-		 */
-		private function get_legacy_user_value( int $user_id, string $type ): ?string {
+         * Get the legacy user checkout field value.
+         *
+         * @param int    $user_id User ID.
+         * @param string $type    Field type.
+         */
+        private function get_legacy_user_value( int $user_id, string $type ): ?string {
 			if ( $type !== $this->get_legacy_type() ) {
 				return null;
 			}

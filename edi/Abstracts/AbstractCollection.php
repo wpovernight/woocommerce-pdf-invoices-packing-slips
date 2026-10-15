@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WPO\IPS\EDI\Abstracts;
 
 use Iterator;
@@ -11,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class AbstractCollection implements Iterator {
 
 	private array $items  = array();
-	private int $position = 0;
+	private int $position;
 
 	/**
 	 * Constructor to initialize the collection.
@@ -21,47 +23,37 @@ abstract class AbstractCollection implements Iterator {
 	}
 
 	/**
-	 * Rewind the iterator to the first element.
-	 *
-	 * @return void
-	 */
-	public function rewind(): void {
+     * Rewind the iterator to the first element.
+     */
+    public function rewind(): void {
 		$this->position = 0;
 	}
 
 	/**
-	 * Current element in the collection.
-	 * 
-	 * @return mixed
-	 */
-	public function current(): mixed {
+     * Current element in the collection.
+     */
+    public function current(): mixed {
 		return $this->items[ $this->position ];
 	}
 
 	/**
-	 * Get the current key
-	 *
-	 * @return int
-	 */
-	public function key(): int {
+     * Get the current key
+     */
+    public function key(): int {
 		return $this->position;
 	}
 
 	/**
-	 * Next element in the collection.
-	 * 
-	 * @return void
-	 */
-	public function next(): void {
+     * Next element in the collection.
+     */
+    public function next(): void {
 		++$this->position;
 	}
 
 	/**
-	 * Check if the current position is valid.
-	 *
-	 * @return bool
-	 */
-	public function valid(): bool {
+     * Check if the current position is valid.
+     */
+    public function valid(): bool {
 		return isset( $this->items[ $this->position ] );
 	}
 

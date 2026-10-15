@@ -1,4 +1,4 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
+<?php defined( 'ABSPATH' ) || exit; ?>
 <?php
 $invoice_settings_url = esc_url( add_query_arg( array(
 	'tab' => 'documents',

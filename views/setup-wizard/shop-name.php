@@ -1,4 +1,4 @@
-<?php defined( 'ABSPATH' ) or exit; ?>
+<?php defined( 'ABSPATH' ) || exit; ?>
 <div class="wpo-step-description">
 	<h2><?php esc_html_e( 'Enter your shop name', 'woocommerce-pdf-invoices-packing-slips' ); ?></h2>
 	<p><?php esc_html_e( 'Lets quickly setup your invoice. Please enter the name and address of your shop in the fields on the right.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>
@@ -20,7 +20,7 @@
 	);
 	$countries        = array_merge( array( '' => __( 'Select a country', 'woocommerce-pdf-invoices-packing-slips' ) ), \WC()->countries->get_countries() );
 	$states           = wpo_wcpdf_get_country_states( $current_settings['shop_address_country']['default'] ?? '' );
-	$states_disabled  = empty( $states ) ? 'disabled' : '';
+	$states_disabled  = $states === [] ? 'disabled' : '';
 	?>
 	<input
 		type="text"
@@ -57,7 +57,7 @@
 	</select>
 	<select class="shop-address-state" name="wcpdf_settings[wpo_wcpdf_settings_general][shop_address_state][default]" <?php echo esc_attr( $states_disabled ); ?>>
 		<?php
-			if ( ! empty( $states ) ) {
+			if ( $states !== [] ) {
 				foreach ( $states as $state_code => $state_name ) {
 					printf(
 						'<option value="%s" %s>%s</option>',

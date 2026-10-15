@@ -14,11 +14,9 @@ class Peppol {
 	protected static ?self $_instance = null;
 
 	/**
-	 * Get the singleton instance of this class.
-	 *
-	 * @return self
-	 */
-	public static function instance(): self {
+     * Get the singleton instance of this class.
+     */
+    public static function instance(): self {
 		if ( is_null( self::$_instance ) ) {
 			self::$_instance = new self();
 		}
@@ -62,13 +60,9 @@ class Peppol {
 	}
 
 	/**
-	 * Add EDI Peppol Settings user account menu item
-	 *
-	 * @param array $items
-	 * @param array $endpoints
-	 * @return array
-	 */
-	public function peppol_account_menu_item( array $items, array $endpoints ): array {
+     * Add EDI Peppol Settings user account menu item
+     */
+    public function peppol_account_menu_item( array $items, array $endpoints ): array {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'my_account' ) ) {
 			return $items;
 		}
@@ -82,11 +76,9 @@ class Peppol {
 	}
 
 	/**
-	 * Add EDI Peppol Settings to user account page.
-	 *
-	 * @return void
-	 */
-	public function peppol_settings_account_page(): void {
+     * Add EDI Peppol Settings to user account page.
+     */
+    public function peppol_settings_account_page(): void {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'my_account' ) ) {
 			echo '<p>' . esc_html__( 'Peppol is not available.', 'woocommerce-pdf-invoices-packing-slips' ) . '</p>';
 			return;
@@ -176,11 +168,9 @@ class Peppol {
 	}
 
 	/**
-	 * Save EDI Peppol settings to user profile.
-	 *
-	 * @return void
-	 */
-	public function save_peppol_settings(): void {
+     * Save EDI Peppol settings to user profile.
+     */
+    public function save_peppol_settings(): void {
 		$request_method = isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '';
 		if ( empty( $request_method ) || 'POST' !== $request_method || ! isset( $_POST['save_peppol_settings'] ) ) {
 			return;
@@ -216,11 +206,9 @@ class Peppol {
 	}
 
 	/**
-	 * Display EDI Peppol fields in the Checkout Block.
-	 *
-	 * @return void
-	 */
-	public function peppol_display_checkout_block_fields(): void {
+     * Display EDI Peppol fields in the Checkout Block.
+     */
+    public function peppol_display_checkout_block_fields(): void {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
@@ -265,7 +253,7 @@ class Peppol {
 			},
 		);
 
-		if ( ! empty( $conditional_hidden ) ) {
+		if ( $conditional_hidden !== [] ) {
 			$args['hidden'] = $conditional_hidden;
 		}
 
@@ -296,7 +284,7 @@ class Peppol {
 				},
 			);
 
-			if ( ! empty( $conditional_hidden ) ) {
+			if ( $conditional_hidden !== [] ) {
 				$args['hidden'] = $conditional_hidden;
 			}
 
@@ -305,11 +293,9 @@ class Peppol {
 	}
 
 	/**
-	 * Set default values for EDI Peppol fields in the Checkout Block.
-	 *
-	 * @return void
-	 */
-	public function peppol_set_checkout_block_fields_value(): void {
+     * Set default values for EDI Peppol fields in the Checkout Block.
+     */
+    public function peppol_set_checkout_block_fields_value(): void {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
@@ -332,16 +318,14 @@ class Peppol {
 	}
 
 	/**
-	 * Provide a default value for the Checkout Block additional field
-	 * using the value we store in user meta.
-	 *
-	 * @param null     $value     Current default (usually empty).
-	 * @param string   $group     'billing' | 'shipping' | 'other'. Our field is in the 'order' location, so this will be 'other'.
-	 * @param \WC_Data $wc_object Object for which the default is being requested.
-	 *
-	 * @return string
-	 */
-	public function peppol_prefill_checkout_block_field_from_user_meta( $value, string $group, \WC_Data $wc_object ): string {
+     * Provide a default value for the Checkout Block additional field
+     * using the value we store in user meta.
+     *
+     * @param null     $value     Current default (usually empty).
+     * @param string   $group     'billing' | 'shipping' | 'other'. Our field is in the 'order' location, so this will be 'other'.
+     * @param \WC_Data $wc_object Object for which the default is being requested.
+     */
+    public function peppol_prefill_checkout_block_field_from_user_meta( $value, string $group, \WC_Data $wc_object ): string {
 		if ( 'other' !== $group || ! $wc_object instanceof \WC_Customer ) {
 			return (string) $value;
 		}
@@ -378,15 +362,14 @@ class Peppol {
 	}
 
 	/**
-	 * Save EDI Peppol fields from Checkout Block.
-	 *
-	 * @param string $key Field key.
-	 * @param mixed $value Field value.
-	 * @param string $group Group name.
-	 * @param object $wc_object WC object (e.g. order).
-	 * @return void
-	 */
-	public function peppol_save_checkout_block_fields( string $key, $value, string $group, object $wc_object ): void {
+     * Save EDI Peppol fields from Checkout Block.
+     *
+     * @param string $key Field key.
+     * @param mixed $value Field value.
+     * @param string $group Group name.
+     * @param object $wc_object WC object (e.g. order).
+     */
+    public function peppol_save_checkout_block_fields( string $key, $value, string $group, object $wc_object ): void {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
@@ -419,12 +402,9 @@ class Peppol {
 	}
 
 	/**
-	 * Remove EDI Peppol fields from order meta after checkout.
-	 *
-	 * @param \WC_Abstract_Order $order
-	 * @return void
-	 */
-	public function peppol_remove_order_checkout_block_fields_meta( \WC_Abstract_Order $order ): void {
+     * Remove EDI Peppol fields from order meta after checkout.
+     */
+    public function peppol_remove_order_checkout_block_fields_meta( \WC_Abstract_Order $order ): void {
 		$fields = array(
 			'wpo-ips-edi/peppol-endpoint-id',
 			'wpo-ips-edi/peppol-endpoint-eas',
@@ -554,14 +534,13 @@ class Peppol {
 	}
 
 	/**
-	 * Validate Peppol Endpoint / Legal‑ID pairs after WooCommerce
-	 * has normalised and sanitised all checkout data.
-	 *
-	 * @param mixed $data   All posted checkout fields.
-	 * @param mixed $errors Errors object to add validation errors to.
-	 * @return void
-	 */
-	public function peppol_validate_classic_checkout_field_values( $data, $errors ): void {
+     * Validate Peppol Endpoint / Legal‑ID pairs after WooCommerce
+     * has normalised and sanitised all checkout data.
+     *
+     * @param mixed $data   All posted checkout fields.
+     * @param mixed $errors Errors object to add validation errors to.
+     */
+    public function peppol_validate_classic_checkout_field_values( $data, $errors ): void {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) || ! $errors instanceof \WP_Error ) {
 			return;
 		}
@@ -585,13 +564,12 @@ class Peppol {
 	}
 
 	/**
-	 * Save EDI Peppol fields from Classic Checkout page.
-	 *
-	 * @param int $order_id Order ID.
-	 * @param array $data Checkout data.
-	 * @return void
-	 */
-	public function peppol_save_classic_checkout_fields( int $order_id, array $data ): void {
+     * Save EDI Peppol fields from Classic Checkout page.
+     *
+     * @param int $order_id Order ID.
+     * @param array $data Checkout data.
+     */
+    public function peppol_save_classic_checkout_fields( int $order_id, array $data ): void {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
@@ -629,11 +607,9 @@ class Peppol {
 	}
 
 	/**
-	 * Enqueue Peppol scripts on the checkout page.
-	 *
-	 * @return void
-	 */
-	public function peppol_enqueue_checkout_scripts(): void {
+     * Enqueue Peppol scripts on the checkout page.
+     */
+    public function peppol_enqueue_checkout_scripts(): void {
 		if ( is_admin() ) {
 			return;
 		}
@@ -668,11 +644,9 @@ class Peppol {
 	}
 
 	/**
-	 * Register REST API endpoint for Peppol identifier autofill based on VAT number.
-	 *
-	 * @return void
-	 */
-	public function peppol_register_checkout_autofill_endpoint_route(): void {
+     * Register REST API endpoint for Peppol identifier autofill based on VAT number.
+     */
+    public function peppol_register_checkout_autofill_endpoint_route(): void {
 		if ( ! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ) {
 			return;
 		}
@@ -757,12 +731,9 @@ class Peppol {
 	}
 
 	/**
-	 * Handle automatic Peppol Endpoint ID derivation on new order creation.
-	 *
-	 * @param \WC_Order $order
-	 * @return void
-	 */
-	public function peppol_handle_new_order_automatic_endpoint_id_derivation( \WC_Order $order ): void {
+     * Handle automatic Peppol Endpoint ID derivation on new order creation.
+     */
+    public function peppol_handle_new_order_automatic_endpoint_id_derivation( \WC_Order $order ): void {
 		$order_id = $order->get_id();
 
 		if ( ! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' ) ) {
@@ -843,11 +814,9 @@ class Peppol {
 	}
 
 	/**
-	 * Enqueue Peppol script for Classic Checkout page.
-	 *
-	 * @return void
-	 */
-	private function peppol_enqueue_classic_checkout_script(): void {
+     * Enqueue Peppol script for Classic Checkout page.
+     */
+    private function peppol_enqueue_classic_checkout_script(): void {
 		if ( ! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ) {
 			return;
 		}
@@ -908,11 +877,9 @@ class Peppol {
 	}
 
 	/**
-	 * Enqueue Peppol script for Block Checkout page.
-	 *
-	 * @return void
-	 */
-	private function peppol_enqueue_block_checkout_script(): void {
+     * Enqueue Peppol script for Block Checkout page.
+     */
+    private function peppol_enqueue_block_checkout_script(): void {
 		if (
 			! wpo_ips_edi_peppol_enabled_for_location( 'checkout' ) ||
 			! (bool) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation' )
@@ -985,20 +952,18 @@ class Peppol {
 		$allowed         = array( 'always', 'toggle', 'company' );
 
 		if ( ! in_array( $visibility_mode, $allowed, true ) ) {
-			$visibility_mode = 'always';
+			return 'always';
 		}
 
 		return $visibility_mode;
 	}
 
 	/**
-	 * Build the Checkout Block "hidden" condition for the Peppol fields.
-	 *
-	 * @link https://developer.woocommerce.com/docs/block-development/tutorials/how-to-conditional-additional-fields/
-	 *
-	 * @return array
-	 */
-	private function peppol_checkout_block_hidden_condition(): array {
+     * Build the Checkout Block "hidden" condition for the Peppol fields.
+     *
+     * @link https://developer.woocommerce.com/docs/block-development/tutorials/how-to-conditional-additional-fields/
+     */
+    private function peppol_checkout_block_hidden_condition(): array {
 		$visibility_mode = $this->peppol_checkout_visibility_mode();
 
 		if ( 'toggle' === $visibility_mode ) {
@@ -1047,7 +1012,7 @@ class Peppol {
 	 * @return true|\WP_Error True if valid or should be accepted, WP_Error if invalid.
 	 */
 	private function peppol_validate_identifier_value( string $raw_value ) {
-		$val = preg_replace( '/\s+/', '', trim( (string) $raw_value ) );
+		$val = preg_replace( '/\s+/', '', trim( $raw_value ) );
 
 		// Let "required" or other validation handle this elsewhere.
 		if ( '' === $val ) {
@@ -1113,7 +1078,7 @@ class Peppol {
 				'<a href="' . esc_url( $directory_url ) . '" target="_blank" rel="noopener noreferrer">' . __( 'Peppol Directory', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 			);
 
-			if ( ! empty( $matches ) ) {
+			if ( $matches !== [] ) {
 				$message .= $this->peppol_directory_render_matches_list( $matches, $val );
 			}
 
@@ -1128,7 +1093,7 @@ class Peppol {
 		 */
 
 		// No matches at all (for full query and fallback).
-		if ( empty( $matches ) ) {
+		if ( $matches === [] ) {
 			$message = sprintf(
 				/* translators: 1: entered identifier, 2: Peppol Directory URL */
 				__(
@@ -1170,13 +1135,12 @@ class Peppol {
 	}
 
 	/**
-	 * Query the Peppol Directory for an endpoint.
-	 *
-	 * @param string $endpoint_id
-	 * @return array|\WP_Error
-	 */
-	private function peppol_directory_lookup( string $endpoint_id ) {
-		$endpoint_id = trim( (string) $endpoint_id );
+     * Query the Peppol Directory for an endpoint.
+     *
+     * @return array|\WP_Error
+     */
+    private function peppol_directory_lookup( string $endpoint_id ) {
+		$endpoint_id = trim( $endpoint_id );
 
 		if ( '' === $endpoint_id ) {
 			return new \WP_Error(
@@ -1208,7 +1172,7 @@ class Peppol {
 		$matches = isset( $data['matches'] ) && is_array( $data['matches'] ) ? $data['matches'] : array();
 
 		// Fallback: if we had "scheme:value" and got no matches, try "value" only.
-		if ( $has_colon && empty( $matches ) && '' !== $fallback_query ) {
+		if ( $has_colon && $matches === [] && '' !== $fallback_query ) {
 			$data = $this->peppol_directory_request_by_query( $fallback_query );
 
 			if ( is_wp_error( $data ) ) {
@@ -1362,13 +1326,12 @@ class Peppol {
 	}
 
 	/**
-	 * Find the first valid Peppol endpoint from VAT mappings.
-	 *
-	 * @param string $billing_country Billing country.
-	 * @param string $vat_number      VAT number.
-	 * @return array
-	 */
-	private function peppol_find_valid_endpoint_from_vat( string $billing_country, string $vat_number ): array {
+     * Find the first valid Peppol endpoint from VAT mappings.
+     *
+     * @param string $billing_country Billing country.
+     * @param string $vat_number      VAT number.
+     */
+    private function peppol_find_valid_endpoint_from_vat( string $billing_country, string $vat_number ): array {
 		$candidates = wpo_ips_edi_build_peppol_endpoint_candidates_from_vat( $billing_country, $vat_number );
 
 		foreach ( $candidates as $candidate ) {
@@ -1385,12 +1348,11 @@ class Peppol {
 	}
 
 	/**
-	 * Check whether a Peppol participant exists in the Directory.
-	 *
-	 * @param string $endpoint_id Endpoint ID.
-	 * @return bool
-	 */
-	private function peppol_directory_participant_exists( string $endpoint_id ): bool {
+     * Check whether a Peppol participant exists in the Directory.
+     *
+     * @param string $endpoint_id Endpoint ID.
+     */
+    private function peppol_directory_participant_exists( string $endpoint_id ): bool {
 		$data = $this->peppol_directory_request_by_participant( $endpoint_id );
 
 		if ( is_wp_error( $data ) ) {
@@ -1414,14 +1376,12 @@ class Peppol {
 	}
 
 	/**
-	 * Render Peppol Directory matches as a simple text list.
-	 *
-	 * @param array  $matches
-	 * @param string $endpoint
-	 * @return string HTML string.
-	 */
-	private function peppol_directory_render_matches_list( array $matches, string $endpoint ): string {
-		if ( empty( $matches ) ) {
+     * Render Peppol Directory matches as a simple text list.
+     *
+     * @return string HTML string.
+     */
+    private function peppol_directory_render_matches_list( array $matches, string $endpoint ): string {
+		if ( $matches === [] ) {
 			return '';
 		}
 
@@ -1446,7 +1406,7 @@ class Peppol {
 					$identifiers = ( ! empty( $match['identifiers'] ) && is_array( $match['identifiers'] ) ) ? $match['identifiers'] : array();
 
 					// Prefer the participantID value, fall back to the first identifier.
-					$identifier = ( '' !== $value ) ? $value : ( ( ! empty( $identifiers ) ) ? (string) reset( $identifiers ) : '' );
+					$identifier = ( '' !== $value ) ? $value : ( ( $identifiers !== [] ) ? (string) reset( $identifiers ) : '' );
 
 					if ( '' !== $name && '' !== $identifier ) {
 						$item = sprintf( '%1$s (%2$s)', $name, $identifier );

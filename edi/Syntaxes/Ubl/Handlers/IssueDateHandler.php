@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class IssueDateHandler extends AbstractUblHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$date_instance    = $this->document->order_document->get_date();
 		$issue_date_value = '';
 
@@ -41,11 +40,9 @@ class IssueDateHandler extends AbstractUblHandler {
 	}
 
 	/**
-	 * Get the formatted date fallback from order meta.
-	 *
-	 * @return string
-	 */
-	protected function get_formatted_date_fallback(): string {
+     * Get the formatted date fallback from order meta.
+     */
+    protected function get_formatted_date_fallback(): string {
 		$order_document = $this->document->order_document ?? null;
 
 		if ( empty( $order_document->order ) || ! is_callable( array( $order_document->order, 'get_meta' ) ) ) {

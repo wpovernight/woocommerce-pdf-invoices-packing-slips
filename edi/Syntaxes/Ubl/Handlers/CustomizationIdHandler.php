@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class CustomizationIdHandler extends AbstractUblHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$customization_id = array(
 			'name'  => 'cbc:CustomizationID',
 			'value' => 'urn:cen.eu:en16931:2017',

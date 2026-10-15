@@ -1,5 +1,5 @@
 <?php
-defined( 'ABSPATH' ) or exit;
+defined( 'ABSPATH' ) || exit;
 $settings_instance = \WPO_WCPDF()->get_instance( 'settings' );
 ?>
 <div id="debug-tools">

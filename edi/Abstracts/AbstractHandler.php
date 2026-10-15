@@ -24,21 +24,19 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	abstract public function handle( array $data, array $options = array() ): array;
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    abstract public function handle( array $data, array $options = array() ): array;
 
 	/**
-	 * Get the supplier identifiers data.
-	 *
-	 * @param string $key The data key (e.g., 'shop_name', 'coc_number', 'shop_address_line_1', 'shop_address_postcode').
-	 * @return string
-	 */
-	protected function get_supplier_identifiers_data( string $key ): string {
+     * Get the supplier identifiers data.
+     *
+     * @param string $key The data key (e.g., 'shop_name', 'coc_number', 'shop_address_line_1', 'shop_address_postcode').
+     */
+    protected function get_supplier_identifiers_data( string $key ): string {
 		$general_settings_instance = WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
 		$language                  = wpo_ips_edi_get_settings( 'supplier_identifiers_language' );
 
@@ -70,11 +68,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Returns the due date for the document.
-	 *
-	 * @return string
-	 */
-	protected function get_due_date(): string {
+     * Returns the due date for the document.
+     */
+    protected function get_due_date(): string {
 		$due_date = is_callable( array( $this->document->order_document, 'get_due_date' ) )
 			? $this->document->order_document->get_due_date()
 			: 0;
@@ -83,11 +79,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Returns the due date days for the document.
-	 *
-	 * @return int
-	 */
-	protected function get_due_date_days(): int {
+     * Returns the due date days for the document.
+     */
+    protected function get_due_date_days(): int {
 		$due_date_days = is_callable( array( $this->document->order_document, 'get_setting' ) )
 			? absint( $this->document->order_document->get_setting( 'due_date_days' ) )
 			: 0;
@@ -200,13 +194,12 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Normalize a raw date input into a specific format.
-	 *
-	 * @param mixed  $raw    The input date (DateTime, string, timestamp, etc.)
-	 * @param string $format The output format (default: 'Y-m-d')
-	 * @return string
-	 */
-	protected function normalize_date( $raw, string $format = 'Y-m-d' ): string {
+     * Normalize a raw date input into a specific format.
+     *
+     * @param mixed  $raw    The input date (DateTime, string, timestamp, etc.)
+     * @param string $format The output format (default: 'Y-m-d')
+     */
+    protected function normalize_date( $raw, string $format = 'Y-m-d' ): string {
 		if ( empty( $raw ) ) {
 			return '';
 		}
@@ -249,14 +242,13 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Format a decimal number to a string with fixed decimal places,
-	 * using WooCommerce normalization and avoiding scientific notation.
-	 *
-	 * @param float|string $amount The amount to format.
-	 * @param int          $decimal_places Number of decimal places (default: 2).
-	 * @return string
-	 */
-	protected function format_decimal( $amount, int $decimal_places = 2 ): string {
+     * Format a decimal number to a string with fixed decimal places,
+     * using WooCommerce normalization and avoiding scientific notation.
+     *
+     * @param float|string $amount The amount to format.
+     * @param int          $decimal_places Number of decimal places (default: 2).
+     */
+    protected function format_decimal( $amount, int $decimal_places = 2 ): string {
 		// Normalize using WooCommerce helper (handles locale, strings, etc.).
 		$value = (float) wc_format_decimal( $amount, $decimal_places, false );
 
@@ -277,12 +269,11 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get normalized zero-tax meta (scheme/category/reason), with filter support.
-	 *
-	 * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
-	 * @return array
-	 */
-	protected function get_zero_tax_meta( $context = null ): array {
+     * Get normalized zero-tax meta (scheme/category/reason), with filter support.
+     *
+     * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
+     */
+    protected function get_zero_tax_meta( $context = null ): array {
 		$defaults = array(
 			'scheme'   => 'VAT',
 			'category' => 'Z',
@@ -310,15 +301,13 @@ abstract class AbstractHandler implements HandlerInterface {
 			$reason = $defaults['reason'];
 		}
 
-		return compact( 'scheme', 'category', 'reason' );
+		return ['scheme' => $scheme, 'category' => $category, 'reason' => $reason];
 	}
 
 	/**
-	 * Get grouped order tax data by rate, category, reason, and scheme.
-	 *
-	 * @return array
-	 */
-	protected function get_grouped_order_tax_data(): array {
+     * Get grouped order tax data by rate, category, reason, and scheme.
+     */
+    protected function get_grouped_order_tax_data(): array {
 		$order      = $this->document->order;
 		$groups     = array();
 		$line_items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
@@ -372,7 +361,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			}
 
 			if ( $this->is_credit_note_document() && $this->should_normalize_credit_note_signs() ) {
-				$line_sign = (float) $net_total < 0 ? -1 : 1;
+				$line_sign = $net_total < 0 ? -1 : 1;
 				$item_tax  = abs( $item_tax ) * $line_sign;
 			}
 
@@ -393,7 +382,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		// Fallback only when there are really no grouped lines at all.
-		if ( empty( $groups ) ) {
+		if ( $groups === [] ) {
 			$lines_net = $this->get_lines_net_total( $order );
 
 			$groups[ sprintf( '0|%s|%s|%s', $zero_category, $zero_reason, $zero_scheme ) ] = array(
@@ -468,12 +457,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get calculated payment totals for an order.
-	 *
-	 * @param \WC_Abstract_Order $order
-	 * @return array
-	 */
-	protected function get_order_payment_totals( \WC_Abstract_Order $order ): array {
+     * Get calculated payment totals for an order.
+     */
+    protected function get_order_payment_totals( \WC_Abstract_Order $order ): array {
 		$grouped_tax_data = $this->get_grouped_order_tax_data();
 
 		$total_exc_raw = 0.0;
@@ -501,7 +487,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		$total_inc_tax = (float) $this->format_decimal( $total_exc_tax + $total_tax, 2 );
 
 		// For diagnostics also compute invoice line net sum.
-		$lines_net         = (float) $this->get_lines_net_total( $order );
+		$lines_net         = $this->get_lines_net_total( $order );
 		$lines_net_rounded = (float) $this->format_decimal( $lines_net, 2 );
 
 		// Log if base of groups and base from lines differ materially.
@@ -570,15 +556,7 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		// Compact totals for return.
-		$totals = compact(
-			'total_exc_tax',
-			'total_inc_tax',
-			'total_tax',
-			'prepaid_amount',
-			'rounding_diff',
-			'payable_amount',
-			'lines_net'
-		);
+		$totals = ['total_exc_tax' => $total_exc_tax, 'total_inc_tax' => $total_inc_tax, 'total_tax' => $total_tax, 'prepaid_amount' => $prepaid_amount, 'rounding_diff' => $rounding_diff, 'payable_amount' => $payable_amount, 'lines_net' => $lines_net];
 
 		return (array) apply_filters(
 			'wpo_ips_edi_order_payment_totals',
@@ -589,12 +567,9 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get sum of line net amounts (excl. VAT).
-	 *
-	 * @param \WC_Abstract_Order $order
-	 * @return float
-	 */
-	protected function get_lines_net_total( \WC_Abstract_Order $order ): float {
+     * Get sum of line net amounts (excl. VAT).
+     */
+    protected function get_lines_net_total( \WC_Abstract_Order $order ): float {
 		$lines_net      = 0.0;
 		$include_coupon = apply_filters( 'wpo_ips_edi_ubl_discount_as_line', false, $this );
 		$line_items     = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
@@ -629,22 +604,21 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 	
 	/**
-	 * Get the number of decimal places needed for XML unit prices.
-	 *
-	 * Line totals remain rounded to 2 decimals, but unit prices may require
-	 * additional precision to ensure that multiplying the unit price by the
-	 * quantity reproduces the original line total.
-	 *
-	 * @param array $parts {
-	 *     Price parts for the order item.
-	 *
-	 *     @type float|int|string $qty         Item quantity.
-	 *     @type float|int|string $net_total   Item net line total.
-	 *     @type float|int|string $gross_total Item gross line total.
-	 * }
-	 * @return int
-	 */
-	protected function get_line_price_decimal_places( array $parts ): int {
+     * Get the number of decimal places needed for XML unit prices.
+     *
+     * Line totals remain rounded to 2 decimals, but unit prices may require
+     * additional precision to ensure that multiplying the unit price by the
+     * quantity reproduces the original line total.
+     *
+     * @param array $parts {
+     *     Price parts for the order item.
+     *
+     *     @type float|int|string $qty         Item quantity.
+     *     @type float|int|string $net_total   Item net line total.
+     *     @type float|int|string $gross_total Item gross line total.
+     * }
+     */
+    protected function get_line_price_decimal_places( array $parts ): int {
 		$qty = isset( $parts['qty'] )
 			? abs( (float) $parts['qty'] )
 			: 0.0;
@@ -724,15 +698,14 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get the tax rows used for item tax classification.
-	 *
-	 * Product items use the subtotal bucket so the original tax class can still be
-	 * detected on fully discounted lines. Other item types use the total bucket.
-	 *
-	 * @param \WC_Order_Item $item Order item instance.
-	 * @return array
-	 */
-	protected function get_item_tax_rows( \WC_Order_Item $item ): array {
+     * Get the tax rows used for item tax classification.
+     *
+     * Product items use the subtotal bucket so the original tax class can still be
+     * detected on fully discounted lines. Other item types use the total bucket.
+     *
+     * @param \WC_Order_Item $item Order item instance.
+     */
+    protected function get_item_tax_rows( \WC_Order_Item $item ): array {
 		$type       = $item->get_type();
 		$taxes      = $item->get_taxes();
 		$tax_bucket = ( 'line_item' === $type ) ? 'subtotal' : 'total';
@@ -743,14 +716,13 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get the final tax rows for an order item.
-	 *
-	 * These rows reflect the final tax amounts stored on the line after discounts.
-	 *
-	 * @param \WC_Order_Item $item Order item instance.
-	 * @return array
-	 */
-	protected function get_item_final_tax_rows( \WC_Order_Item $item ): array {
+     * Get the final tax rows for an order item.
+     *
+     * These rows reflect the final tax amounts stored on the line after discounts.
+     *
+     * @param \WC_Order_Item $item Order item instance.
+     */
+    protected function get_item_final_tax_rows( \WC_Order_Item $item ): array {
 		$taxes = $item->get_taxes();
 
 		return ( isset( $taxes['total'] ) && is_array( $taxes['total'] ) )
@@ -759,12 +731,11 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get the preferred zero-tax metadata for the current order context.
-	 *
-	 * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
-	 * @return array
-	 */
-	protected function get_preferred_zero_tax_meta( $context = null ): array {
+     * Get the preferred zero-tax metadata for the current order context.
+     *
+     * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
+     */
+    protected function get_preferred_zero_tax_meta( $context = null ): array {
 		$zero_meta = $this->get_zero_tax_meta( $context );
 		$order     = $this->document->order;
 
@@ -772,9 +743,9 @@ abstract class AbstractHandler implements HandlerInterface {
 			return $zero_meta;
 		}
 
-		$scheme   = strtoupper( trim( (string) wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order ) ) );
-		$category = strtoupper( trim( (string) wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order ) ) );
-		$reason   = strtoupper( trim( (string) wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order ) ) );
+		$scheme   = strtoupper( trim( wpo_ips_edi_get_tax_data_from_fallback( 'scheme', null, $order ) ) );
+		$category = strtoupper( trim( wpo_ips_edi_get_tax_data_from_fallback( 'category', null, $order ) ) );
+		$reason   = strtoupper( trim( wpo_ips_edi_get_tax_data_from_fallback( 'reason', null, $order ) ) );
 
 		if ( '' === $scheme || 'DEFAULT' === $scheme ) {
 			$scheme = $zero_meta['scheme'];
@@ -791,17 +762,16 @@ abstract class AbstractHandler implements HandlerInterface {
 			) ? $zero_meta['reason'] : 'NONE';
 		}
 
-		return compact( 'scheme', 'category', 'reason' );
+		return ['scheme' => $scheme, 'category' => $category, 'reason' => $reason];
 	}
 
 	/**
-	 * Determine whether the given tax metadata represents the generic zero-tax classification.
-	 *
-	 * @param array $tax_meta Tax metadata to inspect.
-	 * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
-	 * @return bool
-	 */
-	protected function is_generic_zero_tax_meta( array $tax_meta, $context = null ): bool {
+     * Determine whether the given tax metadata represents the generic zero-tax classification.
+     *
+     * @param array $tax_meta Tax metadata to inspect.
+     * @param \WC_Order_Item|\WC_Abstract_Order|null $context Optional context.
+     */
+    protected function is_generic_zero_tax_meta( array $tax_meta, $context = null ): bool {
 		$zero_meta  = $this->get_zero_tax_meta( $context );
 		$scheme     = strtoupper( trim( (string) ( $tax_meta['scheme'] ?? '' ) ) );
 		$category   = strtoupper( trim( (string) ( $tax_meta['category'] ?? '' ) ) );
@@ -815,12 +785,11 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Determine whether the resolved tax metadata is invalid for standard-rated VAT.
-	 *
-	 * @param array $tax_meta Tax metadata.
-	 * @return bool
-	 */
-	protected function is_invalid_standard_tax_meta( array $tax_meta ): bool {
+     * Determine whether the resolved tax metadata is invalid for standard-rated VAT.
+     *
+     * @param array $tax_meta Tax metadata.
+     */
+    protected function is_invalid_standard_tax_meta( array $tax_meta ): bool {
 		$category   = strtoupper( trim( (string) ( $tax_meta['category'] ?? '' ) ) );
 		$percentage = (float) ( $tax_meta['percentage'] ?? 0.0 );
 
@@ -857,13 +826,12 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Select the final tax classification candidate for an order item.
-	 *
-	 * @param \WC_Order_Item $item Order item instance.
-	 * @param array[]        $candidates Candidate tax classifications for the item.
-	 * @return array
-	 */
-	protected function select_item_tax_classification( \WC_Order_Item $item, array $candidates ): array {
+     * Select the final tax classification candidate for an order item.
+     *
+     * @param \WC_Order_Item $item Order item instance.
+     * @param array[]        $candidates Candidate tax classifications for the item.
+     */
+    protected function select_item_tax_classification( \WC_Order_Item $item, array $candidates ): array {
 		$first_candidate        = null;
 		$first_non_generic_zero = null;
 
@@ -896,17 +864,16 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Resolve tax metadata for an order item.
-	 *
-	 * @param \WC_Order_Item $item Order item instance.
-	 * @return array
-	 */
-	protected function resolve_item_tax_meta( \WC_Order_Item $item ): array {
+     * Resolve tax metadata for an order item.
+     *
+     * @param \WC_Order_Item $item Order item instance.
+     */
+    protected function resolve_item_tax_meta( \WC_Order_Item $item ): array {
 		$candidates = $this->get_item_tax_candidates( $item );
 
 		// If there are no usable tax candidates on the item, fall back to the
 		// configured item tax class before using generic zero-tax handling.
-		if ( empty( $candidates ) ) {
+		if ( $candidates === [] ) {
 			return $this->get_item_tax_class_fallback_meta( $item );
 		}
 
@@ -932,13 +899,11 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Compute line totals, unit prices and unit discount for an item.
-	 *
-	 * @param \WC_Order_Item $item
-	 * @param bool           $lock_net_to_subtotal
-	 * @return array
-	 */
-	protected function compute_item_price_parts( $item, bool $lock_net_to_subtotal = false ): array {
+     * Compute line totals, unit prices and unit discount for an item.
+     *
+     * @param \WC_Order_Item $item
+     */
+    protected function compute_item_price_parts( $item, bool $lock_net_to_subtotal = false ): array {
 		if ( $item instanceof \WC_Order_Item_Product ) {
 			$gross_total = (float) $item->get_subtotal();                                                  // ex-VAT, before discounts
 			$net_total   = (float) ( $lock_net_to_subtotal ? $item->get_subtotal() : $item->get_total() ); // ex-VAT, after discounts
@@ -962,17 +927,15 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		$unit_discount = max( 0.0, $gross_unit - $net_unit );
 
-		return compact( 'gross_total', 'net_total', 'qty', 'gross_unit', 'net_unit', 'unit_discount', 'line_sign' );
+		return ['gross_total' => $gross_total, 'net_total' => $net_total, 'qty' => $qty, 'gross_unit' => $gross_unit, 'net_unit' => $net_unit, 'unit_discount' => $unit_discount, 'line_sign' => $line_sign];
 	}
 
 	/**
-	 * Get order item meta.
-	 *
-	 * @param \WC_Order_Item $item Order item object.
-	 * @param array          $args
-	 * @return array
-	 */
-	protected function get_item_meta( \WC_Order_Item $item, array $args = array() ): array {
+     * Get order item meta.
+     *
+     * @param \WC_Order_Item $item Order item object.
+     */
+    protected function get_item_meta( \WC_Order_Item $item, array $args = array() ): array {
 		$args = wp_parse_args(
 			$args,
 			array(
@@ -994,7 +957,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$this
 		);
 		foreach ( (array) $skip_types as $class ) {
-			if ( is_a( $item, $class, true ) ) {
+			if ( $item instanceof $class ) {
 				$rows = apply_filters( 'wpo_ips_edi_get_item_meta', array(), $item, $args, $this );
 				return is_array( $rows ) ? $rows : array();
 			}
@@ -1011,7 +974,7 @@ abstract class AbstractHandler implements HandlerInterface {
 
 		$rows = array();
 
-		foreach ( $meta_items as $meta_id => $m ) {
+		foreach ( $meta_items as $m ) {
 			$raw_key   = isset( $m->key )   ? (string) $m->key : '';
 			$raw_value = isset( $m->value ) ? $m->value        : '';
 
@@ -1065,23 +1028,22 @@ abstract class AbstractHandler implements HandlerInterface {
 		$rows = apply_filters( 'wpo_ips_edi_get_item_meta', $rows, $item, $args, $this );
 
 		if ( ! is_array( $rows ) ) {
-			$rows = array();
+			return array();
 		}
 
 		return $rows;
 	}
 
 	/**
-	 * Resolve fallback tax metadata from the order item's tax class.
-	 *
-	 * This is used when the item has no usable tax rows to classify from, such as
-	 * products with a final price of zero or fully discounted items where WooCommerce
-	 * no longer provides meaningful tax row data for export classification.
-	 *
-	 * @param \WC_Order_Item $item Order item instance.
-	 * @return array
-	 */
-	protected function get_item_tax_class_fallback_meta( \WC_Order_Item $item ): array {
+     * Resolve fallback tax metadata from the order item's tax class.
+     *
+     * This is used when the item has no usable tax rows to classify from, such as
+     * products with a final price of zero or fully discounted items where WooCommerce
+     * no longer provides meaningful tax row data for export classification.
+     *
+     * @param \WC_Order_Item $item Order item instance.
+     */
+    protected function get_item_tax_class_fallback_meta( \WC_Order_Item $item ): array {
 		$order = $this->document->order;
 
 		if ( wpo_wcpdf_order_is_vat_exempt( $order ) ) {
@@ -1116,7 +1078,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$tax_class = 'standard';
 		}
 
-		$settings          = (array) wpo_ips_edi_get_tax_settings();
+		$settings          = wpo_ips_edi_get_tax_settings();
 		$class_settings    = isset( $settings['class'][ $tax_class ] ) && is_array( $settings['class'][ $tax_class ] )
 			? $settings['class'][ $tax_class ]
 			: array();
@@ -1207,21 +1169,19 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Check whether the current EDI document is a credit note.
-	 *
-	 * @return bool
-	 */
-	protected function is_credit_note_document(): bool {
+     * Check whether the current EDI document is a credit note.
+     */
+    protected function is_credit_note_document(): bool {
 		$document_type = is_callable( array( $this->document->order_document, 'get_type' ) )
-			? (string) $this->document->order_document->get_type()
+			? $this->document->order_document->get_type()
 			: '';
 
 		$root_element = is_callable( array( $this->document, 'get_root_element' ) )
-			? (string) $this->document->get_root_element()
+			? $this->document->get_root_element()
 			: '';
 
 		$quantity_role = is_callable( array( $this->document, 'get_quantity_role' ) )
-			? (string) $this->document->get_quantity_role()
+			? $this->document->get_quantity_role()
 			: '';
 
 		return (
@@ -1232,12 +1192,10 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Whether credit note signs should be normalized from WooCommerce refund signs
-	 * to Peppol CreditNote signs.
-	 *
-	 * @return bool
-	 */
-	protected function should_normalize_credit_note_signs(): bool {
+     * Whether credit note signs should be normalized from WooCommerce refund signs
+     * to Peppol CreditNote signs.
+     */
+    protected function should_normalize_credit_note_signs(): bool {
 		return (bool) apply_filters(
 			'wpo_ips_edi_normalize_credit_note_signs',
 			true,
@@ -1246,16 +1204,12 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Get the sign that should be used for a credit note line.
-	 *
-	 * For normal WooCommerce refunds, refund item totals are negative, but Peppol
-	 * CreditNote lines should mirror the original invoice line sign.
-	 *
-	 * @param \WC_Order_Item $item
-	 * @param float          $fallback_amount
-	 * @return int
-	 */
-	protected function get_credit_note_line_sign( \WC_Order_Item $item, float $fallback_amount = 0.0 ): int {
+     * Get the sign that should be used for a credit note line.
+     *
+     * For normal WooCommerce refunds, refund item totals are negative, but Peppol
+     * CreditNote lines should mirror the original invoice line sign.
+     */
+    protected function get_credit_note_line_sign( \WC_Order_Item $item, float $fallback_amount = 0.0 ): int {
 		$sign = 1;
 
 		if ( ! $this->is_credit_note_document() || ! $this->should_normalize_credit_note_signs() ) {
@@ -1296,14 +1250,13 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Reconcile VAT breakdown taxable amounts with the line net total.
-	 *
-	 * @param array              $groups Grouped tax data.
-	 * @param \WC_Abstract_Order $order  WooCommerce order.
-	 * @return array
-	 */
-	protected function reconcile_tax_groups_to_line_totals( array $groups, \WC_Abstract_Order $order ): array {
-		if ( empty( $groups ) ) {
+     * Reconcile VAT breakdown taxable amounts with the line net total.
+     *
+     * @param array              $groups Grouped tax data.
+     * @param \WC_Abstract_Order $order  WooCommerce order.
+     */
+    protected function reconcile_tax_groups_to_line_totals( array $groups, \WC_Abstract_Order $order ): array {
+		if ( $groups === [] ) {
 			return $groups;
 		}
 
@@ -1389,12 +1342,11 @@ abstract class AbstractHandler implements HandlerInterface {
 	}
 
 	/**
-	 * Check whether the document contains a specific tax category.
-	 *
-	 * @param string $category Tax category code.
-	 * @return bool
-	 */
-	protected function has_tax_category( string $category ): bool {
+     * Check whether the document contains a specific tax category.
+     *
+     * @param string $category Tax category code.
+     */
+    protected function has_tax_category( string $category ): bool {
 		$category = strtoupper( trim( $category ) );
 
 		foreach ( $this->get_grouped_order_tax_data() as $tax_group ) {

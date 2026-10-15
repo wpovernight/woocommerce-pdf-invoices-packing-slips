@@ -11,11 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler {
 
 	/**
-	 * Returns the customer party details for the UBL document.
-	 *
-	 * @return array
-	 */
-	public function get_party(): array {
+     * Returns the customer party details for the UBL document.
+     */
+    public function get_party(): array {
 		$customer_party = array(
 			'name'  => 'cac:Party',
 			'value' => array_filter( array(
@@ -36,11 +34,9 @@ class AccountingCustomerPartyHandler extends BaseAccountingCustomerPartyHandler 
 	}
 
 	/**
-	 * Returns the endpoint ID for the customer.
-	 *
-	 * @return array|null
-	 */
-	public function get_party_endpoint_id(): ?array {
+     * Returns the endpoint ID for the customer.
+     */
+    public function get_party_endpoint_id(): ?array {
 		$endpoint = $this->get_endpoint();
 
 		if ( ! $endpoint ) {

@@ -19,14 +19,11 @@ class Document {
 	public string $output;
 
 	/**
-	 * Constructor
-	 *
-	 * @param string $syntax
-	 * @param string $format
-	 * @param OrderDocument $order_document
-	 * @throws \Exception
-	 */
-	public function __construct( string $syntax, string $format, OrderDocument $order_document ) {
+     * Constructor
+     *
+     * @throws \Exception
+     */
+    public function __construct( string $syntax, string $format, OrderDocument $order_document ) {
 		$this->syntax          = $syntax;
 		$this->format          = $format;
 		$this->order_document  = $order_document;
@@ -42,15 +39,13 @@ class Document {
 	}
 
 	/**
-	 * Get the format document instance
-	 *
-	 * @return object|null
-	 */
-	public function get_format_document(): ?object {
+     * Get the format document instance
+     */
+    public function get_format_document(): ?object {
 		$format        = wpo_ips_edi_syntax_formats( $this->syntax, $this->format );
 		$document_type = $this->order_document->get_type();
 
-		if ( ! $format ) {
+		if ( $format === [] ) {
 			wpo_ips_edi_log(
 				sprintf(
 					'Format "%s" for syntax "%s" is not available.',
@@ -104,11 +99,9 @@ class Document {
 	}
 
 	/**
-	 * Get the document type code
-	 *
-	 * @return string
-	 */
-	public function get_type_code(): string {
+     * Get the document type code
+     */
+    public function get_type_code(): string {
 		return (string) apply_filters(
 			'wpo_ips_edi_document_type_code',
 			$this->format_document->get_type_code(),
@@ -117,11 +110,9 @@ class Document {
 	}
 
 	/**
-	 * Get the document quantity role (UBL formats only)
-	 *
-	 * @return string
-	 */
-	public function get_quantity_role(): string {
+     * Get the document quantity role (UBL formats only)
+     */
+    public function get_quantity_role(): string {
 		return (string) apply_filters(
 			'wpo_ips_edi_document_quantity_role',
 			is_callable( array( $this->format_document, 'get_quantity_role' ) )
@@ -132,11 +123,9 @@ class Document {
 	}
 
 	/**
-	 * Get the document root element
-	 *
-	 * @return string
-	 */
-	public function get_root_element(): string {
+     * Get the document root element
+     */
+    public function get_root_element(): string {
 		return (string) apply_filters(
 			'wpo_ips_edi_document_root_element',
 			$this->format_document->get_root_element(),
@@ -145,11 +134,9 @@ class Document {
 	}
 
 	/**
-	 * Get the document additional attributes
-	 *
-	 * @return array
-	 */
-	public function get_additional_attributes(): array {
+     * Get the document additional attributes
+     */
+    public function get_additional_attributes(): array {
 		return (array) apply_filters(
 			'wpo_ips_edi_document_additional_attributes',
 			$this->format_document->get_additional_attributes(),
@@ -158,11 +145,9 @@ class Document {
 	}
 
 	/**
-	 * Get the document namespaces
-	 *
-	 * @return array
-	 */
-	public function get_namespaces(): array {
+     * Get the document namespaces
+     */
+    public function get_namespaces(): array {
 		return (array) apply_filters(
 			'wpo_ips_edi_document_namespaces',
 			$this->format_document->get_namespaces(),
@@ -192,7 +177,7 @@ class Document {
 			return array();
 		}
 
-		foreach ( $structure as $key => $value ) {
+		foreach ( $structure as $value ) {
 			// skip disabled or mis-configured entries
 			if ( empty( $value['enabled'] ) || empty( $value['handler'] ) ) {
 				continue;
@@ -259,11 +244,9 @@ class Document {
 	}
 
 	/**
-	 * Get tax rates
-	 *
-	 * @return array
-	 */
-	public function get_tax_rates(): array {
+     * Get tax rates
+     */
+    public function get_tax_rates(): array {
 		$order_tax_data = array();
 		$items          = $this->order->get_items( array( 'fee', 'line_item', 'shipping' ) );
 
@@ -279,7 +262,7 @@ class Document {
 			$rows = ( isset( $taxes[ $bucket ] ) && is_array( $taxes[ $bucket ] ) ) ? $taxes[ $bucket ] : array();
 
 			// Nothing taxable on this item.
-			if ( empty( $rows ) ) {
+			if ( $rows === [] ) {
 				continue;
 			}
 
@@ -389,13 +372,11 @@ class Document {
 	}
 
 	/**
-	 * Get percentage from fallback
-	 *
-	 * @param array $tax_data
-	 * @param int   $rate_id
-	 * @return float|int
-	 */
-	public function get_percentage_from_fallback( array $tax_data, int $rate_id ) {
+     * Get percentage from fallback
+     *
+     * @return float|int
+     */
+    public function get_percentage_from_fallback( array $tax_data, int $rate_id ) {
 		$percentage = ( 0 != $tax_data['total_ex'] )
 			? ( $tax_data['total_tax'] / $tax_data['total_ex'] ) * 100
 			: 0;

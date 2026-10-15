@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ReceiptDocumentReferenceHandler extends AbstractUblHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		if ( $this->document->order_document && $this->document->order_document->exists() && function_exists( 'WPO_WCPDF_Pro' ) ) {
 			$order   = \wpo_ips_edi_get_parent_order( $this->document->order );
 			$receipt = \wcpdf_get_document( 'receipt', $order );

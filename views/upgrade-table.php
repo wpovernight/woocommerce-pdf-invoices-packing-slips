@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					if ( $bundle_is_enabled && 'bundle' !== $extension ) {
 						$title = '';
 					}
-					
+
 					if ( ( empty( $info['status'] ) || 'valid' !== $info['status'] ) && 'bundle' !== $extension ) {
 						$subtitle = sprintf(
 							/* translators: learn more link */
@@ -103,22 +103,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			switch ( implode( ',', $extensions_enabled ) . '-' . implode( ',', $extensions_disabled ) ) {
 				case 'pro-templates,bundle':
-					$styles .= '#upgrade-table .templates { display: none; }';
-					break;
-				case 'templates-pro,bundle':
-					$styles .= '#upgrade-table .pro { display: none; }';
-					break;
 				case 'pro,templates-':
-					$styles .= '#upgrade-table .templates { display: none; }';
-					break;
 				case 'pro,templates-bundle':
-					$styles .= '#upgrade-table .templates { display: none; }';
-					break;
 				case 'pro,templates,bundle-':
-					$styles .= '#upgrade-table .templates { display: none; }';
-					break;
 				case '-pro,templates,bundle':
 					$styles .= '#upgrade-table .templates { display: none; }';
+					break;
+                case 'templates-pro,bundle':
+					$styles .= '#upgrade-table .pro { display: none; }';
 					break;
 			}
 

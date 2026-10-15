@@ -10,13 +10,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 
 	/**
-	 * Handle the data and return the formatted output.
-	 *
-	 * @param array $data    The data to be handled.
-	 * @param array $options Additional options for handling.
-	 * @return array
-	 */
-	public function handle( array $data, array $options = array() ): array {
+     * Handle the data and return the formatted output.
+     *
+     * @param array $data    The data to be handled.
+     * @param array $options Additional options for handling.
+     */
+    public function handle( array $data, array $options = array() ): array {
 		$order = $this->document->order;
 		$items = $order->get_items( array( 'line_item', 'fee', 'shipping' ) );
 
@@ -140,8 +139,7 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 			if ( wpo_ips_edi_include_item_meta() ) {
 				$meta_rows = $this->get_item_meta( $item );
 
-				if ( ! empty( $meta_rows ) ) {
-					foreach ( $meta_rows as $row ) {
+				foreach ( $meta_rows as $row ) {
 						$product_value[] = array(
 							'name'  => 'ram:ApplicableProductCharacteristic',
 							'value' => array(
@@ -156,7 +154,6 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 							),
 						);
 					}
-				}
 			}
 
 			$quantity_value = $parts['qty'];
