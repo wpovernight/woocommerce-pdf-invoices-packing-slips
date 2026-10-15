@@ -146,7 +146,10 @@ class BulkDocument {
 			true
 		);
 
-		$html = wpo_ips_prepare_document_html( $html );
+		// clean up special characters
+		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
+			$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
+		}
 
 		$this->rendered_resource_urls = array_keys( $resource_urls );
 

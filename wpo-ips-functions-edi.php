@@ -203,7 +203,7 @@ function wpo_ips_edi_get_tax_data_from_fallback( string $key, ?int $rate_id, ?\W
  */
 function wpo_ips_edi_save_order_taxes( \WC_Abstract_Order $order ): void {
 	foreach ( $order->get_taxes() as $item_id => $tax_item ) {
-		if ( $tax_item instanceof \WC_Order_Item_Tax && is_callable( array( $tax_item, 'get_rate_id' ) ) ) {
+		if ( is_a( $tax_item, '\WC_Order_Item_Tax' ) && is_callable( array( $tax_item, 'get_rate_id' ) ) ) {
 			// get tax rate id from item
 			$tax_rate_id = $tax_item->get_rate_id();
 
@@ -1370,7 +1370,7 @@ function wpo_ips_edi_peppol_save_customer_identifiers( int $user_id, array $requ
  * @return \WC_Order
  */
 function wpo_ips_edi_get_parent_order( \WC_Abstract_Order $order ): \WC_Order {
-	if ( $order instanceof \WC_Order_Refund ) {
+	if ( is_a( $order, 'WC_Order_Refund' ) ) {
 		$parent_id = $order->get_parent_id();
 		if ( $parent_id ) {
 			$parent_order = wc_get_order( $parent_id );
