@@ -2,6 +2,7 @@
 namespace WPO\IPS;
 
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
+use WPO\IPS\Documents\BulkDocument;
 use WPO\IPS\Documents\OrderDocument;
 use WPO\IPS\Vendor\Dompdf\Dompdf;
 
@@ -1911,11 +1912,15 @@ class Main {
 	/**
 	 * Mark document printed
 	 *
-	 * @param OrderDocument $document
+	 * @param OrderDocument|BulkDocument $document
 	 * @param string $trigger
 	 * @return void
 	 */
-	public function mark_document_printed( OrderDocument $document, string $trigger ): void {
+	public function mark_document_printed( OrderDocument|BulkDocument $document, string $trigger ): void {
+		if ( $document instanceof BulkDocument ) {
+			return;
+		}
+
 		$triggers = isset( $document->latest_settings['mark_printed'] ) && is_array( $document->latest_settings['mark_printed'] ) ? $document->latest_settings['mark_printed'] : [];
 		if ( ! empty( $document ) && ! $this->is_document_printed( $document ) ) {
 			if ( ! empty( $document->order ) && ! empty( $trigger ) && in_array( $trigger, $triggers, true ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
@@ -2026,10 +2031,10 @@ class Main {
 	/**
 	 * Check if a document can be manually marked as printed
 	 *
-	 * @param OrderDocument $document
+	 * @param OrderDocument|BulkDocument $document
 	 * @return bool
 	 */
-	public function document_can_be_manually_marked_printed( OrderDocument $document ): bool {
+	public function document_can_be_manually_marked_printed( OrderDocument|BulkDocument $document ): bool {
 		$can_be_manually_marked_printed = false;
 
 		if ( empty( $document ) || ( property_exists( $document, 'is_bulk' ) && $document->is_bulk ) ) {
