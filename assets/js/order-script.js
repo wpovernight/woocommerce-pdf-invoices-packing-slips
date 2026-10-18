@@ -361,7 +361,7 @@ jQuery( function( $ ) {
 					const val = row.find( 'td.edit input[type="text"]' ).val();
 					row.find( 'td.display' ).text( val || '—' );
 				} );
-				
+
 				$table.removeClass( 'is-editing' );
 
 				const msg = ( response && response.data && response.data.message ) || wpo_wcpdf_ajax.saved;
@@ -379,5 +379,62 @@ jQuery( function( $ ) {
 				$btn.prop( 'disabled', false );
 			} );
 	} );
+
+	function get_pending_documents() {
+		const pending_documents = [];
+
+		$( '#wpo_wcpdf-data-input-box .wcpdf-data-fields[data-is_pending="yes"]' ).each( function () {
+			pending_documents.push( {
+				type:     $( this ).data( 'document' ),
+				order_id: $( this ).data( 'order_id' ),
+			} );
+		} );
+
+		return pending_documents;
+	}
+
+	// Fetch data for documents that were being generated in the background on page load.
+	let ajax_count       = 0;
+	const ajax_max_count = 3; // Limit the number of requests to prevent a performance burden.
+	const ajax_interval  = 3000;
+	const fetch_pending_documents_data = function () {
+		const pending_documents = get_pending_documents();
+
+		if ( pending_documents.length <= 0 ) {
+			return;
+		}
+
+		ajax_count++;
+
+		$.ajax( {
+			url:  wpo_wcpdf_ajax.ajaxurl,
+			type: 'POST',
+			data: {
+				action:    'wpo_wcpdf_fetch_document_data',
+				security:  wpo_wcpdf_ajax.nonce,
+				documents: pending_documents,
+			},
+		} )
+			.done( function ( response ) {
+				if ( ! response || ! response.success || ! Array.isArray( response.data ) ) {
+					return;
+				}
+
+				$.each( response.data, function ( i, document_data ) {
+					$( '#wpo_wcpdf-data-input-box .wcpdf-data-fields[data-document="' + document_data.type + '"][data-order_id="' + document_data.order_id + '"]' ).replaceWith( document_data.html );
+				} );
+			} )
+			.fail( function ( xhr ) {
+				console.error( xhr.responseText );
+			} )
+			.always( function () {
+				// Schedule the next request only after the current one finished, to avoid overlapping requests.
+				if ( ajax_count < ajax_max_count ) {
+					setTimeout( fetch_pending_documents_data, ajax_interval );
+				}
+			} );
+	};
+
+	setTimeout( fetch_pending_documents_data, ajax_interval );
 
 } );
