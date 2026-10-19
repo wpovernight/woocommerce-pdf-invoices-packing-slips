@@ -492,6 +492,9 @@ class Main {
 		// set default is allowed
 		$allowed = true;
 
+		// set valid credentials
+		$valid_credentials = true;
+
 		// no order when it is a single order
 		if ( ! $order && 1 === count( $order_ids ) ) {
 			$allowed = false;
@@ -526,9 +529,10 @@ class Main {
 				}
 				break;
 			case 'full':
-				// check if we have a valid access when it's from bulk actions
-				if ( isset( $request['bulk'] ) && ! $valid_nonce ) {
-					$allowed = false;
+				// Multi-order and bulk requests carry no order key, so they need a valid nonce.
+				if ( ( isset( $request['bulk'] ) || count( $order_ids ) > 1 ) && ! $valid_nonce ) {
+					$allowed           = false;
+					$valid_credentials = false;
 					break;
 				}
 
@@ -541,7 +545,8 @@ class Main {
 
 				// check if we have a valid access key only when it's not from bulk actions
 				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order_key, $access_key ) ) {
-					$allowed = false;
+					$allowed           = false;
+					$valid_credentials = false;
 					break;
 				}
 				break;
@@ -552,7 +557,7 @@ class Main {
 
 		$allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
 
-		if ( ! $allowed ) {
+		if ( ! $valid_credentials || ! $allowed ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
