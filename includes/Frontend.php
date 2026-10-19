@@ -266,11 +266,13 @@ class Frontend {
 		}
 
 		// Get $order
-		$order = null;
+		$order             = null;
+		$is_order_received = false;
 
 		if ( ! $has_explicit_order_id ) {
 			if ( is_checkout() && is_wc_endpoint_url( 'order-received' ) && isset( $wp->query_vars['order-received'] ) ) {
-				$order = wc_get_order( $wp->query_vars['order-received'] );
+				$order             = wc_get_order( $wp->query_vars['order-received'] );
+				$is_order_received = true;
 			} elseif ( is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
 				$order = wc_get_order( $wp->query_vars['view-order'] );
 			}
@@ -282,7 +284,22 @@ class Frontend {
 			return '';
 		}
 
-		if ( $has_explicit_order_id && ! $this->current_user_can_access_shortcode_order( $order, $values['document_type'] ) ) {
+		$can_access_order = $this->current_user_can_access_shortcode_order( $order, $values['document_type'] );
+
+		// Require a valid order key for guest access, including guest orders viewed after logging in.
+		if (
+			! $can_access_order &&
+			$is_order_received &&
+			$order instanceof \WC_Order &&
+			( ! is_user_logged_in() || ! $order->get_customer_id() )
+		) {
+			$order_key   = $order->get_order_key();
+			$request_key = isset( $_GET['key'] ) && is_string( $_GET['key'] ) ? wc_clean( wp_unslash( $_GET['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			$can_access_order = '' !== $order_key && '' !== $request_key && hash_equals( $order_key, $request_key );
+		}
+
+		if ( ! $can_access_order ) {
 			return '';
 		}
 

@@ -105,7 +105,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		// Restore the original order if modified.
 		$this->order = $original_order;
 
-		return $address;
+		return $this->protect_from_document_decode( $address );
 	}
 	public function billing_address() {
 		echo wp_kses_post( $this->get_billing_address() );
@@ -216,7 +216,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 		// Restore the original order if modified.
 		$this->order = $original_order;
 
-		return $address;
+		return $this->protect_from_document_decode( $address );
 	}
 	public function shipping_address() {
 		echo wp_kses_post( $this->get_shipping_address() );
@@ -264,7 +264,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			}
 		}
 
-		return apply_filters( 'wpo_wcpdf_billing_custom_field', $custom_field, $this );
+		return $this->protect_from_document_decode( apply_filters( 'wpo_wcpdf_billing_custom_field', $custom_field, $this ) );
 	}
 	public function custom_field( $field_name, $field_label = '', $display_empty = false ) {
 		$custom_field = $this->get_custom_field( $field_name );
@@ -470,7 +470,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 				$content     = apply_filters( 'wpo_wcpdf_order_note', $content, $note );
 				?>
 				<div class="<?php echo esc_attr( implode( ' ', $css_class ) ); ?>">
-					<?php echo wpo_wcpdf_sanitize_html_content( $content, 'notes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?php echo $this->protect_from_document_decode( wpo_wcpdf_sanitize_html_content( $content, 'notes' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				</div>
 				<?php
 			}
@@ -672,7 +672,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 				}
 
 				// Set item meta
-				$data['meta'] = wpo_ips_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) );
+				$data['meta'] = $this->protect_from_document_decode( wpo_ips_display_item_meta( $item, apply_filters( 'wpo_wcpdf_display_item_meta_args', array( 'echo' => false ), $this ) ) );
 
 				$data_list[ $item_id ] = apply_filters( 'wpo_wcpdf_order_item_data', $data, $this->order, $this->get_type() );
 			}
@@ -1202,7 +1202,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$shipping_notes = wp_strip_all_tags( $shipping_notes );
 		}
 
-		return apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes, $this );
+		return $this->protect_from_document_decode( apply_filters( 'wpo_wcpdf_shipping_notes', $shipping_notes, $this ) );
 	}
 
 	/**

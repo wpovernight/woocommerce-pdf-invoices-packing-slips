@@ -73,6 +73,12 @@ abstract class OrderDocument {
 	public $order_settings;
 
 	/**
+	 * Whether customer text must be protected from the document-wide decode.
+	 * @var bool
+	 */
+	protected $protect_from_decode = false;
+
+	/**
 	 * TRUE if PDF document is enabled.
 	 * @var bool
 	 */
@@ -1681,21 +1687,32 @@ abstract class OrderDocument {
 
 		$default_args = array (
 			'wrap_html_content'	=> true,
+			'decode_html'       => true,
 		);
 		$args = $args + $default_args;
 
-		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ), array(
-				'order'    => $this->order,
-				'order_id' => $this->order_id,
-			)
-		);
+		$decode_html = (bool) apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) );
+
+		$this->protect_from_decode = $decode_html;
+
+		try {
+			$html = $this->render_template(
+				$this->locate_template_file( "{$this->type}.php" ),
+				array(
+					'order'    => $this->order,
+					'order_id' => $this->order_id,
+				)
+			);
+		} finally {
+			$this->protect_from_decode = false;
+		}
 
 		if ( $args['wrap_html_content'] ) {
 			$html = $this->wrap_html_content( $html );
 		}
 
 		// clean up special characters
-		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
+		if ( $decode_html && $args['decode_html'] ) {
 			$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
 		}
 
@@ -1705,6 +1722,28 @@ abstract class OrderDocument {
 		\wpo_ips_remove_filters( $html_filters );
 
 		return apply_filters( 'wpo_wcpdf_get_html', $html, $this );
+	}
+
+	/**
+	 * Escape ampersands so the document-wide decode in get_html() leaves the value as it was.
+	 *
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public function protect_from_document_decode( $value ) {
+		if ( ! $this->protect_from_decode ) {
+			return $value;
+		}
+
+		if ( is_string( $value ) ) {
+			return str_replace( '&', '&amp;', $value );
+		}
+
+		if ( is_array( $value ) ) {
+			return array_map( array( $this, 'protect_from_document_decode' ), $value );
+		}
+
+		return $value;
 	}
 
 	public function output_pdf( $output_mode = 'download' ) {

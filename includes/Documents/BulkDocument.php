@@ -130,7 +130,7 @@ class BulkDocument {
 			$order = wc_get_order( $order_id );
 
 			if ( $document = wcpdf_get_document( $this->get_type(), $order, true ) ) {
-				$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false ) );
+				$html_content[ $key ] = $document->get_html( array( 'wrap_html_content' => false, 'decode_html' => false ) );
 			}
 		}
 
