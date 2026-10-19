@@ -322,8 +322,13 @@ class Frontend {
 
 		$can_access_order = $this->current_user_can_access_shortcode_order( $order, $values['document_type'] );
 
-		// Guests must already have the order key; an order ID alone must never expose a download link.
-		if ( ! $can_access_order && $is_order_received && ! is_user_logged_in() && $order instanceof \WC_Order ) {
+		// Require a valid order key for guest access, including guest orders viewed after logging in.
+		if (
+			! $can_access_order &&
+			$is_order_received &&
+			$order instanceof \WC_Order &&
+			( ! is_user_logged_in() || ! $order->get_customer_id() )
+		) {
 			$order_key   = $order->get_order_key();
 			$request_key = isset( $_GET['key'] ) && is_string( $_GET['key'] ) ? wc_clean( wp_unslash( $_GET['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
