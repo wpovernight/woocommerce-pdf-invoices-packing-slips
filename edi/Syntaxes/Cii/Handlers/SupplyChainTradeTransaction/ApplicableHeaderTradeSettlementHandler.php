@@ -40,7 +40,7 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 	 * @return array|null
 	 */
 	public function get_payment_reference(): ?array {
-		$order     = $this->document->order;
+		$order     = \wpo_ips_edi_get_parent_order( $this->document->order );
 		$reference = $order->get_order_number(); // Default to WooCommerce order number
 		$reference = apply_filters( 'wpo_ips_edi_cii_payment_reference', $reference, $order, $this );
 
