@@ -160,7 +160,7 @@ class PDFMaker {
 	 * @param Options $options
 	 * @return void
 	 */
-	protected function restrict_remote_resources( Options $options ): void {
+	private function restrict_remote_resources( Options $options ): void {
 		$resource_urls = wpo_ips_get_trusted_resource_urls( $this->document );
 
 		if ( empty( $options->getAllowedRemoteHosts() ) ) {
@@ -214,7 +214,7 @@ class PDFMaker {
 	 *
 	 * @return bool
 	 */
-	protected function is_hybrid_format(): bool {
+	private function is_hybrid_format(): bool {
 		if ( ! function_exists( 'wpo_ips_edi_is_available' ) || ! wpo_ips_edi_is_available() ) {
 			return false;
 		}
