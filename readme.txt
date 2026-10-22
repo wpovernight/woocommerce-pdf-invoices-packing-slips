@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 4.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 5.16.5
+Stable tag: 5.16.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,10 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 5.16.6 (2026-10-22) =
+- Fix: Prevent wrong invoice attachments in customer emails
+- Translations: Updated translation template (POT)
 
 = 5.16.5 (2026-10-20) =
 - Fix: Harden document output and shortcode order access
