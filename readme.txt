@@ -110,6 +110,10 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
+= 5.16.6 (2026-10-22) =
+- Fix: Prevent wrong invoice attachments in customer emails
+- Translations: Updated translation template (POT)
+
 = 5.16.5 (2026-10-20) =
 - Fix: Harden document output and shortcode order access
 - Translations: Updated translation template (POT)
