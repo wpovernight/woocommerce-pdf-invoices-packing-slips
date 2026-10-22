@@ -1339,7 +1339,7 @@ class Main {
 
 						// Include only the attachment directories created by this plugin, without following symlinks.
 						if ( preg_match( '/^document-[a-f0-9]{64}$/D', $basename ) && ! is_link( $file_path ) && WPO_WCPDF()->file_system->is_dir( $file_path ) ) {
-							$paths_to_cleanup[]         = $file_path;
+							$paths_to_cleanup[]        = $file_path;
 							$directories[ $file_path ] = WPO_WCPDF()->file_system->mtime( $file_path );
 						}
 
