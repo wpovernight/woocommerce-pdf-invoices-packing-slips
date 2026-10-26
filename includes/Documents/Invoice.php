@@ -168,7 +168,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Get the document filename.
-	 * 
+	 *
 	 * @param string $context
 	 * @param array $args
 	 * @return string
@@ -217,7 +217,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Initialise settings
-	 * 
+	 *
 	 * @return void
 	 */
 	public function init_settings(): void {
@@ -250,7 +250,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * PDF settings fields
-	 * 
+	 *
 	 * @param string $option_name
 	 * @return array
 	 */
@@ -389,6 +389,29 @@ class Invoice extends OrderDocumentMethods {
 					'text_input_size'    => 3,
 					'text_input_id'      => 'due_date_days',
 					'text_input_default' => 30,
+					'description'        =>
+						(
+							class_exists( 'WPO_WC_Smart_Reminder_Emails' ) ?
+								sprintf(
+									'<a class="button button-secondary submit wpo-button" id="create-payment-reminder" href="%s">%s</a>',
+									esc_url( wp_nonce_url( add_query_arg( array(
+										'post_type'         => 'wc_reminder_email',
+										'generate_template' => array_values( WPO_WCPDF()->get_instance( 'third_party_plugins' )->get_payment_reminder_email_template_keys() ),
+									), admin_url( 'edit.php' ) ), 'wpo_wcsre_generate_template' ) ),
+									__( 'Create payment reminders', 'woocommerce-pdf-invoices-packing-slips' )
+								) :
+								sprintf(
+									'<span class="wpo-info">%s</span>',
+									sprintf(
+										/* translators: %s: Plugin name hyperlink */
+										__( 'Create payment reminders with one click using %s!', 'woocommerce-pdf-invoices-packing-slips' ),
+										'<a href="https://wpovernight.com/downloads/woocommerce-reminder-emails-payment-reminders/?utm_medium=plugin&utm_source=ips&utm_campaign=documents-tab&utm_content=reminder-emails-cross" target="_blank" rel="noopener noreferrer">Smart Reminder Email</a>'
+									)
+								)
+						) .
+						'<br>' .
+						/* translators: 1, 2: HTML opening and closing anchor tags */
+						sprintf( __( 'Need more information? Read a %1$sstep-by-step guide.%2$s', 'woocommerce-pdf-invoices-packing-slips' ), '<a href="#">', '</a>' ), // ToDo: Replace # with the article link.
 				)
 			),
 			array(
@@ -767,7 +790,7 @@ class Invoice extends OrderDocumentMethods {
 			$this
 		);
 	}
-	
+
 	/**
 	 * Legacy function < v3.8.0
 	 *
