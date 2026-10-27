@@ -214,19 +214,19 @@ class ThirdPartyPlugins {
 	}
 	
 	/**
-	 * Hide the component order price when WooCommerce Composite Products includes it in the container.
+	 * Hide the composite order prices that WooCommerce Composite Products hides.
 	 *
 	 * Composite Products adds the component subtotals to the container item subtotal, so the
 	 * component prices would otherwise be listed twice (once on the container and once on the
-	 * components). We also keep the price empty when Composite Products hides it, instead of
-	 * falling back to our own price.
+	 * components). We also keep the container and component prices empty when Composite Products
+	 * hides them, instead of falling back to our own price.
 	 *
 	 * @param array  $data
 	 * @param mixed  $order
 	 * @param string $document_type
 	 * @return array
 	 */
-	public function composite_products_component_order_price( $data, $order, $document_type = '' ) {
+	public function composite_products_order_price( $data, $order, $document_type = '' ) {
 		if (
 			! is_array( $data )                               ||
 			! $order instanceof \WC_Abstract_Order            ||
@@ -238,15 +238,19 @@ class ThirdPartyPlugins {
 
 		$container_item = wc_cp_get_composited_order_item_container( $data['item'], $order );
 
-		if ( empty( $container_item ) ) {
+		if ( empty( $container_item ) && ! wc_cp_is_composite_container_order_item( $data['item'] ) ) {
 			return $data;
 		}
 
-		// Composite Products filter: whether component subtotals are included in the container subtotal.
-		$subtotals_added = apply_filters( 'woocommerce_add_composited_order_item_subtotals', true, $container_item, $order );
-		$order_price     = $order->get_formatted_line_subtotal( $data['item'] );
+		$order_price = $order->get_formatted_line_subtotal( $data['item'] );
 
-		if ( $subtotals_added || '' === trim( wp_strip_all_tags( (string) $order_price ) ) ) {
+		if ( '' === trim( wp_strip_all_tags( (string) $order_price ) ) ) {
+			$data['order_price'] = '';
+		} elseif (
+			! empty( $container_item ) &&
+			// Composite Products filter: whether component subtotals are included in the container subtotal.
+			apply_filters( 'woocommerce_add_composited_order_item_subtotals', true, $container_item, $order )
+		) {
 			$data['order_price'] = '';
 		}
 
@@ -447,11 +451,14 @@ class ThirdPartyPlugins {
 	 * @return void
 	 */
 	private function register_composite_products_hooks(): void {
-		if ( ! function_exists( 'wc_cp_get_composited_order_item_container' ) ) {
+		if (
+			! function_exists( 'wc_cp_get_composited_order_item_container' ) ||
+			! function_exists( 'wc_cp_is_composite_container_order_item' )
+		) {
 			return;
 		}
 
-		add_filter( 'wpo_wcpdf_order_item_data', array( $this, 'composite_products_component_order_price' ), 10, 3 );
+		add_filter( 'wpo_wcpdf_order_item_data', array( $this, 'composite_products_order_price' ), 10, 3 );
 	}
 
 	/**
