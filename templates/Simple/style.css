@@ -228,28 +228,6 @@ table.notes-totals {
 	display: none;
 }
 
-/* composite products compatibility */
-.order-details tr.component_table_item td.product {
-	padding-left: 5mm;
-}
-
-.order-details tr.component_container_table_item td {
-	border-bottom: 0;
-}
-
-.order-details tr.component_table_item td {
-	border: 0;
-}
-
-/* keep a composite product and its components on the same page */
-.order-details tr.component_container_table_item {
-	page-break-after: avoid;
-}
-
-.order-details tr.component_table_item {
-	page-break-before: avoid;
-}
-
 /* item meta formatting */
 .item-meta {
 	margin: 8px 0 0 0;

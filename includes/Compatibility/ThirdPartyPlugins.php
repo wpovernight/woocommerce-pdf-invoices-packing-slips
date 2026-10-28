@@ -258,6 +258,61 @@ class ThirdPartyPlugins {
 	}
 
 	/**
+	 * Output WooCommerce Composite Products styles for the Simple template,
+	 * only when the order contains composite products.
+	 *
+	 * @param string             $document_type
+	 * @param OrderDocument|null $document
+	 * @return void
+	 */
+	public function composite_products_styles( string $document_type, ?OrderDocument $document = null ): void {
+		if ( empty( $document ) || empty( $document->order ) || ! $document->order instanceof \WC_Abstract_Order ) {
+			return;
+		}
+
+		$template_path    = explode( '/', untrailingslashit( $document->get_template_path() ) );
+		$current_template = end( $template_path );
+
+		if ( 'Simple' !== $current_template ) {
+			return;
+		}
+
+		$has_composite_items = false;
+		foreach ( $document->order->get_items() as $item ) {
+			if ( wc_cp_is_composite_container_order_item( $item ) ) {
+				$has_composite_items = true;
+				break;
+			}
+		}
+
+		if ( ! $has_composite_items ) {
+			return;
+		}
+		?>
+		.order-details tr.component_table_item td.product {
+			padding-left: 5mm;
+		}
+
+		.order-details tr.component_container_table_item td {
+			border-bottom: 0;
+		}
+
+		.order-details tr.component_table_item td {
+			border: 0;
+		}
+
+		/* keep a composite product and its components on the same page */
+		.order-details tr.component_container_table_item {
+			page-break-after: avoid;
+		}
+
+		.order-details tr.component_table_item {
+			page-break-before: avoid;
+		}
+		<?php
+	}
+
+	/**
 	 * Filter callback to add Dokan vendor data as seller/supplier data for CII and UBL documents.
 	 *
 	 * @param array  $data
@@ -459,6 +514,7 @@ class ThirdPartyPlugins {
 		}
 
 		add_filter( 'wpo_wcpdf_order_item_data', array( $this, 'composite_products_order_price' ), 10, 3 );
+		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'composite_products_styles' ), 10, 2 );
 	}
 
 	/**
