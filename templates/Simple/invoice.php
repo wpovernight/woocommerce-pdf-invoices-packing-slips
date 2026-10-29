@@ -120,7 +120,7 @@
 		<?php foreach ( $this->get_order_items() as $item_id => $item ) : ?>
 			<tr class="<?php echo esc_attr( $item['row_class'] ); ?>">
 				<td class="product">
-					<p class="item-name"><?php echo esc_html( $item['name'] ); ?></p>
+					<p class="item-name"><?php echo wpo_ips_kses_document_content( $item['name'] ); ?></p>
 					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order ); ?>
 					<div class="item-meta">
 						<?php if ( ! empty( $item['sku'] ) ) : ?>
