@@ -238,14 +238,16 @@ class Main {
 	/**
 	 * Get the document PDF attachment path, write the file if it doesn't exist and return the path
 	 *
-	 * @param OrderDocument $document
-	 * @param string        $tmp_path
+	 * @param OrderDocument|BulkDocument $document
+	 * @param string                     $tmp_path
 	 * @return string|false
 	 */
-	public function get_document_pdf_attachment( OrderDocument $document, string $tmp_path ) {
+	public function get_document_pdf_attachment( OrderDocument|BulkDocument $document, string $tmp_path ) {
 		$filename             = $document->get_filename();
 		$document_type        = $document->get_type();
-		$order_id             = isset( $document->order ) ? $document->order->get_id() : 0;
+		$order_ids            = $document instanceof BulkDocument
+			? $document->order_ids
+			: array( isset( $document->order ) ? $document->order->get_id() : 0 );
 		$lock_file            = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
 		$reuse_attachment     = apply_filters( 'wpo_wcpdf_reuse_document_attachment', true, $document );
 		$max_reuse_age        = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
@@ -253,16 +255,28 @@ class Main {
 		$writing_file         = false;
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-		if ( $order_id <= 0 || empty( $filename ) || wp_basename( str_replace( '\\', '/', $filename ) ) !== $filename || in_array( $filename, array( '.', '..' ), true ) ) {
-			wcpdf_log_error( 'Cannot create a PDF attachment without an order ID and a valid filename.', 'critical' );
+		if ( empty( $order_ids ) || empty( $filename ) || wp_basename( str_replace( '\\', '/', $filename ) ) !== $filename || in_array( $filename, array( '.', '..' ), true ) ) {
+			wcpdf_log_error( 'Cannot create a PDF attachment without order IDs and a valid filename.', 'critical' );
 			return false;
 		}
 
-		// Custom filenames are not necessarily unique. Keep each order/document in its own directory.
-		$identity  = hash( 'sha256', get_current_blog_id() . '|' . $document_type . '|' . $order_id );
+		foreach ( $order_ids as $order_id ) {
+			if ( false === filter_var( $order_id, FILTER_VALIDATE_INT, array( 'options' => array( 'min_range' => 1 ) ) ) ) {
+				wcpdf_log_error( 'Cannot create a PDF attachment without valid order IDs.', 'critical' );
+				return false;
+			}
+		}
+
+		// Preserve the order of bulk IDs: it determines the order of pages in the PDF.
+		$order_key = $document instanceof BulkDocument
+			? 'bulk-' . hash( 'sha256', implode( ',', array_map( 'intval', $order_ids ) ) )
+			: (string) reset( $order_ids );
+
+		// Custom filenames are not necessarily unique. Isolate each order or bulk selection.
+		$identity  = hash( 'sha256', get_current_blog_id() . '|' . $document_type . '|' . $order_key );
 		$tmp_path  = trailingslashit( $tmp_path ) . 'document-' . $identity . '/';
 		$pdf_path  = $tmp_path . $filename;
-		$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_id}", $max_reuse_age );
+		$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_key}", $max_reuse_age );
 
 		try {
 			// Lock before checking the cache so an unfinished write cannot be reused.
@@ -292,7 +306,7 @@ class Main {
 
 			$pdf_data = $document->get_pdf();
 			if ( empty( $pdf_data ) ) {
-				wcpdf_log_error( "Couldn't generate the PDF attachment for order #{$order_id} ({$document_type}).", 'critical' );
+				wcpdf_log_error( "Couldn't generate the PDF attachment for order selection {$order_key} ({$document_type}).", 'critical' );
 				return false;
 			}
 
