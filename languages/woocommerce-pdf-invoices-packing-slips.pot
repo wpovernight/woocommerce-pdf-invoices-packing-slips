@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-rc.4\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-rc.5\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-22T09:12:27+00:00\n"
+"POT-Creation-Date: 2026-10-29T09:06:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2204,14 +2204,14 @@ msgstr ""
 #: includes/Admin.php:2049
 #: includes/Assets.php:372
 #: includes/Documents/Invoice.php:405
-#: includes/Main.php:1664
+#: includes/Main.php:1678
 #: views/setup-wizard/display-options.php:83
 msgid "Invoice Number"
 msgstr ""
 
 #: includes/Admin.php:250
 #: includes/Documents/Invoice.php:373
-#: includes/Main.php:1665
+#: includes/Main.php:1679
 #: views/setup-wizard/display-options.php:62
 msgid "Invoice Date"
 msgstr ""
@@ -3164,7 +3164,7 @@ msgid "%s Date:"
 msgstr ""
 
 #: includes/Documents/OrderDocument.php:1183
-#: includes/Main.php:2290
+#: includes/Main.php:2304
 msgid "Due Date:"
 msgstr ""
 
@@ -3320,37 +3320,37 @@ msgstr ""
 msgid "%1$s %2$s successfully attached to the %3$s email."
 msgstr ""
 
-#: includes/Main.php:427
+#: includes/Main.php:441
 msgid "You do not have sufficient permissions to access this page. Reason: empty access key"
 msgstr ""
 
-#: includes/Main.php:433
+#: includes/Main.php:447
 msgid "You do not have sufficient permissions to access this page. Reason: empty action"
 msgstr ""
 
-#: includes/Main.php:439
+#: includes/Main.php:453
 msgid "You do not have sufficient permissions to access this page. Reason: invalid nonce"
 msgstr ""
 
-#: includes/Main.php:449
+#: includes/Main.php:463
 msgid "You haven't selected any orders"
 msgstr ""
 
-#: includes/Main.php:454
+#: includes/Main.php:468
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-#: includes/Main.php:473
+#: includes/Main.php:487
 msgid "You have to save the order before generating a PDF document for it."
 msgstr ""
 
 #. translators: %s: Order ID
-#: includes/Main.php:478
+#: includes/Main.php:492
 #, php-format
 msgid "Could not find the order #%s."
 msgstr ""
 
-#: includes/Main.php:561
+#: includes/Main.php:575
 #: includes/Settings.php:304
 #: includes/Settings.php:494
 #: includes/SetupWizard.php:342
@@ -3358,34 +3358,34 @@ msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #. translators: document type
-#: includes/Main.php:630
+#: includes/Main.php:644
 #, php-format
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr ""
 
-#: includes/Main.php:667
+#: includes/Main.php:681
 msgid "Invalid request. Nonce check failed."
 msgstr ""
 
-#: includes/Main.php:675
-#: includes/Main.php:701
+#: includes/Main.php:689
+#: includes/Main.php:715
 msgid "No orders were provided."
 msgstr ""
 
-#: includes/Main.php:690
+#: includes/Main.php:704
 msgid "You do not have permission to access one or more of these orders."
 msgstr ""
 
-#: includes/Main.php:711
+#: includes/Main.php:725
 msgid "No refunds found for the selected orders."
 msgstr ""
 
-#: includes/Main.php:1570
+#: includes/Main.php:1584
 msgid "Nothing to delete!"
 msgstr ""
 
 #. translators: %1$d is the number of files that couldn't be deleted, %2$d is the number of successfully deleted files
-#: includes/Main.php:1577
+#: includes/Main.php:1591
 #, php-format
 msgid "Unable to delete %1$d file! (deleted %2$d)"
 msgid_plural "Unable to delete %1$d files! (deleted %2$d)"
@@ -3393,80 +3393,80 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d is the number of files successfully deleted
-#: includes/Main.php:1590
+#: includes/Main.php:1604
 #, php-format
 msgid "Successfully deleted %d file!"
 msgid_plural "Successfully deleted %d files!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Main.php:1725
-#: includes/Main.php:1755
+#: includes/Main.php:1739
+#: includes/Main.php:1769
 msgid "User"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1733
+#: includes/Main.php:1747
 #, php-format
 msgid "PDF %1$s created via %2$s."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1762
+#: includes/Main.php:1776
 #, php-format
 msgid "PDF %s deleted."
 msgstr ""
 
-#: includes/Main.php:1779
+#: includes/Main.php:1793
 msgid "manually"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1785
+#: includes/Main.php:1799
 #, php-format
 msgid "%1$s document marked as printed via %2$s."
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1800
+#: includes/Main.php:1814
 #, php-format
 msgid "%1$s document unmark printed."
 msgstr ""
 
-#: includes/Main.php:1887
+#: includes/Main.php:1901
 msgid "single order action"
 msgstr ""
 
-#: includes/Main.php:1888
+#: includes/Main.php:1902
 msgid "bulk order action"
 msgstr ""
 
-#: includes/Main.php:1889
+#: includes/Main.php:1903
 msgid "my account"
 msgstr ""
 
-#: includes/Main.php:1890
+#: includes/Main.php:1904
 msgid "order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Main.php:1894
+#: includes/Main.php:1908
 msgid "email attachment"
 msgstr ""
 
 #. translators: 1. document type, 2. mark/unmark
-#: includes/Main.php:2010
+#: includes/Main.php:2024
 #, php-format
 msgid "Document of type %1$s for the selected order could not be marked as printed."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:2161
+#: includes/Main.php:2175
 #, php-format
 msgid "Order %s Saved"
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Main.php:2404
+#: includes/Main.php:2418
 #, php-format
 msgid "View %s (PDF)"
 msgstr ""
