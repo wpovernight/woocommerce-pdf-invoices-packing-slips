@@ -2,6 +2,7 @@
 namespace WPO\IPS;
 
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
+use WPO\IPS\Documents\BulkDocument;
 use WPO\IPS\Documents\OrderDocument;
 use WPO\IPS\Vendor\Dompdf\Dompdf;
 
@@ -238,14 +239,16 @@ class Main {
 	/**
 	 * Get the document PDF attachment path, write the file if it doesn't exist and return the path
 	 *
-	 * @param OrderDocument $document
-	 * @param string        $tmp_path
+	 * @param OrderDocument|BulkDocument $document
+	 * @param string                     $tmp_path
 	 * @return string|false
 	 */
-	public function get_document_pdf_attachment( OrderDocument $document, string $tmp_path ) {
+	public function get_document_pdf_attachment( OrderDocument|BulkDocument $document, string $tmp_path ) {
 		$filename             = $document->get_filename();
 		$document_type        = $document->get_type();
-		$order_id             = isset( $document->order ) ? $document->order->get_id() : 0;
+		$order_ids            = $document instanceof BulkDocument
+			? $document->order_ids
+			: array( isset( $document->order ) ? $document->order->get_id() : 0 );
 		$lock_file            = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
 		$reuse_attachment     = apply_filters( 'wpo_wcpdf_reuse_document_attachment', true, $document );
 		$max_reuse_age        = apply_filters( 'wpo_wcpdf_reuse_attachment_age', 60 );
@@ -253,16 +256,28 @@ class Main {
 		$writing_file         = false;
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-		if ( $order_id <= 0 || empty( $filename ) || wp_basename( str_replace( '\\', '/', $filename ) ) !== $filename || in_array( $filename, array( '.', '..' ), true ) ) {
-			wcpdf_log_error( 'Cannot create a PDF attachment without an order ID and a valid filename.', 'critical' );
+		if ( empty( $order_ids ) || empty( $filename ) || wp_basename( str_replace( '\\', '/', $filename ) ) !== $filename || in_array( $filename, array( '.', '..' ), true ) ) {
+			wcpdf_log_error( 'Cannot create a PDF attachment without order IDs and a valid filename.', 'critical' );
 			return false;
 		}
 
-		// Custom filenames are not necessarily unique. Keep each order/document in its own directory.
-		$identity  = hash( 'sha256', get_current_blog_id() . '|' . $document_type . '|' . $order_id );
+		foreach ( $order_ids as $order_id ) {
+			if ( false === filter_var( $order_id, FILTER_VALIDATE_INT, array( 'options' => array( 'min_range' => 1 ) ) ) ) {
+				wcpdf_log_error( 'Cannot create a PDF attachment without valid order IDs.', 'critical' );
+				return false;
+			}
+		}
+
+		// Preserve the order of bulk IDs: it determines the order of pages in the PDF.
+		$order_key = $document instanceof BulkDocument
+			? 'bulk-' . hash( 'sha256', implode( ',', array_map( 'intval', $order_ids ) ) )
+			: (string) reset( $order_ids );
+
+		// Custom filenames are not necessarily unique. Isolate each order or bulk selection.
+		$identity  = hash( 'sha256', get_current_blog_id() . '|' . $document_type . '|' . $order_key );
 		$tmp_path  = trailingslashit( $tmp_path ) . 'document-' . $identity . '/';
 		$pdf_path  = $tmp_path . $filename;
-		$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_id}", $max_reuse_age );
+		$semaphore = new Semaphore( "get_{$document_type}_document_pdf_attachment_for_order_{$order_key}", $max_reuse_age );
 
 		try {
 			// Lock before checking the cache so an unfinished write cannot be reused.
@@ -292,7 +307,7 @@ class Main {
 
 			$pdf_data = $document->get_pdf();
 			if ( empty( $pdf_data ) ) {
-				wcpdf_log_error( "Couldn't generate the PDF attachment for order #{$order_id} ({$document_type}).", 'critical' );
+				wcpdf_log_error( "Couldn't generate the PDF attachment for order selection {$order_key} ({$document_type}).", 'critical' );
 				return false;
 			}
 
@@ -492,13 +507,16 @@ class Main {
 		// set default is allowed
 		$allowed = true;
 
+		// set valid credentials
+		$valid_credentials = true;
+
 		// no order when it is a single order
 		if ( ! $order && 1 === count( $order_ids ) ) {
 			$allowed = false;
 		}
 
 		// check the user privileges
-		$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( $document_type );
+		$full_permission = Admin::user_can_manage_document( $document_type );
 
 		// multi-order only allowed with full permissions
 		if ( ! $full_permission && ( count( $order_ids ) > 1 || isset( $request['bulk'] ) ) ) {
@@ -526,9 +544,10 @@ class Main {
 				}
 				break;
 			case 'full':
-				// check if we have a valid access when it's from bulk actions
-				if ( isset( $request['bulk'] ) && ! $valid_nonce ) {
-					$allowed = false;
+				// Multi-order and bulk requests carry no order key, so they need a valid nonce.
+				if ( ( isset( $request['bulk'] ) || count( $order_ids ) > 1 ) && ! $valid_nonce ) {
+					$allowed           = false;
+					$valid_credentials = false;
 					break;
 				}
 
@@ -541,7 +560,8 @@ class Main {
 
 				// check if we have a valid access key only when it's not from bulk actions
 				if ( ! isset( $request['bulk'] ) && $order && ! hash_equals( $order_key, $access_key ) ) {
-					$allowed = false;
+					$allowed           = false;
+					$valid_credentials = false;
 					break;
 				}
 				break;
@@ -552,7 +572,7 @@ class Main {
 
 		$allowed = apply_filters( 'wpo_wcpdf_check_privs', $allowed, $order_ids );
 
-		if ( ! $allowed ) {
+		if ( ! $valid_credentials || ! $allowed ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
@@ -675,7 +695,7 @@ class Main {
 		$order_ids = array_map( 'absint', (array) wp_unslash( $_POST['order_ids'] ) );
 
 		// Check the user privileges
-		$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( 'credit-note' );
+		$full_permission = Admin::user_can_manage_document( 'credit-note' );
 
 		if ( ! $full_permission ) {
 			foreach ( $order_ids as $order_id ) {
@@ -1912,11 +1932,15 @@ class Main {
 	/**
 	 * Mark document printed
 	 *
-	 * @param OrderDocument $document
+	 * @param OrderDocument|BulkDocument $document
 	 * @param string $trigger
 	 * @return void
 	 */
-	public function mark_document_printed( OrderDocument $document, string $trigger ): void {
+	public function mark_document_printed( OrderDocument|BulkDocument $document, string $trigger ): void {
+		if ( $document instanceof BulkDocument ) {
+			return;
+		}
+
 		$triggers = isset( $document->latest_settings['mark_printed'] ) && is_array( $document->latest_settings['mark_printed'] ) ? $document->latest_settings['mark_printed'] : [];
 		if ( ! empty( $document ) && ! $this->is_document_printed( $document ) ) {
 			if ( ! empty( $document->order ) && ! empty( $trigger ) && in_array( $trigger, $triggers, true ) && apply_filters( 'wpo_wcpdf_allow_mark_document_printed', true, $document, $trigger ) ) {
@@ -1968,7 +1992,7 @@ class Main {
 
 		if ( ! empty( $data['action'] ) && $data['action'] == "printed_wpo_wcpdf" && ! empty( $data['event'] ) && ! empty( $data['document_type'] ) && ! empty( $data['order_id'] ) && ! empty( $data['trigger'] ) ) {
 			$document        = wcpdf_get_document( esc_attr( $data['document_type'] ), esc_attr( $data['order_id'] ) );
-			$full_permission = WPO_WCPDF()->get_instance( 'admin' )->user_can_manage_document( esc_attr( $data['document_type'] ) );
+			$full_permission = Admin::user_can_manage_document( esc_attr( $data['document_type'] ) );
 
 			if ( ! empty( $document ) && ! empty( $document->order ) && $full_permission ) {
 				$order = $document->order;
@@ -2027,10 +2051,10 @@ class Main {
 	/**
 	 * Check if a document can be manually marked as printed
 	 *
-	 * @param OrderDocument $document
+	 * @param OrderDocument|BulkDocument $document
 	 * @return bool
 	 */
-	public function document_can_be_manually_marked_printed( OrderDocument $document ): bool {
+	public function document_can_be_manually_marked_printed( OrderDocument|BulkDocument $document ): bool {
 		$can_be_manually_marked_printed = false;
 
 		if ( empty( $document ) || ( property_exists( $document, 'is_bulk' ) && $document->is_bulk ) ) {

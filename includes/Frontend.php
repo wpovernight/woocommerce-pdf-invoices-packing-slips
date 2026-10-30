@@ -30,16 +30,9 @@ class Frontend {
 	 * Constructor
 	 */
 	public function __construct() {
-		// Shortcodes
-		add_shortcode( 'wcpdf_download_invoice', array( $this, 'generate_document_shortcode' ) );
-		add_shortcode( 'wcpdf_download_pdf', array( $this, 'generate_document_shortcode' ) );
-		add_shortcode( 'wcpdf_document_link', array( $this, 'generate_document_shortcode' ) );
-
 		// REST
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
-			add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
-		}
+		add_filter( 'woocommerce_api_order_response', array( $this, 'add_invoice_number_to_wc_legacy_order_api' ), 10, 2 );
+		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
 
 		// Order actions.
 		if ( wpo_ips_is_account_page() || wpo_ips_is_order_received_page() ) {
@@ -309,11 +302,13 @@ class Frontend {
 		}
 
 		// Get $order
-		$order = null;
+		$order             = null;
+		$is_order_received = false;
 
 		if ( ! $has_explicit_order_id ) {
 			if ( is_checkout() && is_wc_endpoint_url( 'order-received' ) && isset( $wp->query_vars['order-received'] ) ) {
-				$order = wc_get_order( $wp->query_vars['order-received'] );
+				$order             = wc_get_order( $wp->query_vars['order-received'] );
+				$is_order_received = true;
 			} elseif ( \wpo_ips_is_account_page() && is_wc_endpoint_url( 'view-order' ) && isset( $wp->query_vars['view-order'] ) ) {
 				$order = wc_get_order( $wp->query_vars['view-order'] );
 			}
@@ -325,7 +320,22 @@ class Frontend {
 			return '';
 		}
 
-		if ( $has_explicit_order_id && ! $this->current_user_can_access_shortcode_order( $order, $values['document_type'] ) ) {
+		$can_access_order = $this->current_user_can_access_shortcode_order( $order, $values['document_type'] );
+
+		// Require a valid order key for guest access, including guest orders viewed after logging in.
+		if (
+			! $can_access_order &&
+			$is_order_received &&
+			$order instanceof \WC_Order &&
+			( ! is_user_logged_in() || ! $order->get_customer_id() )
+		) {
+			$order_key   = $order->get_order_key();
+			$request_key = isset( $_GET['key'] ) && is_string( $_GET['key'] ) ? wc_clean( wp_unslash( $_GET['key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			$can_access_order = '' !== $order_key && '' !== $request_key && hash_equals( $order_key, $request_key );
+		}
+
+		if ( ! $can_access_order ) {
 			return '';
 		}
 
@@ -336,6 +346,10 @@ class Frontend {
 		}
 
 		$pdf_url = WPO_WCPDF()->get_instance( 'endpoint' )->get_document_link( $order, $values['document_type'], [ 'shortcode' => 'true' ] );
+
+		if ( empty( $pdf_url ) ) {
+			return '';
+		}
 
 		if ( 'wcpdf_document_link' === $shortcode_tag ) {
 			return esc_url( $pdf_url );
@@ -1043,14 +1057,14 @@ class Frontend {
 	}
 
 	/**
-	 * Check whether the current user can use a shortcode with an explicit order ID.
+	 * Check whether the current user may obtain a document link for this order.
 	 *
 	 * @param \WC_Abstract_Order $order
 	 * @param string             $document_type
 	 * @return bool
 	 */
 	protected function current_user_can_access_shortcode_order( \WC_Abstract_Order $order, string $document_type ): bool {
-		if ( WPO_WCPDF()->admin->user_can_manage_document( $document_type ) ) {
+		if ( Admin::user_can_manage_document( $document_type ) ) {
 			return true;
 		}
 

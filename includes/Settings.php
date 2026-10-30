@@ -82,8 +82,22 @@ class Settings {
 			add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 		}
 
-		// Runtime hook
+		// Runtime hooks must also be available to cron and CLI runners.
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
+
+		// Register the original removable tax callbacks in every request context.
+		$this->get_instance( 'edi' );
+
+		// Load settings components only when their scheduled jobs run.
+		add_action( 'wpo_wcpdf_number_table_data_fetch', function ( ...$args ) {
+			$this->get_instance( 'debug' )->fetch_number_table_data( ...$args );
+		}, 10, 7 );
+		add_action( 'wpo_wcpdf_check_unstable_version_daily', function () {
+			$this->get_instance( 'debug' )->run_unstable_version_check();
+		} );
+		add_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing', function () {
+			$this->get_instance( 'upgrade' )->clear_extensions_license_cache();
+		} );
 	}
 
 	private function load_settings_components(): void {
@@ -657,7 +671,21 @@ class Settings {
 			$option_name = ( 'pdf' === $output_format || 'xml' === $output_format ) // In 5.0.0 and later, E‑Documents settings are isolated from document settings, so PDF is the default.
 				? "wpo_wcpdf_documents_settings_{$document_type}"
 				: "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
-			return get_option( $option_name, array() );
+
+			$settings = get_option( $option_name, array() );
+
+			if ( ! is_array( $settings ) ) {
+				static $logged = array();
+
+				if ( ! isset( $logged[ $option_name ] ) ) {
+					$logged[ $option_name ] = true;
+					wcpdf_log_error( sprintf( 'Malformed settings option %s, using defaults.', $option_name ), 'warning' );
+				}
+
+				return array();
+			}
+
+			return $settings;
 		} else {
 			return false;
 		}
@@ -1002,12 +1030,13 @@ class Settings {
 	/**
 	 * Callback for when general settings are updated, to check if we need to update the template list cache.
 	 *
-	 * @param array $old_settings
-	 * @param array $settings
+	 * @param mixed $old_settings
+	 * @param mixed $settings
 	 * @param string $option
 	 * @return void
 	 */
-	public function general_settings_updated( array $old_settings, array $settings, string $option ): void {
+	public function general_settings_updated( $old_settings, $settings, string $option ): void {
+		$settings = is_array( $settings ) ? $settings : array();
 		if ( ! empty ( $settings['template_path'] ) ) {
 			$this->delete_template_list_cache();
 			$this->set_template_list_cache( $this->get_installed_templates() );
@@ -1017,12 +1046,14 @@ class Settings {
 	/**
 	 * Callback for when debug settings are updated, to mark rewrite rules for flushing.
 	 *
-	 * @param array  $old_settings
-	 * @param array  $settings
+	 * @param mixed  $old_settings
+	 * @param mixed  $settings
 	 * @param string $option
 	 * @return void
 	 */
-	public function debug_settings_updated( array $old_settings, array $settings, string $option ): void {
+	public function debug_settings_updated( $old_settings, $settings, string $option ): void {
+		$old_settings     = is_array( $old_settings ) ? $old_settings : array();
+		$settings         = is_array( $settings ) ? $settings : array();
 		$old_pretty_links = ! empty( $old_settings['pretty_document_links'] );
 		$new_pretty_links = ! empty( $settings['pretty_document_links'] );
 

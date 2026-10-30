@@ -54,15 +54,15 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 			$parts = $this->compute_item_price_parts( $item, false );
 
 			$price_decimal_places = $this->get_line_price_decimal_places( $parts );
-			$qty                  = (float) $parts['qty'];
+			$qty                  = abs( (float) $parts['qty'] );
 
 			$xml_gross_unit_f = $qty > 0
-				? (float) $this->format_decimal( (float) $parts['gross_total'] / $qty, $price_decimal_places )
+				? (float) $this->format_decimal( abs( (float) $parts['gross_total'] ) / $qty, $price_decimal_places )
 				: 0.0;
 
 			$xml_net_unit_f = $qty > 0
-				? (float) $this->format_decimal( (float) $parts['net_total'] / $qty, $price_decimal_places )
-				: (float) $this->format_decimal( $parts['net_total'], $price_decimal_places );
+				? (float) $this->format_decimal( abs( (float) $parts['net_total'] ) / $qty, $price_decimal_places )
+				: (float) $this->format_decimal( abs( (float) $parts['net_total'] ), $price_decimal_places );
 
 			$xml_unit_discount_f = $xml_gross_unit_f - $xml_net_unit_f;
 			if ( $xml_unit_discount_f < 0 ) {
@@ -159,7 +159,9 @@ class IncludedSupplyChainTradeLineItemHandler extends AbstractCiiHandler {
 				}
 			}
 
-			$quantity_value = $parts['qty'];
+			$quantity_value = (float) $parts['net_total'] < 0
+				? -$qty
+				: $qty;
 
 			// Use Woo’s net_total for the line total amount.
 			$net_line_total_f = (float) $this->format_decimal( $parts['net_total'], 2 );
