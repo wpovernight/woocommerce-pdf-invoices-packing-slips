@@ -1228,7 +1228,7 @@ abstract class OrderDocument {
 			case 'checkout_field':
 				$type  = $this->get_checkout_field_type();
 				$title = $type
-					? \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_label( $this->order, $type ) . ':'
+					? \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_label( $this->order, $type, $this->get_settings() ) . ':'
 					: '';
 				break;
 			default:
@@ -2893,7 +2893,7 @@ abstract class OrderDocument {
 			return '';
 		}
 
-		return \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_types( $this->order )[0] ?? '';
+		return \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_types( $this->order, $this->get_settings() )[0] ?? '';
 	}
 
 	/**
