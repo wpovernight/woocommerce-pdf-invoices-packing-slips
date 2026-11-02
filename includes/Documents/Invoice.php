@@ -168,7 +168,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Get the document filename.
-	 *
+	 * 
 	 * @param string $context
 	 * @param array $args
 	 * @return string
@@ -217,7 +217,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * Initialise settings
-	 *
+	 * 
 	 * @return void
 	 */
 	public function init_settings(): void {
@@ -250,7 +250,7 @@ class Invoice extends OrderDocumentMethods {
 
 	/**
 	 * PDF settings fields
-	 *
+	 * 
 	 * @param string $option_name
 	 * @return array
 	 */
@@ -776,7 +776,7 @@ class Invoice extends OrderDocumentMethods {
 						'unmark_printed',
 						'disable_free',
 						'use_latest_settings',
-					),
+					)
 				),
 			),
 		);
@@ -788,7 +788,7 @@ class Invoice extends OrderDocumentMethods {
 			$this
 		);
 	}
-
+	
 	/**
 	 * Legacy function < v3.8.0
 	 *

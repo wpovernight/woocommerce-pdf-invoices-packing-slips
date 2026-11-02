@@ -67,7 +67,7 @@
 		</td>
 		<td class="order-data">
 			<table>
-				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order, $this ); ?>
 				<tr class="order-number">
 					<th><?php $this->order_number_title(); ?></th>
 					<td><?php $this->order_number(); ?></td>
@@ -82,7 +82,7 @@
 						<td><?php $this->shipping_method(); ?></td>
 					</tr>
 				<?php endif; ?>
-				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order, $this ); ?>
 			</table>
 		</td>
 	</tr>

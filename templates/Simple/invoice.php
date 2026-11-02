@@ -67,7 +67,7 @@
 		</td>
 		<td class="order-data">
 			<table>
-				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order, $this ); ?>
 				<?php if ( isset( $this->settings['display_number'] ) ) : ?>
 					<tr class="invoice-number">
 						<th><?php $this->number_title(); ?></th>
@@ -100,7 +100,7 @@
 						<td><?php $this->payment_method(); ?></td>
 					</tr>
 				<?php endif; ?>
-				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order, $this ); ?>
 			</table>
 		</td>
 	</tr>
