@@ -69,8 +69,11 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return string
 		 */
 		public function get_type( array $settings = array() ): string {
-			$general_settings = \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
-			$type             = $general_settings->get_setting( 'checkout_field_type', '', $settings );
+			$general_settings = \WPO_WCPDF()
+				->get_instance( 'settings' )
+				->get_instance( 'general' );
+
+			$type = (string) $general_settings->get_setting( 'checkout_field_type', '', $settings );
 
 			// Checkout can run before the admin request that upgrades the settings.
 			if ( '' === $type ) {
@@ -220,9 +223,13 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return string
 		 */
 		public function get_label( string $type = '', array $settings = array() ): string {
+			$general_settings = WPO_WCPDF()
+				->get_instance( 'settings' )
+				->get_instance( 'general' );
+
 			$type  = $type ?: $this->get_type( $settings );
 			$label = $type === $this->get_type( $settings )
-				? trim( \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' )->get_setting( 'checkout_field_label', '', $settings ) )
+				? trim( $general_settings->get_setting( 'checkout_field_label', '', $settings ) )
 				: '';
 
 			if ( '' === $label ) {
