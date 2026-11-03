@@ -656,8 +656,8 @@ class Settings {
 			'extra_1'                 => $general_settings['extra_1'] ?? '',
 			'extra_2'                 => $general_settings['extra_2'] ?? '',
 			'extra_3'                 => $general_settings['extra_3'] ?? '',
-			'checkout_field_type' => $general_settings['checkout_field_type'] ?? '',
-			'checkout_field_label' => $general_settings['checkout_field_label'] ?? '',
+			'checkout_field_type'     => $general_settings['checkout_field_type'] ?? '',
+			'checkout_field_label'    => $general_settings['checkout_field_label'] ?? '',
 			'checkout_field_alternative_type' => $general_settings['checkout_field_alternative_type'] ?? '',
 		);
 	}

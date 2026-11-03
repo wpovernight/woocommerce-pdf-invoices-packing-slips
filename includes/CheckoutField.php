@@ -69,11 +69,12 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return string
 		 */
 		public function get_type( array $settings = array() ): string {
-			$type = $this->get_general_setting( 'checkout_field_type', $settings );
+			$general_settings = \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
+			$type             = $general_settings->get_setting( 'checkout_field_type', '', $settings );
 
 			// Checkout can run before the admin request that upgrades the settings.
 			if ( '' === $type ) {
-				$type = $this->get_general_setting( 'checkout_field_as_vat_number', $settings )
+				$type = $general_settings->get_setting( 'checkout_field_as_vat_number', '', $settings )
 					? self::TYPE_VAT_NUMBER
 					: self::TYPE_CUSTOM;
 			}
@@ -88,7 +89,10 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return string Empty means use the primary type everywhere.
 		 */
 		public function get_alternative_type( array $settings = array() ): string {
-			$type = $this->get_general_setting( 'checkout_field_alternative_type', $settings );
+			$type = \WPO_WCPDF()
+				->get_instance( 'settings' )
+				->get_instance( 'general' )
+				->get_setting( 'checkout_field_alternative_type', '', $settings );
 
 			if ( '' === $type ) {
 				return '';
@@ -108,7 +112,10 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		 * @return string
 		 */
 		public function get_shop_country( array $settings = array() ): string {
-			return $this->get_general_setting( 'shop_address_country', $settings );
+			return \WPO_WCPDF()
+				->get_instance( 'settings' )
+				->get_instance( 'general' )
+				->get_setting( 'shop_address_country', '', $settings );
 		}
 
 		/**
@@ -215,7 +222,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		public function get_label( string $type = '', array $settings = array() ): string {
 			$type  = $type ?: $this->get_type( $settings );
 			$label = $type === $this->get_type( $settings )
-				? trim( $this->get_general_setting( 'checkout_field_label', $settings ) )
+				? trim( \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' )->get_setting( 'checkout_field_label', '', $settings ) )
 				: '';
 
 			if ( '' === $label ) {
@@ -508,24 +515,6 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 			return in_array( $type, $this->get_types(), true )
 			? $type
 			: self::TYPE_CUSTOM;
-		}
-
-		/**
-		 * Get a general setting, preferring the value in a settings snapshot.
-		 *
-		 * @param string               $key      Setting key.
-		 * @param array<string, mixed> $settings Settings snapshot. Empty uses the current settings.
-		 * @return string
-		 */
-		private function get_general_setting( string $key, array $settings = array() ): string {
-			if ( array_key_exists( $key, $settings ) && is_scalar( $settings[ $key ] ) ) {
-				return (string) $settings[ $key ];
-			}
-
-			return (string) \WPO_WCPDF()
-				->get_instance( 'settings' )
-				->get_instance( 'general' )
-				->get_setting( $key );
 		}
 
 		/**

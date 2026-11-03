@@ -980,14 +980,17 @@ class SettingsGeneral {
 	 *
 	 * @param string $key          The key of the setting to retrieve.
 	 * @param string|null $locale  Optional. Locale to retrieve. Falls back to 'default' if not provided or not found.
+	 * @param array<string, mixed> $settings Optional. Settings snapshot to read from. Keys missing from it fall back to the current settings.
 	 * @return string              The value of the setting.
 	 */
-	public function get_setting( string $key, ?string $locale = '' ): string {
+	public function get_setting( string $key, ?string $locale = '', array $settings = array() ): string {
 		if ( empty( $key ) ) {
 			return '';
 		}
 
-		$general_settings = get_option( $this->option_name, array() );
+		$general_settings = array_key_exists( $key, $settings )
+			? $settings
+			: get_option( $this->option_name, array() );
 		$setting_text     = '';
 
 		if ( ! empty( $general_settings[ $key ] ) ) {
