@@ -26,9 +26,9 @@ class Settings {
 	public ?SettingsEDI $edi                 = null;
 	
 	public string|false $options_page_hook   = false;
-	public array $general_settings;
-	public array $debug_settings;
-	public array $edi_settings;
+	public array $general_settings           = array();
+	public array $debug_settings             = array();
+	public array $edi_settings               = array();
 
 	private array $installed_templates       = array();
 	private array $installed_templates_cache = array();
@@ -82,8 +82,22 @@ class Settings {
 			add_action( 'wp_ajax_wpo_wcpdf_sync_address', array( $this, 'sync_shop_address_with_woo' ) );
 		}
 
-		// Runtime hook
+		// Runtime hooks must also be available to cron and CLI runners.
 		add_action( 'wpo_wcpdf_schedule_yearly_reset_numbers', array( $this, 'yearly_reset_numbers' ) );
+
+		// Register the original removable tax callbacks in every request context.
+		$this->get_instance( 'edi' );
+
+		// Load settings components only when their scheduled jobs run.
+		add_action( 'wpo_wcpdf_number_table_data_fetch', function ( ...$args ) {
+			$this->get_instance( 'debug' )->fetch_number_table_data( ...$args );
+		}, 10, 7 );
+		add_action( 'wpo_wcpdf_check_unstable_version_daily', function () {
+			$this->get_instance( 'debug' )->run_unstable_version_check();
+		} );
+		add_action( 'wpo_wcpdf_schedule_extensions_license_cache_clearing', function () {
+			$this->get_instance( 'upgrade' )->clear_extensions_license_cache();
+		} );
 	}
 
 	private function load_settings_components(): void {
@@ -657,7 +671,21 @@ class Settings {
 			$option_name = ( 'pdf' === $output_format || 'xml' === $output_format ) // In 5.0.0 and later, E‑Documents settings are isolated from document settings, so PDF is the default.
 				? "wpo_wcpdf_documents_settings_{$document_type}"
 				: "wpo_wcpdf_documents_settings_{$document_type}_{$output_format}";
-			return get_option( $option_name, array() );
+
+			$settings = get_option( $option_name, array() );
+
+			if ( ! is_array( $settings ) ) {
+				static $logged = array();
+
+				if ( ! isset( $logged[ $option_name ] ) ) {
+					$logged[ $option_name ] = true;
+					wcpdf_log_error( sprintf( 'Malformed settings option %s, using defaults.', $option_name ), 'warning' );
+				}
+
+				return array();
+			}
+
+			return $settings;
 		} else {
 			return false;
 		}
@@ -710,6 +738,98 @@ class Settings {
 	}
 
 	/**
+	 * Get the normalized group of a template ID (e.g. 'theme/MyTemplate' => 'theme').
+	 *
+	 * @param string $template_id
+	 * @return string One of 'default', 'premium_plugin', 'extension' or 'theme'.
+	 */
+	public function get_template_group( string $template_id ): string {
+		$group = dirname( $template_id );
+
+		if ( str_contains( $group, 'extension::' ) ) {
+			return 'extension';
+		}
+
+		if ( in_array( $group, array( 'default', 'premium_plugin' ), true ) ) {
+			return $group;
+		}
+
+		return 'theme';
+	}
+
+	/**
+	 * Whether the selected template is a custom (theme) template.
+	 *
+	 * @return bool
+	 */
+	public function is_custom_template(): bool {
+		$selected = $this->get_settings( 'general' )['template_path'] ?? '';
+
+		return ! empty( $selected ) && 'theme' === $this->get_template_group( $selected );
+	}
+
+	/**
+	 * Whether rendered markup escaped by an older template needs restoring.
+	 *
+	 * Templates that predate 6.0.0 run esc_html() on markup the plugin generates.
+	 * Any template we do not ship is assumed to be one of them, because a file can
+	 * be swapped in through wpo_wcpdf_template_file without changing the setting.
+	 *
+	 * @param string $template_file Resolved template file, when known.
+	 * @return bool
+	 */
+	public function template_needs_markup_restore( string $template_file = '' ): bool {
+		// Templates we do not ship, including files swapped in by a filter.
+		if ( '' !== $template_file && ! $this->is_known_template_file( $template_file ) ) {
+			return true;
+		}
+
+		// Custom templates copied from an older version.
+		if ( $this->is_custom_template() ) {
+			return true;
+		}
+
+		// Premium Templates below the version that stopped escaping document markup.
+		if ( function_exists( 'WPO_WCPDF_Templates' ) && version_compare( WPO_WCPDF_Templates()->version, '2.28.0', '<' ) ) {
+			return true;
+		}
+
+		// Order Proposal below the version that stopped escaping document markup.
+		if ( class_exists( 'WC_Order_Proposal' ) && version_compare( \WC_Order_Proposal::ORDER_PROPOSAL_VERSION, '2.5.0', '<' ) ) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether a template file lives in a directory shipped by this plugin or a known extension.
+	 *
+	 * @param string $template_file
+	 * @return bool
+	 */
+	public function is_known_template_file( string $template_file ): bool {
+		$known = apply_filters(
+			'wpo_ips_unescaped_markup_template_paths',
+			array( WPO_WCPDF()->plugin_path() . '/templates/' )
+		);
+
+		$file = wp_normalize_path( $template_file );
+
+		foreach ( (array) $known as $path ) {
+			if ( ! is_string( $path ) || '' === $path ) {
+				continue;
+			}
+
+			if ( 0 === strpos( $file, trailingslashit( wp_normalize_path( $path ) ) ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Get installed templates list as options.
 	 *
 	 * @return array
@@ -720,23 +840,16 @@ class Settings {
 
 		foreach ( $installed_templates as $path => $template_id ) {
 			$template_name = basename( $template_id );
-			$group         = dirname( $template_id );
 
-			// check if this is an extension template
-			if ( false !== strpos( $group, 'extension::' ) ) {
-				$extension = explode( '::', $group );
-				$group     = 'extension';
-			}
-
-			switch ( $group ) {
+			switch ( $this->get_template_group( $template_id ) ) {
 				case 'default':
 				case 'premium_plugin':
 					// no suffix
 					break;
 				case 'extension':
+					$extension     = explode( '::', dirname( $template_id ) );
 					$template_name = sprintf( '%s (%s) [%s]', $template_name, __( 'Extension', 'woocommerce-pdf-invoices-packing-slips' ), $extension[1] );
 					break;
-				case 'theme':
 				default:
 					$template_name = sprintf( '%s (%s)', $template_name, __( 'Custom', 'woocommerce-pdf-invoices-packing-slips' ) );
 					break;
@@ -917,12 +1030,13 @@ class Settings {
 	/**
 	 * Callback for when general settings are updated, to check if we need to update the template list cache.
 	 *
-	 * @param array $old_settings
-	 * @param array $settings
+	 * @param mixed $old_settings
+	 * @param mixed $settings
 	 * @param string $option
 	 * @return void
 	 */
-	public function general_settings_updated( array $old_settings, array $settings, string $option ): void {
+	public function general_settings_updated( $old_settings, $settings, string $option ): void {
+		$settings = is_array( $settings ) ? $settings : array();
 		if ( ! empty ( $settings['template_path'] ) ) {
 			$this->delete_template_list_cache();
 			$this->set_template_list_cache( $this->get_installed_templates() );
@@ -932,12 +1046,14 @@ class Settings {
 	/**
 	 * Callback for when debug settings are updated, to mark rewrite rules for flushing.
 	 *
-	 * @param array  $old_settings
-	 * @param array  $settings
+	 * @param mixed  $old_settings
+	 * @param mixed  $settings
 	 * @param string $option
 	 * @return void
 	 */
-	public function debug_settings_updated( array $old_settings, array $settings, string $option ): void {
+	public function debug_settings_updated( $old_settings, $settings, string $option ): void {
+		$old_settings     = is_array( $old_settings ) ? $old_settings : array();
+		$settings         = is_array( $settings ) ? $settings : array();
 		$old_pretty_links = ! empty( $old_settings['pretty_document_links'] );
 		$new_pretty_links = ! empty( $settings['pretty_document_links'] );
 

@@ -939,7 +939,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	 * @return array
 	 */
 	protected function compute_item_price_parts( $item, bool $lock_net_to_subtotal = false ): array {
-		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+		if ( $item instanceof \WC_Order_Item_Product ) {
 			$gross_total = (float) $item->get_subtotal();                                                  // ex-VAT, before discounts
 			$net_total   = (float) ( $lock_net_to_subtotal ? $item->get_subtotal() : $item->get_total() ); // ex-VAT, after discounts
 			$qty         = max( 1, absint( $item->get_quantity() ) );
@@ -994,7 +994,7 @@ abstract class AbstractHandler implements HandlerInterface {
 			$this
 		);
 		foreach ( (array) $skip_types as $class ) {
-			if ( is_a( $item, $class ) ) {
+			if ( is_a( $item, $class, true ) ) {
 				$rows = apply_filters( 'wpo_ips_edi_get_item_meta', array(), $item, $args, $this );
 				return is_array( $rows ) ? $rows : array();
 			}

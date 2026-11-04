@@ -738,7 +738,9 @@ class Notices {
 			return;
 		}
 
-		if ( is_callable( array( $this->settings, 'maybe_shop_address_is_incomplete' ) ) && $this->settings->maybe_shop_address_is_incomplete() ) {
+		$general_settings = $this->settings->get_instance( 'general' );
+
+		if ( $general_settings->maybe_shop_address_is_incomplete() ) {
 			$general_page_url = admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general' );
 			$dismiss_url      = wp_nonce_url( add_query_arg( 'wpo_dismiss_shop_address_notice', true ), 'dismiss_shop_address_notice' );
 			$notice_message   = sprintf(

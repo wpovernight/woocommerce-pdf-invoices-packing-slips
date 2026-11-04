@@ -266,12 +266,12 @@ function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $
 /**
  * Get the document file
  *
- * @param  \WPO\IPS\Documents\OrderDocument $document
+ * @param  \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\BulkDocument $document
  * @param  string $output_format
  * @param  string $error_handling
  * @return string|false
  */
-function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument $document, string $output_format = 'pdf', string $error_handling = 'exception' ): string|false {
+function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\BulkDocument $document, string $output_format = 'pdf', string $error_handling = 'exception' ): string|false {
 	$default_output_format = 'pdf';
 
 	if ( empty( $output_format ) ) {
@@ -609,6 +609,9 @@ function wcpdf_convert_encoding( string $string, string $tool = 'mb_convert_enco
 /**
  * Sanitize HTML content, prevents XSS attacks.
  *
+ * For text entered by users or shop managers: addresses, notes, custom fields.
+ * Deliberately excludes img and a, and $safe_tags caps what extensions may add.
+ *
  * @param string $html
  * @param string $context
  * @param array  $allow_tags
@@ -621,17 +624,37 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 	}
 
 	// Default allowed tags.
-	$allow_tags = array_merge(
-		apply_filters(
-			'wpo_wcpdf_sanitize_html_default_allow_tags',
+	$default_tags = array(
+		'br'     => array(),
+		'em'     => array(),
+		'strong' => array(),
+		'p'      => array(),
+	);
+
+	// Addresses carry formatting from the address customization setting and from
+	// extensions that label fields, so they allow a wider set. Every tag here is
+	// inert: no URLs, no scripting, no event-capable attributes.
+	if ( 'address' === $context ) {
+		$default_tags = array_merge(
+			$default_tags,
 			array(
-				'br'     => array(),
-				'em'     => array(),
-				'strong' => array(),
-				'p'      => array(),
-			),
-			$context
-		),
+				'b'    => array(),
+				'i'    => array(),
+				'u'    => array(),
+				'h1'   => array(),
+				'h2'   => array(),
+				'h3'   => array(),
+				'h4'   => array(),
+				'h5'   => array(),
+				'h6'   => array(),
+				'span' => array( 'class', 'style' ),
+				'div'  => array( 'class', 'style' ),
+			)
+		);
+	}
+
+	$allow_tags = array_merge(
+		apply_filters( 'wpo_wcpdf_sanitize_html_default_allow_tags', $default_tags, $context ),
 		$allow_tags
 	);
 
@@ -647,14 +670,14 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		'strong'     => array(),
 		'u'          => array(),
 		'ul'         => array(),
-		'span'       => array( 'style' ),
+		'span'       => array( 'class', 'style' ),
 		'h1'         => array(),
 		'h2'         => array(),
 		'h3'         => array(),
 		'h4'         => array(),
 		'h5'         => array(),
 		'h6'         => array(),
-		'div'        => array( 'style' ),
+		'div'        => array( 'class', 'style' ),
 		'table'      => array( 'border', 'cellspacing', 'cellpadding' ),
 		'tr'         => array(),
 		'td'         => array( 'colspan', 'rowspan' ),
@@ -704,11 +727,11 @@ function wpo_wcpdf_sanitize_phone_number( string $text ): string {
 /**
  * Safe redirect or die.
  *
- * @param  string          $url
+ * @param  string|null     $url
  * @param  string|\WP_Error $message
  * @return void
  */
-function wcpdf_safe_redirect_or_die( string $url = '', string|\WP_Error $message = '' ): void {
+function wcpdf_safe_redirect_or_die( ?string $url = '', string|\WP_Error $message = '' ): void {
 	if ( ! empty( $url ) ) {
 		wp_safe_redirect( $url );
 		exit;
@@ -1649,7 +1672,7 @@ function wpo_wcpdf_format_address( array $address ): string {
 	// Remove any new lines.
 	$formatted_address = str_replace( "\n", '', $formatted_address );
 
-	return esc_html( $formatted_address );
+	return $formatted_address;
 }
 
 /**
@@ -2750,7 +2773,11 @@ function wpo_ips_is_pretty_document_link_request(): bool {
 		'/'
 	);
 
-	return $request_path === $identifier || 0 === strpos( $request_path . '/', $identifier . '/' );
+	// Document links are relative to the home URL, which may include a subdirectory.
+	$home_path     = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+	$endpoint_path = ltrim( $home_path . '/' . $identifier, '/' );
+
+	return $request_path === $endpoint_path || 0 === strpos( $request_path . '/', $endpoint_path . '/' );
 }
 
 /**
@@ -2870,6 +2897,30 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 		$urls[] = (string) wp_get_attachment_image_url( $settings_document->get_header_logo_id(), 'full' );
 	}
 
+	// Rendered documents recorded their remote sources, including each order in a bulk document.
+	$rendered_urls = is_object( $document ) && is_callable( array( $document, 'get_rendered_resource_urls' ) ) ? $document->get_rendered_resource_urls() : null;
+
+	if ( null !== $rendered_urls ) {
+		return array_values( array_unique( array_filter( array_merge( $urls, $rendered_urls ) ) ) );
+	}
+
+	// Each invoice in a bulk PDF can retain a different logo in its historical settings.
+	if ( $document instanceof \WPO\IPS\Documents\BulkDocument ) {
+		foreach ( array_filter( $document->order_ids ) as $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( ! $order ) {
+				continue;
+			}
+
+			$order_document = wcpdf_get_document( $document->get_type(), $order );
+
+			if ( $order_document && is_callable( array( $order_document, 'get_header_logo_id' ) ) && $order_document->get_header_logo_id() ) {
+				$urls[] = (string) wp_get_attachment_image_url( $order_document->get_header_logo_id(), 'full' );
+			}
+		}
+	}
+
 	// Product thumbnails, e.g. the Premium Templates thumbnail column.
 	if ( $settings_document && is_callable( array( $settings_document, 'get_thumbnail' ) ) ) {
 		$order_ids = $document->order_ids ?? array( $document->order_id ?? 0 );
@@ -2887,20 +2938,39 @@ function wpo_ips_get_trusted_resource_urls( ?object $document = null ): array {
 
 				if ( '' !== $thumbnail ) {
 					// Use the rendered source, including CDN filters and thumbnail-size overrides.
-					$html = new \DOMDocument();
-					$html->loadHTML( '<?xml encoding="UTF-8">' . $thumbnail, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
-					foreach ( $html->getElementsByTagName( 'img' ) as $image ) {
-						$src = $image->getAttribute( 'src' );
-						if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
-							$urls[] = $src;
-						}
-					}
+					$urls = array_merge( $urls, wpo_ips_get_remote_image_urls( $thumbnail ) );
 				}
 			}
 		}
 	}
 
 	return array_values( array_unique( array_filter( $urls ) ) );
+}
+
+/**
+ * Get the remote (http, https or protocol-relative) image sources in an HTML fragment.
+ *
+ * @param string $html
+ * @return string[]
+ */
+function wpo_ips_get_remote_image_urls( string $html ): array {
+	// Local paths never contain '//', so skip parsing them.
+	if ( ! str_contains( $html, '//' ) ) {
+		return array();
+	}
+
+	$urls = array();
+	$dom  = new \DOMDocument();
+	$dom->loadHTML( '<?xml encoding="UTF-8">' . $html, LIBXML_NONET | LIBXML_NOERROR | LIBXML_NOWARNING );
+
+	foreach ( $dom->getElementsByTagName( 'img' ) as $image ) {
+		$src = $image->getAttribute( 'src' );
+		if ( str_starts_with( $src, '//' ) || in_array( strtolower( (string) wp_parse_url( $src, PHP_URL_SCHEME ) ), array( 'http', 'https' ), true ) ) {
+			$urls[] = $src;
+		}
+	}
+
+	return $urls;
 }
 
 /**
@@ -2989,4 +3059,117 @@ function wpo_ips_normalize_remote_hosts( array|string $hosts, array &$rejected =
 	}
 
 	return array_values( array_unique( $normalized ) );
+}
+
+/**
+ * Sanitize formatted price and totals HTML for document output.
+ * Allows only the markup wc_price() and WooCommerce order totals produce.
+ *
+ * @param mixed $price_html
+ * @return string
+ */
+function wpo_ips_kses_price( $price_html ): string {
+	if ( ! is_scalar( $price_html ) && ! ( is_object( $price_html ) && method_exists( $price_html, '__toString' ) ) ) {
+		return '';
+	}
+
+	return wp_kses( (string) $price_html, array(
+		'span'   => array( 'class' => true, 'translate' => true, 'dir' => true ),
+		'bdi'    => array( 'class' => true, 'dir' => true ),
+		'del'    => array( 'class' => true ),
+		'ins'    => array( 'class' => true ),
+		'small'  => array( 'class' => true ),
+		'p'      => array( 'class' => true ),
+		'br'     => array(),
+		'strong' => array(),
+	) );
+}
+
+/**
+ * Sanitize document content HTML for output in templates.
+ *
+ * For markup the plugin and its extensions generate: item cells, price markup,
+ * thumbnails. Allows img and a, which the user-input sanitizer must never allow.
+ *
+ * @param mixed $html
+ * @return string
+ */
+function wpo_ips_kses_document_content( $html ): string {
+	if ( ! is_scalar( $html ) && ! ( is_object( $html ) && method_exists( $html, '__toString' ) ) ) {
+		return '';
+	}
+
+	$html    = (string) $html;
+	$allowed = array(
+		// price & totals markup
+		'span'       => array( 'class' => true, 'style' => true, 'translate' => true, 'dir' => true ),
+		'bdi'        => array( 'class' => true, 'dir' => true ),
+		'del'        => array( 'class' => true ),
+		'ins'        => array( 'class' => true ),
+		'small'      => array( 'class' => true ),
+		// item cell & meta markup
+		'img'        => array( 'src' => true, 'alt' => true, 'width' => true, 'height' => true, 'class' => true, 'style' => true ),
+		'div'        => array( 'class' => true, 'style' => true ),
+		'p'          => array( 'class' => true, 'style' => true ),
+		'br'         => array(),
+		'strong'     => array( 'class' => true ),
+		'b'          => array( 'class' => true ),
+		'em'         => array( 'class' => true ),
+		'i'          => array( 'class' => true ),
+		'u'          => array( 'class' => true ),
+		'ul'         => array( 'class' => true ),
+		'ol'         => array( 'class' => true ),
+		'li'         => array( 'class' => true ),
+		'dl'         => array( 'class' => true ),
+		'dt'         => array( 'class' => true ),
+		'dd'         => array( 'class' => true ),
+		'table'      => array( 'class' => true, 'style' => true, 'border' => true, 'cellspacing' => true, 'cellpadding' => true ),
+		'thead'      => array( 'class' => true ),
+		'tbody'      => array( 'class' => true ),
+		'tfoot'      => array( 'class' => true ),
+		'tr'         => array( 'class' => true ),
+		'th'         => array( 'class' => true, 'style' => true, 'colspan' => true, 'rowspan' => true, 'scope' => true ),
+		'td'         => array( 'class' => true, 'style' => true, 'colspan' => true, 'rowspan' => true ),
+		'h1'         => array( 'class' => true ),
+		'h2'         => array( 'class' => true ),
+		'h3'         => array( 'class' => true ),
+		'h4'         => array( 'class' => true ),
+		'h5'         => array( 'class' => true ),
+		'h6'         => array( 'class' => true ),
+		'hr'         => array( 'class' => true ),
+		'sup'        => array( 'class' => true ),
+		'sub'        => array( 'class' => true ),
+		'abbr'       => array( 'class' => true, 'title' => true ),
+		'code'       => array( 'class' => true ),
+		'pre'        => array( 'class' => true ),
+		'blockquote' => array( 'class' => true ),
+		'figure'     => array( 'class' => true ),
+		'figcaption' => array( 'class' => true ),
+		'a'          => array( 'href' => true, 'class' => true, 'title' => true ),
+	);
+
+	$protocols = apply_filters(
+		'wpo_ips_kses_document_content_allowed_protocols',
+		array( 'http', 'https', 'data', 'mailto', 'tel' )
+	);
+
+	return wp_kses( $html, apply_filters( 'wpo_ips_kses_document_content_allowed_html', $allowed ), $protocols );
+}
+
+/**
+ * Prepare an assembled document for the PDF renderer.
+ *
+ * Converts non-ASCII characters to HTML entities. Never decode entities here:
+ * this runs on the finished document, after every field sanitizer, so decoding
+ * would revive markup those sanitizers removed.
+ *
+ * @param string $html Assembled document HTML.
+ * @return string
+ */
+function wpo_ips_prepare_document_html( string $html ): string {
+	if ( apply_filters( 'wpo_wcpdf_convert_encoding', true ) ) {
+		$html = wcpdf_convert_encoding( $html );
+	}
+
+	return $html;
 }

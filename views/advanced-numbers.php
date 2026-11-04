@@ -1,22 +1,24 @@
 <?php defined( 'ABSPATH' ) or exit; ?>
 
-<div class="wcpdf_document_settings_sections wcpdf_advanced_numbers_choose_table">
-	<?php
-		$choose_table_title = isset( $number_store_tables[ $selected_table_name ] ) ? esc_attr( $number_store_tables[ $selected_table_name ] ) : __( 'Choose a number store', 'woocommerce-pdf-invoices-packing-slips' );
-		echo '<h2>' . esc_html( $choose_table_title ) . '<span class="arrow-down">&#9660;</span></h2>';
-	?>
-	<ul>
+<div class="wcpdf_advanced_numbers_choose_table">
+	<div class="wcpdf_document_settings_sections">
 		<?php
-			foreach ( $number_store_tables as $table_name => $title ) {
-				if ( isset( $list_table_name ) && $table_name !== $list_table_name ) {
-					if ( empty( trim( $title ) ) ) {
-						$title = '[' . __( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ) . ']';
-					}
-					printf( '<li><a href="%1$s">%2$s</a></li>', esc_url( add_query_arg( 'table_name', esc_attr( $table_name ) ) ), esc_html( $title ) );
-				}
-			}
+			$choose_table_title = isset( $number_store_tables[ $selected_table_name ] ) ? esc_attr( $number_store_tables[ $selected_table_name ] ) : __( 'Choose a number store', 'woocommerce-pdf-invoices-packing-slips' );
+			echo '<h2>' . esc_html( $choose_table_title ) . '<span class="arrow-down">&#9660;</span></h2>';
 		?>
-	</ul>
+		<ul>
+			<?php
+				foreach ( $number_store_tables as $table_name => $title ) {
+					if ( isset( $list_table_name ) && $table_name !== $list_table_name ) {
+						if ( empty( trim( $title ) ) ) {
+							$title = '[' . __( 'untitled', 'woocommerce-pdf-invoices-packing-slips' ) . ']';
+						}
+						printf( '<li><a href="%1$s">%2$s</a></li>', esc_url( add_query_arg( 'table_name', esc_attr( $table_name ) ) ), esc_html( $title ) );
+					}
+				}
+			?>
+		</ul>
+	</div>
 	<?php if ( ! empty( $document_type ) && 'invoice' !== $document_type && in_array( $document_type, $invoice_number_store_doc_types, true ) ) : ?>
 		<div class="notice notice-warning inline">
 			<p><?php esc_html_e( 'This document is currently using the main invoice number sequence.', 'woocommerce-pdf-invoices-packing-slips' ); ?></p>

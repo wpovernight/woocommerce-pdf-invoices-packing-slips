@@ -120,7 +120,7 @@
 		<?php foreach ( $this->get_order_items() as $item_id => $item ) : ?>
 			<tr class="<?php echo esc_attr( $item['row_class'] ); ?>">
 				<td class="product">
-					<p class="item-name"><?php echo esc_html( $item['name'] ); ?></p>
+					<p class="item-name"><?php echo wpo_ips_kses_document_content( $item['name'] ); ?></p>
 					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order ); ?>
 					<div class="item-meta">
 						<?php if ( ! empty( $item['sku'] ) ) : ?>
@@ -138,7 +138,7 @@
 					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->get_type(), $item, $this->order ); ?>
 				</td>
 				<td class="quantity"><?php echo esc_html( $item['quantity'] ); ?></td>
-				<td class="price"><?php echo esc_html( $item['order_price'] ); ?></td>
+				<td class="price"><?php echo wpo_ips_kses_price( $item['order_price'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_ips_kses_price() ?></td>
 			</tr>
 		<?php endforeach; ?>
 	</tbody>
@@ -171,7 +171,7 @@
 						<?php foreach ( $this->get_woocommerce_totals() as $key => $total ) : ?>
 							<tr class="<?php echo esc_attr( $key ); ?>">
 								<th class="description"><?php echo esc_html( $total['label'] ); ?></th>
-								<td class="price"><span class="totals-price"><?php echo esc_html( $total['value'] ); ?></span></td>
+								<td class="price"><span class="totals-price"><?php echo wpo_ips_kses_price( $total['value'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_ips_kses_price() ?></span></td>
 							</tr>
 						<?php endforeach; ?>
 					</tfoot>

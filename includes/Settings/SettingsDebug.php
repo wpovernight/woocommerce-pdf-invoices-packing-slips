@@ -42,8 +42,6 @@ class SettingsDebug {
 		// IPS
 		add_action( 'wpo_wcpdf_settings_output_debug', array( $this, 'output' ), 10, 2 );
 		add_filter( 'pre_update_option_wpo_wcpdf_settings_debug', array( $this, 'normalize_allowed_remote_hosts' ) );
-		add_action( 'wpo_wcpdf_number_table_data_fetch', array( $this, 'fetch_number_table_data' ), 10, 7 );
-		add_action( 'wpo_wcpdf_check_unstable_version_daily', array( $this, 'run_unstable_version_check' ) );
 		add_action( 'wpo_wcpdf_after_sidebar', array( $this, 'display_search_field' ), 10, 2 );
 
 		// AJAX
@@ -1732,12 +1730,7 @@ class SettingsDebug {
 		$chunk_results = $wpdb->get_results( $query ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
 
 		if ( empty( $chunk_results ) ) {
-			if ( function_exists( '\\as_unschedule_all_actions' ) ) {
-				\as_unschedule_all_actions( $hook );
-			} else {
-				wcpdf_log_error( 'Action Scheduler function not available. Cannot unschedule number table data fetch.', 'critical' );
-			}
-
+			// This fetch is complete; leave queued fetches for other stores untouched.
 			update_option( $option_name . '::last_time', time() );
 			return; // exit if no more results
 		}

@@ -24,10 +24,11 @@ abstract class OrderDocument {
 	public bool $enabled;
 	public array $output_formats             = array();
 
-	
 	protected array $linked_documents        = array();
 	protected array $data                    = array();
 	protected array $resolved_settings_cache = array();
+	protected ?array $rendered_resource_urls = null;
+	protected array $escaped_prices          = array(); // V5 compatibility
 
 	/**
 	 * Init/load the order object.
@@ -35,9 +36,12 @@ abstract class OrderDocument {
 	 * @param int|object|null $order Order to init.
 	 */
 	public function __construct( $order = 0 ) {
+		// Register template hooks before reading document data or resolving settings.
+		WPO_WCPDF()->get_instance( 'main' )->load_template_functions();
+
 		if ( is_numeric( $order ) && $order > 0 ) {
 			$this->order_id = absint( $order );
-			$this->order    = wc_get_order( $this->order_id );
+			$this->order    = wc_get_order( $this->order_id ) ?: null;
 		} elseif ( $order instanceof \WC_Order || is_subclass_of( $order, '\WC_Abstract_Order') ) {
 			$this->order_id = $order->get_id();
 			$this->order    = $order;
@@ -1254,7 +1258,23 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function language_attributes(): void {
-		echo esc_html( $this->get_language_attributes() );
+		$attributes = $this->get_language_attributes();
+		$safe       = array();
+
+		// Rebuild from well-formed name="value" pairs only, so a filter cannot
+		// break out of the <html> tag or add an event handler.
+		if ( preg_match_all( '/([a-zA-Z][a-zA-Z0-9:_.-]*)\s*=\s*(?:"([^"<>]*)"|\'([^\'<>]*)\')/', $attributes, $matches, PREG_SET_ORDER ) ) {
+			foreach ( $matches as $match ) {
+				if ( 0 === stripos( $match[1], 'on' ) ) {
+					continue; // event handler
+				}
+
+				$value  = ( isset( $match[3] ) && '' !== $match[3] ) ? $match[3] : $match[2];
+				$safe[] = sprintf( '%s="%s"', strtolower( $match[1] ), esc_attr( $value ) );
+			}
+		}
+
+		echo implode( ' ', $safe ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- rebuilt from an allowlist, values escaped
 	}
 
 	/**
@@ -1305,14 +1325,13 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function set_date( mixed $value, ?\WC_Abstract_Order $order = null ): void {
-		$order = empty( $order ) ? $this->order : $order;
 		try {
 			if ( empty( $value ) ) {
 				$this->data['date'] = null;
 				return;
 			}
 
-			if ( is_a( $value, 'WC_DateTime' ) ) {
+			if ( $value instanceof \WC_DateTime ) {
 				$datetime = $value;
 			} elseif ( is_numeric( $value ) ) {
 				// Timestamps are handled as UTC timestamps in all cases.
@@ -1388,8 +1407,6 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function set_notes( mixed $value, ?\WC_Abstract_Order $order = null ): void {
-		$order = empty( $order ) ? $this->order : $order;
-
 		try {
 			if ( empty( $value ) ) {
 				$this->data['notes'] = null;
@@ -1412,8 +1429,6 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function set_display_date( mixed $value, ?\WC_Abstract_Order $order = null ): void {
-		$order = empty( $order ) ? $this->order : $order;
-
 		try {
 			if ( empty( $value ) ) {
 				$this->data['display_date'] = null;
@@ -1465,7 +1480,7 @@ abstract class OrderDocument {
 
 		$css = apply_filters( 'wpo_wcpdf_template_styles', $css, $this );
 
-		echo esc_textarea( $css );
+		echo wp_strip_all_tags( $css ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS; tags stripped so the style block cannot be closed
 	}
 
 	/**
@@ -1480,7 +1495,7 @@ abstract class OrderDocument {
 
 		$css = apply_filters( 'wpo_wcpdf_template_custom_styles', ob_get_clean(), $this );
 
-		echo esc_html( $css );
+		echo wp_strip_all_tags( $css ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- CSS; tags stripped so the style block cannot be closed
 	}
 
 	/**
@@ -1693,7 +1708,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_line_1(): string {
-		return $this->get_settings_text( 'shop_address_line_1' );
+		return $this->get_settings_text( 'shop_address_line_1', '', false );
 	}
 	
 	/**
@@ -1711,7 +1726,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_line_2(): string {
-		return $this->get_settings_text( 'shop_address_line_2' );
+		return $this->get_settings_text( 'shop_address_line_2', '', false );
 	}
 	
 	/**
@@ -1765,7 +1780,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_state(): string {
-		return $this->get_settings_text( 'shop_address_state' );
+		return $this->get_settings_text( 'shop_address_state', '', false );
 	}
 	
 	/**
@@ -1783,7 +1798,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_city(): string {
-		return $this->get_settings_text( 'shop_address_city' );
+		return $this->get_settings_text( 'shop_address_city', '', false );
 	}
 	
 	/**
@@ -1801,7 +1816,7 @@ abstract class OrderDocument {
 	 * @return string
 	 */
 	public function get_shop_address_postcode(): string {
-		return $this->get_settings_text( 'shop_address_postcode' );
+		return $this->get_settings_text( 'shop_address_postcode', '', false );
 	}
 	
 	/**
@@ -1868,7 +1883,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address(): void {
-		echo esc_html( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ) );
+		echo wpo_wcpdf_sanitize_html_content( apply_filters( 'wpo_wcpdf_shop_address', $this->get_shop_address(), $this ), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	}
 
 	/**
@@ -2063,12 +2078,23 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Get remote resource URLs emitted while rendering the HTML.
+	 *
+	 * @return string[]|null Null means the HTML has not been rendered.
+	 */
+	public function get_rendered_resource_urls(): ?array {
+		return null === $this->rendered_resource_urls ? null : array_keys( $this->rendered_resource_urls );
+	}
+
+	/**
 	 * Get the HTML content for the document.
 	 *
 	 * @param array $args
 	 * @return string
 	 */
 	public function get_html( array $args = array() ): string {
+		$this->rendered_resource_urls = array();
+
 		\WPO_WCPDF()->get_instance( 'main' )->load_template_functions();
 
 		// temporarily apply filters that need to be removed again after the html is generated
@@ -2082,20 +2108,58 @@ abstract class OrderDocument {
 		);
 		$args = $args + $default_args;
 
-		$html = $this->render_template( $this->locate_template_file( "{$this->type}.php" ), array(
-				'order'    => $this->order,
-				'order_id' => $this->order_id,
-			)
+		// Custom templates copied before 6.0.0 run esc_html() on price markup.
+		// Record every price rendered so it can be restored below.
+		$template_file = $this->locate_template_file( "{$this->type}.php" );
+		$record_prices = \WPO_WCPDF()->get_instance( 'settings' )->template_needs_markup_restore( $template_file );
+
+		$price_filters = array(
+			'wc_price'                                  => array( $this, 'record_escaped_markup' ),
+			'woocommerce_order_formatted_line_subtotal' => array( $this, 'record_escaped_markup' ),
+			'woocommerce_get_order_item_totals'         => array( $this, 'record_escaped_total_rows' ),
+			'wpo_wcpdf_templates_table_body'            => array( $this, 'record_escaped_table_body' ),
+			'wpo_wcpdf_templates_totals'                => array( $this, 'record_escaped_total_rows' ),
+			'wpo_wcpdf_woocommerce_totals'              => array( $this, 'record_escaped_total_rows' ),
 		);
+
+		if ( $record_prices ) {
+			foreach ( $price_filters as $hook => $callback ) {
+				add_filter( $hook, $callback, 9999 );
+			}
+		}
+
+		try {
+			$html = $this->render_template(
+				$template_file,
+				array(
+					'order'    => $this->order,
+					'order_id' => $this->order_id,
+				)
+			);
+		} finally {
+			if ( $record_prices ) {
+				foreach ( $price_filters as $hook => $callback ) {
+					remove_filter( $hook, $callback, 9999 );
+				}
+			}
+		}
 
 		if ( $args['wrap_html_content'] ) {
 			$html = $this->wrap_html_content( $html );
 		}
 
-		// clean up special characters
-		if ( apply_filters( 'wpo_wcpdf_convert_encoding', function_exists( 'htmlspecialchars_decode' ) ) ) {
-			$html = htmlspecialchars_decode( wcpdf_convert_encoding( $html ), ENT_QUOTES );
+		// Restore markup escaped by pre-6.0.0 custom templates.
+		if ( ! empty( $this->escaped_prices ) ) {
+			$escaped_prices = $this->escaped_prices;
+
+			uksort( $escaped_prices, static function ( string $a, string $b ): int {
+				return strlen( $b ) <=> strlen( $a );
+			} );
+
+			$html = str_replace( array_keys( $escaped_prices ), array_values( $escaped_prices ), $html );
 		}
+
+		$html = wpo_ips_prepare_document_html( $html );
 
 		do_action( 'wpo_wcpdf_after_html', $this->get_type(), $this );
 
@@ -2216,6 +2280,60 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Record the escaped form of rendered markup so get_html() can restore it.
+	 *
+	 * @param mixed $html
+	 * @return mixed
+	 */
+	public function record_escaped_markup( $html ) {
+		if ( ! is_string( $html ) || '' === $html ) {
+			return $html;
+		}
+
+		$key = esc_html( $html );
+
+		if ( ! isset( $this->escaped_prices[ $key ] ) ) {
+			$this->escaped_prices[ $key ] = wpo_ips_kses_document_content( $html );
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Record each value of a WooCommerce order totals row set.
+	 *
+	 * @param array $total_rows
+	 * @return array
+	 */
+	public function record_escaped_total_rows( $total_rows ) {
+		foreach ( (array) $total_rows as $row ) {
+			if ( isset( $row['value'] ) && is_string( $row['value'] ) ) {
+				$this->record_escaped_markup( $row['value'] );
+			}
+		}
+
+		return $total_rows;
+	}
+
+	/**
+	 * Record each cell of a Premium Templates item table body.
+	 *
+	 * @param array $body
+	 * @return array
+	 */
+	public function record_escaped_table_body( $body ) {
+		foreach ( (array) $body as $columns ) {
+			foreach ( (array) $columns as $column ) {
+				if ( isset( $column['data'] ) && is_string( $column['data'] ) ) {
+					$this->record_escaped_markup( $column['data'] );
+				}
+			}
+		}
+
+		return $body;
+	}
+
+	/**
 	 * Get the filename for the document.
 	 *
 	 * @param string $context
@@ -2305,6 +2423,7 @@ abstract class OrderDocument {
 		if ( WPO_WCPDF()->get_instance( 'file_system' )->exists( $file ) ) {
 			include( $file );
 		}
+
 		return ob_get_clean();
 	}
 
