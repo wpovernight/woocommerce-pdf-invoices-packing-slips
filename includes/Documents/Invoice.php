@@ -375,7 +375,7 @@ class Invoice extends OrderDocumentMethods {
 					'description' => sprintf(
 						/* translators: %s: General settings link */
 						__( 'Display the value customers enter in the checkout field, configured in the %s.', 'woocommerce-pdf-invoices-packing-slips' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general#checkout_field' ) ) . '" target="_blank">' . esc_html__( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
+						'<a href="' . esc_url( admin_url( 'admin.php?page=wpo_wcpdf_options_page&tab=general#checkout_field' ) ) . '">' . esc_html__( 'General settings', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 					),
 				)
 			),

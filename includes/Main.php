@@ -71,6 +71,7 @@ class Main {
 		add_action( 'wpo_wcpdf_save_document', array( $this, 'wc_webhook_trigger' ), 10, 2 );
 		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_due_date_table_row' ), 10, 3 );
 		add_action( 'wpo_wcpdf_after_order_data', array( $this, 'display_checkout_field_table_row' ), 10, 3 );
+		add_action( 'wpo_wcpdf_after_billing_address', array( $this, 'display_checkout_field_billing_address' ), 10, 3 );
 		add_action( 'wpo_wcpdf_delete_document', array( $this, 'log_document_deletion_to_order_notes' ) );
 		
 		// AJAX
@@ -2316,8 +2317,7 @@ class Main {
 	/**
 	 * Display checkout field table row in the order data section.
 	 *
-	 * This is the only place the row is rendered, for every template (Simple included),
-	 * so it never depends on which template file ends up being used.
+	 * Business identifiers are rendered below the billing address instead.
 	 *
 	 * @param null|string $document_type
 	 * @param null|\WC_Abstract_Order $order
@@ -2326,8 +2326,62 @@ class Main {
 	 * @return void
 	 */
 	public function display_checkout_field_table_row( ?string $document_type = null, ?\WC_Abstract_Order $order = null, ?OrderDocument $document = null ): void {
-		if ( empty( $order ) || empty( $document_type ) ) {
+		$document = $this->get_checkout_field_document( $document_type, $order, $document, false );
+
+		if ( ! $document ) {
 			return;
+		}
+
+		echo '<tr class="checkout-field">
+			<th>', esc_html( $document->get_checkout_field_title() ), '</th>
+			<td>', esc_html( $document->get_checkout_field_value() ), '</td>
+		</tr>';
+	}
+
+	/**
+	 * Display a checkout business identifier below the billing address.
+	 *
+	 * @param null|string             $document_type Document type.
+	 * @param null|\WC_Abstract_Order $order         Order object.
+	 * @param null|OrderDocument      $document      Document passed by the template; templates that only pass two args get a new instance.
+	 *
+	 * @return void
+	 */
+	public function display_checkout_field_billing_address(
+		?string $document_type = null,
+		?\WC_Abstract_Order $order = null,
+		?OrderDocument $document = null
+	): void {
+		$document = $this->get_checkout_field_document( $document_type, $order, $document, true );
+
+		if ( ! $document ) {
+			return;
+		}
+
+		echo '<div class="checkout-field">',
+			esc_html( $document->get_checkout_field_title() ), ' ',
+			esc_html( $document->get_checkout_field_value() ),
+		'</div>';
+	}
+
+	/**
+	 * Resolve the document for checkout field display at a given placement.
+	 *
+	 * @param null|string             $document_type         Document type.
+	 * @param null|\WC_Abstract_Order $order                 Order object.
+	 * @param null|OrderDocument      $document              Document passed by the template, if any.
+	 * @param bool                    $below_billing_address Whether the caller renders below the billing address.
+	 *
+	 * @return OrderDocument|null Document when the checkout field should be shown at this placement, null otherwise.
+	 */
+	private function get_checkout_field_document(
+		?string $document_type,
+		?\WC_Abstract_Order $order,
+		?OrderDocument $document,
+		bool $below_billing_address
+	): ?OrderDocument {
+		if ( empty( $order ) || empty( $document_type ) ) {
+			return null;
 		}
 
 		$document = $document ?? wcpdf_get_document( $document_type, $order );
@@ -2337,13 +2391,16 @@ class Main {
 			! is_callable( array( $document, 'show_checkout_field' ) ) ||
 			! $document->show_checkout_field()
 		) {
-			return;
+			return null;
 		}
 
-		echo '<tr class="checkout-field">
-			<th>', esc_html( $document->get_checkout_field_title() ), '</th>
-			<td>', esc_html( $document->get_checkout_field_value() ), '</td>
-		</tr>';
+		$is_business_identifier = in_array(
+			$document->get_checkout_field_type(),
+			array( 'vat_number', 'registration_number' ),
+			true
+		);
+
+		return $is_business_identifier === $below_billing_address ? $document : null;
 	}
 
 	/**
