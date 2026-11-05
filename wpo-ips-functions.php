@@ -2817,6 +2817,22 @@ function wpo_ips_is_checkout_request(): bool {
 }
 
 /**
+ * Checks whether the current request is a WooCommerce API request (`?wc-api=...`),
+ * including the legacy REST API served by the WooCommerce Legacy REST API plugin.
+ *
+ * @return bool
+ */
+function wpo_ips_is_wc_api_request(): bool {
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
+	if ( ! isset( $_GET['wc-api'] ) || ! is_scalar( $_GET['wc-api'] ) ) {
+		return false;
+	}
+
+	return '' !== sanitize_key( wp_unslash( (string) $_GET['wc-api'] ) );
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
+}
+
+/**
  * Checks whether the current request may require document-related functionality.
  *
  * @return bool
