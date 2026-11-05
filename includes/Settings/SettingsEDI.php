@@ -365,7 +365,7 @@ class SettingsEDI {
 				'id'                => 'peppol_automatic_endpoint_id_derivation',
 				'description'       => sprintf(
 					/* translators: %s: link to documentation */
-					__( 'Automatically generate Peppol IDs from VAT numbers for supported countries. This can help ensure the correct format and reduce errors. %s', 'woocommerce-pdf-invoices-packing-slips' ),
+					__( 'Look up customer Peppol Endpoint IDs from VAT numbers for the selected billing countries. When the customer field is enabled at checkout, the lookup fills that field during checkout. Otherwise, it runs when the order is created. A matching participant must be found in the Peppol Directory. %s', 'woocommerce-pdf-invoices-packing-slips' ),
 					'<a href="https://docs.wpovernight.com/e-documents/automatic-peppol-endpoint-id-derivation-from-vat-number/" rel="noopener noreferrer" target="_blank">' . __( 'Learn more', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>'
 				),
 				'custom_attributes' => array(

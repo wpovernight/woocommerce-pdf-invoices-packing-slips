@@ -773,6 +773,20 @@ class Peppol {
 			return;
 		}
 
+		$billing_country = strtoupper( trim( (string) $order->get_billing_country() ) );
+		$countries       = array_map( 'strtoupper', (array) wpo_ips_edi_get_settings( 'peppol_automatic_endpoint_id_derivation_countries' ) );
+
+		if ( ! in_array( $billing_country, $countries, true ) ) {
+			wpo_ips_edi_log(
+				sprintf(
+					'Automatic Peppol Endpoint ID derivation skipped for order #%d: billing country "%s" is not selected for automatic derivation.',
+					$order_id,
+					$billing_country
+				)
+			);
+			return;
+		}
+
 		wpo_ips_edi_log(
 			sprintf(
 				'Attempting automatic Peppol Endpoint ID derivation for order #%d.',
