@@ -2396,7 +2396,7 @@ class Main {
 
 		$is_business_identifier = in_array(
 			$document->get_checkout_field_type(),
-			array( 'vat_number', 'registration_number' ),
+			array( CheckoutField::TYPE_VAT_NUMBER, CheckoutField::TYPE_REGISTRATION_NUMBER ),
 			true
 		);
 
