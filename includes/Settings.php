@@ -24,7 +24,7 @@ class Settings {
 	public ?SettingsDebug $debug             = null;
 	public ?SettingsUpgrade $upgrade         = null;
 	public ?SettingsEDI $edi                 = null;
-	
+
 	public string|false $options_page_hook   = false;
 	public array $general_settings           = array();
 	public array $debug_settings             = array();
@@ -108,7 +108,7 @@ class Settings {
 		$this->get_instance( 'upgrade' );
 		$this->get_instance( 'edi' );
 	}
-	
+
 	/**
 	 * Get a settings instance by slug.
 	 *
@@ -143,7 +143,7 @@ class Settings {
 
 	/**
 	 * Add plugin settings page to WooCommerce menu.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function menu(): void {
@@ -159,7 +159,7 @@ class Settings {
 
 	/**
 	 * Add settings link to plugins page
-	 * 
+	 *
 	 * @param array $links
 	 * @return array
 	 */
@@ -174,7 +174,7 @@ class Settings {
 	/**
 	 * Add various support links to plugin page
 	 * after meta (version, authors, site)
-	 * 
+	 *
 	 * @param array $links
 	 * @param string $file
 	 * @return array
@@ -220,7 +220,7 @@ class Settings {
 
 	/**
 	 * Check if user role can manage settings.
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function user_can_manage_settings(): bool {
@@ -229,7 +229,7 @@ class Settings {
 
 	/**
 	 * Output the settings page.
-	 * 
+	 *
 	 * @return void
 	 */
 	public function settings_page(): void {
@@ -636,26 +636,29 @@ class Settings {
 		$general_settings = $this->get_settings( 'general' );
 
 		return array(
-			'paper_size'              => $general_settings['paper_size'] ?? '',
-			'font_subsetting'         => isset( $general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
-			'header_logo'             => $general_settings['header_logo'] ?? '',
-			'header_logo_height'      => $general_settings['header_logo_height'] ?? '',
-			'vat_number'              => $general_settings['vat_number'] ?? '',
-			'coc_number'              => $general_settings['coc_number'] ?? '',
-			'shop_name'               => $general_settings['shop_name'] ?? '',
-			'shop_phone_number'       => $general_settings['shop_phone_number'] ?? '',
-			'shop_email_address'      => $general_settings['shop_email_address'] ?? '',
-			'shop_address_line_1'     => $general_settings['shop_address_line_1'] ?? '',
-			'shop_address_line_2'     => $general_settings['shop_address_line_2'] ?? '',
-			'shop_address_country'    => $general_settings['shop_address_country'] ?? '',
-			'shop_address_state'      => $general_settings['shop_address_state'] ?? '',
-			'shop_address_city'       => $general_settings['shop_address_city'] ?? '',
-			'shop_address_postcode'   => $general_settings['shop_address_postcode'] ?? '',
-			'shop_address_additional' => $general_settings['shop_address_additional'] ?? '',
-			'footer'                  => $general_settings['footer'] ?? '',
-			'extra_1'                 => $general_settings['extra_1'] ?? '',
-			'extra_2'                 => $general_settings['extra_2'] ?? '',
-			'extra_3'                 => $general_settings['extra_3'] ?? '',
+			'paper_size'                      => $general_settings['paper_size'] ?? '',
+			'font_subsetting'                 => isset( $general_settings['font_subsetting'] ) || ( defined( "DOMPDF_ENABLE_FONTSUBSETTING" ) && DOMPDF_ENABLE_FONTSUBSETTING === true ),
+			'header_logo'                     => $general_settings['header_logo'] ?? '',
+			'header_logo_height'              => $general_settings['header_logo_height'] ?? '',
+			'vat_number'                      => $general_settings['vat_number'] ?? '',
+			'coc_number'                      => $general_settings['coc_number'] ?? '',
+			'shop_name'                       => $general_settings['shop_name'] ?? '',
+			'shop_phone_number'               => $general_settings['shop_phone_number'] ?? '',
+			'shop_email_address'              => $general_settings['shop_email_address'] ?? '',
+			'shop_address_line_1'             => $general_settings['shop_address_line_1'] ?? '',
+			'shop_address_line_2'             => $general_settings['shop_address_line_2'] ?? '',
+			'shop_address_country'            => $general_settings['shop_address_country'] ?? '',
+			'shop_address_state'              => $general_settings['shop_address_state'] ?? '',
+			'shop_address_city'               => $general_settings['shop_address_city'] ?? '',
+			'shop_address_postcode'           => $general_settings['shop_address_postcode'] ?? '',
+			'shop_address_additional'         => $general_settings['shop_address_additional'] ?? '',
+			'footer'                          => $general_settings['footer'] ?? '',
+			'extra_1'                         => $general_settings['extra_1'] ?? '',
+			'extra_2'                         => $general_settings['extra_2'] ?? '',
+			'extra_3'                         => $general_settings['extra_3'] ?? '',
+			'checkout_field_type'             => $general_settings['checkout_field_type'] ?? '',
+			'checkout_field_label'            => $general_settings['checkout_field_label'] ?? '',
+			'checkout_field_alternative_type' => $general_settings['checkout_field_alternative_type'] ?? '',
 		);
 	}
 
@@ -733,7 +736,7 @@ class Settings {
 		} else {
 			$output_mode = 'download';
 		}
-		
+
 		return $output_mode;
 	}
 
@@ -969,11 +972,11 @@ class Settings {
 	public function get_template_list_cache(): array {
 		$template_list        = get_option( 'wpo_wcpdf_installed_template_paths', array() );
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
-		
+
 		if ( ! empty( $template_list ) ) {
 			$checked_list = array();
 			$outdated     = false;
-			
+
 			// cache could be outdated, so we check whether the folders exist
 			foreach ( $template_list as $path => $template_id ) {
 				if ( $file_system_instance->is_dir( $path ) ) {
@@ -988,7 +991,7 @@ class Settings {
 					// try wp-content
 					$relative_path = substr( $path, strrpos( $path, $wp_content_folder ) + strlen( $wp_content_folder ) );
 					$new_path      = WP_CONTENT_DIR . $relative_path;
-					
+
 					if ( $file_system_instance->is_dir( $new_path ) ) {
 						$checked_list[$new_path] = $template_id;
 					}
@@ -1187,7 +1190,7 @@ class Settings {
 	 */
 	public function get_sequential_number_store_method(): string {
 		global $wpdb;
-		
+
 		$method = isset( $this->get_settings( 'debug' )['calculate_document_numbers'] ) ? 'calculate' : 'auto_increment';
 
 		// safety first - always use calculate when auto_increment_increment is not 1

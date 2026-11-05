@@ -1,52 +1,52 @@
 <?php if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly ?>
 
-<?php do_action( 'wpo_wcpdf_before_document', $this->get_type(), $this->order ); ?>
+<?php do_action( 'wpo_wcpdf_before_document', $this->get_type(), $this->order, $this ); ?>
 
 <table class="head container">
 	<tr>
 		<td class="header">
 			<?php if ( $this->has_header_logo() ) : ?>
-				<?php do_action( 'wpo_wcpdf_before_shop_logo', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_shop_logo', $this->get_type(), $this->order, $this ); ?>
 				<?php $this->header_logo(); ?>
-				<?php do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_shop_logo', $this->get_type(), $this->order, $this ); ?>
 			<?php else : ?>
 				<?php $this->title(); ?>
 			<?php endif; ?>
 		</td>
 		<td class="shop-info">
-			<?php do_action( 'wpo_wcpdf_before_shop_name', $this->get_type(), $this->order ); ?>
+			<?php do_action( 'wpo_wcpdf_before_shop_name', $this->get_type(), $this->order, $this ); ?>
 			<div class="shop-name"><h3><?php $this->shop_name(); ?></h3></div>
-			<?php do_action( 'wpo_wcpdf_after_shop_name', $this->get_type(), $this->order ); ?>
-			<?php do_action( 'wpo_wcpdf_before_shop_address', $this->get_type(), $this->order ); ?>
+			<?php do_action( 'wpo_wcpdf_after_shop_name', $this->get_type(), $this->order, $this ); ?>
+			<?php do_action( 'wpo_wcpdf_before_shop_address', $this->get_type(), $this->order, $this ); ?>
 			<div class="shop-address"><?php $this->shop_address(); ?></div>
-			<?php do_action( 'wpo_wcpdf_after_shop_address', $this->get_type(), $this->order ); ?>
-			<?php do_action( 'wpo_wcpdf_before_shop_phone_number', $this->get_type(), $this->order ); ?>
+			<?php do_action( 'wpo_wcpdf_after_shop_address', $this->get_type(), $this->order, $this ); ?>
+			<?php do_action( 'wpo_wcpdf_before_shop_phone_number', $this->get_type(), $this->order, $this ); ?>
 			<?php if ( ! empty( $this->get_shop_phone_number() ) ) : ?>
 				<div class="shop-phone-number"><?php $this->shop_phone_number(); ?></div>
 			<?php endif; ?>
-			<?php do_action( 'wpo_wcpdf_after_shop_phone_number', $this->get_type(), $this->order ); ?>
+			<?php do_action( 'wpo_wcpdf_after_shop_phone_number', $this->get_type(), $this->order, $this ); ?>
 			<?php if ( ! empty( $this->get_shop_email_address() ) ) : ?>
 				<div class="shop-email-address"><?php $this->shop_email_address(); ?></div>
 			<?php endif; ?>
-			<?php do_action( 'wpo_wcpdf_after_shop_email_address', $this->get_type(), $this->order ); ?>
+			<?php do_action( 'wpo_wcpdf_after_shop_email_address', $this->get_type(), $this->order, $this ); ?>
 		</td>
 	</tr>
 </table>
 
-<?php do_action( 'wpo_wcpdf_before_document_label', $this->get_type(), $this->order ); ?>
+<?php do_action( 'wpo_wcpdf_before_document_label', $this->get_type(), $this->order, $this ); ?>
 
 <?php if ( $this->has_header_logo() ) : ?>
 	<h1 class="document-type-label"><?php $this->title(); ?></h1>
 <?php endif; ?>
 
-<?php do_action( 'wpo_wcpdf_after_document_label', $this->get_type(), $this->order ); ?>
+<?php do_action( 'wpo_wcpdf_after_document_label', $this->get_type(), $this->order, $this ); ?>
 
 <table class="order-data-addresses">
 	<tr>
 		<td class="address billing-address">
-			<?php do_action( 'wpo_wcpdf_before_billing_address', $this->get_type(), $this->order ); ?>
+			<?php do_action( 'wpo_wcpdf_before_billing_address', $this->get_type(), $this->order, $this ); ?>
 			<p><?php $this->billing_address(); ?></p>
-			<?php do_action( 'wpo_wcpdf_after_billing_address', $this->get_type(), $this->order ); ?>
+			<?php do_action( 'wpo_wcpdf_after_billing_address', $this->get_type(), $this->order, $this ); ?>
 			<?php if ( isset( $this->settings['display_email'] ) ) : ?>
 				<div class="billing-email"><?php $this->billing_email(); ?></div>
 			<?php endif; ?>
@@ -57,9 +57,9 @@
 		<td class="address shipping-address">
 			<?php if ( $this->show_shipping_address() ) : ?>
 				<h3><?php $this->shipping_address_title(); ?></h3>
-				<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_shipping_address', $this->get_type(), $this->order, $this ); ?>
 				<p><?php $this->shipping_address(); ?></p>
-				<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_shipping_address', $this->get_type(), $this->order, $this ); ?>
 				<?php if ( isset( $this->settings['display_phone'] ) ) : ?>
 					<div class="shipping-phone"><?php $this->shipping_phone(); ?></div>
 				<?php endif; ?>
@@ -67,7 +67,7 @@
 		</td>
 		<td class="order-data">
 			<table>
-				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_order_data', $this->get_type(), $this->order, $this ); ?>
 				<?php if ( isset( $this->settings['display_number'] ) ) : ?>
 					<tr class="invoice-number">
 						<th><?php $this->number_title(); ?></th>
@@ -100,13 +100,13 @@
 						<td><?php $this->payment_method(); ?></td>
 					</tr>
 				<?php endif; ?>
-				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order, $this ); ?>
 			</table>
 		</td>
 	</tr>
 </table>
 
-<?php do_action( 'wpo_wcpdf_before_order_details', $this->get_type(), $this->order ); ?>
+<?php do_action( 'wpo_wcpdf_before_order_details', $this->get_type(), $this->order, $this ); ?>
 
 <table class="order-details">
 	<thead>
@@ -121,7 +121,7 @@
 			<tr class="<?php echo esc_attr( $item['row_class'] ); ?>">
 				<td class="product">
 					<p class="item-name"><?php echo wpo_ips_kses_document_content( $item['name'] ); ?></p>
-					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order ); ?>
+					<?php do_action( 'wpo_wcpdf_before_item_meta', $this->get_type(), $item, $this->order, $this ); ?>
 					<div class="item-meta">
 						<?php if ( ! empty( $item['sku'] ) ) : ?>
 							<p class="sku"><span class="label"><?php $this->sku_title(); ?></span> <?php echo esc_html( $item['sku'] ); ?></p>
@@ -135,7 +135,7 @@
 						<?php endif; ?>
 						<!-- / ul.wc-item-meta -->
 					</div>
-					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->get_type(), $item, $this->order ); ?>
+					<?php do_action( 'wpo_wcpdf_after_item_meta', $this->get_type(), $item, $this->order, $this ); ?>
 				</td>
 				<td class="quantity"><?php echo esc_html( $item['quantity'] ); ?></td>
 				<td class="price"><?php echo wpo_ips_kses_price( $item['order_price'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_ips_kses_price() ?></td>
@@ -148,22 +148,22 @@
 	<tbody>
 		<tr class="no-borders">
 			<td class="no-borders notes-cell">
-				<?php do_action( 'wpo_wcpdf_before_document_notes', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_before_document_notes', $this->get_type(), $this->order, $this ); ?>
 				<?php if ( $this->get_document_notes() ) : ?>
 					<div class="document-notes">
 						<h3><?php $this->notes_title(); ?></h3>
 						<?php $this->document_notes(); ?>
 					</div>
 				<?php endif; ?>
-				<?php do_action( 'wpo_wcpdf_after_document_notes', $this->get_type(), $this->order ); ?>
-				<?php do_action( 'wpo_wcpdf_before_customer_notes', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_document_notes', $this->get_type(), $this->order, $this ); ?>
+				<?php do_action( 'wpo_wcpdf_before_customer_notes', $this->get_type(), $this->order, $this ); ?>
 				<?php if ( $this->get_shipping_notes() ) : ?>
 					<div class="customer-notes">
 						<h3><?php $this->customer_notes_title(); ?></h3>
 						<?php $this->shipping_notes(); ?>
 					</div>
 				<?php endif; ?>
-				<?php do_action( 'wpo_wcpdf_after_customer_notes', $this->get_type(), $this->order ); ?>
+				<?php do_action( 'wpo_wcpdf_after_customer_notes', $this->get_type(), $this->order, $this ); ?>
 			</td>
 			<td class="no-borders totals-cell">
 				<table class="totals">
@@ -181,7 +181,7 @@
 	</tbody>
 </table>
 
-<?php do_action( 'wpo_wcpdf_after_order_details', $this->get_type(), $this->order ); ?>
+<?php do_action( 'wpo_wcpdf_after_order_details', $this->get_type(), $this->order, $this ); ?>
 
 <div class="bottom-spacer"></div>
 
@@ -195,4 +195,4 @@
 	</htmlpagefooter><!-- required for mPDF engine -->
 <?php endif; ?>
 
-<?php do_action( 'wpo_wcpdf_after_document', $this->get_type(), $this->order ); ?>
+<?php do_action( 'wpo_wcpdf_after_document', $this->get_type(), $this->order, $this ); ?>

@@ -1148,6 +1148,15 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Get the checkout field title
+	 *
+	 * @return string
+	 */
+	public function get_checkout_field_title(): string {
+		return $this->get_title_for( 'checkout_field' );
+	}
+
+	/**
 	 * Get the title for a specific slug
 	 *
 	 * @param string $slug
@@ -1215,6 +1224,12 @@ abstract class OrderDocument {
 				break;
 			case 'customer_notes':
 				$title = __( 'Customer Notes:', 'woocommerce-pdf-invoices-packing-slips' );
+				break;
+			case 'checkout_field':
+				$type  = $this->get_checkout_field_type();
+				$title = $type
+					? \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_label( $this->order, $type, $this->get_settings() ) . ':'
+					: '';
 				break;
 			default:
 				$title = '';
@@ -2868,6 +2883,47 @@ abstract class OrderDocument {
 		return $this->get_due_date() > 0;
 	}
 	
+	/**
+	 * Get the checkout field type that has a value on the order, preferring configured types.
+	 *
+	 * @return string Empty when the order has no checkout field value.
+	 */
+	public function get_checkout_field_type(): string {
+		if ( empty( $this->order ) ) {
+			return '';
+		}
+
+		return \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_types( $this->order, $this->get_settings() )[0] ?? '';
+	}
+
+	/**
+	 * Get the checkout field value.
+	 *
+	 * The filter only refines a stored value: without a stored type there is no label to show it under.
+	 *
+	 * @return string
+	 */
+	public function get_checkout_field_value(): string {
+		$type = $this->get_checkout_field_type();
+
+		if ( ! $type ) {
+			return '';
+		}
+
+		$value = (string) \WPO_WCPDF()->get_instance( 'checkout_field' )->get_order_value( $this->order, $type );
+
+		return (string) apply_filters( 'wpo_ips_checkout_field_document_value', $value, $type, $this );
+	}
+
+	/**
+	 * Check if the checkout field should be shown.
+	 *
+	 * @return bool
+	 */
+	public function show_checkout_field(): bool {
+		return ! empty( $this->get_setting( 'display_checkout_field' ) ) && '' !== $this->get_checkout_field_value();
+	}
+
 	/**
 	 * Get non historical settings keys.
 	 *

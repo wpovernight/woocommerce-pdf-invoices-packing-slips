@@ -65,18 +65,19 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		/**
 		 * Get the configured field type.
 		 *
+		 * @param array<string, mixed> $settings Settings snapshot
 		 * @return string
 		 */
-		public function get_type(): string {
-			$general_settings = WPO_WCPDF()
+		public function get_type( array $settings = array() ): string {
+			$general_settings = \WPO_WCPDF()
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
 
-			$type = (string) $general_settings->get_setting( 'checkout_field_type' );
+			$type = (string) $general_settings->get_setting( 'checkout_field_type', '', $settings );
 
 			// Checkout can run before the admin request that upgrades the settings.
 			if ( '' === $type ) {
-				$type = $general_settings->get_setting( 'checkout_field_as_vat_number' )
+				$type = $general_settings->get_setting( 'checkout_field_as_vat_number', '', $settings )
 					? self::TYPE_VAT_NUMBER
 					: self::TYPE_CUSTOM;
 			}
@@ -87,11 +88,14 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		/**
 		 * Get the optional field type for billing countries outside the shop country.
 		 *
+		 * @param array<string, mixed> $settings Settings snapshot
 		 * @return string Empty means use the primary type everywhere.
 		 */
-		public function get_alternative_type(): string {
-			$general = \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' );
-			$type    = (string) $general->get_setting( 'checkout_field_alternative_type' );
+		public function get_alternative_type( array $settings = array() ): string {
+			$type = \WPO_WCPDF()
+				->get_instance( 'settings' )
+				->get_instance( 'general' )
+				->get_setting( 'checkout_field_alternative_type', '', $settings );
 
 			if ( '' === $type ) {
 				return '';
@@ -99,7 +103,7 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 
 			$type = $this->normalize_type( $type );
 
-			return $this->get_shop_country() && $type !== $this->get_type()
+			return $this->get_shop_country( $settings ) && $type !== $this->get_type( $settings )
 				? $type
 				: '';
 		}
@@ -107,10 +111,14 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		/**
 		 * Get the shop country used for checkout labels and type selection.
 		 *
+		 * @param array<string, mixed> $settings Settings snapshot
 		 * @return string
 		 */
-		public function get_shop_country(): string {
-			return \WPO_WCPDF()->get_instance( 'settings' )->get_instance( 'general' )->get_setting( 'shop_address_country' );
+		public function get_shop_country( array $settings = array() ): string {
+			return \WPO_WCPDF()
+				->get_instance( 'settings' )
+				->get_instance( 'general' )
+				->get_setting( 'shop_address_country', '', $settings );
 		}
 
 		/**
@@ -130,12 +138,13 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		/**
 		 * Map checkout field IDs to their types.
 		 *
-		 * @param bool $block Whether to return Checkout Block IDs.
+		 * @param bool                 $block    Whether to return Checkout Block IDs.
+		 * @param array<string, mixed> $settings Settings snapshot
 		 * @return array
 		 */
-		public function get_field_types( bool $block = false ): array {
-			$fields      = array( ( $block ? self::BLOCK_FIELD_ID : self::CLASSIC_FIELD_KEY ) => $this->get_type() );
-			$alternative = $this->get_alternative_type();
+		public function get_field_types( bool $block = false, array $settings = array() ): array {
+			$fields      = array( ( $block ? self::BLOCK_FIELD_ID : self::CLASSIC_FIELD_KEY ) => $this->get_type( $settings ) );
+			$alternative = $this->get_alternative_type( $settings );
 
 			if ( $alternative && ( ! $block || ( defined( 'WC_VERSION' ) && version_compare( WC_VERSION, '9.9', '>=' ) ) ) ) {
 				$fields[ $block ? self::ALTERNATIVE_BLOCK_FIELD_ID : self::ALTERNATIVE_CLASSIC_FIELD_KEY ] = $alternative;
@@ -209,23 +218,24 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 		/**
 		 * Get the field label, defaulting to the shop country label.
 		 *
-		 * @param string $type Field type. Defaults to the primary type.
+		 * @param string               $type     Field type. Defaults to the primary type.
+		 * @param array<string, mixed> $settings Settings snapshot
 		 * @return string
 		 */
-		public function get_label( string $type = '' ): string {
+		public function get_label( string $type = '', array $settings = array() ): string {
 			$general_settings = WPO_WCPDF()
 				->get_instance( 'settings' )
 				->get_instance( 'general' );
 
-			$type  = $type ?: $this->get_type();
-			$label = $type === $this->get_type()
-				? trim( (string) $general_settings->get_setting( 'checkout_field_label' ) )
+			$type  = $type ?: $this->get_type( $settings );
+			$label = $type === $this->get_type( $settings )
+				? trim( $general_settings->get_setting( 'checkout_field_label', '', $settings ) )
 				: '';
 
 			if ( '' === $label ) {
 				$label = $this->get_default_label(
 					$type,
-					$this->get_shop_country()
+					$this->get_shop_country( $settings )
 				);
 			}
 
@@ -287,6 +297,56 @@ if ( ! class_exists( '\WPO\IPS\CheckoutField' ) ) :
 			}
 
 			return $this->get_legacy_order_value( $order, $type );
+		}
+
+		/**
+		 * Get the field types that have a value on the order.
+		 *
+		 * Configured types come first (foreign customers may have filled in the alternative type instead of the primary one),
+		 * then every other type, so values stored under a type that is no longer configured are still found.
+		 *
+		 * @param \WC_Abstract_Order   $order    Order object.
+		 * @param array<string, mixed> $settings Settings snapshot
+		 * @return string[]
+		 */
+		public function get_order_types( \WC_Abstract_Order $order, array $settings = array() ): array {
+			$types = array_unique(
+				array_merge(
+					array_values( $this->get_field_types( false, $settings ) ),
+					$this->get_types()
+				)
+			);
+
+			return array_values(
+				array_filter(
+					$types,
+					fn( string $type ): bool => null !== $this->get_order_value( $order, $type )
+				)
+			);
+		}
+
+		/**
+		 * Get the label for a field type on an order.
+		 *
+		 * Configured types use the configured label. Types that are no longer configured
+		 * use their default label for the order's billing country, because the configured
+		 * label belongs to another type.
+		 *
+		 * @param \WC_Abstract_Order   $order    Order object.
+		 * @param string               $type     Field type.
+		 * @param array<string, mixed> $settings Settings snapshot
+		 * @return string
+		 */
+		public function get_order_label( \WC_Abstract_Order $order, string $type, array $settings = array() ): string {
+			if ( in_array( $type, $this->get_field_types( false, $settings ), true ) ) {
+				return $this->get_label( $type, $settings );
+			}
+
+			$country = is_callable( array( $order, 'get_billing_country' ) )
+				? (string) $order->get_billing_country()
+				: '';
+
+			return $this->get_default_label( $type, $country );
 		}
 
 		/**
