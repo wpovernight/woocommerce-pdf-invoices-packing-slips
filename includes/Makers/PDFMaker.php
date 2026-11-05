@@ -60,6 +60,40 @@ class PDFMaker {
 
 		$hybrid = $this->is_hybrid_document();
 
+		try {
+			return $this->render_pdf( $tmp_path, $fonts_path, $hybrid, $hybrid );
+		} catch ( \Throwable $e ) {
+			// The matched exception message is thrown by Dompdf's bundled Cpdf
+			// library (lib/Cpdf.php, processFont()) when serializing the PDF:
+			// in PDF/A mode every font in the document must have an embeddable
+			// font file, which templates falling back to a core font (e.g. an
+			// unregistered custom font ending on the generic 'sans-serif') do
+			// not provide. Retry once without PDF/A to still produce a hybrid
+			// PDF with the embedded EDI document.
+			if ( $hybrid && str_contains( $e->getMessage(), 'A fully embeddable font must be used' ) ) {
+				wcpdf_log_error(
+					'Hybrid EDI document uses a non-embeddable font, which is not compatible with PDF/A mode. Retrying without PDF/A; use an embeddable font (e.g. DejaVu Sans) in your document template to keep full PDF/A conformance.',
+					'warning',
+					$e
+				);
+
+				return $this->render_pdf( $tmp_path, $fonts_path, $hybrid, false );
+			}
+
+			throw $e;
+		}
+	}
+	
+	/**
+	 * Render the PDF with the given settings.
+	 *
+	 * @param string $tmp_path   Temporary directory path.
+	 * @param string $fonts_path Fonts directory path.
+	 * @param bool   $hybrid     Whether to embed the hybrid EDI document.
+	 * @param bool   $pdfa       Whether to generate the document in PDF/A mode.
+	 * @return string|null
+	 */
+	private function render_pdf( string $tmp_path, string $fonts_path, bool $hybrid, bool $pdfa ): ?string {
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
 			'tempDir'                 => $tmp_path,
@@ -73,7 +107,7 @@ class PDFMaker {
 			'isFontSubsettingEnabled' => (bool) $this->settings['font_subsetting'],
 		) ) );
 
-		if ( $hybrid ) {
+		if ( $pdfa ) {
 			$options->setIsPdfAEnabled( true );
 		}
 
