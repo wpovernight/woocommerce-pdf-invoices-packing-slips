@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-rc.5\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-rc.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-29T09:06:17+00:00\n"
+"POT-Creation-Date: 2026-11-05T12:43:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -85,7 +85,7 @@ msgstr ""
 
 #: edi/IdentifierMappings.php:562
 #: includes/CheckoutField.php:61
-#: includes/CheckoutField.php:258
+#: includes/CheckoutField.php:268
 msgid "Company registration number"
 msgstr ""
 
@@ -182,63 +182,63 @@ msgstr ""
 msgid "No valid Peppol Endpoint ID could be derived from the VAT number."
 msgstr ""
 
-#: edi/Peppol.php:905
-#: edi/Peppol.php:973
+#: edi/Peppol.php:919
+#: edi/Peppol.php:987
 msgid "Override (edit manually)"
 msgstr ""
 
-#: edi/Peppol.php:1072
-#: includes/Admin.php:2407
+#: edi/Peppol.php:1086
+#: includes/Admin.php:2401
 msgid "The identifier must be in \"scheme:value\" format (for example 0088:123456789)."
 msgstr ""
 
-#: edi/Peppol.php:1086
-#: edi/Peppol.php:1184
+#: edi/Peppol.php:1100
+#: edi/Peppol.php:1198
 msgid "Peppol Endpoint ID is empty."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:1108
+#: edi/Peppol.php:1122
 #, php-format
 msgid "The identifier \"%1$s\" was found without a scheme. Please enter it in \"scheme:value\" format. You can search for the correct scheme and identifier in the %2$s."
 msgstr ""
 
-#: edi/Peppol.php:1113
-#: edi/Peppol.php:1139
-#: edi/Peppol.php:1162
+#: edi/Peppol.php:1127
+#: edi/Peppol.php:1153
+#: edi/Peppol.php:1176
 msgid "Peppol Directory"
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:1134
+#: edi/Peppol.php:1148
 #, php-format
 msgid "No Peppol participant was found for \"%1$s\". Please confirm the scheme and identifier in the %2$s."
 msgstr ""
 
 #. translators: 1: entered identifier, 2: Peppol Directory URL
-#: edi/Peppol.php:1157
+#: edi/Peppol.php:1171
 #, php-format
 msgid "We could not find a Peppol participant with this scheme and identifier. Please check the scheme or search in the %2$s. Below are participants found for this identifier value:"
 msgstr ""
 
 #. translators: %s: error message
-#: edi/Peppol.php:1305
+#: edi/Peppol.php:1319
 #, php-format
 msgid "Peppol Directory request failed: %s"
 msgstr ""
 
 #. translators: %d: HTTP status code
-#: edi/Peppol.php:1319
+#: edi/Peppol.php:1333
 #, php-format
 msgid "Peppol Directory returned an unexpected status code: %d"
 msgstr ""
 
-#: edi/Peppol.php:1330
+#: edi/Peppol.php:1344
 msgid "Peppol Directory returned an invalid JSON response."
 msgstr ""
 
 #. translators: %s: endpoint ID
-#: edi/Peppol.php:1453
+#: edi/Peppol.php:1467
 #, php-format
 msgid "We found the following participant(s) related to \"%s\":"
 msgstr ""
@@ -2203,15 +2203,15 @@ msgstr ""
 #: includes/Admin.php:249
 #: includes/Admin.php:2049
 #: includes/Assets.php:372
-#: includes/Documents/Invoice.php:405
-#: includes/Main.php:1678
+#: includes/Documents/Invoice.php:425
+#: includes/Main.php:1680
 #: views/setup-wizard/display-options.php:83
 msgid "Invoice Number"
 msgstr ""
 
 #: includes/Admin.php:250
-#: includes/Documents/Invoice.php:373
-#: includes/Main.php:1679
+#: includes/Documents/Invoice.php:393
+#: includes/Main.php:1681
 #: views/setup-wizard/display-options.php:62
 msgid "Invoice Date"
 msgstr ""
@@ -2372,15 +2372,15 @@ msgid "Number prefix"
 msgstr ""
 
 #: includes/Admin.php:1232
-#: includes/Documents/Invoice.php:441
+#: includes/Documents/Invoice.php:461
 msgid "If set, this value will be used as number prefix."
 msgstr ""
 
 #. translators: 1. document slug, 2-3 placeholders
 #: includes/Admin.php:1235
 #: includes/Admin.php:1255
-#: includes/Documents/Invoice.php:443
-#: includes/Documents/Invoice.php:452
+#: includes/Documents/Invoice.php:463
+#: includes/Documents/Invoice.php:472
 #, php-format
 msgid "You can use the %1$s year and/or month with the %2$s or %3$s placeholders respectively."
 msgstr ""
@@ -2390,7 +2390,7 @@ msgid "Number suffix"
 msgstr ""
 
 #: includes/Admin.php:1252
-#: includes/Documents/Invoice.php:450
+#: includes/Documents/Invoice.php:470
 msgid "If set, this value will be used as number suffix."
 msgstr ""
 
@@ -2400,14 +2400,14 @@ msgstr ""
 
 #. translators: 1. example number, 2. document type, 3. example number without padding, 4. example number with padding
 #: includes/Admin.php:1272
-#: includes/Documents/Invoice.php:463
+#: includes/Documents/Invoice.php:483
 #, php-format
 msgid "Enter the number of digits you want to use as padding. For instance, enter %1$s to display the %2$s number %3$s as %4$s, filling it with zeros until the number set as padding is reached."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag
 #: includes/Admin.php:1288
-#: includes/Documents/Invoice.php:473
+#: includes/Documents/Invoice.php:493
 #, php-format
 msgid "For more information about setting up the number format and see the available placeholders for the prefix and suffix, check this article: %1$sNumber format explained%2$s"
 msgstr ""
@@ -2463,7 +2463,7 @@ msgid "Displayed in the document!"
 msgstr ""
 
 #: includes/Admin.php:1392
-#: includes/Admin.php:2411
+#: includes/Admin.php:2405
 msgid "Cancel"
 msgstr ""
 
@@ -2549,76 +2549,76 @@ msgstr ""
 msgid "Invoice numbers"
 msgstr ""
 
-#: includes/Admin.php:2252
+#: includes/Admin.php:2246
 msgid "RFND"
 msgstr ""
 
-#: includes/Admin.php:2252
+#: includes/Admin.php:2246
 msgid "ORD"
 msgstr ""
 
 #. translators: document title
-#: includes/Admin.php:2260
+#: includes/Admin.php:2254
 #, php-format
 msgid "XML %s"
 msgstr ""
 
-#: includes/Admin.php:2291
+#: includes/Admin.php:2285
 msgid "Identifier"
 msgstr ""
 
-#: includes/Admin.php:2293
+#: includes/Admin.php:2287
 #: includes/Assets.php:89
 msgid "Show"
 msgstr ""
 
-#: includes/Admin.php:2312
-#: includes/Admin.php:2345
-#: includes/Admin.php:2391
+#: includes/Admin.php:2306
+#: includes/Admin.php:2339
+#: includes/Admin.php:2385
 #: includes/Assets.php:343
 #: includes/Settings/SettingsEDI.php:869
 msgid "Missing"
 msgstr ""
 
-#: includes/Admin.php:2313
-#: includes/Admin.php:2346
-#: includes/Admin.php:2392
+#: includes/Admin.php:2307
+#: includes/Admin.php:2340
+#: includes/Admin.php:2386
 #: includes/Assets.php:344
 #: includes/Settings/SettingsEDI.php:870
 msgid "Optional"
 msgstr ""
 
-#: includes/Admin.php:2359
+#: includes/Admin.php:2353
 #: includes/Settings/SettingsEDI.php:878
 msgid "VAT number is missing the country prefix"
 msgstr ""
 
-#: includes/Admin.php:2374
+#: includes/Admin.php:2368
 msgid "Peppol"
 msgstr ""
 
-#: includes/Admin.php:2376
+#: includes/Admin.php:2370
 msgid "Edit"
 msgstr ""
 
-#: includes/Admin.php:2410
+#: includes/Admin.php:2404
 #: includes/Settings/SettingsCallbacks.php:919
 msgid "Save"
 msgstr ""
 
 #. translators: %s document title
-#: includes/Admin.php:2453
+#: includes/Admin.php:2447
 #, php-format
 msgid "Editing of %s number and date is currently disabled."
 msgstr ""
 
 #. translators: %1$s: open anchor tag, %2$s: close anchor tag, %3$s: setting name
-#: includes/Admin.php:2458
+#: includes/Admin.php:2452
 #, php-format
 msgid "If you need to enable this feature, you can do so in the %1$sAdvanced Settings%2$s section under %3$s."
 msgstr ""
 
-#: includes/Admin.php:2461
+#: includes/Admin.php:2455
 #: includes/Settings/SettingsDebug.php:973
 msgid "Enable document data editing"
 msgstr ""
@@ -2770,18 +2770,18 @@ msgid "No customer identifiers found."
 msgstr ""
 
 #: includes/CheckoutField.php:59
-#: includes/Settings.php:854
+#: includes/Settings.php:857
 msgid "Custom"
 msgstr ""
 
 #: includes/CheckoutField.php:60
-#: includes/CheckoutField.php:249
+#: includes/CheckoutField.php:259
 #: wpo-ips-functions-edi.php:1111
 #: wpo-ips-functions-edi.php:1187
 msgid "VAT number"
 msgstr ""
 
-#: includes/CheckoutField.php:262
+#: includes/CheckoutField.php:272
 #: includes/Install.php:783
 msgid "Customer identification"
 msgstr ""
@@ -2813,10 +2813,10 @@ msgid "Ship To:"
 msgstr ""
 
 #: includes/Documents/Invoice.php:178
-#: includes/Documents/Invoice.php:444
-#: includes/Documents/Invoice.php:453
-#: includes/Documents/Invoice.php:465
-#: includes/Documents/Invoice.php:479
+#: includes/Documents/Invoice.php:464
+#: includes/Documents/Invoice.php:473
+#: includes/Documents/Invoice.php:485
+#: includes/Documents/Invoice.php:499
 msgid "invoice"
 msgid_plural "invoices"
 msgstr[0] ""
@@ -2852,8 +2852,8 @@ msgid "Display shipping address"
 msgstr ""
 
 #: includes/Documents/Invoice.php:321
-#: includes/Documents/Invoice.php:372
-#: includes/Documents/Invoice.php:404
+#: includes/Documents/Invoice.php:392
+#: includes/Documents/Invoice.php:424
 #: includes/Documents/PackingSlip.php:177
 #: views/advanced-status.php:156
 #: views/advanced-status.php:160
@@ -2871,7 +2871,7 @@ msgid "Only when different from billing address"
 msgstr ""
 
 #: includes/Documents/Invoice.php:323
-#: includes/Documents/Invoice.php:506
+#: includes/Documents/Invoice.php:526
 #: includes/Documents/PackingSlip.php:179
 #: includes/Settings/SettingsEDI.php:318
 #: views/setup-wizard/display-options.php:22
@@ -2893,78 +2893,95 @@ msgstr ""
 msgid "Display customer notes"
 msgstr ""
 
-#: includes/Documents/Invoice.php:365
+#. translators: %s: checkout field label
+#: includes/Documents/Invoice.php:367
+#, php-format
+msgid "Display %s (Checkout Field)"
+msgstr ""
+
+#. translators: %s: General settings link
+#: includes/Documents/Invoice.php:377
+#, php-format
+msgid "Display the value customers enter in the checkout field, configured in the %s."
+msgstr ""
+
+#: includes/Documents/Invoice.php:378
+#: includes/Settings/SettingsGeneral.php:115
+msgid "General settings"
+msgstr ""
+
+#: includes/Documents/Invoice.php:385
 msgid "Display invoice date"
 msgstr ""
 
-#: includes/Documents/Invoice.php:374
+#: includes/Documents/Invoice.php:394
 #: includes/Documents/OrderDocumentMethods.php:1654
 #: views/setup-wizard/display-options.php:63
 msgid "Order Date"
 msgstr ""
 
-#: includes/Documents/Invoice.php:381
+#: includes/Documents/Invoice.php:401
 msgid "Display due date"
 msgstr ""
 
 #. translators: number of days
-#: includes/Documents/Invoice.php:388
+#: includes/Documents/Invoice.php:408
 #, php-format
 msgid "%s days"
 msgstr ""
 
-#: includes/Documents/Invoice.php:397
+#: includes/Documents/Invoice.php:417
 msgid "Display invoice number"
 msgstr ""
 
-#: includes/Documents/Invoice.php:406
+#: includes/Documents/Invoice.php:426
 #: views/setup-wizard/display-options.php:84
 msgid "Order Number"
 msgstr ""
 
-#: includes/Documents/Invoice.php:410
+#: includes/Documents/Invoice.php:430
 #: includes/Settings/SettingsCallbacks.php:41
 msgid "Warning!"
 msgstr ""
 
-#: includes/Documents/Invoice.php:411
+#: includes/Documents/Invoice.php:431
 msgid "Using the Order Number as invoice number is not recommended as this may lead to gaps in the invoice number sequence (even when order numbers are sequential)."
 msgstr ""
 
-#: includes/Documents/Invoice.php:412
+#: includes/Documents/Invoice.php:432
 msgid "More information"
 msgstr ""
 
-#: includes/Documents/Invoice.php:419
+#: includes/Documents/Invoice.php:439
 msgid "Next invoice number (without prefix/suffix etc.)"
 msgstr ""
 
-#: includes/Documents/Invoice.php:425
+#: includes/Documents/Invoice.php:445
 msgid "This is the number that will be used for the next document. By default, numbering starts from 1 and increases for every new document. Note that if you override this and set it lower than the current/highest number, this could create duplicate numbers!"
 msgstr ""
 
-#: includes/Documents/Invoice.php:431
+#: includes/Documents/Invoice.php:451
 msgid "Number format"
 msgstr ""
 
-#: includes/Documents/Invoice.php:439
+#: includes/Documents/Invoice.php:459
 msgid "Prefix"
 msgstr ""
 
-#: includes/Documents/Invoice.php:445
-#: includes/Documents/Invoice.php:454
+#: includes/Documents/Invoice.php:465
+#: includes/Documents/Invoice.php:474
 msgid "Check the Docs article below to see all the available placeholders for prefix/suffix."
 msgstr ""
 
-#: includes/Documents/Invoice.php:448
+#: includes/Documents/Invoice.php:468
 msgid "Suffix"
 msgstr ""
 
-#: includes/Documents/Invoice.php:457
+#: includes/Documents/Invoice.php:477
 msgid "Padding"
 msgstr ""
 
-#: includes/Documents/Invoice.php:476
+#: includes/Documents/Invoice.php:496
 #: includes/Settings/SettingsDebug.php:944
 #: includes/Settings/SettingsDebug.php:980
 #: includes/Settings/SettingsGeneral.php:481
@@ -2976,164 +2993,164 @@ msgid "Note"
 msgstr ""
 
 #. translators: document type
-#: includes/Documents/Invoice.php:478
+#: includes/Documents/Invoice.php:498
 #, php-format
 msgid "Changes made to the number format will only be reflected on new orders. Also, if you have already created a custom %s number format with a filter, the above settings will be ignored."
 msgstr ""
 
-#: includes/Documents/Invoice.php:486
+#: includes/Documents/Invoice.php:506
 msgid "Reset invoice number yearly"
 msgstr ""
 
-#: includes/Documents/Invoice.php:497
+#: includes/Documents/Invoice.php:517
 msgid "Allow My Account invoice download"
 msgstr ""
 
-#: includes/Documents/Invoice.php:504
+#: includes/Documents/Invoice.php:524
 msgid "Only when an invoice is already created/emailed"
 msgstr ""
 
-#: includes/Documents/Invoice.php:505
+#: includes/Documents/Invoice.php:525
 msgid "Only for specific order statuses (define below)"
 msgstr ""
 
-#: includes/Documents/Invoice.php:507
+#: includes/Documents/Invoice.php:527
 msgid "Never"
 msgstr ""
 
-#: includes/Documents/Invoice.php:522
+#: includes/Documents/Invoice.php:542
 msgid "Enable invoice number column in the orders list"
 msgstr ""
 
-#: includes/Documents/Invoice.php:533
+#: includes/Documents/Invoice.php:553
 msgid "Enable invoice date column in the orders list"
 msgstr ""
 
-#: includes/Documents/Invoice.php:544
+#: includes/Documents/Invoice.php:564
 msgid "Enable invoice number search in the orders list"
 msgstr ""
 
-#: includes/Documents/Invoice.php:550
+#: includes/Documents/Invoice.php:570
 msgid "Enables searching orders by invoice number. On HPOS stores, this adds an \"Invoice numbers\" option to the order search type selector and supports searching multiple invoice numbers using a comma-separated list. The search process may be slower on non-HPOS stores."
 msgstr ""
 
-#: includes/Documents/Invoice.php:556
+#: includes/Documents/Invoice.php:576
 msgid "Enable partial invoice number matching"
 msgstr ""
 
-#: includes/Documents/Invoice.php:562
+#: includes/Documents/Invoice.php:582
 msgid "When enabled, searching for an invoice number will also match partial values (e.g. searching \"123\" will match \"INV-123\"). Requires invoice number search to be enabled."
 msgstr ""
 
-#: includes/Documents/Invoice.php:573
+#: includes/Documents/Invoice.php:593
 msgid "Disable for free orders"
 msgstr ""
 
 #. translators: zero number
-#: includes/Documents/Invoice.php:581
+#: includes/Documents/Invoice.php:601
 #, php-format
 msgid "Disable document when the order total is %s"
 msgstr ""
 
-#: includes/Documents/Invoice.php:589
+#: includes/Documents/Invoice.php:609
 msgid "Mark as printed"
 msgstr ""
 
-#: includes/Documents/Invoice.php:597
+#: includes/Documents/Invoice.php:617
 msgid "Manually"
 msgstr ""
 
-#: includes/Documents/Invoice.php:600
+#: includes/Documents/Invoice.php:620
 msgid "On single order action"
 msgstr ""
 
-#: includes/Documents/Invoice.php:601
+#: includes/Documents/Invoice.php:621
 msgid "On bulk order action"
 msgstr ""
 
-#: includes/Documents/Invoice.php:602
+#: includes/Documents/Invoice.php:622
 msgid "On my account"
 msgstr ""
 
-#: includes/Documents/Invoice.php:603
+#: includes/Documents/Invoice.php:623
 msgid "On email attachment"
 msgstr ""
 
-#: includes/Documents/Invoice.php:604
+#: includes/Documents/Invoice.php:624
 msgid "On order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Documents/Invoice.php:609
+#: includes/Documents/Invoice.php:629
 msgid "Allows you to mark the document as printed, manually (in the order page) or automatically (based on the document creation context you have selected)."
 msgstr ""
 
-#: includes/Documents/Invoice.php:615
+#: includes/Documents/Invoice.php:635
 msgid "Unmark as printed"
 msgstr ""
 
-#: includes/Documents/Invoice.php:621
+#: includes/Documents/Invoice.php:641
 msgid "Adds a link in the order page to allow to remove the printed mark."
 msgstr ""
 
-#: includes/Documents/Invoice.php:627
+#: includes/Documents/Invoice.php:647
 msgid "Always use most current settings"
 msgstr ""
 
-#: includes/Documents/Invoice.php:635
+#: includes/Documents/Invoice.php:655
 msgid "When enabled, the document will always reflect the most current settings (such as footer text, document name, etc.) rather than using historical settings."
 msgstr ""
 
-#: includes/Documents/Invoice.php:636
+#: includes/Documents/Invoice.php:656
 msgid "Caution: Enabling this will also mean that if you change your company name or address in the future, previously generated documents will also be affected."
 msgstr ""
 
-#: includes/Documents/Invoice.php:638
+#: includes/Documents/Invoice.php:658
 msgid "Learn more about this setting"
 msgstr ""
 
-#: includes/Documents/Invoice.php:648
+#: includes/Documents/Invoice.php:668
 msgid "Include document link in emails"
 msgstr ""
 
-#: includes/Documents/Invoice.php:657
+#: includes/Documents/Invoice.php:677
 msgid "Select emails to include the document link."
 msgstr ""
 
-#: includes/Documents/Invoice.php:664
+#: includes/Documents/Invoice.php:684
 msgid "Document link position in emails"
 msgstr ""
 
-#: includes/Documents/Invoice.php:671
+#: includes/Documents/Invoice.php:691
 msgid "Select the placement of the document link in the guest customer emails."
 msgstr ""
 
-#: includes/Documents/Invoice.php:684
+#: includes/Documents/Invoice.php:704
 msgid "Invoice numbers are created by a third-party extension."
 msgstr ""
 
 #. translators: link
-#: includes/Documents/Invoice.php:687
+#: includes/Documents/Invoice.php:707
 #, php-format
 msgid "Configure it <a href=\"%s\">here</a>."
 msgstr ""
 
-#: includes/Documents/Invoice.php:716
+#: includes/Documents/Invoice.php:736
 #: includes/Documents/PackingSlip.php:273
 #: includes/Settings.php:241
 #: includes/Settings/SettingsDebug.php:806
 msgid "General"
 msgstr ""
 
-#: includes/Documents/Invoice.php:727
+#: includes/Documents/Invoice.php:747
 #: includes/Documents/PackingSlip.php:280
 msgid "Document details"
 msgstr ""
 
-#: includes/Documents/Invoice.php:741
+#: includes/Documents/Invoice.php:762
 msgid "Admin"
 msgstr ""
 
-#: includes/Documents/Invoice.php:750
+#: includes/Documents/Invoice.php:771
 #: includes/Settings.php:256
 #: includes/Settings/SettingsCallbacks.php:818
 msgid "Advanced"
@@ -3152,73 +3169,73 @@ msgid "%s was regenerated"
 msgstr ""
 
 #. translators: %s: document name
-#: includes/Documents/OrderDocument.php:1169
+#: includes/Documents/OrderDocument.php:1178
 #, php-format
 msgid "%s Number:"
 msgstr ""
 
 #. translators: %s: document name
-#: includes/Documents/OrderDocument.php:1177
+#: includes/Documents/OrderDocument.php:1186
 #, php-format
 msgid "%s Date:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1183
-#: includes/Main.php:2304
+#: includes/Documents/OrderDocument.php:1192
+#: includes/Main.php:2307
 msgid "Due Date:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1187
+#: includes/Documents/OrderDocument.php:1196
 msgid "Billing Address:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1190
+#: includes/Documents/OrderDocument.php:1199
 msgid "Shipping Address:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1193
+#: includes/Documents/OrderDocument.php:1202
 msgid "Order Number:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1196
+#: includes/Documents/OrderDocument.php:1205
 msgid "Order Date:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1199
+#: includes/Documents/OrderDocument.php:1208
 msgid "Payment Method:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1202
+#: includes/Documents/OrderDocument.php:1211
 #: languages/strings.php:8
 msgid "Payment Date:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1205
+#: includes/Documents/OrderDocument.php:1214
 msgid "Shipping Method:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1208
+#: includes/Documents/OrderDocument.php:1217
 msgid "SKU:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1211
+#: includes/Documents/OrderDocument.php:1220
 msgid "Weight:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1214
+#: includes/Documents/OrderDocument.php:1223
 msgid "Notes:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:1217
+#: includes/Documents/OrderDocument.php:1226
 msgid "Customer Notes:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:2477
-#: includes/Documents/OrderDocument.php:2484
+#: includes/Documents/OrderDocument.php:2492
+#: includes/Documents/OrderDocument.php:2499
 msgid "Admin email"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:2480
+#: includes/Documents/OrderDocument.php:2495
 msgid "Manual email"
 msgstr ""
 
@@ -3315,42 +3332,42 @@ msgid "Please enter a VAT number including a valid country prefix (for example P
 msgstr ""
 
 #. translators: 1. output format, 2. document title, 3. email title
-#: includes/Main.php:196
+#: includes/Main.php:198
 #, php-format
 msgid "%1$s %2$s successfully attached to the %3$s email."
 msgstr ""
 
-#: includes/Main.php:441
+#: includes/Main.php:443
 msgid "You do not have sufficient permissions to access this page. Reason: empty access key"
 msgstr ""
 
-#: includes/Main.php:447
+#: includes/Main.php:449
 msgid "You do not have sufficient permissions to access this page. Reason: empty action"
 msgstr ""
 
-#: includes/Main.php:453
+#: includes/Main.php:455
 msgid "You do not have sufficient permissions to access this page. Reason: invalid nonce"
 msgstr ""
 
-#: includes/Main.php:463
+#: includes/Main.php:465
 msgid "You haven't selected any orders"
 msgstr ""
 
-#: includes/Main.php:468
+#: includes/Main.php:470
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-#: includes/Main.php:487
+#: includes/Main.php:489
 msgid "You have to save the order before generating a PDF document for it."
 msgstr ""
 
 #. translators: %s: Order ID
-#: includes/Main.php:492
+#: includes/Main.php:494
 #, php-format
 msgid "Could not find the order #%s."
 msgstr ""
 
-#: includes/Main.php:575
+#: includes/Main.php:577
 #: includes/Settings.php:304
 #: includes/Settings.php:494
 #: includes/SetupWizard.php:342
@@ -3358,34 +3375,34 @@ msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #. translators: document type
-#: includes/Main.php:644
+#: includes/Main.php:646
 #, php-format
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr ""
 
-#: includes/Main.php:681
+#: includes/Main.php:683
 msgid "Invalid request. Nonce check failed."
 msgstr ""
 
-#: includes/Main.php:689
-#: includes/Main.php:715
+#: includes/Main.php:691
+#: includes/Main.php:717
 msgid "No orders were provided."
 msgstr ""
 
-#: includes/Main.php:704
+#: includes/Main.php:706
 msgid "You do not have permission to access one or more of these orders."
 msgstr ""
 
-#: includes/Main.php:725
+#: includes/Main.php:727
 msgid "No refunds found for the selected orders."
 msgstr ""
 
-#: includes/Main.php:1584
+#: includes/Main.php:1586
 msgid "Nothing to delete!"
 msgstr ""
 
 #. translators: %1$d is the number of files that couldn't be deleted, %2$d is the number of successfully deleted files
-#: includes/Main.php:1591
+#: includes/Main.php:1593
 #, php-format
 msgid "Unable to delete %1$d file! (deleted %2$d)"
 msgid_plural "Unable to delete %1$d files! (deleted %2$d)"
@@ -3393,80 +3410,80 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d is the number of files successfully deleted
-#: includes/Main.php:1604
+#: includes/Main.php:1606
 #, php-format
 msgid "Successfully deleted %d file!"
 msgid_plural "Successfully deleted %d files!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Main.php:1739
-#: includes/Main.php:1769
+#: includes/Main.php:1741
+#: includes/Main.php:1771
 msgid "User"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1747
+#: includes/Main.php:1749
 #, php-format
 msgid "PDF %1$s created via %2$s."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1776
+#: includes/Main.php:1778
 #, php-format
 msgid "PDF %s deleted."
 msgstr ""
 
-#: includes/Main.php:1793
+#: includes/Main.php:1795
 msgid "manually"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1799
+#: includes/Main.php:1801
 #, php-format
 msgid "%1$s document marked as printed via %2$s."
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1814
+#: includes/Main.php:1816
 #, php-format
 msgid "%1$s document unmark printed."
 msgstr ""
 
-#: includes/Main.php:1901
+#: includes/Main.php:1903
 msgid "single order action"
 msgstr ""
 
-#: includes/Main.php:1902
+#: includes/Main.php:1904
 msgid "bulk order action"
 msgstr ""
 
-#: includes/Main.php:1903
+#: includes/Main.php:1905
 msgid "my account"
 msgstr ""
 
-#: includes/Main.php:1904
+#: includes/Main.php:1906
 msgid "order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Main.php:1908
+#: includes/Main.php:1910
 msgid "email attachment"
 msgstr ""
 
 #. translators: 1. document type, 2. mark/unmark
-#: includes/Main.php:2024
+#: includes/Main.php:2026
 #, php-format
 msgid "Document of type %1$s for the selected order could not be marked as printed."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:2175
+#: includes/Main.php:2177
 #, php-format
 msgid "Order %s Saved"
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Main.php:2418
+#: includes/Main.php:2510
 #, php-format
 msgid "View %s (PDF)"
 msgstr ""
@@ -3722,29 +3739,29 @@ msgstr ""
 msgid "Error trying to get orders: %s"
 msgstr ""
 
-#: includes/Settings.php:851
+#: includes/Settings.php:854
 msgid "Extension"
 msgstr ""
 
 #. translators: total scheduled actions
-#: includes/Settings.php:1391
+#: includes/Settings.php:1394
 #, php-format
 msgid "Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found"
 msgstr ""
 
-#: includes/Settings.php:1634
+#: includes/Settings.php:1637
 msgid "Additional settings"
 msgstr ""
 
-#: includes/Settings.php:1812
+#: includes/Settings.php:1815
 msgid "Address field is required."
 msgstr ""
 
-#: includes/Settings.php:1828
+#: includes/Settings.php:1831
 msgid "Invalid address field."
 msgstr ""
 
-#: includes/Settings.php:1837
+#: includes/Settings.php:1840
 msgid "The field is empty."
 msgstr ""
 
@@ -4535,7 +4552,7 @@ msgstr ""
 #. translators: %s: link to documentation
 #: includes/Settings/SettingsEDI.php:368
 #, php-format
-msgid "Automatically generate Peppol IDs from VAT numbers for supported countries. This can help ensure the correct format and reduce errors. %s"
+msgid "Look up customer Peppol Endpoint IDs from VAT numbers for the selected billing countries. When the customer field is enabled at checkout, the lookup fills that field during checkout. Otherwise, it runs when the order is created. A matching participant must be found in the Peppol Directory. %s"
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:423
@@ -4826,10 +4843,6 @@ msgstr ""
 
 #: includes/Settings/SettingsGeneral.php:107
 msgid "A VAT plugin is currently active. When the field type is set to VAT number, this checkout field will not be displayed to avoid conflicts and duplicate VAT fields. Other field types remain available."
-msgstr ""
-
-#: includes/Settings/SettingsGeneral.php:115
-msgid "General settings"
 msgstr ""
 
 #: includes/Settings/SettingsGeneral.php:121
@@ -5191,32 +5204,32 @@ msgstr ""
 msgid "No country code provided."
 msgstr ""
 
-#: includes/Settings/SettingsGeneral.php:1065
+#: includes/Settings/SettingsGeneral.php:1068
 msgid "a file"
 msgid_plural "files"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: 1: "file"/"files" label (singular/plural), 2: list of document titles
-#: includes/Settings/SettingsGeneral.php:1070
+#: includes/Settings/SettingsGeneral.php:1073
 #, php-format
 msgid "Your custom template folder does not contain %1$s for: %2$s."
 msgstr ""
 
 #. translators: 1: Opening <strong>, 2: Closing </strong>
-#: includes/Settings/SettingsGeneral.php:1077
+#: includes/Settings/SettingsGeneral.php:1080
 #, php-format
 msgid "Documents where files are missing will remain functional and will use the default %1$sSimple%2$s template."
 msgstr ""
 
 #. translators: %s: Template folder path
-#: includes/Settings/SettingsGeneral.php:1093
+#: includes/Settings/SettingsGeneral.php:1096
 #, php-format
 msgid "If you are not using the latest version of the Premium Templates extension, please update it. Otherwise, copy the template files from the newest version in %s and adapt them to your custom template."
 msgstr ""
 
 #. translators: 1: opening <a>, 2: closing </a>
-#: includes/Settings/SettingsGeneral.php:1102
+#: includes/Settings/SettingsGeneral.php:1105
 #, php-format
 msgid "Please refer to the %1$sCreating a custom PDF template%2$s article to learn how to update your template."
 msgstr ""
