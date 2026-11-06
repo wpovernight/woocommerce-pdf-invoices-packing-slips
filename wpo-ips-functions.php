@@ -2817,19 +2817,37 @@ function wpo_ips_is_checkout_request(): bool {
 }
 
 /**
- * Checks whether the current request is a WooCommerce API request (`?wc-api=...`),
- * including the legacy REST API served by the WooCommerce Legacy REST API plugin.
+ * Checks whether the current request is a WooCommerce API request, including
+ * the legacy REST API served by the WooCommerce Legacy REST API plugin:
+ * `?wc-api=...`, `?wc-api-version=...&wc-api-route=...` (plain permalinks) or
+ * `/wc-api/...` (pretty permalinks).
  *
  * @return bool
  */
 function wpo_ips_is_wc_api_request(): bool {
 	// phpcs:disable WordPress.Security.NonceVerification.Recommended
-	if ( ! isset( $_GET['wc-api'] ) || ! is_scalar( $_GET['wc-api'] ) ) {
+	if ( isset( $_GET['wc-api'] ) && is_scalar( $_GET['wc-api'] ) ) {
+		return '' !== sanitize_key( wp_unslash( (string) $_GET['wc-api'] ) );
+	}
+
+	// The legacy REST API falls back to query parameters on plain permalinks.
+	// These are literal GET values, so they are available before parse_request.
+	if ( isset( $_GET['wc-api-version'], $_GET['wc-api-route'] ) ) {
+		return true;
+	}
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+	// The rewrite endpoint (pretty permalinks) is only parsed into query vars
+	// on parse_request, after 'init', so match the request path instead.
+	if ( ! wpo_ips_is_frontend_page_request() || empty( $_SERVER['REQUEST_URI'] ) ) {
 		return false;
 	}
 
-	return '' !== sanitize_key( wp_unslash( (string) $_GET['wc-api'] ) );
-	// phpcs:enable WordPress.Security.NonceVerification.Recommended
+	$request_path  = trim( (string) wp_parse_url( wp_unslash( (string) $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ), '/' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$home_path     = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+	$endpoint_path = ltrim( $home_path . '/wc-api', '/' );
+
+	return 0 === strpos( $request_path . '/', $endpoint_path . '/' );
 }
 
 /**
