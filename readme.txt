@@ -5,7 +5,7 @@ Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 5.9
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 6.0.0-rc.7
+Stable tag: 6.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,41 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 6.0.0 (2026-11-09) =
+- New: Modernized, object-oriented codebase with strict types, full type coverage and improved performance
+- New: Require PHP 8.1+, WordPress 5.9+ and WooCommerce 4.0+
+- New: Upgrade CII standard from D16B to D22B, with support for profiles
+- New: Add support for plural document titles
+- New: Add document setting to display the Checkout Field on invoices
+- New: Add log note for failed document creations
+- New: Refactor Peppol endpoint derivation into a reusable method
+- New: Allow overriding WordPress.org language pack translations with custom .po/.mo or .l10n.php files
+- Tweak: Remove bundled .po/.mo translation files in favor of WordPress.org language packs
+- Tweak: Improve registration number identifiers and defaults
+- Tweak: Make PDF maker helpers available to extensions safely
+- Tweak: Keep legacy class aliases for backwards compatibility with pre-v6 extensions
+- Fix: Due date formatting fatal error
+- Fix: Invoice date format in order list
+- Fix: Detection of active extensions for license caching
+- Fix: Document action buttons on the Thank You page
+- Fix: Hidden and duplicate Classic Checkout fields when order notes are disabled
+- Fix: Tighten permission checks in admin AJAX handlers and document access
+- Fix: Harden settings validation and PDF resource loading
+- Fix: Guest-order PDF download links disappearing after login
+- Fix: Order admin crash with multiple credit notes
+- Fix: Fatal error with malformed document settings
+- Fix: Restore saving bulk packing slip PDFs
+- Fix: Composite Products compatibility
+- Fix: Automatic Peppol derivation when the checkout field is empty
+- Fix: CII line amounts and quantities for negative values
+- Fix: CII tax exemption element order
+- Fix: Missing delivery date in CII invoices
+- Fix: Plugin Check errors
+- Fix: Remove entity decoding from rendered document HTML
+- Translations: Updated translation template (POT)
+- Tested: Compatibility confirmed with WooCommerce 11.2
+- Tested: Tested up WordPress 7.1
 
 = 5.16.6 (2026-10-22) =
 - Fix: Prevent wrong invoice attachments in customer emails
