@@ -253,6 +253,12 @@ class PDFMaker {
 			return false;
 		}
 
+		// Bulk documents combine multiple orders in one PDF and can't carry
+		// the per-order hybrid EDI document.
+		if ( $this->document instanceof \WPO\IPS\Documents\BulkDocument ) {
+			return false;
+		}
+
 		$format = wpo_ips_edi_get_current_format( true );
 
 		if ( ! is_array( $format ) || empty( $format['hybrid'] ) ) {
