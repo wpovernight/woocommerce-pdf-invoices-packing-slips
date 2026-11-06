@@ -362,8 +362,11 @@ class WPO_WCPDF {
 		$locale = $this->determine_locale();
 		$dir    = trailingslashit( WP_LANG_DIR );
 
+		// Custom translation folder, e.g. to override WordPress.org language packs.
+		$loaded = load_textdomain( $textdomain, $dir . $textdomain . '/' . $textdomain . '-' . $locale . '.mo' );
+
 		// Keep explicit loading to support the plugin_locale filter when reloading email attachment translations.
-		$loaded = load_textdomain( $textdomain, $dir . 'plugins/' . $textdomain . '-' . $locale . '.mo' );
+		$loaded = load_textdomain( $textdomain, $dir . 'plugins/' . $textdomain . '-' . $locale . '.mo' ) || $loaded;
 	}
 
 	/**
