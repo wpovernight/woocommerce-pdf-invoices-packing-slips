@@ -336,7 +336,9 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * Load translations from WordPress.org language packs.
+	 * Load translations from WordPress.org language packs, with custom
+	 * translations overriding them through the textdomain folder
+	 * (WP_LANG_DIR/<textdomain>/<textdomain>-<locale>.mo).
 	 * 
 	 * @param bool $force_reload Reload translations after a locale change, such as when generating email attachments.
 	 * @return void
@@ -350,20 +352,28 @@ class WPO_WCPDF {
 			return;
 		}
 
-		if ( is_textdomain_loaded( $textdomain ) ) {
-			if ( ! $force_reload ) {
-				$loaded = true;
-				return;
-			}
+		$locale     = $this->determine_locale();
+		$dir        = trailingslashit( WP_LANG_DIR );
 
+		// Custom translation folder, e.g. to override WordPress.org language packs.
+		// WordPress can load a sibling .l10n.php file (6.5+) without a .mo file.
+		$custom_mo      = $dir . $textdomain . '/' . $textdomain . '-' . $locale . '.mo';
+		$custom_l10nphp = $dir . $textdomain . '/' . $textdomain . '-' . $locale . '.l10n.php';
+
+		// The domain may already be loaded on demand (e.g. a translation
+		// request before 'init', or WordPress implicit loading for language
+		// packs), skipping the custom folder: only skip when the custom
+		// translations could not change or add anything.
+		if ( is_textdomain_loaded( $textdomain ) && ! $force_reload && ! is_readable( $custom_mo ) && ! is_readable( $custom_l10nphp ) ) {
+			$loaded = true;
+			return;
+		}
+
+		if ( is_textdomain_loaded( $textdomain ) ) {
 			unload_textdomain( $textdomain );
 		}
 
-		$locale = $this->determine_locale();
-		$dir    = trailingslashit( WP_LANG_DIR );
-
-		// Custom translation folder, e.g. to override WordPress.org language packs.
-		$loaded = load_textdomain( $textdomain, $dir . $textdomain . '/' . $textdomain . '-' . $locale . '.mo' );
+		$loaded = load_textdomain( $textdomain, $custom_mo );
 
 		// Keep explicit loading to support the plugin_locale filter when reloading email attachment translations.
 		$loaded = load_textdomain( $textdomain, $dir . 'plugins/' . $textdomain . '-' . $locale . '.mo' ) || $loaded;

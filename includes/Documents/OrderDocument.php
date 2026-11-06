@@ -2043,18 +2043,20 @@ abstract class OrderDocument {
 		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array(), $this );
 		\wpo_ips_add_filters( $pdf_filters );
 
-		$pdf_settings = array(
-			'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
-			'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
-			'font_subsetting'   => $this->get_setting( 'font_subsetting', false ),
-		);
-		$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
-		$pdf          = $pdf_maker->output();
+		try {
+			$pdf_settings = array(
+				'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+				'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+				'font_subsetting'   => $this->get_setting( 'font_subsetting', false ),
+			);
+			$pdf_maker    = wcpdf_get_pdf_maker( $this->get_html(), $pdf_settings, $this );
+			$pdf          = $pdf_maker->output();
 
-		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
-
-		// remove temporary filters
-		\wpo_ips_remove_filters( $pdf_filters );
+			do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
+		} finally {
+			// remove temporary filters, also when generating the PDF throws
+			\wpo_ips_remove_filters( $pdf_filters );
+		}
 
 		do_action( 'wpo_wcpdf_pdf_created', $pdf, $this );
 

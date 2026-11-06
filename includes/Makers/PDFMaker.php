@@ -61,23 +61,13 @@ class PDFMaker {
 		$hybrid = $this->is_hybrid_document();
 
 		// Hybrid documents require PDF/A, which needs an embeddable font file
-		// for every font used: templates falling back to a core font (e.g. an
-		// unregistered custom font ending on the generic 'sans-serif') make
-		// Dompdf throw when serializing, so the failure surfaces instead of
-		// producing a PDF missing the metadata the format requires. Templates
-		// must use an embeddable font for these formats.
-		return $this->render_pdf( $tmp_path, $fonts_path, $hybrid );
-	}
-	
-	/**
-	 * Render the PDF with the given settings.
-	 *
-	 * @param string $tmp_path   Temporary directory path.
-	 * @param string $fonts_path Fonts directory path.
-	 * @param bool   $hybrid     Whether to embed the hybrid EDI document.
-	 * @return string|null
-	 */
-	private function render_pdf( string $tmp_path, string $fonts_path, bool $hybrid ): ?string {
+		// for every font used and does not allow CMYK images or colors:
+		// templates falling back to a core font (e.g. an unregistered custom
+		// font ending on the generic 'sans-serif') or using a CMYK logo make
+		// Dompdf throw when generating the document, so the failure surfaces
+		// instead of producing a PDF missing the metadata the format requires.
+		// Templates must use an embeddable font and RGB colors for these formats.
+
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
 			'tempDir'                 => $tmp_path,
@@ -237,9 +227,10 @@ class PDFMaker {
 			return false;
 		}
 
-		// Bulk documents combine multiple orders in one PDF and can't carry
-		// the per-order hybrid EDI document.
-		if ( $this->document instanceof \WPO\IPS\Documents\BulkDocument ) {
+		// The hybrid EDI document is built from a single order: only order
+		// documents qualify, excluding bulk documents (which combine multiple
+		// orders in one PDF) and any other document object.
+		if ( ! $this->document instanceof \WPO\IPS\Documents\OrderDocument ) {
 			return false;
 		}
 

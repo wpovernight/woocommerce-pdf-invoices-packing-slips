@@ -2817,19 +2817,16 @@ function wpo_ips_is_checkout_request(): bool {
 }
 
 /**
- * Checks whether the current request is a WooCommerce API request, including
- * the legacy REST API served by the WooCommerce Legacy REST API plugin:
- * `?wc-api=...`, `?wc-api-version=...&wc-api-route=...` (plain permalinks) or
- * `/wc-api/...` (pretty permalinks).
+ * Checks whether the current request is served by the WooCommerce Legacy REST
+ * API (WooCommerce Legacy REST API plugin), whose order responses carry the
+ * invoice number: `?wc-api-version=...&wc-api-route=...` (plain permalinks)
+ * or `/wc-api/v1...v3/...` (pretty permalinks). Other WooCommerce API
+ * requests (payment gateway callbacks, webhooks) are not matched.
  *
  * @return bool
  */
 function wpo_ips_is_wc_api_request(): bool {
 	// phpcs:disable WordPress.Security.NonceVerification.Recommended
-	if ( isset( $_GET['wc-api'] ) && is_scalar( $_GET['wc-api'] ) ) {
-		return '' !== sanitize_key( wp_unslash( (string) $_GET['wc-api'] ) );
-	}
-
 	// The legacy REST API falls back to query parameters on plain permalinks.
 	// These are literal GET values, so they are available before parse_request.
 	if ( isset( $_GET['wc-api-version'], $_GET['wc-api-route'] ) ) {
@@ -2845,9 +2842,10 @@ function wpo_ips_is_wc_api_request(): bool {
 
 	$request_path  = trim( (string) wp_parse_url( wp_unslash( (string) $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ), '/' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 	$home_path     = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
-	$endpoint_path = ltrim( $home_path . '/wc-api', '/' );
+	$prefix        = '' === $home_path ? '' : preg_quote( $home_path, '#' ) . '/';
 
-	return 0 === strpos( $request_path . '/', $endpoint_path . '/' );
+	// Permalinks that keep index.php in the path are matched too.
+	return 1 === preg_match( '#^' . $prefix . '(index\.php/)?wc-api/v[1-3](/|$)#', $request_path );
 }
 
 /**
