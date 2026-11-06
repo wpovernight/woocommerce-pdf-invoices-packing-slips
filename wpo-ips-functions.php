@@ -2817,6 +2817,38 @@ function wpo_ips_is_checkout_request(): bool {
 }
 
 /**
+ * Checks whether the current request is served by the WooCommerce Legacy REST
+ * API (WooCommerce Legacy REST API plugin), whose order responses carry the
+ * invoice number: `?wc-api-version=...&wc-api-route=...` (plain permalinks)
+ * or `/wc-api/v1...v3/...` (pretty permalinks). Other WooCommerce API
+ * requests (payment gateway callbacks, webhooks) are not matched.
+ *
+ * @return bool
+ */
+function wpo_ips_is_wc_api_request(): bool {
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended
+	// The legacy REST API falls back to query parameters on plain permalinks.
+	// These are literal GET values, so they are available before parse_request.
+	if ( isset( $_GET['wc-api-version'], $_GET['wc-api-route'] ) ) {
+		return true;
+	}
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+	// The rewrite endpoint (pretty permalinks) is only parsed into query vars
+	// on parse_request, after 'init', so match the request path instead.
+	if ( ! wpo_ips_is_frontend_page_request() || empty( $_SERVER['REQUEST_URI'] ) ) {
+		return false;
+	}
+
+	$request_path  = trim( (string) wp_parse_url( wp_unslash( (string) $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ), '/' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+	$home_path     = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+	$prefix        = '' === $home_path ? '' : preg_quote( $home_path, '#' ) . '/';
+
+	// Permalinks that keep index.php in the path are matched too.
+	return 1 === preg_match( '#^' . $prefix . '(index\.php/)?wc-api/v[1-3](/|$)#', $request_path );
+}
+
+/**
  * Checks whether the current request may require document-related functionality.
  *
  * @return bool

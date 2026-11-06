@@ -87,19 +87,21 @@ class BulkDocument {
 		$pdf_filters = apply_filters( 'wpo_wcpdf_pdf_filters', array(), $this );
 		\wpo_ips_add_filters( $pdf_filters );
 
-		$html         = $this->get_html();
-		$pdf_settings = array(
-			'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->wrapper_document->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
-			'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
-			'font_subsetting'   => $this->wrapper_document->get_setting( 'font_subsetting', false ),
-		);
-		$pdf_maker    = wcpdf_get_pdf_maker( $html, $pdf_settings, $this );
-		$pdf          = apply_filters( 'wpo_wcpdf_pdf_data', $pdf_maker->output(), $this );
+		try {
+			$html         = $this->get_html();
+			$pdf_settings = array(
+				'paper_size'        => apply_filters( 'wpo_wcpdf_paper_format', $this->wrapper_document->get_setting( 'paper_size', 'A4' ), $this->get_type(), $this ),
+				'paper_orientation' => apply_filters( 'wpo_wcpdf_paper_orientation', 'portrait', $this->get_type(), $this ),
+				'font_subsetting'   => $this->wrapper_document->get_setting( 'font_subsetting', false ),
+			);
+			$pdf_maker    = wcpdf_get_pdf_maker( $html, $pdf_settings, $this );
+			$pdf          = apply_filters( 'wpo_wcpdf_pdf_data', $pdf_maker->output(), $this );
 
-		do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
-
-		// remove temporary filters
-		\wpo_ips_remove_filters( $pdf_filters );
+			do_action( 'wpo_wcpdf_after_pdf', $this->get_type(), $this );
+		} finally {
+			// remove temporary filters, also when generating the PDF throws
+			\wpo_ips_remove_filters( $pdf_filters );
+		}
 
 		return $pdf;
 	}

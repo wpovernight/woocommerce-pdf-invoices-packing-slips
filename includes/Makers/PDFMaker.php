@@ -60,6 +60,14 @@ class PDFMaker {
 
 		$hybrid = $this->is_hybrid_document();
 
+		// Hybrid documents require PDF/A, which needs an embeddable font file
+		// for every font used and does not allow CMYK images or colors:
+		// templates falling back to a core font (e.g. an unregistered custom
+		// font ending on the generic 'sans-serif') or using a CMYK logo make
+		// Dompdf throw when generating the document, so the failure surfaces
+		// instead of producing a PDF missing the metadata the format requires.
+		// Templates must use an embeddable font and RGB colors for these formats.
+
 		// set options
 		$options = new Options( apply_filters( 'wpo_wcpdf_dompdf_options', array(
 			'tempDir'                 => $tmp_path,
@@ -216,6 +224,13 @@ class PDFMaker {
 	 */
 	protected function is_hybrid_document(): bool {
 		if ( ! function_exists( 'wpo_ips_edi_is_available' ) || ! wpo_ips_edi_is_available() ) {
+			return false;
+		}
+
+		// The hybrid EDI document is built from a single order: only order
+		// documents qualify, excluding bulk documents (which combine multiple
+		// orders in one PDF) and any other document object.
+		if ( ! $this->document instanceof \WPO\IPS\Documents\OrderDocument ) {
 			return false;
 		}
 
