@@ -2991,6 +2991,20 @@ abstract class OrderDocument {
 	}
 
 	/**
+	 * Escape ampersands, protecting the value from the document-wide entity decode in get_html().
+	 *
+	 * Deprecated without replacement: documents are no longer entity-decoded when rendered,
+	 * so the value is returned as is.
+	 *
+	 * @param mixed $value
+	 * @return mixed
+	 */
+	public function protect_from_document_decode( mixed $value ): mixed {
+		\wcpdf_deprecated_function( __FUNCTION__, '6.0.0' );
+		return $value;
+	}
+
+	/**
 	 * Recursively sanitize settings for storage by removing any objects or resources, which cannot be stored in the database.
 	 *
 	 * @param array $settings
