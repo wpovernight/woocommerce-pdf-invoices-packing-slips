@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-rc.6\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-rc.7\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-05T12:43:09+00:00\n"
+"POT-Creation-Date: 2026-11-06T14:31:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -3230,12 +3230,12 @@ msgstr ""
 msgid "Customer Notes:"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:2492
-#: includes/Documents/OrderDocument.php:2499
+#: includes/Documents/OrderDocument.php:2494
+#: includes/Documents/OrderDocument.php:2501
 msgid "Admin email"
 msgstr ""
 
-#: includes/Documents/OrderDocument.php:2495
+#: includes/Documents/OrderDocument.php:2497
 msgid "Manual email"
 msgstr ""
 
@@ -6263,16 +6263,16 @@ msgid "Visit shop"
 msgstr ""
 
 #. translators: %s: legacy add-on name
-#: woocommerce-pdf-invoices-packingslips.php:503
+#: woocommerce-pdf-invoices-packingslips.php:517
 #, php-format
 msgid "The legacy %s add-on cannot be activated because it is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:521
+#: woocommerce-pdf-invoices-packingslips.php:535
 msgid "Plugin activation blocked"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:591
+#: woocommerce-pdf-invoices-packingslips.php:605
 msgid "Legacy add-on — activation unavailable"
 msgstr ""
 
@@ -6331,26 +6331,26 @@ msgstr ""
 msgid "Unnamed account"
 msgstr ""
 
-#: wpo-ips-functions.php:2846
+#: wpo-ips-functions.php:2878
 msgid "Order details"
 msgstr ""
 
-#: wpo-ips-functions.php:2847
+#: wpo-ips-functions.php:2879
 msgid "Order meta"
 msgstr ""
 
-#: wpo-ips-functions.php:2848
+#: wpo-ips-functions.php:2880
 msgid "Before order table"
 msgstr ""
 
-#: wpo-ips-functions.php:2849
+#: wpo-ips-functions.php:2881
 msgid "After order table"
 msgstr ""
 
-#: wpo-ips-functions.php:2850
+#: wpo-ips-functions.php:2882
 msgid "Customer address section"
 msgstr ""
 
-#: wpo-ips-functions.php:2851
+#: wpo-ips-functions.php:2883
 msgid "Customer details"
 msgstr ""
