@@ -119,6 +119,10 @@ class WPO_WCPDF {
 				'name'    => '«FactuPress» - Veri*Factu for WooCommerce',
 				'version' => '2.6.0',
 			),
+			'woocommerce-deposits/woocommerce-deposits.php'                                 => array(
+				'name'    => 'WooCommerce Deposits',
+				'version' => '2.5.17',
+			),
 			// Legacy addons
 			'ubl-woocommerce-pdf-invoices/ubl-woocommerce-pdf-invoices.php'                 => 'UBL Invoices for WooCommerce',
 			'woocommerce-pdf-ips-number-tools/woocommerce-pdf-ips-number-tools.php'         => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
@@ -128,7 +132,6 @@ class WPO_WCPDF {
 			'wpo-ips-xrechnung/wpo-ips-xrechnung.php'                                       => 'PDF Invoices & Packing Slips for WooCommerce - XRechnung',
 			'wpo-ips-fatturapa/wpo-ips-fatturapa.php'                                       => 'PDF Invoices & Packing Slips for WooCommerce - FatturaPA',
 			'wcpdf-quotation/wcpdf-quotation.php'                                           => 'PDF Invoices & Packing Slips for WooCommerce - Quotation Document',
-			'woocommerce-deposits/woocommerce-deposits.php'                                 => 'WooCommerce Deposits',
 		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
