@@ -707,7 +707,7 @@ class WPO_WCPDF {
 	 * @param string $plugin_basename Plugin basename.
 	 * @return string|null
 	 */
-	public function get_legacy_addon_author( string $plugin_basename ): ?string {
+	private function get_legacy_addon_author( string $plugin_basename ): ?string {
 		$addon = $this->legacy_addons[ $plugin_basename ] ?? null;
 
 		if ( is_array( $addon ) && ! empty( $addon['author'] ) ) {
@@ -718,45 +718,25 @@ class WPO_WCPDF {
 	}
 
 	/**
-	 * Get the author of a plugin from its file header.
+	 * Get the Version and Author headers of an installed plugin.
 	 *
 	 * @param string $plugin_basename Plugin basename.
-	 * @return string Empty string when the author cannot be determined.
+	 * @return array Empty array when the file does not exist.
 	 */
-	private function get_plugin_author( string $plugin_basename ): string {
-		static $authors = array();
+	private function get_plugin_headers( string $plugin_basename ): array {
+		static $headers = array();
 
-		if ( ! isset( $authors[ $plugin_basename ] ) ) {
+		if ( ! isset( $headers[ $plugin_basename ] ) ) {
 			$file = WP_PLUGIN_DIR . '/' . $plugin_basename;
-			$data = file_exists( $file )
-				? get_file_data( $file, array( 'Author' => 'Author' ) )
+			$headers[ $plugin_basename ] = file_exists( $file )
+				? get_file_data( $file, array(
+					'Version' => 'Version',
+					'Author'  => 'Author',
+				) )
 				: array();
-
-			$authors[ $plugin_basename ] = (string) ( $data['Author'] ?? '' );
 		}
 
-		return $authors[ $plugin_basename ];
-	}
-
-	/**
-	 * Get the installed version of a plugin from its file header.
-	 *
-	 * @param string $plugin_basename Plugin basename.
-	 * @return string Empty string when the version cannot be determined.
-	 */
-	private function get_plugin_version( string $plugin_basename ): string {
-		static $versions = array();
-
-		if ( ! isset( $versions[ $plugin_basename ] ) ) {
-			$file = WP_PLUGIN_DIR . '/' . $plugin_basename;
-			$data = file_exists( $file )
-				? get_file_data( $file, array( 'Version' => 'Version' ) )
-				: array();
-
-			$versions[ $plugin_basename ] = (string) ( $data['Version'] ?? '' );
-		}
-
-		return $versions[ $plugin_basename ];
+		return $headers[ $plugin_basename ];
 	}
 
 	/**
@@ -855,8 +835,8 @@ class WPO_WCPDF {
 	/**
 	 * Parse update notice from readme file.
 	 *
-	 * Shows the Upgrade Notice of the newest entry that is not newer than
-	 * the version being offered ($new_version); the block stops at the next
+	 * Shows the first Upgrade Notice entry, unless it is newer than the
+	 * version being offered ($new_version); the block stops at the next
 	 * version heading, so older entries below it are not appended.
 	 *
 	 * @param  string $content
@@ -953,9 +933,10 @@ class WPO_WCPDF {
 	 * -rc.1) are stripped, so every build of a release line is compared as
 	 * that release. Entries with an author only apply to installed plugins
 	 * whose Author header matches, so plugins sharing a basename stay
-	 * unaffected. A missing add-on file is never treated as legacy: WordPress
-	 * skips missing files when loading plugins, so a temporarily absent file
-	 * (deployment, maintenance) must not disable a compatible add-on.
+	 * unaffected. A missing add-on file is never treated as legacy (when its
+	 * version or author is checked): WordPress skips missing files when
+	 * loading plugins, so a temporarily absent file (deployment, maintenance)
+	 * must not disable a compatible add-on.
 	 *
 	 * @param string $plugin_basename Plugin basename.
 	 * @return bool
@@ -966,25 +947,28 @@ class WPO_WCPDF {
 		}
 
 		$deprecated_version = $this->get_legacy_addon_deprecated_version( $plugin_basename );
+		$author            = $this->get_legacy_addon_author( $plugin_basename );
+
+		if ( null !== $deprecated_version || null !== $author ) {
+			if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_basename ) ) {
+				return false;
+			}
+
+			$headers = $this->get_plugin_headers( $plugin_basename );
+
+			if (
+				null !== $author &&
+				false === stripos( (string) ( $headers['Author'] ?? '' ), $author )
+			) {
+				return false;
+			}
+		}
 
 		if ( null === $deprecated_version ) {
 			return true;
 		}
 
-		if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_basename ) ) {
-			return false;
-		}
-
-		$author = $this->get_legacy_addon_author( $plugin_basename );
-
-		if (
-			null !== $author &&
-			false === stripos( $this->get_plugin_author( $plugin_basename ), $author )
-		) {
-			return false;
-		}
-
-		$installed_version = $this->get_plugin_version( $plugin_basename );
+		$installed_version = (string) ( $headers['Version'] ?? '' );
 
 		// Strip the dev suffix to compare base versions only.
 		if ( ! preg_match( '/^v?(\d+(?:\.\d+)*)/', $installed_version, $matches ) ) {
