@@ -119,6 +119,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - New: Add log note for failed document creations
 - New: Refactor Peppol endpoint derivation into a reusable method
 - New: Allow overriding WordPress.org language pack translations with custom .po/.mo or .l10n.php files
+- New: Deactivate outdated extension versions automatically, based on the last compatible release of each extension
 - Tweak: Remove bundled .po/.mo translation files in favor of WordPress.org language packs
 - Tweak: Improve registration number identifiers and defaults
 - Tweak: Make PDF maker helpers available to extensions safely
@@ -1625,6 +1626,9 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 * Translations: Added Indonesian
 
 == Upgrade Notice ==
+
+= 6.0.0 =
+Major update! Update all your PDF Invoices & Packing Slips extensions and add-ons (Professional, Order Proposal, Dokan Invoice, Italian Add-on, Donation Platform, FactuPress and others) to their latest versions BEFORE upgrading. Outdated versions are deactivated automatically after the update.
 
 = 2.1.10 =
 2.X is a BIG update! Make a full site backup before upgrading if you were using version 1.X!

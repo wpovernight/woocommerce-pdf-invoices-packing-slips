@@ -120,14 +120,15 @@ class WPO_WCPDF {
 				'version' => '2.6.0',
 			),
 			// Legacy addons
-			'ubl-woocommerce-pdf-invoices/ubl-woocommerce-pdf-invoices.php'         => 'UBL Invoices for WooCommerce',
-			'woocommerce-pdf-ips-number-tools/woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
-			'woocommerce-pdf-ips-ubl-extender/woocommerce-pdf-ips-ubl-extender.php' => 'PDF Invoices & Packing Slips for WooCommerce - UBL Extender',
-			'wpo-ips-factur-x/wpo-ips-factur-x.php'                                 => 'PDF Invoices & Packing Slips for WooCommerce - Factur-X',
-			'wpo-ips-cius-ro/wpo-ips-cius-ro.php'                                   => 'PDF Invoices & Packing Slips for WooCommerce - CIUS-RO',
-			'wpo-ips-xrechnung/wpo-ips-xrechnung.php'                               => 'PDF Invoices & Packing Slips for WooCommerce - XRechnung',
-			'wpo-ips-fatturapa/wpo-ips-fatturapa.php'                               => 'PDF Invoices & Packing Slips for WooCommerce - FatturaPA',
-			'wcpdf-quotation/wcpdf-quotation.php'                                   => 'PDF Invoices & Packing Slips for WooCommerce - Quotation Document',
+			'ubl-woocommerce-pdf-invoices/ubl-woocommerce-pdf-invoices.php'                 => 'UBL Invoices for WooCommerce',
+			'woocommerce-pdf-ips-number-tools/woocommerce-pdf-ips-number-tools.php'         => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
+			'woocommerce-pdf-ips-ubl-extender/woocommerce-pdf-ips-ubl-extender.php'         => 'PDF Invoices & Packing Slips for WooCommerce - UBL Extender',
+			'wpo-ips-factur-x/wpo-ips-factur-x.php'                                         => 'PDF Invoices & Packing Slips for WooCommerce - Factur-X',
+			'wpo-ips-cius-ro/wpo-ips-cius-ro.php'                                           => 'PDF Invoices & Packing Slips for WooCommerce - CIUS-RO',
+			'wpo-ips-xrechnung/wpo-ips-xrechnung.php'                                       => 'PDF Invoices & Packing Slips for WooCommerce - XRechnung',
+			'wpo-ips-fatturapa/wpo-ips-fatturapa.php'                                       => 'PDF Invoices & Packing Slips for WooCommerce - FatturaPA',
+			'wcpdf-quotation/wcpdf-quotation.php'                                           => 'PDF Invoices & Packing Slips for WooCommerce - Quotation Document',
+			'woocommerce-deposits/woocommerce-deposits.php'                                 => 'WooCommerce Deposits',
 		) );
 
 		$this->define( 'WPO_WCPDF_VERSION', $this->version );
@@ -698,7 +699,7 @@ class WPO_WCPDF {
 	 * @param string $plugin_basename Plugin basename.
 	 * @return string Empty string when the version cannot be determined.
 	 */
-	public function get_plugin_version( string $plugin_basename ): string {
+	private function get_plugin_version( string $plugin_basename ): string {
 		static $versions = array();
 
 		if ( ! isset( $versions[ $plugin_basename ] ) ) {
@@ -712,7 +713,7 @@ class WPO_WCPDF {
 
 		return $versions[ $plugin_basename ];
 	}
-	
+
 	/**
 	 * Get transient name for legacy addon notice based on the addon filename.
 	 *
@@ -892,7 +893,9 @@ class WPO_WCPDF {
 	 * that version or lower, or when the installed version cannot be determined.
 	 * Dev suffixes in the installed version (e.g. -i782, -pr781, -beta.1 or
 	 * -rc.1) are stripped, so every build of a release line is compared as
-	 * that release.
+	 * that release. A missing add-on file is never treated as legacy: WordPress
+	 * skips missing files when loading plugins, so a temporarily absent file
+	 * (deployment, maintenance) must not disable a compatible add-on.
 	 *
 	 * @param string $plugin_basename Plugin basename.
 	 * @return bool
@@ -908,27 +911,41 @@ class WPO_WCPDF {
 			return true;
 		}
 
+		if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_basename ) ) {
+			return false;
+		}
+
 		$installed_version = $this->get_plugin_version( $plugin_basename );
 
 		// Strip the dev suffix to compare base versions only.
-		if ( ! preg_match( '/^\d+(?:\.\d+)*/', $installed_version, $matches ) ) {
+		if ( ! preg_match( '/^v?(\d+(?:\.\d+)*)/', $installed_version, $matches ) ) {
 			return true; // Unrecognized version format: treat as legacy.
 		}
 
-		return version_compare( $matches[0], $deprecated_version, '<=' );
+		return version_compare( $matches[1], $deprecated_version, '<=' );
 	}
 
 	/**
 	 * Store the notice state for a legacy add-on.
 	 *
+	 * Versioned add-ons have no expiry: they can only be deactivated by a
+	 * background update, the deactivation warning must not silently
+	 * disappear, and the notice is removed by legacy_addon_notices() once
+	 * a compatible add-on version is installed. Always-legacy add-ons
+	 * keep the 24h expiry.
+	 *
 	 * @param string $plugin_basename Plugin basename.
 	 * @return void
 	 */
 	private function set_legacy_addon_notice( string $plugin_basename ): void {
+		$expiry = null !== $this->get_legacy_addon_deprecated_version( $plugin_basename )
+			? 0
+			: DAY_IN_SECONDS;
+
 		set_transient(
 			$this->get_legacy_addon_transient_name( $plugin_basename ),
 			'yes',
-			DAY_IN_SECONDS
+			$expiry
 		);
 	}
 
