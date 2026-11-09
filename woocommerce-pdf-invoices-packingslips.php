@@ -107,7 +107,7 @@ class WPO_WCPDF {
 				'name'    => 'Dokan - PDF Invoice',
 				'version' => '1.2.8',
 			),
-			'woocommerce-pdf-italian-add-on/woocommerce-pdf-italian-add-on.php'             => array(
+			'woocommerce-pdf-invoices-italian-add-on/woocommerce-pdf-italian-add-on.php'    => array(
 				'name'    => 'PDF Invoices Italian Add-on for WooCommerce',
 				'version' => '0.7.7.4',
 			),
