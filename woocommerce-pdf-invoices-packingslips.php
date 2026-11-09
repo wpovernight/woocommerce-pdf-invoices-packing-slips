@@ -122,6 +122,7 @@ class WPO_WCPDF {
 			'woocommerce-deposits/woocommerce-deposits.php'                                 => array(
 				'name'    => 'WooCommerce Deposits', // No longer maintained: https://github.com/Pepper-Ng/woocommerce-deposits
 				'version' => '2.5.17',
+				'author'  => 'Webtomizer', // protects the WooCommerce Deposits extension (by Woo), which shares this basename
 			),
 			// Legacy addons
 			'ubl-woocommerce-pdf-invoices/ubl-woocommerce-pdf-invoices.php'                 => 'UBL Invoices for WooCommerce',
@@ -697,6 +698,47 @@ class WPO_WCPDF {
 	}
 
 	/**
+	 * Get the author an add-on must match to be treated as legacy.
+	 *
+	 * Distinguishes different plugins that share a basename (e.g. the
+	 * unmaintained Webtomizer deposits plugin and the WooCommerce Deposits
+	 * extension). Null when the entry applies to any author.
+	 *
+	 * @param string $plugin_basename Plugin basename.
+	 * @return string|null
+	 */
+	public function get_legacy_addon_author( string $plugin_basename ): ?string {
+		$addon = $this->legacy_addons[ $plugin_basename ] ?? null;
+
+		if ( is_array( $addon ) && ! empty( $addon['author'] ) ) {
+			return (string) $addon['author'];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get the author of a plugin from its file header.
+	 *
+	 * @param string $plugin_basename Plugin basename.
+	 * @return string Empty string when the author cannot be determined.
+	 */
+	private function get_plugin_author( string $plugin_basename ): string {
+		static $authors = array();
+
+		if ( ! isset( $authors[ $plugin_basename ] ) ) {
+			$file = WP_PLUGIN_DIR . '/' . $plugin_basename;
+			$data = file_exists( $file )
+				? get_file_data( $file, array( 'Author' => 'Author' ) )
+				: array();
+
+			$authors[ $plugin_basename ] = (string) ( $data['Author'] ?? '' );
+		}
+
+		return $authors[ $plugin_basename ];
+	}
+
+	/**
 	 * Get the installed version of a plugin from its file header.
 	 *
 	 * @param string $plugin_basename Plugin basename.
@@ -813,9 +855,9 @@ class WPO_WCPDF {
 	/**
 	 * Parse update notice from readme file.
 	 *
-	 * Shows the Upgrade Notice block of the version being offered
-	 * ($new_version); the block stops at the next version heading, so
-	 * older entries below it are not appended.
+	 * Shows the Upgrade Notice of the newest entry that is not newer than
+	 * the version being offered ($new_version); the block stops at the next
+	 * version heading, so older entries below it are not appended.
 	 *
 	 * @param  string $content
 	 * @param  string $new_version
@@ -833,8 +875,8 @@ class WPO_WCPDF {
 
 		if ( preg_match( $regexp, $content, $matches ) ) {
 
-			// Only show the notice of the update being offered.
-			if ( trim( (string) $matches[1] ) !== $new_version ) {
+			// Ignore notices for versions newer than the update being offered.
+			if ( version_compare( trim( (string) $matches[1] ), $new_version, '>' ) ) {
 				return $upgrade_notice;
 			}
 
@@ -909,7 +951,9 @@ class WPO_WCPDF {
 	 * that version or lower, or when the installed version cannot be determined.
 	 * Dev suffixes in the installed version (e.g. -i782, -pr781, -beta.1 or
 	 * -rc.1) are stripped, so every build of a release line is compared as
-	 * that release. A missing add-on file is never treated as legacy: WordPress
+	 * that release. Entries with an author only apply to installed plugins
+	 * whose Author header matches, so plugins sharing a basename stay
+	 * unaffected. A missing add-on file is never treated as legacy: WordPress
 	 * skips missing files when loading plugins, so a temporarily absent file
 	 * (deployment, maintenance) must not disable a compatible add-on.
 	 *
@@ -928,6 +972,15 @@ class WPO_WCPDF {
 		}
 
 		if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_basename ) ) {
+			return false;
+		}
+
+		$author = $this->get_legacy_addon_author( $plugin_basename );
+
+		if (
+			null !== $author &&
+			false === stripos( $this->get_plugin_author( $plugin_basename ), $author )
+		) {
 			return false;
 		}
 
