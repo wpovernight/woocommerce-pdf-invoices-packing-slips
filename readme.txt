@@ -129,9 +129,8 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - Fix: Detection of active extensions for license caching
 - Fix: Document action buttons on the Thank You page
 - Fix: Hidden and duplicate Classic Checkout fields when order notes are disabled
-- Fix: Tighten permission checks in admin AJAX handlers and document access
+- Fix: Tighten document permission checks
 - Fix: Harden settings validation and PDF resource loading
-- Fix: Guest-order PDF download links disappearing after login
 - Fix: Order admin crash with multiple credit notes
 - Fix: Fatal error with malformed document settings
 - Fix: Restore saving bulk packing slip PDFs
@@ -141,7 +140,6 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - Fix: CII tax exemption element order
 - Fix: Missing delivery date in CII invoices
 - Fix: Plugin Check errors
-- Fix: Remove entity decoding from rendered document HTML
 - Translations: Updated translation template (POT)
 - Tested: Compatibility confirmed with WooCommerce 11.2
 - Tested: Tested up WordPress 7.1
