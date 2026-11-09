@@ -120,7 +120,7 @@ class WPO_WCPDF {
 				'version' => '2.6.0',
 			),
 			'woocommerce-deposits/woocommerce-deposits.php'                                 => array(
-				'name'    => 'WooCommerce Deposits',
+				'name'    => 'WooCommerce Deposits', // No longer maintained: https://github.com/Pepper-Ng/woocommerce-deposits
 				'version' => '2.5.17',
 			),
 			// Legacy addons
