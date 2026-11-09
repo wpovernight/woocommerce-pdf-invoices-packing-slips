@@ -485,16 +485,34 @@ class Notices {
 	 * @return void
 	 */
 	public function legacy_addon_notices(): void {
-		foreach ( $this->plugin->legacy_addons as $filename => $name ) {
-			$transient_name = $this->plugin->get_legacy_addon_transient_name( $filename );
-			$query_arg      = "{$transient_name}_notice";
+		foreach ( array_keys( $this->plugin->legacy_addons ) as $filename ) {
+			$name               = $this->plugin->get_legacy_addon_name( $filename );
+			$deprecated_version = $this->plugin->get_legacy_addon_deprecated_version( $filename );
+			$transient_name     = $this->plugin->get_legacy_addon_transient_name( $filename );
+			$query_arg          = "{$transient_name}_notice";
 
 			if ( get_transient( $transient_name ) ) {
+				// The add-on has since been updated to a compatible version: clear the stale deactivation notice.
+				if ( ! $this->plugin->is_legacy_addon( $filename ) ) {
+					delete_transient( $transient_name );
+					continue;
+				}
+
 				ob_start();
 				?>
 				<div class="notice notice-warning">
 					<p>
 						<?php
+						if ( null !== $deprecated_version ) {
+							echo wp_kses_post(
+								sprintf(
+									/* translators: 1: add-on name, 2: last deprecated add-on version */
+									__( 'The %1$s add-on is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce and cannot remain active. Please update the add-on to a version newer than %2$s to restore compatibility.', 'woocommerce-pdf-invoices-packing-slips' ),
+									'<strong>' . esc_html( $name ) . '</strong>',
+									'<strong>' . esc_html( $deprecated_version ) . '</strong>'
+								)
+							);
+						} else {
 							echo wp_kses_post(
 								sprintf(
 									/* translators: 1: legacy add-on name, 2: support contact URL */
@@ -503,6 +521,7 @@ class Notices {
 									esc_url( 'https://wpovernight.com/contact/' )
 								)
 							);
+						}
 						?>
 					</p>
 					<p><a href="<?php echo esc_url( wp_nonce_url( add_query_arg( array( $query_arg => true ) ), 'wcpdf_legacy_addon_notice' ) ); ?>"><?php esc_html_e( 'Hide this message', 'woocommerce-pdf-invoices-packing-slips' ); ?></a></p>

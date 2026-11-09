@@ -119,6 +119,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - New: Add log note for failed document creations
 - New: Refactor Peppol endpoint derivation into a reusable method
 - New: Allow overriding WordPress.org language pack translations with custom .po/.mo or .l10n.php files
+- New: Deactivate outdated extension versions automatically, based on each extension's last incompatible release
 - Tweak: Remove bundled .po/.mo translation files in favor of WordPress.org language packs
 - Tweak: Improve registration number identifiers and defaults
 - Tweak: Make PDF maker helpers available to extensions safely
@@ -128,9 +129,8 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - Fix: Detection of active extensions for license caching
 - Fix: Document action buttons on the Thank You page
 - Fix: Hidden and duplicate Classic Checkout fields when order notes are disabled
-- Fix: Tighten permission checks in admin AJAX handlers and document access
+- Fix: Tighten document permission checks
 - Fix: Harden settings validation and PDF resource loading
-- Fix: Guest-order PDF download links disappearing after login
 - Fix: Order admin crash with multiple credit notes
 - Fix: Fatal error with malformed document settings
 - Fix: Restore saving bulk packing slip PDFs
@@ -140,7 +140,6 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - Fix: CII tax exemption element order
 - Fix: Missing delivery date in CII invoices
 - Fix: Plugin Check errors
-- Fix: Remove entity decoding from rendered document HTML
 - Translations: Updated translation template (POT)
 - Tested: Compatibility confirmed with WooCommerce 11.2
 - Tested: Tested up WordPress 7.1
@@ -1466,6 +1465,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 * Translations: Updated translations POT
 
 = 2.1.10 =
+* Upgrade notice: 2.X is a BIG update! Make a full site backup before upgrading if you were using version 1.X!
 * Feature: Include invoice number and date in WooCommerce data remover and exporter
 * Fix: Row class for Chained Products compatibility
 * Fix: Improved compatibility with Advanced Custom Fields
@@ -1626,5 +1626,5 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Upgrade Notice ==
 
-= 2.1.10 =
-2.X is a BIG update! Make a full site backup before upgrading if you were using version 1.X!
+= 6.0.0 =
+Major update! Update all your PDF Invoices & Packing Slips extensions and add-ons (Professional, Order Proposal, Dokan Invoice, Italian Add-on, Donation Platform, FactuPress and others) to their latest versions BEFORE upgrading. Outdated versions are deactivated automatically after the update.
