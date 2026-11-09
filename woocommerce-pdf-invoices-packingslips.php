@@ -947,7 +947,8 @@ class WPO_WCPDF {
 		}
 
 		$deprecated_version = $this->get_legacy_addon_deprecated_version( $plugin_basename );
-		$author            = $this->get_legacy_addon_author( $plugin_basename );
+		$author             = $this->get_legacy_addon_author( $plugin_basename );
+		$headers            = array();
 
 		if ( null !== $deprecated_version || null !== $author ) {
 			if ( ! file_exists( WP_PLUGIN_DIR . '/' . $plugin_basename ) ) {
