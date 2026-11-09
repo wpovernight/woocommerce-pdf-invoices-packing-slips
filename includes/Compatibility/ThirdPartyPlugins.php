@@ -2,6 +2,7 @@
 namespace WPO\IPS\Compatibility;
 
 use WPO\IPS\Documents\OrderDocument;
+use WPO\IPS\Documents\Summary;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -261,11 +262,11 @@ class ThirdPartyPlugins {
 	 * Output WooCommerce Composite Products styles for the Simple template,
 	 * only when the order contains composite products.
 	 *
-	 * @param string             $document_type
-	 * @param OrderDocument|null $document
+	 * @param string                     $document_type
+	 * @param OrderDocument|Summary|null $document
 	 * @return void
 	 */
-	public function composite_products_styles( string $document_type, ?OrderDocument $document = null ): void {
+	public function composite_products_styles( string $document_type, OrderDocument|Summary|null $document = null ): void {
 		if ( empty( $document ) || empty( $document->order ) || ! $document->order instanceof \WC_Abstract_Order ) {
 			return;
 		}

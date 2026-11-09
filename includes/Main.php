@@ -4,6 +4,7 @@ namespace WPO\IPS;
 use WPO\IPS\Vendor\Dompdf\Exception as DompdfException;
 use WPO\IPS\Documents\BulkDocument;
 use WPO\IPS\Documents\OrderDocument;
+use WPO\IPS\Documents\Summary;
 use WPO\IPS\Vendor\Dompdf\Dompdf;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -240,14 +241,15 @@ class Main {
 	/**
 	 * Get the document PDF attachment path, write the file if it doesn't exist and return the path
 	 *
-	 * @param OrderDocument|BulkDocument $document
-	 * @param string                     $tmp_path
+	 * @param OrderDocument|BulkDocument|Summary $document
+	 * @param string                             $tmp_path
 	 * @return string|false
 	 */
-	public function get_document_pdf_attachment( OrderDocument|BulkDocument $document, string $tmp_path ) {
+	public function get_document_pdf_attachment( OrderDocument|BulkDocument|Summary $document, string $tmp_path ) {
 		$filename             = $document->get_filename();
 		$document_type        = $document->get_type();
-		$order_ids            = $document instanceof BulkDocument
+		$is_order_selection   = $document instanceof BulkDocument || $document instanceof Summary;
+		$order_ids            = $is_order_selection
 			? $document->order_ids
 			: array( isset( $document->order ) ? $document->order->get_id() : 0 );
 		$lock_file            = apply_filters( 'wpo_wcpdf_lock_attachment_file', true );
@@ -270,7 +272,7 @@ class Main {
 		}
 
 		// Preserve the order of bulk IDs: it determines the order of pages in the PDF.
-		$order_key = $document instanceof BulkDocument
+		$order_key = $is_order_selection
 			? 'bulk-' . hash( 'sha256', implode( ',', array_map( 'intval', $order_ids ) ) )
 			: (string) reset( $order_ids );
 
