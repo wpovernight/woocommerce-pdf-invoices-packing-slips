@@ -94,6 +94,32 @@ class WPO_WCPDF {
 
 		$this->plugin_basename = plugin_basename( __FILE__ );
 		$this->legacy_addons   = apply_filters( 'wpo_wcpdf_legacy_addons', array(
+			// Incompatible versions
+			'woocommerce-pdf-ips-pro/woocommerce-pdf-ips-pro.php'                           => array(
+				'name'    => 'PDF Invoices & Packing Slips for WooCommerce - Professional',
+				'version' => '2.22.0',
+			),
+			'woocommerce-order-proposal/woocommerce-order-proposal.php'                     => array(
+				'name'    => 'WooCommerce Order Proposal',
+				'version' => '2.3.1',
+			),
+			'dokan-invoice/dokan-invoice.php'                                               => array(
+				'name'    => 'Dokan - PDF Invoice',
+				'version' => '1.2.8',
+			),
+			'woocommerce-pdf-italian-add-on/woocommerce-pdf-italian-add-on.php'             => array(
+				'name'    => 'PDF Invoices Italian Add-on for WooCommerce',
+				'version' => '0.7.7.4',
+			),
+			'wc-donation-platform/wc-donation-platform.php'                                 => array(
+				'name'    => 'Donation Platform for WooCommerce: Fundraising & Donation Management',
+				'version' => '1.4.0',
+			),
+			'factupress-verifactu-for-woocommerce/factupress-verifactu-for-woocommerce.php' => array(
+				'name'    => '«FactuPress» - Veri*Factu for WooCommerce',
+				'version' => '2.6.0', // still to confirm
+			),
+			// Legacy addons
 			'ubl-woocommerce-pdf-invoices/ubl-woocommerce-pdf-invoices.php'         => 'UBL Invoices for WooCommerce',
 			'woocommerce-pdf-ips-number-tools/woocommerce-pdf-ips-number-tools.php' => 'PDF Invoices & Packing Slips for WooCommerce - Number Tools',
 			'woocommerce-pdf-ips-ubl-extender/woocommerce-pdf-ips-ubl-extender.php' => 'PDF Invoices & Packing Slips for WooCommerce - UBL Extender',
@@ -479,7 +505,10 @@ class WPO_WCPDF {
 	public function deactivate_legacy_addons(): void {
 		$active_legacy_addons = array_filter(
 			array_keys( $this->legacy_addons ),
-			array( $this, 'plugin_is_activated' )
+			function ( string $plugin_basename ): bool {
+				return $this->plugin_is_activated( $plugin_basename )
+					&& $this->is_legacy_addon( $plugin_basename );
+			}
 		);
 
 		if ( empty( $active_legacy_addons ) ) {
@@ -508,15 +537,25 @@ class WPO_WCPDF {
 			return;
 		}
 
-		$name = $this->legacy_addons[ $plugin ];
+		$name               = $this->get_legacy_addon_name( $plugin );
+		$deprecated_version = $this->get_legacy_addon_deprecated_version( $plugin );
 
 		$this->set_legacy_addon_notice( $plugin );
 
-		$message = sprintf(
-			/* translators: %s: legacy add-on name */
-			__( 'The legacy %s add-on cannot be activated because it is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce.', 'woocommerce-pdf-invoices-packing-slips' ),
-			$name
-		);
+		if ( null !== $deprecated_version ) {
+			$message = sprintf(
+				/* translators: 1: legacy add-on name, 2: last deprecated add-on version */
+				__( 'The %1$s add-on cannot be activated because the installed version is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce. Please update the add-on to a version newer than %2$s first.', 'woocommerce-pdf-invoices-packing-slips' ),
+				$name,
+				$deprecated_version
+			);
+		} else {
+			$message = sprintf(
+				/* translators: %s: legacy add-on name */
+				__( 'The legacy %s add-on cannot be activated because it is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce.', 'woocommerce-pdf-invoices-packing-slips' ),
+				$name
+			);
+		}
 
 		if ( wp_doing_ajax() ) {
 			wp_send_json_error(
@@ -551,20 +590,25 @@ class WPO_WCPDF {
 	public function filter_legacy_addons_from_active_plugin_option( mixed $plugins, mixed $old_plugins, string $option ): array {
 		$plugins             = is_array( $plugins ) ? $plugins : array();
 		$old_plugins         = is_array( $old_plugins ) ? $old_plugins : array();
-		$legacy_addons       = array_keys( $this->legacy_addons );
+		$legacy_addons       = array_filter(
+			array_keys( $this->legacy_addons ),
+			function ( string $plugin_basename ): bool {
+				return $this->is_legacy_addon( $plugin_basename );
+			}
+		);
 		$is_networkwide_list = 'active_sitewide_plugins' === $option;
 
 		if ( $is_networkwide_list ) {
 			$activation_attempts = array_intersect_key(
 				array_diff_key( $plugins, $old_plugins ),
-				$this->legacy_addons
+				array_fill_keys( $legacy_addons, true )
 			);
 
 			foreach ( array_keys( $activation_attempts ) as $plugin_basename ) {
 				$this->set_legacy_addon_notice( $plugin_basename );
 			}
 
-			return array_diff_key( $plugins, $this->legacy_addons );
+			return array_diff_key( $plugins, array_fill_keys( $legacy_addons, true ) );
 		}
 
 		$activation_attempts = array_intersect(
@@ -600,12 +644,73 @@ class WPO_WCPDF {
 			$actions['network_activate']
 		);
 
+		$deprecated_version = $this->get_legacy_addon_deprecated_version( $plugin_file );
+
+		if ( null !== $deprecated_version ) {
+			$label = esc_html__( 'Outdated version — update to activate', 'woocommerce-pdf-invoices-packing-slips' );
+		} else {
+			$label = esc_html__( 'Legacy add-on — activation unavailable', 'woocommerce-pdf-invoices-packing-slips' );
+		}
+
 		$actions['wpo_wcpdf_legacy_addon'] = sprintf(
 			'<span aria-disabled="true">%s</span>',
-			esc_html__( 'Legacy add-on — activation unavailable', 'woocommerce-pdf-invoices-packing-slips' )
+			$label
 		);
 
 		return $actions;
+	}
+	
+	/**
+	 * Get the display name of a legacy add-on.
+	 *
+	 * @param string $plugin_basename Plugin basename.
+	 * @return string
+	 */
+	public function get_legacy_addon_name( string $plugin_basename ): string {
+		$addon = $this->legacy_addons[ $plugin_basename ] ?? '';
+
+		if ( is_array( $addon ) ) {
+			return (string) ( $addon['name'] ?? '' );
+		}
+
+		return (string) $addon;
+	}
+
+	/**
+	 * Get the last add-on version still treated as legacy.
+	 *
+	 * @param string $plugin_basename Plugin basename.
+	 * @return string|null Null when the add-on is always legacy.
+	 */
+	public function get_legacy_addon_deprecated_version( string $plugin_basename ): ?string {
+		$addon = $this->legacy_addons[ $plugin_basename ] ?? null;
+
+		if ( is_array( $addon ) && ! empty( $addon['version'] ) ) {
+			return (string) $addon['version'];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get the installed version of a plugin from its file header.
+	 *
+	 * @param string $plugin_basename Plugin basename.
+	 * @return string Empty string when the version cannot be determined.
+	 */
+	public function get_plugin_version( string $plugin_basename ): string {
+		static $versions = array();
+
+		if ( ! isset( $versions[ $plugin_basename ] ) ) {
+			$file = WP_PLUGIN_DIR . '/' . $plugin_basename;
+			$data = file_exists( $file )
+				? get_file_data( $file, array( 'Version' => 'Version' ) )
+				: array();
+
+			$versions[ $plugin_basename ] = (string) ( $data['Version'] ?? '' );
+		}
+
+		return $versions[ $plugin_basename ];
 	}
 	
 	/**
@@ -782,11 +887,35 @@ class WPO_WCPDF {
 	/**
 	 * Check whether a plugin is a legacy add-on.
 	 *
+	 * Add-ons without a version are always legacy. Add-ons with a version
+	 * (the last legacy release) are only legacy when the installed version is
+	 * that version or lower, or when the installed version cannot be determined.
+	 * Dev suffixes in the installed version (e.g. -i782, -pr781, -beta.1 or
+	 * -rc.1) are stripped, so every build of a release line is compared as
+	 * that release.
+	 *
 	 * @param string $plugin_basename Plugin basename.
 	 * @return bool
 	 */
-	private function is_legacy_addon( string $plugin_basename ): bool {
-		return isset( $this->legacy_addons[ $plugin_basename ] );
+	public function is_legacy_addon( string $plugin_basename ): bool {
+		if ( ! isset( $this->legacy_addons[ $plugin_basename ] ) ) {
+			return false;
+		}
+
+		$deprecated_version = $this->get_legacy_addon_deprecated_version( $plugin_basename );
+
+		if ( null === $deprecated_version ) {
+			return true;
+		}
+
+		$installed_version = $this->get_plugin_version( $plugin_basename );
+
+		// Strip the dev suffix to compare base versions only.
+		if ( ! preg_match( '/^\d+(?:\.\d+)*/', $installed_version, $matches ) ) {
+			return true; // Unrecognized version format: treat as legacy.
+		}
+
+		return version_compare( $matches[0], $deprecated_version, '<=' );
 	}
 
 	/**
