@@ -103,6 +103,10 @@ class WPO_WCPDF {
 				'name'    => 'WooCommerce Order Proposal',
 				'version' => '2.3.1',
 			),
+			'woocommerce-pdf-ips-mpdf/wcpdf-mpdf.php'                                       => array(
+				'name'    => 'PDF Invoices & Packing Slips for WooCommerce - mPDF',
+				'version' => '3.1.0',
+			),
 			'dokan-invoice/dokan-invoice.php'                                               => array(
 				'name'    => 'Dokan - PDF Invoice',
 				'version' => '1.2.8',
