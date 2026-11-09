@@ -117,7 +117,7 @@ class WPO_WCPDF {
 			),
 			'factupress-verifactu-for-woocommerce/factupress-verifactu-for-woocommerce.php' => array(
 				'name'    => '«FactuPress» - Veri*Factu for WooCommerce',
-				'version' => '2.6.0', // still to confirm
+				'version' => '2.6.0',
 			),
 			// Legacy addons
 			'ubl-woocommerce-pdf-invoices/ubl-woocommerce-pdf-invoices.php'         => 'UBL Invoices for WooCommerce',
