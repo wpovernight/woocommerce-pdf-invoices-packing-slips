@@ -110,7 +110,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 6.0.0 (2026-11-09) =
+= 6.0.0 (2026-11-10) =
 - New: Modernized, object-oriented codebase with strict types, full type coverage and improved performance
 - New: Require PHP 8.1+, WordPress 5.9+ and WooCommerce 4.0+
 - New: Upgrade CII standard from D16B to D22B, with support for profiles
