@@ -121,7 +121,6 @@ class WPO_WCPDF {
 			),
 			'woocommerce-deposits/woocommerce-deposits.php'                                 => array(
 				'name'    => 'WooCommerce Deposits', // No longer maintained: https://github.com/Pepper-Ng/woocommerce-deposits
-				'version' => '2.5.17',
 				'author'  => 'Webtomizer', // protects the WooCommerce Deposits extension (by Woo), which shares this basename
 			),
 			// Legacy addons
