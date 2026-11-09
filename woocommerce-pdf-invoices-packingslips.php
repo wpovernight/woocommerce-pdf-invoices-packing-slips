@@ -813,18 +813,31 @@ class WPO_WCPDF {
 	/**
 	 * Parse update notice from readme file.
 	 *
+	 * Shows the Upgrade Notice block of the version being offered
+	 * ($new_version); the block stops at the next version heading, so
+	 * older entries below it are not appended.
+	 *
 	 * @param  string $content
 	 * @param  string $new_version
 	 * @return string
 	 */
 	private function parse_update_notice( string $content, string $new_version ): string {
 		// Output Upgrade Notice.
+		// The notice block stops at the next version heading (any `= 1.2.3 =`)
+		// or at the end of the section, so older entries below the newest one
+		// are not appended to the notice of the update being offered.
 		$matches        = null;
-		$regexp         = '~==\s*Upgrade Notice\s*==\s*=\s*(.*)\s*=(.*)(=\s*' . preg_quote( $new_version ) . '\s*=|$)~Uis';
+		$regexp         = '~==\s*Upgrade Notice\s*==\s*=\s*(.*)\s*=(.*)(=\s*\d+(?:\.\d+)*\s*=|$)~Uis';
 		$upgrade_notice = '';
 
 
 		if ( preg_match( $regexp, $content, $matches ) ) {
+
+			// Only show the notice of the update being offered.
+			if ( trim( (string) $matches[1] ) !== $new_version ) {
+				return $upgrade_notice;
+			}
+
 			$notices = (array) preg_split( '~[\r\n]+~', trim( $matches[2] ) );
 
 			// Convert the full version strings to minor versions.
@@ -931,9 +944,10 @@ class WPO_WCPDF {
 	/**
 	 * Store the notice state for a legacy add-on.
 	 *
-	 * Versioned add-ons have no expiry: they can only be deactivated by a
-	 * background update, the deactivation warning must not silently
-	 * disappear, and the notice is removed by legacy_addon_notices() once
+	 * Versioned add-ons can be deactivated at any time (at plugins_loaded,
+	 * on activation of this plugin, including blocked activation attempts),
+	 * so their notice has no expiry: the deactivation warning must not
+	 * silently disappear, and it is removed by legacy_addon_notices() once
 	 * a compatible add-on version is installed. Always-legacy add-ons
 	 * keep the 24h expiry.
 	 *
