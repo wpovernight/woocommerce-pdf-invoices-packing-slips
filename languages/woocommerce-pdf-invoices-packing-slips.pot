@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.0-rc.8\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-06T14:44:11+00:00\n"
+"POT-Creation-Date: 2026-11-10T09:50:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2204,14 +2204,14 @@ msgstr ""
 #: includes/Admin.php:2049
 #: includes/Assets.php:372
 #: includes/Documents/Invoice.php:425
-#: includes/Main.php:1680
+#: includes/Main.php:1682
 #: views/setup-wizard/display-options.php:83
 msgid "Invoice Number"
 msgstr ""
 
 #: includes/Admin.php:250
 #: includes/Documents/Invoice.php:393
-#: includes/Main.php:1681
+#: includes/Main.php:1683
 #: views/setup-wizard/display-options.php:62
 msgid "Invoice Date"
 msgstr ""
@@ -3181,7 +3181,7 @@ msgid "%s Date:"
 msgstr ""
 
 #: includes/Documents/OrderDocument.php:1192
-#: includes/Main.php:2307
+#: includes/Main.php:2309
 msgid "Due Date:"
 msgstr ""
 
@@ -3332,42 +3332,42 @@ msgid "Please enter a VAT number including a valid country prefix (for example P
 msgstr ""
 
 #. translators: 1. output format, 2. document title, 3. email title
-#: includes/Main.php:198
+#: includes/Main.php:199
 #, php-format
 msgid "%1$s %2$s successfully attached to the %3$s email."
 msgstr ""
 
-#: includes/Main.php:443
+#: includes/Main.php:445
 msgid "You do not have sufficient permissions to access this page. Reason: empty access key"
 msgstr ""
 
-#: includes/Main.php:449
+#: includes/Main.php:451
 msgid "You do not have sufficient permissions to access this page. Reason: empty action"
 msgstr ""
 
-#: includes/Main.php:455
+#: includes/Main.php:457
 msgid "You do not have sufficient permissions to access this page. Reason: invalid nonce"
 msgstr ""
 
-#: includes/Main.php:465
+#: includes/Main.php:467
 msgid "You haven't selected any orders"
 msgstr ""
 
-#: includes/Main.php:470
+#: includes/Main.php:472
 msgid "Some of the export parameters are missing."
 msgstr ""
 
-#: includes/Main.php:489
+#: includes/Main.php:491
 msgid "You have to save the order before generating a PDF document for it."
 msgstr ""
 
 #. translators: %s: Order ID
-#: includes/Main.php:494
+#: includes/Main.php:496
 #, php-format
 msgid "Could not find the order #%s."
 msgstr ""
 
-#: includes/Main.php:577
+#: includes/Main.php:579
 #: includes/Settings.php:304
 #: includes/Settings.php:494
 #: includes/SetupWizard.php:342
@@ -3375,34 +3375,34 @@ msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
 #. translators: document type
-#: includes/Main.php:646
+#: includes/Main.php:648
 #, php-format
 msgid "Document of type '%s' for the selected order(s) could not be generated"
 msgstr ""
 
-#: includes/Main.php:683
+#: includes/Main.php:685
 msgid "Invalid request. Nonce check failed."
 msgstr ""
 
-#: includes/Main.php:691
-#: includes/Main.php:717
+#: includes/Main.php:693
+#: includes/Main.php:719
 msgid "No orders were provided."
 msgstr ""
 
-#: includes/Main.php:706
+#: includes/Main.php:708
 msgid "You do not have permission to access one or more of these orders."
 msgstr ""
 
-#: includes/Main.php:727
+#: includes/Main.php:729
 msgid "No refunds found for the selected orders."
 msgstr ""
 
-#: includes/Main.php:1586
+#: includes/Main.php:1588
 msgid "Nothing to delete!"
 msgstr ""
 
 #. translators: %1$d is the number of files that couldn't be deleted, %2$d is the number of successfully deleted files
-#: includes/Main.php:1593
+#: includes/Main.php:1595
 #, php-format
 msgid "Unable to delete %1$d file! (deleted %2$d)"
 msgid_plural "Unable to delete %1$d files! (deleted %2$d)"
@@ -3410,80 +3410,80 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d is the number of files successfully deleted
-#: includes/Main.php:1606
+#: includes/Main.php:1608
 #, php-format
 msgid "Successfully deleted %d file!"
 msgid_plural "Successfully deleted %d files!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/Main.php:1741
-#: includes/Main.php:1771
+#: includes/Main.php:1743
+#: includes/Main.php:1773
 msgid "User"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1749
+#: includes/Main.php:1751
 #, php-format
 msgid "PDF %1$s created via %2$s."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:1778
+#: includes/Main.php:1780
 #, php-format
 msgid "PDF %s deleted."
 msgstr ""
 
-#: includes/Main.php:1795
+#: includes/Main.php:1797
 msgid "manually"
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1801
+#: includes/Main.php:1803
 #, php-format
 msgid "%1$s document marked as printed via %2$s."
 msgstr ""
 
 #. translators: 1. document title, 2. creation trigger
-#: includes/Main.php:1816
+#: includes/Main.php:1818
 #, php-format
 msgid "%1$s document unmark printed."
 msgstr ""
 
-#: includes/Main.php:1903
+#: includes/Main.php:1905
 msgid "single order action"
 msgstr ""
 
-#: includes/Main.php:1904
+#: includes/Main.php:1906
 msgid "bulk order action"
 msgstr ""
 
-#: includes/Main.php:1905
+#: includes/Main.php:1907
 msgid "my account"
 msgstr ""
 
-#: includes/Main.php:1906
+#: includes/Main.php:1908
 msgid "order document data (number and/or date set manually)"
 msgstr ""
 
-#: includes/Main.php:1910
+#: includes/Main.php:1912
 msgid "email attachment"
 msgstr ""
 
 #. translators: 1. document type, 2. mark/unmark
-#: includes/Main.php:2026
+#: includes/Main.php:2028
 #, php-format
 msgid "Document of type %1$s for the selected order could not be marked as printed."
 msgstr ""
 
 #. translators: document title
-#: includes/Main.php:2177
+#: includes/Main.php:2179
 #, php-format
 msgid "Order %s Saved"
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Main.php:2510
+#: includes/Main.php:2512
 #, php-format
 msgid "View %s (PDF)"
 msgstr ""
@@ -3514,12 +3514,12 @@ msgstr ""
 
 #: includes/Notices.php:311
 #: includes/Notices.php:340
-#: includes/Notices.php:508
-#: includes/Notices.php:565
-#: includes/Notices.php:594
-#: includes/Notices.php:644
-#: includes/Notices.php:723
-#: includes/Notices.php:757
+#: includes/Notices.php:527
+#: includes/Notices.php:584
+#: includes/Notices.php:613
+#: includes/Notices.php:663
+#: includes/Notices.php:742
+#: includes/Notices.php:776
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:135
 #: views/promo.php:34
@@ -3580,96 +3580,102 @@ msgstr ""
 msgid "Hide this version"
 msgstr ""
 
+#. translators: 1: add-on name, 2: last deprecated add-on version
+#: includes/Notices.php:510
+#, php-format
+msgid "The %1$s add-on is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce and cannot remain active. Please update the add-on to a version newer than %2$s to restore compatibility."
+msgstr ""
+
 #. translators: 1: legacy add-on name, 2: support contact URL
-#: includes/Notices.php:501
+#: includes/Notices.php:519
 #, php-format
 msgid "The legacy %1$s add-on is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce and cannot remain active. If you need help finding a replacement or alternative solution, please <a href=\"%2$s\" target=\"_blank\" rel=\"noopener noreferrer\">contact our support team</a>."
 msgstr ""
 
 #. translators: 1: MailPoet version, 2: MailPoet sending method, 3: MailPoet sending method, 4: plugin name.
-#: includes/Notices.php:546
+#: includes/Notices.php:565
 #, php-format
 msgid "When sending emails with %1$s and the active sending method is %2$s or %3$s, MailPoet does not include the %4$s attachments in the emails."
 msgstr ""
 
 #. translators: 1: The default WordPress sending method (default), 2: Advanced tab.
-#: includes/Notices.php:558
+#: includes/Notices.php:577
 #, php-format
 msgid "To fix this you should select %1$s on the %2$s."
 msgstr ""
 
-#: includes/Notices.php:560
+#: includes/Notices.php:579
 msgid "Advanced tab"
 msgstr ""
 
-#: includes/Notices.php:564
+#: includes/Notices.php:583
 msgid "Change MailPoet sending method to WordPress (default)"
 msgstr ""
 
 #. translators: 1. plugin name, 2. compatible PDF engine
-#: includes/Notices.php:589
+#: includes/Notices.php:608
 #, php-format
 msgid "%1$s detected that your current site locale is right-to-left (RTL) which the current PDF engine does not support it. Please consider installing our %2$s extension that is compatible."
 msgstr ""
 
-#: includes/Notices.php:593
+#: includes/Notices.php:612
 msgid "Download mPDF extension"
 msgstr ""
 
 #. translators: rounded count
-#: includes/Notices.php:636
+#: includes/Notices.php:655
 #, php-format
 msgid "Wow, you have created more than %d invoices with our plugin!"
 msgstr ""
 
-#: includes/Notices.php:641
+#: includes/Notices.php:660
 msgid "It would mean a lot to us if you would quickly give our plugin a 5-star rating. Help us spread the word and boost our motivation!"
 msgstr ""
 
-#: includes/Notices.php:643
+#: includes/Notices.php:662
 msgid "Yes you deserve it!"
 msgstr ""
 
-#: includes/Notices.php:644
+#: includes/Notices.php:663
 msgid "Already did!"
 msgstr ""
 
-#: includes/Notices.php:645
+#: includes/Notices.php:664
 msgid "Actually, I have a complaint..."
 msgstr ""
 
 #. translators: plugin name
-#: includes/Notices.php:677
+#: includes/Notices.php:696
 #, php-format
 msgid "New to %s?"
 msgstr ""
 
-#: includes/Notices.php:679
+#: includes/Notices.php:698
 msgid "Jumpstart the plugin by following our wizard!"
 msgstr ""
 
-#: includes/Notices.php:680
+#: includes/Notices.php:699
 #: views/advanced-tools.php:152
 #: views/advanced-tools.php:154
 msgid "Run the Setup Wizard"
 msgstr ""
 
-#: includes/Notices.php:680
+#: includes/Notices.php:699
 msgid "I am the wizard"
 msgstr ""
 
 #. translators: 1. plugin name, 2. directory path
-#: includes/Notices.php:716
+#: includes/Notices.php:735
 #, php-format
 msgid "The %1$s directory %2$s couldn't be created or is not writable!"
 msgstr ""
 
-#: includes/Notices.php:722
+#: includes/Notices.php:741
 msgid "Please check your directories write permissions or contact your hosting service provider."
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Open anchor tag, 3: Close anchor tag
-#: includes/Notices.php:748
+#: includes/Notices.php:767
 #, php-format
 msgid "%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s."
 msgstr ""
@@ -6262,17 +6268,27 @@ msgstr ""
 msgid "Visit shop"
 msgstr ""
 
+#. translators: 1: legacy add-on name, 2: last deprecated add-on version
+#: woocommerce-pdf-invoices-packingslips.php:556
+#, php-format
+msgid "The %1$s add-on cannot be activated because the installed version is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce. Please update the add-on to a version newer than %2$s first."
+msgstr ""
+
 #. translators: %s: legacy add-on name
-#: woocommerce-pdf-invoices-packingslips.php:517
+#: woocommerce-pdf-invoices-packingslips.php:563
 #, php-format
 msgid "The legacy %s add-on cannot be activated because it is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:535
+#: woocommerce-pdf-invoices-packingslips.php:582
 msgid "Plugin activation blocked"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:605
+#: woocommerce-pdf-invoices-packingslips.php:658
+msgid "Outdated version — update to activate"
+msgstr ""
+
+#: woocommerce-pdf-invoices-packingslips.php:660
 msgid "Legacy add-on — activation unavailable"
 msgstr ""
 
