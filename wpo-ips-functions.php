@@ -266,12 +266,12 @@ function wcpdf_pdf_headers( string $filename, string $mode = 'inline', ?string $
 /**
  * Get the document file
  *
- * @param  \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\BulkDocument $document
+ * @param  \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\BulkDocument|\WPO\IPS\Documents\Summary $document
  * @param  string $output_format
  * @param  string $error_handling
  * @return string|false
  */
-function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\BulkDocument $document, string $output_format = 'pdf', string $error_handling = 'exception' ): string|false {
+function wcpdf_get_document_file( \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\BulkDocument|\WPO\IPS\Documents\Summary $document, string $output_format = 'pdf', string $error_handling = 'exception' ): string|false {
 	$default_output_format = 'pdf';
 
 	if ( empty( $output_format ) ) {
@@ -470,11 +470,11 @@ function wcpdf_error_handling( string $message, string $handling_type = 'excepti
 /**
  * Date formatting function
  *
- * @param \WPO\IPS\Documents\OrderDocument|null $document
+ * @param \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\Summary|null $document
  * @param string|null $date_type Optional. A date type to be filtered eg. 'invoice_date', 'order_date_created', 'order_date_modified', 'order_date', 'order_date_paid', 'order_date_completed', 'current_date', 'document_date', 'packing_slip_date'.
  * @return string
  */
-function wcpdf_date_format( ?\WPO\IPS\Documents\OrderDocument $document = null, ?string $date_type = null ): string {
+function wcpdf_date_format( \WPO\IPS\Documents\OrderDocument|\WPO\IPS\Documents\Summary|null $document = null, ?string $date_type = null ): string {
 	return (string) apply_filters(
 		'wpo_wcpdf_date_format',
 		wc_date_format(),

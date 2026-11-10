@@ -1,7 +1,9 @@
 <?php
 namespace WPO\IPS\Compatibility;
 
+use WPO\IPS\Documents\BulkDocument;
 use WPO\IPS\Documents\OrderDocument;
+use WPO\IPS\Documents\Summary;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -166,10 +168,10 @@ class ThirdPartyPlugins {
 	 * Applies decimal & Thousand separator settings
 	 * 
 	 * @param string $document_type
-	 * @param OrderDocument $document
+	 * @param OrderDocument|BulkDocument|Summary $document
 	 * @return void
 	 */
-	public function aelia_currency_formatting( string $document_type, OrderDocument $document ): void {
+	public function aelia_currency_formatting( string $document_type, OrderDocument|BulkDocument|Summary $document ): void {
 		add_filter( 'wc_price_args', array( $this, 'aelia_currency_price_args' ), 10, 1 );
 	}
 
@@ -193,10 +195,10 @@ class ThirdPartyPlugins {
 	 * Avoid double images from German Market
 	 * 
 	 * @param string $document_type
-	 * @param OrderDocument $document
+	 * @param OrderDocument|BulkDocument|Summary $document
 	 * @return void
 	 */
-	public function remove_wgm_thumbnails( string $document_type, OrderDocument $document ): void {
+	public function remove_wgm_thumbnails( string $document_type, OrderDocument|BulkDocument|Summary $document ): void {
 		remove_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 	}
 
@@ -204,10 +206,10 @@ class ThirdPartyPlugins {
 	 * Restore above filter after document generation
 	 * 
 	 * @param string $document_type
-	 * @param OrderDocument $document
+	 * @param OrderDocument|BulkDocument|Summary $document
 	 * @return void
 	 */
-	public function restore_wgm_thumbnails( string $document_type, OrderDocument $document ): void {
+	public function restore_wgm_thumbnails( string $document_type, OrderDocument|BulkDocument|Summary $document ): void {
 		if ( is_callable( array( 'WGM_Product', 'add_thumbnail_to_order' ) ) && get_option( 'german_market_product_images_in_order', 'off' ) == 'on' ) {
 			add_filter( 'woocommerce_order_item_name', array( 'WGM_Product', 'add_thumbnail_to_order' ), 100, 3 );
 		}
@@ -261,11 +263,11 @@ class ThirdPartyPlugins {
 	 * Output WooCommerce Composite Products styles for the Simple template,
 	 * only when the order contains composite products.
 	 *
-	 * @param string             $document_type
-	 * @param OrderDocument|null $document
+	 * @param string                     $document_type
+	 * @param OrderDocument|Summary|null $document
 	 * @return void
 	 */
-	public function composite_products_styles( string $document_type, ?OrderDocument $document = null ): void {
+	public function composite_products_styles( string $document_type, OrderDocument|Summary|null $document = null ): void {
 		if ( empty( $document ) || empty( $document->order ) || ! $document->order instanceof \WC_Abstract_Order ) {
 			return;
 		}
