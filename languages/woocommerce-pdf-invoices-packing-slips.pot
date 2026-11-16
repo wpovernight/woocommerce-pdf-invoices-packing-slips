@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-13T08:33:56+00:00\n"
+"POT-Creation-Date: 2026-11-16T15:00:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -3522,7 +3522,6 @@ msgstr ""
 #: includes/Notices.php:776
 #: views/attachment-settings-hint.php:12
 #: views/extensions.php:135
-#: views/promo.php:34
 msgid "Hide this message"
 msgstr ""
 
@@ -6090,8 +6089,46 @@ msgstr ""
 msgid "For custom templates, contact us at %s."
 msgstr ""
 
+#: views/promo.php:24
+msgid "Explore store productivity upgrades"
+msgstr ""
+
+#: views/promo.php:26
+msgid "Black Friday"
+msgstr ""
+
+#: views/promo.php:26
+msgid "Last chance to save!"
+msgstr ""
+
 #: views/promo.php:27
-msgid "Last chance to use your Black Friday discount!"
+msgid "Upgrade your workflow."
+msgstr ""
+
+#: views/promo.php:27
+msgid "40% discount."
+msgstr ""
+
+#: views/promo.php:28
+msgid "Explore extensions for PDF Invoices & Packing Slips, or browse our other tools to find new ways to streamline your store’s workflow."
+msgstr ""
+
+#. translators: %s: promotional code wrapped in a code element.
+#: views/promo.php:33
+#, php-format
+msgid "Use code %s at checkout."
+msgstr ""
+
+#: views/promo.php:40
+msgid "Explore upgrades"
+msgstr ""
+
+#: views/promo.php:42
+msgid "Offer ends December 2."
+msgstr ""
+
+#: views/promo.php:46
+msgid "Hide upgrade message"
 msgstr ""
 
 #: views/settings-page.php:5

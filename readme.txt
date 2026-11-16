@@ -120,6 +120,7 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 - New: Refactor Peppol endpoint derivation into a reusable method
 - New: Allow overriding WordPress.org language pack translations with custom .po/.mo or .l10n.php files
 - New: Deactivate outdated extension versions automatically, based on each extension's last incompatible release
+- Tweak: Updated promo banner
 - Tweak: Remove bundled .po/.mo translation files in favor of WordPress.org language packs
 - Tweak: Improve registration number identifiers and defaults
 - Tweak: Make PDF maker helpers available to extensions safely
