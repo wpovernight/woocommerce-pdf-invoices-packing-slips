@@ -2295,9 +2295,9 @@ class Admin {
 									continue;
 								}
 
-								$value    = $identifier['value'];
-								$required = $identifier['required'];
-								$display  = sprintf(
+								$value         = $identifier['value'];
+								$required      = $identifier['required'];
+								$fallback_span = sprintf(
 									'<span class="%s">%s</span>',
 									$required
 										? 'missing'
@@ -2312,7 +2312,7 @@ class Admin {
 									<td><?php echo esc_html( $identifier['label'] ); ?></td>
 								<?php endif; ?>
 									<td>
-										<?php echo $value ? esc_html( $value ) : wp_kses_post( $display ); ?>
+										<?php echo $value ? esc_html( $value ) : wp_kses_post( $fallback_span ); ?>
 									</td>
 								</tr>
 								<?php
@@ -2327,10 +2327,10 @@ class Admin {
 										continue;
 									}
 
-									$identifier = $identifiers_data[ $identifier_key ];
-									$value      = $identifier['value'];
-									$required   = $identifier['required'];
-									$display    = sprintf(
+									$identifier    = $identifiers_data[ $identifier_key ];
+									$value         = $identifier['value'];
+									$required      = $identifier['required'];
+									$fallback_span = sprintf(
 										'<span class="%s">%s</span>',
 										$required
 											? 'missing'
@@ -2345,7 +2345,7 @@ class Admin {
 										<td><?php echo esc_html( $identifier['label'] ); ?></td>
 									<?php endif; ?>
 									<td>
-										<?php echo $value ? esc_html( $value ) : wp_kses_post( $display ); ?>
+										<?php echo $value ? esc_html( $value ) : wp_kses_post( $fallback_span ); ?>
 
 										<?php if ( 'vat_number' === $identifier_key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
 											<br>
@@ -2374,9 +2374,9 @@ class Admin {
 						<tbody>
 							<?php
 								foreach ( $peppol_identifiers as $key => $identifier ) {
-									$value    = $identifier['value'];
-									$required = $identifier['required'];
-									$display  = sprintf(
+									$value         = $identifier['value'];
+									$required      = $identifier['required'];
+									$fallback_span = sprintf(
 										'<span style="color:%s">%s</span>',
 										$required
 											? '#d63638'
@@ -2388,7 +2388,7 @@ class Admin {
 									?>
 									<tr>
 										<td><?php echo esc_html( $identifier['label'] ); ?></td>
-										<td class="display"><?php echo $value ? esc_html( $value ) : wp_kses_post( $display ); ?></td>
+										<td class="display"><?php echo $value ? esc_html( $value ) : wp_kses_post( $fallback_span ); ?></td>
 										<td class="edit">
 											<input type="text" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>">
 										</td>
