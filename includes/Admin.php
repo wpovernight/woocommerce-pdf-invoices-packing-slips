@@ -2312,7 +2312,7 @@ class Admin {
 									<td><?php echo esc_html( $identifier['label'] ); ?></td>
 								<?php endif; ?>
 									<td>
-										<?php echo wp_kses_post( $display ); ?>
+										<?php echo $value ? esc_html( $value ) : wp_kses_post( $display ); ?>
 									</td>
 								</tr>
 								<?php
@@ -2345,7 +2345,7 @@ class Admin {
 										<td><?php echo esc_html( $identifier['label'] ); ?></td>
 									<?php endif; ?>
 									<td>
-										<?php echo wp_kses_post( $display ); ?>
+										<?php echo $value ? esc_html( $value ) : wp_kses_post( $display ); ?>
 
 										<?php if ( 'vat_number' === $identifier_key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
 											<br>
@@ -2388,7 +2388,7 @@ class Admin {
 									?>
 									<tr>
 										<td><?php echo esc_html( $identifier['label'] ); ?></td>
-										<td class="display"><?php echo wp_kses_post( $display ); ?></td>
+										<td class="display"><?php echo $value ? esc_html( $value ) : wp_kses_post( $display ); ?></td>
 										<td class="edit">
 											<input type="text" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>">
 										</td>
