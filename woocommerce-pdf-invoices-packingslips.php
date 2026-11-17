@@ -190,7 +190,7 @@ class WPO_WCPDF {
 			'plugin_action_links',
 			array( $this, 'filter_legacy_addon_action_links' ),
 			10,
-			4
+			2
 		);
 
 		// Remove activation links from the Network Plugins screen.
@@ -198,7 +198,7 @@ class WPO_WCPDF {
 			'network_admin_plugin_action_links',
 			array( $this, 'filter_legacy_addon_action_links' ),
 			10,
-			4
+			2
 		);
 	}
 	
@@ -638,11 +638,9 @@ class WPO_WCPDF {
 	 *
 	 * @param array  $actions     Plugin action links.
 	 * @param string $plugin_file Plugin basename.
-	 * @param array  $plugin_data Plugin data.
-	 * @param string $context     Plugins list context.
 	 * @return array
 	 */
-	public function filter_legacy_addon_action_links( array $actions, string $plugin_file, array $plugin_data, string $context ): array {
+	public function filter_legacy_addon_action_links( array $actions, string $plugin_file ): array {
 		if ( ! $this->is_legacy_addon( $plugin_file ) ) {
 			return $actions;
 		}
