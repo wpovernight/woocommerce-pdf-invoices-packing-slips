@@ -427,11 +427,11 @@ class Admin {
 	/**
 	 * Add the meta boxes on the single order page
 	 *
-	 * @param string $wc_screen_id        Can be also $post_type
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
+	 * @param string $wc_screen_id             Can be also $post_type
+	 * @param \WC_Abstract_Order|\WP_Post|null $post_or_order_object
 	 * @return void
 	 */
-	public function add_meta_boxes( string $wc_screen_id, object $post_or_order_object ): void {
+	public function add_meta_boxes( string $wc_screen_id, ?object $post_or_order_object ): void {
 		if ( WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() ) {
 			$screen_id = wc_get_page_screen_id( 'shop-order' );
 		} else {
