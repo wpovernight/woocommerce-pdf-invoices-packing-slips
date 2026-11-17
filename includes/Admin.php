@@ -2297,7 +2297,7 @@ class Admin {
 
 								$value    = $identifier['value'];
 								$required = $identifier['required'];
-								$display  = $value ?: sprintf(
+								$display  = sprintf(
 									'<span class="%s">%s</span>',
 									$required
 										? 'missing'
@@ -2330,7 +2330,7 @@ class Admin {
 									$identifier = $identifiers_data[ $identifier_key ];
 									$value      = $identifier['value'];
 									$required   = $identifier['required'];
-									$display    = $value ?: sprintf(
+									$display    = sprintf(
 										'<span class="%s">%s</span>',
 										$required
 											? 'missing'
@@ -2376,7 +2376,7 @@ class Admin {
 								foreach ( $peppol_identifiers as $key => $identifier ) {
 									$value    = $identifier['value'];
 									$required = $identifier['required'];
-									$display  = $value ?: sprintf(
+									$display  = sprintf(
 										'<span style="color:%s">%s</span>',
 										$required
 											? '#d63638'
