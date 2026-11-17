@@ -915,7 +915,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 			$line_taxes = $line_tax_data[ $tax_data_key ];
 			foreach ( $line_taxes as $tax_id => $tax ) {
 				if ( isset( $tax ) && '' !== $tax ) {
-					$tax_rate = $this->get_tax_rate_by_id( $tax_id, $order );
+					$tax_rate = is_numeric( $tax_id ) ? $this->get_tax_rate_by_id( (int) $tax_id, $order ) : false;
 					if ( $tax_rate !== false && $force_calculation === false ) {
 						$tax_rates[] = $tax_rate . ' %';
 					} else {
