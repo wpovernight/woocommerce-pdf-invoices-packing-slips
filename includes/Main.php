@@ -2453,40 +2453,10 @@ class Main {
 	}
 
 	/**
-	 * Handle document link in emails.
-	 *
-	 * @return void
-	 */
-	public function handle_document_link_in_emails(): void {
-		$email_hooks = array();
-		$plugin      = WPO_WCPDF();
-		$documents   = $plugin->get_instance( 'documents' )->get_documents();
-		$settings    = $plugin->get_instance( 'settings' );
-
-		foreach ( $documents as $document ) {
-			$document_settings = $settings->get_document_settings( $document->get_type(), 'pdf' );
-			$email_placement   = $document_settings['include_email_link_placement'] ?? '';
-
-			if ( ! empty( $email_placement ) ) {
-				$email_hooks[] = 'woocommerce_email_' . $email_placement;
-			}
-		}
-
-		$email_hooks = array_unique( apply_filters( 'wpo_wcpdf_add_document_link_to_email_hooks', $email_hooks ) );
-
-		foreach ( $email_hooks as $email_hook ) {
-			if ( 'woocommerce_email_customer_address_section' === $email_hook ) {
-				add_action( $email_hook, array( $this, 'add_document_link_to_address_section' ), 10, 4 );
-			} else {
-				add_action( $email_hook, array( $this, 'add_document_link_to_email' ), 10, 4 );
-			}
-		}
-	}
-
-	/**
 	 * Wrapper for woocommerce_email_customer_address_section hook.
 	 * Since different parameters sent to this hook, we use a wrapper for it.
-	 * Parameters are untyped because third parties may fire this hook with unexpected values.
+	 * Parameters are untyped and have defaults because third parties may fire this hook
+	 * with fewer or unexpected arguments.
 	 *
 	 * @param mixed|string             $type
 	 * @param mixed|\WC_Abstract_Order $order
@@ -2494,7 +2464,7 @@ class Main {
 	 * @param mixed|bool               $plain_text
 	 * @return void
 	 */
-	public function add_document_link_to_address_section( $type, $order, $sent_to_admin, $plain_text ): void {
+	public function add_document_link_to_address_section( $type = '', $order = null, $sent_to_admin = false, $plain_text = false ): void {
 		// Since this hook doesn’t pass the $email object, we pass null (or create a dummy if needed).
 		$this->add_document_link_to_email( $order, $sent_to_admin, $plain_text, null );
 	}
