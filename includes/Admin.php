@@ -55,9 +55,6 @@ class Admin {
 		add_filter( 'bulk_actions-woocommerce_page_wc-orders', array( $this, 'bulk_actions' ), 20 ); // WC 7.1+
 		add_filter( 'woocommerce_order_table_search_query_meta_keys', array( $this, 'search_fields' ) ); // HPOS specific filter
 		add_filter( 'woocommerce_shop_order_search_fields', array( $this, 'search_fields' ) );
-		add_filter( 'woocommerce_rest_prepare_report_orders', array( $this, 'add_invoice_number_to_order_report' ) );
-		add_filter( 'woocommerce_report_orders_export_columns', array( $this, 'add_invoice_number_header_to_order_export' ) );
-		add_filter( 'woocommerce_report_orders_prepare_export_item', array( $this, 'add_invoice_number_value_to_order_export' ), 10, 2 );
 		add_action( 'manage_woocommerce_page_wc-orders_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 ); // WC 7.1+
 		add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
 		add_action( 'manage_shop_order_posts_custom_column', array( $this, 'invoice_columns_data' ), 10, 2 );
@@ -427,11 +424,11 @@ class Admin {
 	/**
 	 * Add the meta boxes on the single order page
 	 *
-	 * @param string $wc_screen_id        Can be also $post_type
-	 * @param \WC_Abstract_Order|\WP_Post $post_or_order_object
+	 * @param string $wc_screen_id             Can be also $post_type
+	 * @param \WC_Abstract_Order|\WP_Post|null $post_or_order_object
 	 * @return void
 	 */
-	public function add_meta_boxes( string $wc_screen_id, object $post_or_order_object ): void {
+	public function add_meta_boxes( string $wc_screen_id, ?object $post_or_order_object ): void {
 		if ( WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() ) {
 			$screen_id = wc_get_page_screen_id( 'shop-order' );
 		} else {
@@ -2025,48 +2022,6 @@ class Admin {
 	}
 
 	/**
-	 * Add invoice number to the order report response.
-	 *
-	 * @param \WP_REST_Response $response The REST API response object.
-	 * @return \WP_REST_Response Modified REST API response object with invoice number included.
-	 */
-	public function add_invoice_number_to_order_report( \WP_REST_Response $response ): \WP_REST_Response {
-		$order = wc_get_order( $response->data['order_id'] );
-		if ( ! empty( $order ) ) {
-			$response->data['invoice_number'] = $order->get_meta( '_wcpdf_invoice_number' );
-		}
-
-		return $response;
-	}
-
-	/**
-	 * Add invoice number header to the order export columns.
-	 *
-	 * @param array $export_columns The existing export columns.
-	 * @return array Modified export columns with invoice number header included.
-	 */
-	public function add_invoice_number_header_to_order_export( array $export_columns ): array {
-		$export_columns['invoice_number'] = __( 'Invoice Number', 'woocommerce-pdf-invoices-packing-slips' );
-
-		return $export_columns;
-	}
-
-	/**
-	 * Add invoice number value to the order export data.
-	 *
-	 * @param array $export_item The existing export item data.
-	 * @param array $item The original item data containing the order information.
-	 * @return array Modified export item data with invoice number included.
-	 */
-	public function add_invoice_number_value_to_order_export( array $export_item, array $item ): array {
-		if ( ! empty( $item['invoice_number'] ) ) {
-			$export_item['invoice_number'] = $item['invoice_number'];
-		}
-
-		return $export_item;
-	}
-
-	/**
 	 * Add invoice date and number columns to the sortable columns in the admin order list.
 	 *
 	 * @param array $columns The existing sortable columns.
@@ -2295,9 +2250,9 @@ class Admin {
 									continue;
 								}
 
-								$value    = $identifier['value'];
-								$required = $identifier['required'];
-								$display  = $value ?: sprintf(
+								$value         = $identifier['value'];
+								$required      = $identifier['required'];
+								$fallback_span = sprintf(
 									'<span class="%s">%s</span>',
 									$required
 										? 'missing'
@@ -2312,7 +2267,7 @@ class Admin {
 									<td><?php echo esc_html( $identifier['label'] ); ?></td>
 								<?php endif; ?>
 									<td>
-										<?php echo wp_kses_post( $display ); ?>
+										<?php echo $value ? esc_html( $value ) : wp_kses_post( $fallback_span ); ?>
 									</td>
 								</tr>
 								<?php
@@ -2327,10 +2282,10 @@ class Admin {
 										continue;
 									}
 
-									$identifier = $identifiers_data[ $identifier_key ];
-									$value      = $identifier['value'];
-									$required   = $identifier['required'];
-									$display    = $value ?: sprintf(
+									$identifier    = $identifiers_data[ $identifier_key ];
+									$value         = $identifier['value'];
+									$required      = $identifier['required'];
+									$fallback_span = sprintf(
 										'<span class="%s">%s</span>',
 										$required
 											? 'missing'
@@ -2345,7 +2300,7 @@ class Admin {
 										<td><?php echo esc_html( $identifier['label'] ); ?></td>
 									<?php endif; ?>
 									<td>
-										<?php echo wp_kses_post( $display ); ?>
+										<?php echo $value ? esc_html( $value ) : wp_kses_post( $fallback_span ); ?>
 
 										<?php if ( 'vat_number' === $identifier_key && ! empty( $value ) && ! wpo_ips_edi_vat_number_has_country_prefix( $value ) ) : ?>
 											<br>
@@ -2374,9 +2329,9 @@ class Admin {
 						<tbody>
 							<?php
 								foreach ( $peppol_identifiers as $key => $identifier ) {
-									$value    = $identifier['value'];
-									$required = $identifier['required'];
-									$display  = $value ?: sprintf(
+									$value         = $identifier['value'];
+									$required      = $identifier['required'];
+									$fallback_span = sprintf(
 										'<span style="color:%s">%s</span>',
 										$required
 											? '#d63638'
@@ -2388,7 +2343,7 @@ class Admin {
 									?>
 									<tr>
 										<td><?php echo esc_html( $identifier['label'] ); ?></td>
-										<td class="display"><?php echo wp_kses_post( $display ); ?></td>
+										<td class="display"><?php echo $value ? esc_html( $value ) : wp_kses_post( $fallback_span ); ?></td>
 										<td class="edit">
 											<input type="text" name="<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $value ); ?>">
 										</td>
