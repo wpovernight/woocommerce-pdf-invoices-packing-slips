@@ -54,8 +54,8 @@ In addition to a number of default settings (including a custom header/logo) and
 
 = Minimum Requirements =
 
-* WooCommerce 4.0 or later
-* WordPress 4.4 or later
+* WooCommerce 7.0 or later
+* WordPress 5.9 or later
 
 = Automatic installation =
 Automatic installation is the easiest option as WordPress handles the file transfers itself and you don't even need to leave your web browser. To do an automatic install of PDF Invoices & Packing Slips for WooCommerce, log in to your WordPress admin panel, navigate to the Plugins menu and click Add New.
@@ -109,6 +109,10 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 6. Set shop name, address, header logo, etc.
 
 == Changelog ==
+
+= 6.0.1 (unreleased) =
+- Tweak: Require WooCommerce 7.0+ instead of 4.0+, the first version line fully supporting PHP 8.1
+- Tweak: Align the minimum WordPress version requirement to 5.9 in the readme and status page
 
 = 6.0.0 (2026-11-16) =
 - New: Modernized, object-oriented codebase with strict types, full type coverage and improved performance
