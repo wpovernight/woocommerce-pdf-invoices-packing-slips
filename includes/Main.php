@@ -2486,89 +2486,110 @@ class Main {
 	/**
 	 * Wrapper for woocommerce_email_customer_address_section hook.
 	 * Since different parameters sent to this hook, we use a wrapper for it.
+	 * Parameters are untyped because third parties may fire this hook with unexpected values.
 	 *
-	 * @param string $type
-	 * @param \WC_Abstract_Order $order
-	 * @param bool $sent_to_admin
-	 * @param bool $plain_text
+	 * @param mixed|string             $type
+	 * @param mixed|\WC_Abstract_Order $order
+	 * @param mixed|bool               $sent_to_admin
+	 * @param mixed|bool               $plain_text
 	 * @return void
 	 */
-	public function add_document_link_to_address_section( string $type, \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text ): void {
+	public function add_document_link_to_address_section( $type, $order, $sent_to_admin, $plain_text ): void {
 		// Since this hook doesn’t pass the $email object, we pass null (or create a dummy if needed).
 		$this->add_document_link_to_email( $order, $sent_to_admin, $plain_text, null );
 	}
 
 	/**
 	 * Add document download link to the email.
+	 * Parameters are untyped because third parties may fire these hooks with unexpected values,
+	 * and any failure is logged instead of aborting the email.
 	 *
-	 * @param \WC_Abstract_Order $order
-	 * @param bool $sent_to_admin
-	 * @param bool $plain_text
-	 * @param mixed|\WC_Email $email Some third-parties might send different values or omit this argument.
+	 * @param mixed|\WC_Abstract_Order $order
+	 * @param mixed|bool               $sent_to_admin
+	 * @param mixed|bool               $plain_text
+	 * @param mixed|\WC_Email          $email Some third-parties might send different values or omit this argument.
 	 * @return void
 	 */
-	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, $email = null ): void {
-		$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
-		
-		// Check if document access type is 'full'.
-		$is_full_access_type = 'full' === $endpoint_instance->get_document_link_access_type();
-
-		// Early exit if the requirements are not met
-		if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_requirements_met', $is_full_access_type, $order, $sent_to_admin, $plain_text, $email ) ) {
+	public function add_document_link_to_email( $order, $sent_to_admin, $plain_text, $email = null ): void {
+		if ( ! $order instanceof \WC_Abstract_Order ) {
 			return;
 		}
 
-		$allowed_document_types = apply_filters( 'wpo_wcpdf_add_document_link_to_email_allowed_document_types', array( 'invoice' ), $order, $sent_to_admin, $plain_text, $email );
-		$documents              = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
+		$sent_to_admin = (bool) $sent_to_admin;
+		$plain_text    = (bool) $plain_text;
+
+		try {
+			$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
+
+			// Check if document access type is 'full'.
+			$is_full_access_type = 'full' === $endpoint_instance->get_document_link_access_type();
+
+			// Early exit if the requirements are not met
+			if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_requirements_met', $is_full_access_type, $order, $sent_to_admin, $plain_text, $email ) ) {
+				return;
+			}
+
+			$allowed_document_types = apply_filters( 'wpo_wcpdf_add_document_link_to_email_allowed_document_types', array( 'invoice' ), $order, $sent_to_admin, $plain_text, $email );
+			$documents              = WPO_WCPDF()->get_instance( 'documents' )->get_documents();
+		} catch ( \Throwable $e ) {
+			wcpdf_log_error( sprintf( 'Document links could not be added to the email for order ID# %s: %s', $order->get_id(), $e->getMessage() ), 'critical', $e );
+			return;
+		}
 
 		foreach ( $documents as $document ) {
-			$document_settings = WPO_WCPDF()->get_instance( 'settings' )->get_document_settings( $document->get_type(), 'pdf' );
-			$selected_emails   = $document_settings['include_email_link'] ?? array();
-			$email_placement   = $document_settings['include_email_link_placement'] ?? '';
+			try {
+				$document_settings = WPO_WCPDF()->get_instance( 'settings' )->get_document_settings( $document->get_type(), 'pdf' );
+				$selected_emails   = $document_settings['include_email_link'] ?? array();
+				$email_placement   = $document_settings['include_email_link_placement'] ?? '';
 
-			// Skip if no email placement is set.
-			if ( empty( $email_placement ) ) {
+				// Skip if no email placement is set.
+				if ( empty( $email_placement ) ) {
+					continue;
+				}
+
+				$email_id   = ( $email instanceof \WC_Email ) ? $email->id : '';
+				$is_allowed =
+					in_array( $document->get_type(), $allowed_document_types, true ) &&
+					in_array( $email_id, $selected_emails, true ) &&
+					( 'woocommerce_email_' . $email_placement ) === current_filter();
+
+				if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
+					continue;
+				}
+
+				$document = wcpdf_get_document( $document->get_type(), $order );
+
+				if ( ! $document ) {
+					continue;
+				}
+
+				if (
+					! $document->exists() &&
+					apply_filters( 'wpo_wcpdf_add_document_link_to_email_skip_missing_documents', false, $document, $order, $sent_to_admin, $plain_text, $email )
+				) {
+					continue;
+				}
+
+				$link_text = sprintf(
+					/* translators: %s: Document type */
+					__( 'View %s (PDF)', 'woocommerce-pdf-invoices-packing-slips' ),
+					wp_kses_post( $document->get_type() )
+				);
+				$link_url  = $endpoint_instance->get_document_link( $order, $document->get_type(), array(), true );
+
+				$document_link = sprintf(
+					'<p><a id="%s" href="%s" target="_blank">%s</a></p>',
+					esc_attr( 'wpo_wcpdf_' . $document->get_type() . '_document_link' ),
+					esc_url( $link_url ),
+					esc_html( $link_text )
+				);
+
+				echo wp_kses_post( apply_filters( 'wpo_wcpdf_add_document_download_link_to_email', $document_link, $document, $order, $sent_to_admin, $plain_text, $email ) );
+			} catch ( \Throwable $e ) {
+				$document_type = is_object( $document ) && is_callable( array( $document, 'get_type' ) ) ? $document->get_type() : 'unknown';
+				wcpdf_log_error( sprintf( 'Document link (%s) could not be added to the email for order ID# %s: %s', $document_type, $order->get_id(), $e->getMessage() ), 'critical', $e );
 				continue;
 			}
-
-			$email_id   = ( $email instanceof \WC_Email ) ? $email->id : '';
-			$is_allowed =
-				in_array( $document->get_type(), $allowed_document_types, true ) &&
-				in_array( $email_id, $selected_emails, true ) &&
-				( 'woocommerce_email_' . $email_placement ) === current_filter();
-
-			if ( ! apply_filters( 'wpo_wcpdf_add_document_link_to_email_is_allowed', $is_allowed, $order, $sent_to_admin, $plain_text, $email ) ) {
-				continue;
-			}
-
-			$document = wcpdf_get_document( $document->get_type(), $order );
-
-			if ( ! $document ) {
-				continue;
-			}
-
-			if (
-				! $document->exists() &&
-				apply_filters( 'wpo_wcpdf_add_document_link_to_email_skip_missing_documents', false, $document, $order, $sent_to_admin, $plain_text, $email )
-			) {
-				continue;
-			}
-
-			$link_text = sprintf(
-				/* translators: %s: Document type */
-				__( 'View %s (PDF)', 'woocommerce-pdf-invoices-packing-slips' ),
-				wp_kses_post( $document->get_type() )
-			);
-			$link_url  = $endpoint_instance->get_document_link( $order, $document->get_type(), array(), true );
-
-			$document_link = sprintf(
-				'<p><a id="%s" href="%s" target="_blank">%s</a></p>',
-				esc_attr( 'wpo_wcpdf_' . $document->get_type() . '_document_link' ),
-				esc_url( $link_url ),
-				esc_html( $link_text )
-			);
-
-			echo wp_kses_post( apply_filters( 'wpo_wcpdf_add_document_download_link_to_email', $document_link, $document, $order, $sent_to_admin, $plain_text, $email ) );
 		}
 	}
 
