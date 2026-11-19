@@ -18,38 +18,26 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings' ) ) :
 
 class Settings {
 
-	public ?SettingsCallbacks $callbacks     = null;
-	public ?SettingsGeneral $general         = null;
-	public ?SettingsDocuments $documents     = null;
-	public ?SettingsDebug $debug             = null;
-	public ?SettingsUpgrade $upgrade         = null;
-	public ?SettingsEDI $edi                 = null;
+	public ?SettingsCallbacks $callbacks       = null;
+	public ?SettingsGeneral $general           = null;
+	public ?SettingsDocuments $documents       = null;
+	public ?SettingsDebug $debug               = null;
+	public ?SettingsUpgrade $upgrade           = null;
+	public ?SettingsEDI $edi                   = null;
 
-	public string|false $options_page_hook   = false;
-	public array $general_settings           = array();
-	public array $debug_settings             = array();
-	public array $edi_settings               = array();
+	public string|false $options_page_hook     = false;
+	public array $general_settings             = array();
+	public array $debug_settings               = array();
+	public array $edi_settings                 = array();
 
-	private array $installed_templates       = array();
-	private array $installed_templates_cache = array();
-	private array $template_list_cache       = array();
-
-	/**
-	 * Whether the runtime template fallback has been logged in this request.
-	 *
-	 * @var bool
-	 */
-	private bool $template_fallback_logged = false;
-
-	/**
-	 * Latest template validation error for settings, preview and wizard feedback.
-	 *
-	 * @var string|null
-	 */
+	private array $installed_templates         = array();
+	private array $installed_templates_cache   = array();
+	private array $template_list_cache         = array();
+	private bool $template_fallback_logged     = false;
 	private ?string $template_validation_error = null;
 
-	protected bool $settings_loaded          = false;
-	protected static ?self $_instance        = null;
+	protected bool $settings_loaded            = false;
+	protected static ?self $_instance          = null;
 
 	/**
 	 * Singleton instance accessor.
