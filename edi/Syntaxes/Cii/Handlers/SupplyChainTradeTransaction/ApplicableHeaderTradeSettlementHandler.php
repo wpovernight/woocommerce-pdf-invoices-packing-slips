@@ -331,11 +331,21 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 						'currencyID' => $currency,
 					),
 				),
-				array(
-					'name'  => 'ram:GrandTotalAmount',
-					'value' => $this->format_decimal( $totals['total_inc_tax'] ),
-				),
 			),
+		);
+
+		// Only include RoundingAmount when materially non-zero.
+		// CII D16B requires it between TaxTotalAmount and GrandTotalAmount.
+		if ( abs( $totals['rounding_diff'] ) >= 0.01 ) {
+			$monetary_summation['value'][] = array(
+				'name'  => 'ram:RoundingAmount',
+				'value' => $this->format_decimal( $totals['rounding_diff'] ),
+			);
+		}
+
+		$monetary_summation['value'][] = array(
+			'name'  => 'ram:GrandTotalAmount',
+			'value' => $this->format_decimal( $totals['total_inc_tax'] ),
 		);
 
 		// Only output TotalPrepaidAmount when there is an actual prepayment.
@@ -343,14 +353,6 @@ class ApplicableHeaderTradeSettlementHandler extends AbstractCiiHandler {
 			$monetary_summation['value'][] = array(
 				'name'  => 'ram:TotalPrepaidAmount',
 				'value' => $this->format_decimal( $totals['prepaid_amount'] ),
-			);
-		}
-
-		// Only include RoundingAmount when materially non-zero.
-		if ( abs( $totals['rounding_diff'] ) >= 0.01 ) {
-			$monetary_summation['value'][] = array(
-				'name'  => 'ram:RoundingAmount',
-				'value' => $this->format_decimal( $totals['rounding_diff'] ),
 			);
 		}
 
