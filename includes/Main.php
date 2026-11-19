@@ -2191,9 +2191,11 @@ class Main {
 	 * @return \WP_REST_Response Modified REST API response object with invoice number included.
 	 */
 	public function add_invoice_number_to_order_report( \WP_REST_Response $response ): \WP_REST_Response {
-		$order = wc_get_order( $response->data['order_id'] );
-		if ( ! empty( $order ) ) {
-			$response->data['invoice_number'] = $order->get_meta( '_wcpdf_invoice_number' );
+		if ( is_array( $response->data ) && isset( $response->data['order_id'] ) ) {
+			$order = wc_get_order( absint( $response->data['order_id'] ) );
+			if ( ! empty( $order ) ) {
+				$response->data['invoice_number'] = (string) $order->get_meta( '_wcpdf_invoice_number', true );
+			}
 		}
 
 		return $response;
