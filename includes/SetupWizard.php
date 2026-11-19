@@ -267,6 +267,7 @@ class SetupWizard {
 	 */
 	public function setup_wizard_content(): void {
 		echo '<div class="wpo-setup-content">';
+		settings_errors( 'wpo_wcpdf_template_path' );
 		include( $this->steps[ $this->step ]['view'] );
 		echo '</div>';
 	}
@@ -338,12 +339,14 @@ class SetupWizard {
 	 * @return void
 	 */
 	public function save_step(): void {
-		if ( ! WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
+		if ( ! $settings_instance->user_can_manage_settings() ) {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' ), '', array( 'response' => 403 ) );
 		}
 
 		check_admin_referer( 'wpo-wcpdf-setup' );
-		$request = stripslashes_deep( $_POST );
+		$request        = stripslashes_deep( $_POST );
+		$template_error = null;
 
 		if ( isset( $this->steps[ $this->step ]['handler'] ) ) {
 			// for doing more than just saving an option value
@@ -360,6 +363,12 @@ class SetupWizard {
 
 					// sanitize posted settings
 					foreach ( $settings as $key => $value ) {
+						if ( 'wpo_wcpdf_settings_general' === $option && 'template_path' === $key ) {
+							$settings[ $key ] = $settings_instance->validate_template_path( $value );
+							$template_error   = $settings_instance->get_template_validation_error();
+							continue;
+						}
+
 						if ( 'attach_to_email_ids' === $key ) {
 							$value = array_fill_keys( $value, '1' );
 						}
@@ -412,6 +421,11 @@ class SetupWizard {
 					}
 				}
 			}
+		}
+
+		// Keep the current step visible so its validation warning can be displayed.
+		if ( null !== $template_error ) {
+			return;
 		}
 
 		wp_safe_redirect( $this->get_step_link( $this->get_step(1) ) );
