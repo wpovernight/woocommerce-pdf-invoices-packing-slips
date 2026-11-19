@@ -874,7 +874,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function title(): void {
-		echo esc_html( $this->get_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -892,7 +892,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function plural_title(): void {
-		echo esc_html( $this->get_plural_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_plural_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -910,7 +910,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function number_title(): void {
-		echo esc_html( $this->get_number_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_number_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -928,7 +928,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function date_title(): void {
-		echo esc_html( $this->get_date_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_date_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -946,7 +946,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function due_date_title(): void {
-		echo esc_html( $this->get_due_date_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_due_date_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -964,7 +964,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function billing_address_title(): void {
-		echo esc_html( $this->get_billing_address_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_billing_address_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -982,7 +982,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shipping_address_title(): void {
-		echo esc_html( $this->get_shipping_address_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shipping_address_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1000,7 +1000,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function order_number_title(): void {
-		echo esc_html( $this->get_order_number_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_order_number_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1018,7 +1018,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function order_date_title(): void {
-		echo esc_html( $this->get_order_date_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_order_date_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1036,7 +1036,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function payment_method_title(): void {
-		echo esc_html( $this->get_payment_method_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_payment_method_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1054,7 +1054,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function payment_date_title(): void {
-		echo esc_html( $this->get_payment_date_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_payment_date_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1072,7 +1072,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shipping_method_title(): void {
-		echo esc_html( $this->get_shipping_method_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shipping_method_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1090,7 +1090,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function sku_title(): void {
-		echo esc_html( $this->get_sku_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_sku_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1108,7 +1108,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function weight_title(): void {
-		echo esc_html( $this->get_weight_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_weight_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1126,7 +1126,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function notes_title(): void {
-		echo esc_html( $this->get_notes_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_notes_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1144,7 +1144,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function customer_notes_title(): void {
-		echo esc_html( $this->get_customer_notes_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_customer_notes_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1678,7 +1678,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_name(): void {
-		echo esc_html( $this->get_shop_name() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shop_name(), 'shop_name' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1732,7 +1732,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address_line_1(): void {
-		echo esc_html( $this->get_shop_address_line_1() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shop_address_line_1(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1750,7 +1750,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address_line_2(): void {
-		echo esc_html( $this->get_shop_address_line_2() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shop_address_line_2(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1768,7 +1768,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address_country(): void {
-		echo esc_html( $this->get_shop_address_country() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shop_address_country(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1786,7 +1786,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address_country_code(): void {
-		echo esc_html( $this->get_shop_address_country_code() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shop_address_country_code(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1804,7 +1804,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address_state(): void {
-		echo esc_html( $this->get_shop_address_state() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shop_address_state(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1822,7 +1822,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address_city(): void {
-		echo esc_html( $this->get_shop_address_city() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shop_address_city(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1840,7 +1840,7 @@ abstract class OrderDocument {
 	 * @return void
 	 */
 	public function shop_address_postcode(): void {
-		echo esc_html( $this->get_shop_address_postcode() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_shop_address_postcode(), 'address' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**

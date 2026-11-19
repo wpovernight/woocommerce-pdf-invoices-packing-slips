@@ -1677,7 +1677,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return void
 	 */
 	public function invoice_number_title(): void {
-		echo esc_html( $this->get_invoice_number_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_invoice_number_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 
 	/**
@@ -1703,7 +1703,7 @@ abstract class OrderDocumentMethods extends OrderDocument {
 	 * @return void
 	 */
 	public function refund_reason_title(): void {
-		echo esc_html( $this->get_refund_reason_title() );
+		echo wpo_wcpdf_sanitize_html_content( $this->get_refund_reason_title(), 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content()
 	}
 	
 	/**
