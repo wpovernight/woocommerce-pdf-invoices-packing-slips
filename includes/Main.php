@@ -2457,10 +2457,10 @@ class Main {
 	 * @param \WC_Abstract_Order $order
 	 * @param bool $sent_to_admin
 	 * @param bool $plain_text
-	 * @param mixed|\WC_Email $email Some third-parties might send different values.
+	 * @param mixed|\WC_Email $email Some third-parties might send different values or omit this argument.
 	 * @return void
 	 */
-	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, $email ): void {
+	public function add_document_link_to_email( \WC_Abstract_Order $order, bool $sent_to_admin, bool $plain_text, $email = null ): void {
 		$endpoint_instance = WPO_WCPDF()->get_instance( 'endpoint' );
 		
 		// Check if document access type is 'full'.
