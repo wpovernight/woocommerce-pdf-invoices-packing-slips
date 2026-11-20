@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.1-rc.1\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.1-rc.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-19T11:36:26+00:00\n"
+"POT-Creation-Date: 2026-11-20T08:22:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -2229,8 +2229,8 @@ msgid "PDF document data"
 msgstr ""
 
 #: includes/Admin.php:478
-#: includes/Settings.php:249
-#: includes/Settings/SettingsDebug.php:808
+#: includes/Settings.php:251
+#: includes/Settings/SettingsDebug.php:822
 msgid "E-Documents"
 msgstr ""
 
@@ -2619,7 +2619,7 @@ msgid "If you need to enable this feature, you can do so in the %1$sAdvanced Set
 msgstr ""
 
 #: includes/Admin.php:2410
-#: includes/Settings/SettingsDebug.php:973
+#: includes/Settings/SettingsDebug.php:987
 msgid "Enable document data editing"
 msgstr ""
 
@@ -2660,8 +2660,8 @@ msgid "Preview"
 msgstr ""
 
 #: includes/Assets.php:123
-#: includes/Settings.php:168
-#: includes/Settings/SettingsDebug.php:1606
+#: includes/Settings.php:170
+#: includes/Settings/SettingsDebug.php:1620
 #: includes/Settings/SettingsEDI.php:34
 msgid "Settings"
 msgstr ""
@@ -2711,9 +2711,9 @@ msgstr ""
 
 #: includes/Assets.php:307
 #: includes/Settings/SettingsDebug.php:349
-#: includes/Settings/SettingsDebug.php:628
-#: includes/Settings/SettingsDebug.php:1768
-#: includes/Settings/SettingsDebug.php:2031
+#: includes/Settings/SettingsDebug.php:642
+#: includes/Settings/SettingsDebug.php:1782
+#: includes/Settings/SettingsDebug.php:2045
 msgid "You are not allowed to perform this action."
 msgstr ""
 
@@ -2770,7 +2770,7 @@ msgid "No customer identifiers found."
 msgstr ""
 
 #: includes/CheckoutField.php:59
-#: includes/Settings.php:857
+#: includes/Settings.php:868
 msgid "Custom"
 msgstr ""
 
@@ -2789,7 +2789,7 @@ msgstr ""
 #: includes/Documents/Invoice.php:20
 #: includes/Documents/Invoice.php:72
 #: includes/Frontend.php:90
-#: includes/Settings/SettingsDebug.php:983
+#: includes/Settings/SettingsDebug.php:997
 #: views/settings-page.php:182
 msgid "Invoice"
 msgstr ""
@@ -2982,8 +2982,8 @@ msgid "Padding"
 msgstr ""
 
 #: includes/Documents/Invoice.php:496
-#: includes/Settings/SettingsDebug.php:944
-#: includes/Settings/SettingsDebug.php:980
+#: includes/Settings/SettingsDebug.php:958
+#: includes/Settings/SettingsDebug.php:994
 #: includes/Settings/SettingsGeneral.php:481
 #: includes/Settings/SettingsGeneral.php:500
 #: includes/Settings/SettingsGeneral.php:530
@@ -3136,8 +3136,8 @@ msgstr ""
 
 #: includes/Documents/Invoice.php:736
 #: includes/Documents/PackingSlip.php:273
-#: includes/Settings.php:241
-#: includes/Settings/SettingsDebug.php:806
+#: includes/Settings.php:243
+#: includes/Settings/SettingsDebug.php:820
 msgid "General"
 msgstr ""
 
@@ -3151,7 +3151,7 @@ msgid "Admin"
 msgstr ""
 
 #: includes/Documents/Invoice.php:771
-#: includes/Settings.php:256
+#: includes/Settings.php:258
 #: includes/Settings/SettingsCallbacks.php:818
 msgid "Advanced"
 msgstr ""
@@ -3267,7 +3267,7 @@ msgid "Total ex. VAT"
 msgstr ""
 
 #: includes/Documents/OrderDocumentMethods.php:1463
-#: includes/Settings.php:553
+#: includes/Settings.php:564
 msgid "Total"
 msgstr ""
 
@@ -3368,9 +3368,9 @@ msgid "Could not find the order #%s."
 msgstr ""
 
 #: includes/Main.php:582
-#: includes/Settings.php:304
-#: includes/Settings.php:494
-#: includes/SetupWizard.php:342
+#: includes/Settings.php:306
+#: includes/Settings.php:505
+#: includes/SetupWizard.php:344
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
@@ -3483,7 +3483,7 @@ msgid "Order %s Saved"
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Main.php:2559
+#: includes/Main.php:2545
 #, php-format
 msgid "View %s (PDF)"
 msgstr ""
@@ -3679,94 +3679,98 @@ msgstr ""
 msgid "%1$s: Your shop address is incomplete. Please fill in the missing fields in the %2$sGeneral settings%3$s."
 msgstr ""
 
-#: includes/Settings.php:152
-#: includes/Settings.php:153
+#: includes/Settings.php:154
+#: includes/Settings.php:155
 msgid "PDF Invoices"
 msgstr ""
 
-#: includes/Settings.php:185
+#: includes/Settings.php:187
 msgid "Documentation"
 msgstr ""
 
-#: includes/Settings.php:186
+#: includes/Settings.php:188
 msgid "Support Forum"
 msgstr ""
 
-#: includes/Settings.php:245
+#: includes/Settings.php:247
 msgid "Documents"
 msgstr ""
 
-#: includes/Settings.php:261
+#: includes/Settings.php:263
 msgid "Upgrade"
 msgstr ""
 
-#: includes/Settings.php:344
+#: includes/Settings.php:346
 #: includes/Settings/SettingsEDI.php:790
 msgid "Order not found!"
 msgstr ""
 
-#: includes/Settings.php:347
+#: includes/Settings.php:349
 msgid "Object found is not an order!"
 msgstr ""
 
 #. translators: 1. order ID, 2. documentation page link, 3. documentation page link closing tag
-#: includes/Settings.php:453
+#: includes/Settings.php:464
 #, php-format
 msgid "The PDF preview for order #%1$d is not available. This can happen if some settings prevent the document from being generated. Please review your configuration or check the %2$sdocumentation%3$s for more details."
 msgstr ""
 
-#: includes/Settings.php:462
+#: includes/Settings.php:473
 msgid "No WooCommerce orders found! Please consider adding your first order to see this preview."
 msgstr ""
 
 #. translators: error message
-#: includes/Settings.php:472
+#: includes/Settings.php:483
 #, php-format
 msgid "Error trying to generate document: %s"
 msgstr ""
 
-#: includes/Settings.php:552
+#: includes/Settings.php:563
 #: includes/Tables/NumberStoreListTable.php:149
 msgid "Date"
 msgstr ""
 
-#: includes/Settings.php:560
+#: includes/Settings.php:571
 msgid "No order(s) found!"
 msgstr ""
 
-#: includes/Settings.php:563
+#: includes/Settings.php:574
 msgid "An error occurred when trying to process your request!"
 msgstr ""
 
 #. translators: error message
-#: includes/Settings.php:570
+#: includes/Settings.php:581
 #, php-format
 msgid "Error trying to get orders: %s"
 msgstr ""
 
-#: includes/Settings.php:854
+#: includes/Settings.php:865
 msgid "Extension"
 msgstr ""
 
+#: includes/Settings.php:975
+msgid "The selected PDF template could not be verified. The previous selection has been retained."
+msgstr ""
+
 #. translators: total scheduled actions
-#: includes/Settings.php:1394
+#: includes/Settings.php:1495
 #, php-format
 msgid "Only 1 scheduled action should exist for the yearly reset of the numbering system, but %s were found"
 msgstr ""
 
-#: includes/Settings.php:1637
+#: includes/Settings.php:1738
 msgid "Additional settings"
 msgstr ""
 
-#: includes/Settings.php:1815
+#: includes/Settings.php:1916
 msgid "Address field is required."
 msgstr ""
 
-#: includes/Settings.php:1831
+#: includes/Settings.php:1932
 msgid "Invalid address field."
 msgstr ""
 
-#: includes/Settings.php:1840
+#: includes/Settings.php:1941
 msgid "The field is empty."
 msgstr ""
 
@@ -3839,169 +3843,173 @@ msgstr ""
 msgid "Couldn't determine the settings option for the import!"
 msgstr ""
 
+#: includes/Settings/SettingsDebug.php:520
+msgid "Other settings were imported."
+msgstr ""
+
 #. translators: settings type
-#: includes/Settings/SettingsDebug.php:514
+#: includes/Settings/SettingsDebug.php:528
 #, php-format
 msgid "%s settings imported successfully!"
 msgstr ""
 
 #. translators: settings type
-#: includes/Settings/SettingsDebug.php:522
+#: includes/Settings/SettingsDebug.php:536
 #, php-format
 msgid "The %s settings file you are trying to import is identical to your current settings, therefore, the settings were not imported."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:540
+#: includes/Settings/SettingsDebug.php:554
 msgid "Reset settings type is empty!"
 msgstr ""
 
 #. translators: settings type
-#: includes/Settings/SettingsDebug.php:580
+#: includes/Settings/SettingsDebug.php:594
 #, php-format
 msgid "%s settings reset not supported!"
 msgstr ""
 
 #. translators: settings type
-#: includes/Settings/SettingsDebug.php:593
+#: includes/Settings/SettingsDebug.php:607
 #, php-format
 msgid "%s settings are already reset!"
 msgstr ""
 
 #. translators: settings type
-#: includes/Settings/SettingsDebug.php:605
+#: includes/Settings/SettingsDebug.php:619
 #, php-format
 msgid "%s settings reset successfully!"
 msgstr ""
 
 #. translators: settings type
-#: includes/Settings/SettingsDebug.php:613
+#: includes/Settings/SettingsDebug.php:627
 #, php-format
 msgid "An error occurred when trying to reset the %s settings."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:637
+#: includes/Settings/SettingsDebug.php:651
 msgid "One or more request parameters missing."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:649
+#: includes/Settings/SettingsDebug.php:663
 msgid "documents deleted."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:649
+#: includes/Settings/SettingsDebug.php:663
 msgid "documents renumbered."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:680
+#: includes/Settings/SettingsDebug.php:694
 msgid "Wrong date type selected."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:697
+#: includes/Settings/SettingsDebug.php:711
 msgid "Unexpected results from the orders query."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:807
+#: includes/Settings/SettingsDebug.php:821
 msgid "Debug"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:809
+#: includes/Settings/SettingsDebug.php:823
 msgid "E-Document Taxes"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:851
+#: includes/Settings/SettingsDebug.php:865
 msgid "File System Method"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:859
+#: includes/Settings/SettingsDebug.php:873
 msgid "PHP Filesystem Functions (recommended)"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:860
-#: includes/Settings/SettingsDebug.php:866
+#: includes/Settings/SettingsDebug.php:874
+#: includes/Settings/SettingsDebug.php:880
 msgid "WP Filesystem API"
 msgstr ""
 
 #. translators: 1. PHP Filesystem Functions, 2. WP Filesystem API, 3. direct
-#: includes/Settings/SettingsDebug.php:864
+#: includes/Settings/SettingsDebug.php:878
 #, php-format
 msgid "Choose the filesystem method for file operations. By default, our plugin uses %1$s. If you prefer to use the %2$s, please note that only the %3$s method is supported."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:865
+#: includes/Settings/SettingsDebug.php:879
 msgid "PHP Filesystem Functions"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:869
+#: includes/Settings/SettingsDebug.php:883
 msgid "Warning:"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:869
+#: includes/Settings/SettingsDebug.php:883
 msgid "A code snippet is overriding this setting."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:877
+#: includes/Settings/SettingsDebug.php:891
 msgid "Document link access type"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:885
+#: includes/Settings/SettingsDebug.php:899
 msgid "Logged in (recommended)"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:886
-#: includes/Settings/SettingsDebug.php:1210
+#: includes/Settings/SettingsDebug.php:900
+#: includes/Settings/SettingsDebug.php:1224
 msgid "Full"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:903
+#: includes/Settings/SettingsDebug.php:917
 msgid "Document access denied redirect page"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:911
+#: includes/Settings/SettingsDebug.php:925
 msgid "Blank page with message (default)"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:912
+#: includes/Settings/SettingsDebug.php:926
 msgid "Login page"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:913
+#: includes/Settings/SettingsDebug.php:927
 msgid "My Account page"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:914
+#: includes/Settings/SettingsDebug.php:928
 msgid "Custom page (enter below)"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:916
+#: includes/Settings/SettingsDebug.php:930
 msgid "Select a frontend page to be used to redirect users when the document access is denied."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:929
+#: includes/Settings/SettingsDebug.php:943
 msgid "Custom external URLs not allowed."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:935
+#: includes/Settings/SettingsDebug.php:949
 msgid "Pretty document links"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:942
+#: includes/Settings/SettingsDebug.php:956
 msgid "Changes the document links to a prettier URL scheme."
 msgstr ""
 
 #. translators: 1. Permalinks type, 2. Setting link, 3. Documentation link
-#: includes/Settings/SettingsDebug.php:946
+#: includes/Settings/SettingsDebug.php:960
 #, php-format
 msgid "Pretty document links will not work when the %1$s is set to %2$s."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:947
+#: includes/Settings/SettingsDebug.php:961
 msgid "permalink setting"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:948
+#: includes/Settings/SettingsDebug.php:962
 msgid "Plain"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:950
+#: includes/Settings/SettingsDebug.php:964
 #: includes/Settings/SettingsEDI.php:369
 #: includes/Settings/SettingsUpgrade.php:111
 #: includes/Settings/SettingsUpgrade.php:121
@@ -4010,426 +4018,426 @@ msgstr ""
 msgid "Learn more"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:956
+#: includes/Settings/SettingsDebug.php:970
 msgid "Calculate document numbers (slow)"
 msgstr ""
 
 #. translators: 1. AUTO_INCREMENT, 2. one
-#: includes/Settings/SettingsDebug.php:964
+#: includes/Settings/SettingsDebug.php:978
 #, php-format
 msgid "Document numbers (such as invoice numbers) are generated using %1$s by default. Use this setting if your database auto increments with more than %2$s."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:979
+#: includes/Settings/SettingsDebug.php:993
 msgid "Allow editing of document number and date on the order page."
 msgstr ""
 
 #. translators: %s: document types
-#: includes/Settings/SettingsDebug.php:982
+#: includes/Settings/SettingsDebug.php:996
 #, php-format
 msgid "Changing document data is prohibited in some countries. This setting is disabled by default to comply with legal requirements. Only the following document types are affected: %s."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:983
+#: includes/Settings/SettingsDebug.php:997
 msgid "Credit Note"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:994
+#: includes/Settings/SettingsDebug.php:1008
 msgid "Default manual document number"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:999
+#: includes/Settings/SettingsDebug.php:1013
 msgid "0 (zero)"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1000
+#: includes/Settings/SettingsDebug.php:1014
 msgid "Next document number"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1002
+#: includes/Settings/SettingsDebug.php:1016
 msgid "Select the default value for the document number field in the \"PDF document data\" meta box when manually creating a new document."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1012
+#: includes/Settings/SettingsDebug.php:1026
 msgid "Enable automatic cleanup"
 msgstr ""
 
 #. translators: number of days
-#: includes/Settings/SettingsDebug.php:1019
+#: includes/Settings/SettingsDebug.php:1033
 #, php-format
 msgid "every %s days"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1023
+#: includes/Settings/SettingsDebug.php:1037
 msgid "Automatically clean up PDF files stored in the temporary folder (used for email attachments), and remove old document locks that prevent conflicts when generating document numbers."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1029
+#: includes/Settings/SettingsDebug.php:1043
 msgid "Output to HTML"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1035
+#: includes/Settings/SettingsDebug.php:1049
 msgid "Send the template output as HTML to the browser instead of creating a PDF."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1036
+#: includes/Settings/SettingsDebug.php:1050
 msgid "You can also add <code>&output=html</code> to the URL to apply this on a per-order basis."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1042
+#: includes/Settings/SettingsDebug.php:1056
 msgid "Embed Images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1048
+#: includes/Settings/SettingsDebug.php:1062
 msgid "Embed images only if you are experiencing issues with them loading in your PDF. Please note that this option can significantly increase the file size."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1054
+#: includes/Settings/SettingsDebug.php:1068
 msgid "Allowed image hosts"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1063
+#: includes/Settings/SettingsDebug.php:1077
 msgid "By default, images and other resources in PDFs are only loaded from this website and from the hosts serving the shop logo and product images. Add allowed hostnames here, one per line (for example cdn.example.com). Each entry allows only that exact hostname. List subdomains separately; wildcards and leading-dot notation are not supported."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1069
+#: includes/Settings/SettingsDebug.php:1083
 msgid "Reload translations for attachments"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1075
+#: includes/Settings/SettingsDebug.php:1089
 msgid "If enabled, the plugin will reload translations when generating documents for email attachments. Disable this if you are experiencing incomplete or incorrect translations in the attached PDFs."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1081
+#: includes/Settings/SettingsDebug.php:1095
 msgid "Disable document preview"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1087
+#: includes/Settings/SettingsDebug.php:1101
 msgid "Disables the document preview on the plugin settings pages."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1093
+#: includes/Settings/SettingsDebug.php:1107
 msgid "Check for unstable versions"
 msgstr ""
 
 #. translators: %1$s: open status page link anchor, %2$s: close status page link anchor
-#: includes/Settings/SettingsDebug.php:1101
+#: includes/Settings/SettingsDebug.php:1115
 #, php-format
 msgid "Enable this to check for new beta or pre-release versions and display them in the %1$sstatus page%2$s. A notice will appear when a new version is available."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1110
+#: includes/Settings/SettingsDebug.php:1124
 msgid "Enable debug output"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1126
+#: includes/Settings/SettingsDebug.php:1140
 msgid "Enable this option to output plugin errors if you're getting a blank page or other PDF generation issues."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1127
+#: includes/Settings/SettingsDebug.php:1141
 msgid "<b>Caution!</b> This setting may reveal errors (from other plugins) in other places on your site too, therefore this is not recommended to leave it enabled on live sites."
 msgstr ""
 
 #. translators: %s: &debug=true
-#: includes/Settings/SettingsDebug.php:1130
+#: includes/Settings/SettingsDebug.php:1144
 #, php-format
 msgid "You can also add %s to the URL to apply this on a per-order basis."
 msgstr ""
 
 #. translators: %s: log.htm link
-#: includes/Settings/SettingsDebug.php:1135
+#: includes/Settings/SettingsDebug.php:1149
 #, php-format
 msgid "When enabled, Dompdf logs will be saved to %s."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1145
+#: includes/Settings/SettingsDebug.php:1159
 msgid "Log to order notes"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1151
+#: includes/Settings/SettingsDebug.php:1165
 msgid "Log PDF document creation, deletion, and mark/unmark as printed to order notes."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1157
+#: includes/Settings/SettingsDebug.php:1171
 msgid "Log missing translations"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1163
+#: includes/Settings/SettingsDebug.php:1177
 msgid "Enable this option to log dynamic strings that could not be translated. This can help you identify which strings need to be registered for translation."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1169
+#: includes/Settings/SettingsDebug.php:1183
 msgid "Enable semaphore logs"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1175
+#: includes/Settings/SettingsDebug.php:1189
 msgid "Our plugin uses a semaphore class that prevents race conditions in multiple places in the code. Enable this setting only if you are having issues with document numbers, yearly reset or documents being assigned to the wrong order."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1181
+#: includes/Settings/SettingsDebug.php:1195
 msgid "Enable danger zone tools"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1187
+#: includes/Settings/SettingsDebug.php:1201
 msgid "Enables the danger zone tools. The actions performed by these tools are irreversible!"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1206
+#: includes/Settings/SettingsDebug.php:1220
 msgid "Logged in"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1207
+#: includes/Settings/SettingsDebug.php:1221
 msgid "Document can be accessed by logged in users only."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1211
+#: includes/Settings/SettingsDebug.php:1225
 msgid "Document can be accessed by everyone with the link."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1248
+#: includes/Settings/SettingsDebug.php:1262
 msgid "Unknown"
 msgstr ""
 
 #. translators: %s dependency min version
-#: includes/Settings/SettingsDebug.php:1257
-#: includes/Settings/SettingsDebug.php:1266
+#: includes/Settings/SettingsDebug.php:1271
 #: includes/Settings/SettingsDebug.php:1280
+#: includes/Settings/SettingsDebug.php:1294
 #, php-format
 msgid "%s or superior"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1273
+#: includes/Settings/SettingsDebug.php:1287
 msgid "Recommended"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1274
+#: includes/Settings/SettingsDebug.php:1288
 #: views/advanced-status.php:177
 msgid "Enabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1274
+#: includes/Settings/SettingsDebug.php:1288
 msgid "Disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1287
+#: includes/Settings/SettingsDebug.php:1301
 msgid "MySQL, MariaDB, or SQLite"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1290
+#: includes/Settings/SettingsDebug.php:1304
 msgid "Unable to detect the database server"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1301
+#: includes/Settings/SettingsDebug.php:1315
 msgid "Recommended, will use fallback functions"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1307
+#: includes/Settings/SettingsDebug.php:1321
 msgid "Required if you have images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1310
+#: includes/Settings/SettingsDebug.php:1324
 msgid "Required when using .webp images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1313
+#: includes/Settings/SettingsDebug.php:1327
 msgid "Required if you have .webp images in your documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1316
+#: includes/Settings/SettingsDebug.php:1330
 msgid "To compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1319
+#: includes/Settings/SettingsDebug.php:1333
 msgid "Recommended to compress PDF documents"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1322
+#: includes/Settings/SettingsDebug.php:1336
 msgid "For better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1325
-#: includes/Settings/SettingsDebug.php:1331
+#: includes/Settings/SettingsDebug.php:1339
+#: includes/Settings/SettingsDebug.php:1345
 msgid "Recommended for better performances"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1328
+#: includes/Settings/SettingsDebug.php:1342
 msgid "Better with transparent PNG images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1334
+#: includes/Settings/SettingsDebug.php:1348
 msgid "Required to detect custom templates and to clear the temp folder periodically"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1337
+#: includes/Settings/SettingsDebug.php:1351
 msgid "Check PHP disable_functions"
 msgstr ""
 
 #. translators: <a> tags
-#: includes/Settings/SettingsDebug.php:1341
+#: includes/Settings/SettingsDebug.php:1355
 msgid "Recommended: 128MB (especially for plugin-heavy setups)"
 msgstr ""
 
 #. translators: 1: opening anchor tag, 2: closing anchor tag
-#: includes/Settings/SettingsDebug.php:1343
+#: includes/Settings/SettingsDebug.php:1357
 #, php-format
 msgid "See: %1$sIncreasing the WordPress Memory Limit%2$s"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1351
+#: includes/Settings/SettingsDebug.php:1365
 msgid "Required to save documents to the server"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1354
+#: includes/Settings/SettingsDebug.php:1368
 msgid "Check your server configuration"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1357
+#: includes/Settings/SettingsDebug.php:1371
 msgid "Allow remote stylesheets and images"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1360
+#: includes/Settings/SettingsDebug.php:1374
 msgid "allow_url_fopen disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1363
+#: includes/Settings/SettingsDebug.php:1377
 msgid "Necessary to verify the MIME type of local images."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1366
+#: includes/Settings/SettingsDebug.php:1380
 msgid "fileinfo disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1369
+#: includes/Settings/SettingsDebug.php:1383
 msgid "To compress and decompress font and image data"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1372
+#: includes/Settings/SettingsDebug.php:1386
 msgid "base64_decode disabled"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1380
+#: includes/Settings/SettingsDebug.php:1394
 msgid "Required for IMagick"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1383
+#: includes/Settings/SettingsDebug.php:1397
 msgid "ImageMagick library, integrated via the IMagick PHP extension for advanced image processing capabilities"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1494
+#: includes/Settings/SettingsDebug.php:1508
 msgid "Writable"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1495
+#: includes/Settings/SettingsDebug.php:1509
 msgid "Not writable"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1503
+#: includes/Settings/SettingsDebug.php:1517
 msgid "Central temporary plugin folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1509
+#: includes/Settings/SettingsDebug.php:1523
 msgid "Temporary attachments folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1515
+#: includes/Settings/SettingsDebug.php:1529
 msgid "Temporary DOMPDF folder"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1521
+#: includes/Settings/SettingsDebug.php:1535
 msgid "DOMPDF fonts folder (needs to be writable for custom/remote fonts)"
 msgstr ""
 
 #. translators: %s action date
-#: includes/Settings/SettingsDebug.php:1567
+#: includes/Settings/SettingsDebug.php:1581
 #, php-format
 msgid "Scheduled to: %s"
 msgstr ""
 
 #. translators: total scheduled actions
-#: includes/Settings/SettingsDebug.php:1576
+#: includes/Settings/SettingsDebug.php:1590
 #, php-format
 msgid "Only 1 scheduled action should exist, but %s were found"
 msgstr ""
 
 #. translators: 1. open anchor tag, 2. close anchor tag
-#: includes/Settings/SettingsDebug.php:1586
+#: includes/Settings/SettingsDebug.php:1600
 #, php-format
 msgid "Scheduled action not found. Please reschedule it %1$shere%2$s."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1607
+#: includes/Settings/SettingsDebug.php:1621
 #: views/advanced-status.php:52
 #: views/advanced-status.php:246
 msgid "Status"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1608
+#: includes/Settings/SettingsDebug.php:1622
 msgid "Tools"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1609
+#: includes/Settings/SettingsDebug.php:1623
 msgid "Numbers"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1622
+#: includes/Settings/SettingsDebug.php:1636
 msgid "File System & Access"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1632
+#: includes/Settings/SettingsDebug.php:1646
 msgid "Document Display & Interaction"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1642
+#: includes/Settings/SettingsDebug.php:1656
 msgid "Document Management & Behavior"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1651
+#: includes/Settings/SettingsDebug.php:1665
 msgid "Localization & Translation"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1658
+#: includes/Settings/SettingsDebug.php:1672
 msgid "Debugging & Logging"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1666
+#: includes/Settings/SettingsDebug.php:1680
 msgid "Versioning & Stability"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1672
+#: includes/Settings/SettingsDebug.php:1686
 msgid "Advanced / Experimental"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:1787
+#: includes/Settings/SettingsDebug.php:1801
 msgid "Invalid request"
 msgstr ""
 
 #. translators: %s: comma-separated list of invalid entries.
-#: includes/Settings/SettingsDebug.php:2127
+#: includes/Settings/SettingsDebug.php:2141
 #, php-format
 msgid "These entries were ignored in Allowed image hosts: %s. Enter exact hostnames such as cdn.example.com. Wildcards, leading-dot notation, IP addresses, and localhost are not supported."
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:2147
+#: includes/Settings/SettingsDebug.php:2161
 msgid "Temporary folder moved to"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:2163
+#: includes/Settings/SettingsDebug.php:2177
 msgid "Fonts reinstalled!"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:2178
+#: includes/Settings/SettingsDebug.php:2192
 msgid "Yearly reset numbering system rescheduled!"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:2218
+#: includes/Settings/SettingsDebug.php:2232
 msgid "Released semaphore locks have been cleaned up!"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:2233
+#: includes/Settings/SettingsDebug.php:2247
 msgid "Released legacy semaphore locks have been cleaned up!"
 msgstr ""
 
-#: includes/Settings/SettingsDebug.php:2248
+#: includes/Settings/SettingsDebug.php:2262
 msgid "Extensions' license cache cleared successfully!"
 msgstr ""
 
@@ -5429,19 +5437,19 @@ msgstr ""
 msgid "Setup Wizard"
 msgstr ""
 
-#: includes/SetupWizard.php:284
+#: includes/SetupWizard.php:285
 msgid "Previous"
 msgstr ""
 
-#: includes/SetupWizard.php:289
+#: includes/SetupWizard.php:290
 msgid "Next"
 msgstr ""
 
-#: includes/SetupWizard.php:290
+#: includes/SetupWizard.php:291
 msgid "Skip this step"
 msgstr ""
 
-#: includes/SetupWizard.php:292
+#: includes/SetupWizard.php:293
 msgid "Finish"
 msgstr ""
 
@@ -5514,17 +5522,17 @@ msgid "SKU"
 msgstr ""
 
 #: languages/strings.php:14
-#: wpo-ips-functions.php:1056
+#: wpo-ips-functions.php:1063
 msgid "Product"
 msgstr ""
 
 #: languages/strings.php:15
-#: wpo-ips-functions.php:1057
+#: wpo-ips-functions.php:1064
 msgid "Quantity"
 msgstr ""
 
 #: languages/strings.php:16
-#: wpo-ips-functions.php:1058
+#: wpo-ips-functions.php:1065
 msgid "Price"
 msgstr ""
 
@@ -6380,30 +6388,30 @@ msgstr ""
 msgid "Error creating PDF, please contact the site owner."
 msgstr ""
 
-#: wpo-ips-functions.php:2417
+#: wpo-ips-functions.php:2424
 msgid "Unnamed account"
 msgstr ""
 
-#: wpo-ips-functions.php:2878
+#: wpo-ips-functions.php:2885
 msgid "Order details"
 msgstr ""
 
-#: wpo-ips-functions.php:2879
+#: wpo-ips-functions.php:2886
 msgid "Order meta"
 msgstr ""
 
-#: wpo-ips-functions.php:2880
+#: wpo-ips-functions.php:2887
 msgid "Before order table"
 msgstr ""
 
-#: wpo-ips-functions.php:2881
+#: wpo-ips-functions.php:2888
 msgid "After order table"
 msgstr ""
 
-#: wpo-ips-functions.php:2882
+#: wpo-ips-functions.php:2889
 msgid "Customer address section"
 msgstr ""
 
-#: wpo-ips-functions.php:2883
+#: wpo-ips-functions.php:2890
 msgid "Customer details"
 msgstr ""
