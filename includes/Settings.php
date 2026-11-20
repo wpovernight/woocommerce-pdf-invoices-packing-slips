@@ -18,24 +18,26 @@ if ( ! class_exists( '\\WPO\\IPS\\Settings' ) ) :
 
 class Settings {
 
-	public ?SettingsCallbacks $callbacks     = null;
-	public ?SettingsGeneral $general         = null;
-	public ?SettingsDocuments $documents     = null;
-	public ?SettingsDebug $debug             = null;
-	public ?SettingsUpgrade $upgrade         = null;
-	public ?SettingsEDI $edi                 = null;
+	public ?SettingsCallbacks $callbacks       = null;
+	public ?SettingsGeneral $general           = null;
+	public ?SettingsDocuments $documents       = null;
+	public ?SettingsDebug $debug               = null;
+	public ?SettingsUpgrade $upgrade           = null;
+	public ?SettingsEDI $edi                   = null;
 
-	public string|false $options_page_hook   = false;
-	public array $general_settings           = array();
-	public array $debug_settings             = array();
-	public array $edi_settings               = array();
+	public string|false $options_page_hook     = false;
+	public array $general_settings             = array();
+	public array $debug_settings               = array();
+	public array $edi_settings                 = array();
 
-	private array $installed_templates       = array();
-	private array $installed_templates_cache = array();
-	private array $template_list_cache       = array();
+	private array $installed_templates         = array();
+	private array $installed_templates_cache   = array();
+	private array $template_list_cache         = array();
+	private bool $template_fallback_logged     = false;
+	private ?string $template_validation_error = null;
 
-	protected bool $settings_loaded          = false;
-	protected static ?self $_instance        = null;
+	protected bool $settings_loaded            = false;
+	protected static ?self $_instance          = null;
 
 	/**
 	 * Singleton instance accessor.
@@ -354,12 +356,21 @@ class Settings {
 					$form_data = stripslashes_deep( $form_data );
 
 					foreach ( $form_data as $option_key => $form_settings ) {
+						// Template discovery must not be replaced by submitted preview data.
+						if ( 'wpo_wcpdf_installed_template_paths' === $option_key ) {
+							continue;
+						}
+
 						if ( ! empty( $option_key ) && false === apply_filters( 'wpo_wcpdf_preview_filter_option', 0 === strpos( $option_key, 'wpo_wcpdf' ), $option_key ) ) {
 							continue; // not our business
 						}
 
 						// validate option values
 						$form_settings = $this->get_instance( 'callbacks' )->validate( $form_settings );
+
+						if ( null !== $this->get_template_validation_error() ) {
+							wp_send_json_error( array( 'error' => $this->get_template_validation_error() ) );
+						}
 
 						// filter the options
 						add_filter( "option_{$option_key}", function( $_value, $_option ) use ( $form_settings ) {
@@ -865,43 +876,121 @@ class Settings {
 	}
 
 	/**
-	 * Get template path by template name or path.
+	 * Get an installed template path by ID or a recognized legacy path.
 	 *
-	 * @param string $template_path Template name or path.
+	 * @param string $template_path Template ID or legacy path.
 	 * @return string
 	 */
 	public function get_template_path( string $template_path = '' ): string {
-		$selected_template = $template_path
-			? sanitize_text_field( $template_path )
+		$selected_template = '' !== $template_path
+			? $template_path
 			: ( $this->get_settings( 'general' )['template_path'] ?? '' );
+		$template          = $this->find_installed_template( $selected_template, $this->get_installed_templates() );
 
-		// return default path if no template selected
-		if ( empty( $selected_template ) ) {
-			return wp_normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
+		if ( null !== $template ) {
+			return $template['path'];
 		}
 
-		$installed_templates = $this->get_installed_templates();
+		if ( ! empty( $selected_template ) && ! $this->template_fallback_logged ) {
+			$this->template_fallback_logged = true;
+			wcpdf_log_error( 'The selected PDF template is unavailable or invalid. Using the Simple template for this request.', 'warning' );
+		}
 
-		if ( in_array( $selected_template, $installed_templates, true ) ) {
-			return array_search( $selected_template, $installed_templates );
-		} else {
-			// unknown template or full template path (filter override)
-			$template_path = wp_normalize_path( $selected_template );
+		return wp_normalize_path( WPO_WCPDF()->plugin_path() . '/templates/Simple' );
+	}
 
-			// add base path, checking if it's not already there
-			// alternative setups like Bedrock have WP_CONTENT_DIR & ABSPATH separated
-			if ( defined( 'WP_CONTENT_DIR' ) && ! empty( WP_CONTENT_DIR ) && false !== strpos( WP_CONTENT_DIR, ABSPATH ) ) {
-				$base_path = wp_normalize_path( ABSPATH );
-			} else {
-				$base_path = wp_normalize_path( WP_CONTENT_DIR );
+	/**
+	 * Normalize a local template path or ID without accepting wrappers or traversal.
+	 *
+	 * @param mixed $path Template path or ID.
+	 * @return string|null
+	 */
+	private function normalize_template_path( mixed $path ): ?string {
+		if ( ! is_string( $path ) || '' === $path || str_contains( $path, "\0" ) ) {
+			return null;
+		}
+
+		$path = str_replace( '\\', '/', $path );
+
+		if ( str_contains( $path, '://' ) || preg_match( '#(^|/)\.\.(/|$)#', $path ) ) {
+			return null;
+		}
+
+		$path = untrailingslashit( wp_normalize_path( $path ) );
+
+		return '' !== $path ? $path : null;
+	}
+
+	/**
+	 * Match a selection against installed IDs and recognized legacy paths.
+	 *
+	 * @param mixed $selected_template Submitted or stored selection.
+	 * @param array $installed_templates Installed paths mapped to template IDs.
+	 * @return array|null Matched path and ID, or null when unavailable or invalid.
+	 */
+	private function find_installed_template( mixed $selected_template, array $installed_templates ): ?array {
+		$selected_template = $this->normalize_template_path( $selected_template );
+
+		if ( null === $selected_template ) {
+			return null;
+		}
+
+		foreach ( $installed_templates as $path => $template_id ) {
+			$path = $this->normalize_template_path( $path );
+
+			if ( null === $path || ! is_string( $template_id ) || '' === $template_id ) {
+				continue;
 			}
 
-			if ( ! empty( $template_path ) && false === strpos( $template_path, $base_path ) ) {
-				$template_path = wp_normalize_path( $base_path . $template_path );
+			if (
+				$selected_template === $template_id ||
+				$selected_template === $path ||
+				ltrim( $selected_template, '/' ) === ltrim( $this->get_relative_template_path( $path ), '/' )
+			) {
+				return array(
+					'path' => $path,
+					'id'   => $template_id,
+				);
 			}
 		}
 
-		return $template_path;
+		return null;
+	}
+
+	/**
+	 * Normalize a template setting to an installed ID, retaining the previous selection on failure.
+	 *
+	 * @param mixed $template_path Submitted template ID or legacy path.
+	 * @return string
+	 */
+	public function validate_template_path( mixed $template_path ): string {
+		$this->template_validation_error = null;
+
+		$template = $this->find_installed_template( $template_path, $this->get_installed_templates( true ) );
+
+		if ( null !== $template ) {
+			return $template['id'];
+		}
+
+		$this->template_validation_error = __( 'The selected PDF template could not be verified. The previous selection has been retained.', 'woocommerce-pdf-invoices-packing-slips' );
+
+		if ( function_exists( 'add_settings_error' ) && empty( get_settings_errors( 'wpo_wcpdf_template_path' ) ) ) {
+			add_settings_error( 'wpo_wcpdf_template_path', 'wpo_wcpdf_invalid_template', $this->template_validation_error, 'warning' );
+		}
+
+		$current_settings  = get_option( 'wpo_wcpdf_settings_general', array() );
+		$previous_template = is_array( $current_settings ) ? ( $current_settings['template_path'] ?? 'default/Simple' ) : 'default/Simple';
+
+		return is_string( $previous_template ) ? $previous_template : 'default/Simple';
+	}
+
+	/**
+	 * Get the latest template validation error for AJAX and wizard feedback.
+	 *
+	 * @return string|null
+	 */
+	public function get_template_validation_error(): ?string {
+		return $this->template_validation_error;
 	}
 
 	/**
@@ -911,15 +1000,15 @@ class Settings {
 	 * @return array
 	 */
 	public function get_installed_templates( bool $force_reload = false ): array {
-		// because this method can be called (too) early we load from a cached list in those cases
-		// this cache is updated each time the template settings are saved/updated
-		if ( ! did_action( 'wpo_wcpdf_init_documents' ) && ( $cached_template_list = $this->get_template_list_cache() ) ) {
-			return $cached_template_list;
+		// Prefer discovery already performed in this request, including a forced refresh.
+		if ( ! $force_reload && ! empty( $this->installed_templates ) ) {
+			return $this->installed_templates;
 		}
 
-		// to save resources on the disk operations we only do this once
-		if ( $force_reload === false && ! empty ( $this->installed_templates ) ) {
-			return $this->installed_templates;
+		// because this method can be called (too) early we load from a cached list in those cases
+		// this cache is updated each time the template settings are saved/updated
+		if ( ! $force_reload && ! did_action( 'wpo_wcpdf_init_documents' ) && ( $cached_template_list = $this->get_template_list_cache() ) ) {
+			return $cached_template_list;
 		}
 
 		$installed_templates = array();
@@ -973,12 +1062,24 @@ class Settings {
 		$template_list        = get_option( 'wpo_wcpdf_installed_template_paths', array() );
 		$file_system_instance = WPO_WCPDF()->get_instance( 'file_system' );
 
-		if ( ! empty( $template_list ) ) {
+		if ( is_array( $template_list ) && ! empty( $template_list ) ) {
 			$checked_list = array();
 			$outdated     = false;
 
 			// cache could be outdated, so we check whether the folders exist
 			foreach ( $template_list as $path => $template_id ) {
+				$normalized_path = $this->normalize_template_path( $path );
+
+				if ( null === $normalized_path || ! is_string( $template_id ) || '' === $template_id ) {
+					$outdated = true;
+					continue;
+				}
+
+				if ( $normalized_path !== $path ) {
+					$outdated = true;
+					$path     = $normalized_path;
+				}
+
 				if ( $file_system_instance->is_dir( $path ) ) {
 					$checked_list[$path] = $template_id; // folder exists
 					continue;

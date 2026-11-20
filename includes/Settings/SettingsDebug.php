@@ -507,7 +507,21 @@ class SettingsDebug {
 			wp_send_json_error( compact( 'message' ) );
 		}
 
+		$template_error = null;
+		if ( 'wpo_wcpdf_settings_general' === $settings_option && array_key_exists( 'template_path', $new_settings ) ) {
+			$settings_instance             = WPO_WCPDF()->get_instance( 'settings' );
+			$new_settings['template_path'] = $settings_instance->validate_template_path( $new_settings['template_path'] );
+			$template_error                = $settings_instance->get_template_validation_error();
+		}
+
 		$updated = update_option( $settings_option, $new_settings );
+		if ( null !== $template_error ) {
+			$message = $updated
+				? __( 'Other settings were imported.', 'woocommerce-pdf-invoices-packing-slips' ) . ' ' . $template_error
+				: $template_error;
+			wp_send_json_error( compact( 'message' ) );
+		}
+
 		if ( $updated ) {
 			$message = sprintf(
 				/* translators: settings type */

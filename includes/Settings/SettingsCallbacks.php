@@ -1157,6 +1157,10 @@ class SettingsCallbacks {
 			}
 		}
 
+		if ( array_key_exists( 'template_path', $output ) || ( is_array( $input ) && array_key_exists( 'template_path', $input ) ) ) {
+			$output['template_path'] = WPO_WCPDF()->get_instance( 'settings' )->validate_template_path( $output['template_path'] ?? '' );
+		}
+
 		// Return the array processing any additional functions filtered by this action.
 		return (array) apply_filters(
 			'wpo_wcpdf_validate_input',
