@@ -323,6 +323,9 @@ class ThirdPartyPlugins {
 	 * container and once on the child items). When the container has a static price, Mix and Match
 	 * hides the child prices, so we keep them empty instead of falling back to our own price.
 	 *
+	 * When the child item subtotals are not added to the container, a container priced per product
+	 * has no price of its own, so we hide its zero price as long as its child items show theirs.
+	 *
 	 * @param array  $data
 	 * @param mixed  $order
 	 * @param string $document_type
@@ -335,6 +338,23 @@ class ThirdPartyPlugins {
 			! isset( $data['item'] )                          ||
 			! $data['item'] instanceof \WC_Order_Item_Product
 		) {
+			return $data;
+		}
+
+		if ( wc_mnm_is_container_order_item( $data['item'] ) ) {
+			if (
+				0.0 === (float) $data['item']->get_subtotal() &&
+				// Mix and Match filter: whether child item subtotals are included in the container subtotal.
+				! apply_filters( 'wc_mnm_add_child_order_item_subtotals', true, $data['item'], $order )
+			) {
+				foreach ( wc_mnm_get_child_order_items( $data['item'], $order ) as $child_item ) {
+					if ( '' !== trim( wp_strip_all_tags( (string) $order->get_formatted_line_subtotal( $child_item ) ) ) ) {
+						$data['order_price'] = '';
+						break;
+					}
+				}
+			}
+
 			return $data;
 		}
 
