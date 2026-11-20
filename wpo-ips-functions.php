@@ -653,6 +653,13 @@ function wpo_wcpdf_sanitize_html_content( string $html, string $context = '', ar
 		);
 	}
 
+	// Shop names and document titles may carry inline styling (e.g. a colored
+	// span), but stay inert: no URLs, no scripting, no event-capable attributes.
+	// Extend per context via the 'wpo_wcpdf_sanitize_html_default_allow_tags' filter.
+	if ( in_array( $context, array( 'shop_name', 'title' ), true ) ) {
+		$default_tags['span'] = array( 'class', 'style' );
+	}
+
 	$allow_tags = array_merge(
 		apply_filters( 'wpo_wcpdf_sanitize_html_default_allow_tags', $default_tags, $context ),
 		$allow_tags

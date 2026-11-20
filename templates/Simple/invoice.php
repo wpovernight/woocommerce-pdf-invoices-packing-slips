@@ -112,7 +112,7 @@
 	<thead>
 		<tr>
 			<?php foreach ( wpo_wcpdf_get_simple_template_default_table_headers( $this ) as $column_class => $column_title ) : ?>
-				<th class="<?php echo esc_attr( $column_class ); ?>"><?php echo esc_html( $column_title ); ?></th>
+				<th class="<?php echo esc_attr( $column_class ); ?>"><?php echo wpo_wcpdf_sanitize_html_content( $column_title, 'title' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized by wpo_wcpdf_sanitize_html_content() ?></th>
 			<?php endforeach; ?>
 		</tr>
 	</thead>
