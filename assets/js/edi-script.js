@@ -185,24 +185,34 @@ jQuery( function ( $ ) {
 
 					if ( typeof value === 'undefined' || value === null || value === '' ) {
 						color = identifier.required ? '#d63638' : '#996800';
-						value = `<span style="color:${color};">${identifier.required ? wpo_ips_edi.missing : wpo_ips_edi.optional}</span>`;
+						value = $( '<span>' ).css( 'color', color ).text( identifier.required ? wpo_ips_edi.missing : wpo_ips_edi.optional );
 					}
 
 					if ( key === 'vat_number' && identifier.value && ! wpo_ips_edi_has_country_prefix( identifier.value ) ) {
-						note = `<br><small style="color:#996800;">${wpo_ips_edi.vat_warning}</small>`;
+						note = $( '<br>' ).add( $( '<small>' ).css( 'color', '#996800' ).text( wpo_ips_edi.vat_warning ) );
 					}
 
-					$tbody.append(`
-						<tr>
-							<td>${label}</td>
-							<td>${value}${note}</td>
-						</tr>
-					`);
+					const $value = $( '<td>' );
+					if ( value instanceof jQuery ) {
+						$value.append( value );
+					} else {
+						$value.text( value );
+					}
+					$value.append( note );
+
+					$tbody.append(
+						$( '<tr>' ).append(
+							$( '<td>' ).text( label ),
+							$value
+						)
+					);
 				} );
 			} else {
 				const message = response.data || wpo_ips_edi.no_identifiers_found;
 				$tbody.append(
-					`<tr><td colspan="2">${message}</td></tr>`
+					$( '<tr>' ).append(
+						$( '<td>' ).attr( 'colspan', '2' ).text( message )
+					)
 				);
 			}
 		} );

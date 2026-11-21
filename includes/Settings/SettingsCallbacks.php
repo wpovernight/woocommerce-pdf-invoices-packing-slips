@@ -1152,6 +1152,11 @@ class SettingsCallbacks {
 						$value = $this->normalize_identifier( (string) $value );
 					}
 
+					// Sanitize the checkout field label on save.
+					if ( 'checkout_field_label' === $key ) {
+						$value = sanitize_text_field( (string) $value );
+					}
+
 					$output[ $key ] = $value;
 				}
 			}
