@@ -172,8 +172,9 @@ class Notices {
 			return;
 		}
 
-		$is_settings_page = \wpo_ips_is_settings_page();
-		$is_plugins_page  = \wpo_ips_is_plugins_page();
+		$is_settings_page    = \wpo_ips_is_settings_page();
+		$is_plugins_page     = \wpo_ips_is_plugins_page();
+		$can_manage_settings = \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings();
 
 		$notices = array(
 			array( array( $this, 'nginx_detected_notice' ), $is_settings_page ),
@@ -184,9 +185,9 @@ class Notices {
 			array( array( $this, 'install_wizard_notice' ), $is_settings_page ),
 			array( array( $this, 'display_admin_notice_for_shop_address' ), $is_settings_page ),
 			array( array( $this, 'legacy_addon_notices' ), $is_settings_page || $is_plugins_page ),
-			array( array( $this, 'mailpoet_mta_detected_notice' ), true ),
+			array( array( $this, 'mailpoet_mta_detected_notice' ), $can_manage_settings ),
 			array( array( $this, 'rtl_detected_notice' ), true ),
-			array( array( $this, 'no_dir_notice' ), true ),
+			array( array( $this, 'no_dir_notice' ), $can_manage_settings ),
 		);
 
 		foreach ( $notices as $notice ) {
@@ -228,6 +229,12 @@ class Notices {
 
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), $nonce_action ) ) {
 			wcpdf_log_error( 'Invalid nonce for action: ' . $query_arg );
+			wp_safe_redirect( $redirect_url );
+			exit;
+		}
+
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			wcpdf_log_error( 'Insufficient permissions for action: ' . $query_arg );
 			wp_safe_redirect( $redirect_url );
 			exit;
 		}
