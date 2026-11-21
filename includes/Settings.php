@@ -715,7 +715,7 @@ class Settings {
 	public function get_output_format( ?object $document = null, ?array $request = null ): string {
 		$output_format = 'pdf'; // default
 
-		if ( isset( $this->get_settings( 'debug' )['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
+		if ( isset( $this->get_settings( 'debug' )['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] && $this->user_can_manage_settings() ) ) {
 			$output_format = 'html';
 		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats, true ) ) {
 			$output_format = esc_attr( $request['output'] );
