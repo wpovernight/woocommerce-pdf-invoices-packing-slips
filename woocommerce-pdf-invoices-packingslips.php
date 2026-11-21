@@ -233,10 +233,12 @@ class WPO_WCPDF {
 		// Register document routing on every request so rewrite rebuilds retain its rule.
 		$this->get_instance( 'endpoint' );
 
+		// Compatibility hooks must be registered on every request.
+		$this->get_instance( 'third_party_plugins' );
+
 		// Document-related runtime
 		if ( $is_document_context ) {
 			$this->get_instance( 'file_system' );
-			$this->get_instance( 'third_party_plugins' );
 			$this->get_instance( 'font_synchronizer' );
 		}
 
