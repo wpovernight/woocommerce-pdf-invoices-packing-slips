@@ -46,7 +46,6 @@ class Main {
 		$this->register_document_link_email_hooks();
 		
 		// WP
-		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );
 		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
 		
 		// Woo
@@ -1710,33 +1709,6 @@ class Main {
 			'_wcpdf_invoice_date_formatted' => esc_html__( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		return $meta_to_export + $private_address_meta;
-	}
-
-	/**
-	 * Set the default PHPMailer validator to 'php' ( which uses filter_var($address, FILTER_VALIDATE_EMAIL) )
-	 * This avoids issues with the presence of attachments affecting email address validation in some distros of PHP 7.3
-	 * See: https://wordpress.org/support/topic/invalid-address-setfrom/#post-11583815
-	 * Fixed in WP5.5 due to upgrade to newer PHPMailer
-	 * 
-	 * @param array $mailArray The array of mail data being passed to PHPMailer
-	 * @return array The unmodified mail array, after setting the PHPMailer validator
-	 */
-	public function set_phpmailer_validator( array $mailArray ): array {
-		if ( version_compare( get_bloginfo( 'version' ), '5.5-dev', '>=' ) ) {
-			return $mailArray;
-		}
-		
-		global $phpmailer;
-		
-		if ( ! $phpmailer instanceof \PHPMailer ) {
-			require_once ABSPATH . WPINC . '/class-phpmailer.php';
-			require_once ABSPATH . WPINC . '/class-smtp.php';
-			$phpmailer = new \PHPMailer( true );
-		}
-		
-		$phpmailer::$validator = 'php';
-
-		return $mailArray;
 	}
 
 	/**
