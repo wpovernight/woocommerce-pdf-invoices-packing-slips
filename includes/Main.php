@@ -583,6 +583,22 @@ class Main {
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
 		}
 
+		// Refund objects only support specific document types (e.g. credit notes).
+		if ( $order instanceof \WC_Order_Refund ) {
+			/**
+			 * Filters the document types that may be generated for a refund object.
+			 *
+			 * @param string[]         $allowed_document_types Document types allowed on refund objects.
+			 * @param \WC_Order_Refund $order                  The refund object.
+			 */
+			$allowed_document_types = apply_filters( 'wpo_ips_refund_allowed_document_types', array( 'credit-note' ), $order );
+
+			if ( ! in_array( $document_type, $allowed_document_types, true ) ) {
+				$message = esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' );
+				wcpdf_safe_redirect_or_die( $redirect_url, $message );
+			}
+		}
+
 		// if we got here, we're safe to go!
 		try {
 			if ( isset( $request['bulk'] ) ) {
