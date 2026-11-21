@@ -2068,7 +2068,7 @@ class SettingsDebug {
 
 		check_ajax_referer( 'wpo_ips_plugin_report', 'nonce' );
 
-		$include_sensitive    = isset( $_GET['include_sensitive'] )
+		$include_sensitive    = current_user_can( 'manage_options' ) && isset( $_GET['include_sensitive'] )
 			? filter_var( wp_unslash( $_GET['include_sensitive'] ), FILTER_VALIDATE_BOOLEAN )
 			: false;
 		$output_html          = isset( $_GET['output_html'] )
