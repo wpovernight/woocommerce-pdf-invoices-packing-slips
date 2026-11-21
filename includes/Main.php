@@ -93,15 +93,15 @@ class Main {
 	/**
 	 * Attach document to WooCommerce email
 	 * 
-	 * @param array           $attachments
-	 * @param string          $email_id
+	 * @param mixed           $attachments Passed through unchanged when not an array.
+	 * @param mixed           $email_id
 	 * @param mixed           $order
 	 * @param mixed|\WC_Email $email
-	 * @return array
+	 * @return mixed
 	 */
-	public function attach_document_to_email( array $attachments, string $email_id, mixed $order, $email = null ): array {
+	public function attach_document_to_email( $attachments, $email_id, mixed $order, $email = null ) {
 		// check if all variables properly set
-		if ( ! is_object( $order ) || ! isset( $email_id ) ) {
+		if ( ! is_object( $order ) || ! isset( $email_id ) || ! is_array( $attachments ) || ! is_string( $email_id ) ) {
 			return $attachments;
 		}
 
