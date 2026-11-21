@@ -34,6 +34,7 @@ class ThirdPartyPlugins {
 		$this->register_subscriptions_hooks();
 		$this->register_item_row_class_hooks();
 		$this->register_composite_products_hooks();
+		$this->register_mix_and_match_hooks();
 		$this->register_order_status_hooks();
 		$this->register_aelia_hooks();
 		$this->register_german_market_hooks();
@@ -315,6 +316,123 @@ class ThirdPartyPlugins {
 	}
 
 	/**
+	 * Hide the child item prices that WooCommerce Mix and Match Products hides or adds to the container.
+	 *
+	 * When the container is priced per product, Mix and Match adds the child item subtotals to the
+	 * container item subtotal, so the child prices would otherwise be listed twice (once on the
+	 * container and once on the child items). When the container has a static price, Mix and Match
+	 * hides the child prices, so we keep them empty instead of falling back to our own price.
+	 *
+	 * When the child item subtotals are not added to the container, a container priced per product
+	 * has no price of its own, so we hide its zero price as long as its child items show theirs.
+	 *
+	 * @param array  $data
+	 * @param mixed  $order
+	 * @param string $document_type
+	 * @return array
+	 */
+	public function mix_and_match_order_price( $data, $order, $document_type = '' ) {
+		if (
+			! is_array( $data )                               ||
+			! $order instanceof \WC_Abstract_Order            ||
+			! isset( $data['item'] )                          ||
+			! $data['item'] instanceof \WC_Order_Item_Product
+		) {
+			return $data;
+		}
+
+		if ( wc_mnm_is_container_order_item( $data['item'] ) ) {
+			if (
+				0.0 === (float) $data['item']->get_subtotal() &&
+				// Mix and Match filter: whether child item subtotals are included in the container subtotal.
+				! apply_filters( 'wc_mnm_add_child_order_item_subtotals', true, $data['item'], $order )
+			) {
+				foreach ( wc_mnm_get_child_order_items( $data['item'], $order ) as $child_item ) {
+					if ( '' !== trim( wp_strip_all_tags( (string) $order->get_formatted_line_subtotal( $child_item ) ) ) ) {
+						$data['order_price'] = '';
+						break;
+					}
+				}
+			}
+
+			return $data;
+		}
+
+		$container_item = wc_mnm_get_order_item_container( $data['item'], $order );
+
+		if ( empty( $container_item ) ) {
+			return $data;
+		}
+
+		$order_price = $order->get_formatted_line_subtotal( $data['item'] );
+
+		if (
+			'' === trim( wp_strip_all_tags( (string) $order_price ) ) ||
+			// Mix and Match filter: whether child item subtotals are included in the container subtotal.
+			apply_filters( 'wc_mnm_add_child_order_item_subtotals', true, $container_item, $order )
+		) {
+			$data['order_price'] = '';
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Output WooCommerce Mix and Match Products styles for the Simple template,
+	 * only when the order contains Mix and Match containers.
+	 *
+	 * @param string                     $document_type
+	 * @param OrderDocument|Summary|null $document
+	 * @return void
+	 */
+	public function mix_and_match_styles( string $document_type, OrderDocument|Summary|null $document = null ): void {
+		if ( empty( $document ) || empty( $document->order ) || ! $document->order instanceof \WC_Abstract_Order ) {
+			return;
+		}
+
+		$template_path    = explode( '/', untrailingslashit( $document->get_template_path() ) );
+		$current_template = end( $template_path );
+
+		if ( 'Simple' !== $current_template ) {
+			return;
+		}
+
+		$has_mix_and_match_items = false;
+		foreach ( $document->order->get_items() as $item ) {
+			if ( wc_mnm_is_container_order_item( $item ) ) {
+				$has_mix_and_match_items = true;
+				break;
+			}
+		}
+
+		if ( ! $has_mix_and_match_items ) {
+			return;
+		}
+		?>
+		.order-details tr.mnm_table_item td.product {
+			padding-left: 5mm;
+		}
+
+		.order-details tr.mnm_table_container td {
+			border-bottom: 0;
+		}
+
+		.order-details tr.mnm_table_item td {
+			border: 0;
+		}
+
+		/* keep a Mix and Match container and its child items on the same page */
+		.order-details tr.mnm_table_container {
+			page-break-after: avoid;
+		}
+
+		.order-details tr.mnm_table_item {
+			page-break-before: avoid;
+		}
+		<?php
+	}
+
+	/**
 	 * Filter callback to add Dokan vendor data as seller/supplier data for CII and UBL documents.
 	 *
 	 * @param array  $data
@@ -437,7 +555,7 @@ class ThirdPartyPlugins {
 	}
 	
 	/**
-	 * Register hooks to add CSS classes to item rows for compatibility with product bundles, chained products and composite products
+	 * Register hooks to add CSS classes to item rows for compatibility with product bundles, chained products, composite products and mix and match products
 	 *
 	 * @return void
 	 */
@@ -447,13 +565,15 @@ class ThirdPartyPlugins {
 		$has_yith_bundles       = class_exists( 'YITH_WCPB' ) || class_exists( 'YITH_WCPB_Frontend' );
 		$has_chained_products   = class_exists( 'SA_WC_Chained_Products' ) || class_exists( 'WC_Chained_Products' );
 		$has_composite_products = function_exists( 'wc_cp_is_composited_order_item' ) && function_exists( 'wc_cp_is_composite_container_order_item' );
+		$has_mix_and_match      = function_exists( 'wc_mnm_get_order_item_container' ) && function_exists( 'wc_mnm_is_container_order_item' );
 
 		if (
 			! $has_wc_bundles &&
 			! $has_wpc_bundles &&
 			! $has_yith_bundles &&
 			! $has_chained_products &&
-			! $has_composite_products
+			! $has_composite_products &&
+			! $has_mix_and_match
 		) {
 			return;
 		}
@@ -465,7 +585,8 @@ class ThirdPartyPlugins {
 				$has_wpc_bundles,
 				$has_yith_bundles,
 				$has_chained_products,
-				$has_composite_products
+				$has_composite_products,
+				$has_mix_and_match
 			): string {
 				if ( empty( $item_id ) ) {
 					$item_id = $this->get_item_id_from_classes( $classes );
@@ -495,6 +616,10 @@ class ThirdPartyPlugins {
 					$classes = $this->maybe_add_composite_product_class( $classes, $order, $item_id );
 				}
 
+				if ( $has_mix_and_match ) {
+					$classes = $this->maybe_add_mix_and_match_class( $classes, $order, $item_id );
+				}
+
 				return $classes;
 			},
 			10,
@@ -517,6 +642,23 @@ class ThirdPartyPlugins {
 
 		add_filter( 'wpo_wcpdf_order_item_data', array( $this, 'composite_products_order_price' ), 10, 3 );
 		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'composite_products_styles' ), 10, 2 );
+	}
+
+	/**
+	 * Register hooks for WooCommerce Mix and Match Products compatibility
+	 *
+	 * @return void
+	 */
+	private function register_mix_and_match_hooks(): void {
+		if (
+			! function_exists( 'wc_mnm_get_order_item_container' ) ||
+			! function_exists( 'wc_mnm_is_container_order_item' )
+		) {
+			return;
+		}
+
+		add_filter( 'wpo_wcpdf_order_item_data', array( $this, 'mix_and_match_order_price' ), 10, 3 );
+		add_action( 'wpo_wcpdf_custom_styles', array( $this, 'mix_and_match_styles' ), 10, 2 );
 	}
 
 	/**
@@ -703,6 +845,30 @@ class ThirdPartyPlugins {
 				}
 				break;
 			}
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * WooCommerce Mix and Match Products
+	 *
+	 * @param string             $classes
+	 * @param \WC_Abstract_Order $order
+	 * @param int                $item_id
+	 * @return string
+	 */
+	private function maybe_add_mix_and_match_class( string $classes, \WC_Abstract_Order $order, int $item_id ): string {
+		$order_item = $order->get_item( $item_id );
+
+		if ( ! $order_item instanceof \WC_Order_Item_Product ) {
+			return $classes;
+		}
+
+		if ( wc_mnm_get_order_item_container( $order_item, $order ) ) {
+			$classes .= ' mnm_table_item';
+		} elseif ( wc_mnm_is_container_order_item( $order_item ) ) {
+			$classes .= ' mnm_table_container';
 		}
 
 		return $classes;
