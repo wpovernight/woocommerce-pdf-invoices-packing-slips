@@ -1908,6 +1908,10 @@ class Settings {
 	public function sync_shop_address_with_woo(): void {
 		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
 
+		if ( ! $this->user_can_manage_settings() ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
+		}
+
 		$address_field = ! empty( $_POST['address_field'] )
 			? sanitize_text_field( wp_unslash( $_POST['address_field'] ) )
 			: '';
