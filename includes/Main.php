@@ -490,15 +490,23 @@ class Main {
 			$order_id = reset( $order_ids );
 			$order    = wc_get_order( $order_id );
 
-			if ( $order && $order->get_status() == 'auto-draft' ) {
-				$message = esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' );
-				wcpdf_safe_redirect_or_die( null, $message );
-			} elseif ( ! $order ) {
-				$message = sprintf(
-					/* translators: %s: Order ID */
-					esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ),
-					$order_id
-				);
+			if ( ! $order || 'auto-draft' === $order->get_status() ) {
+				// Same response as a failed credential check, so a missing or unsaved order is not revealed.
+				if ( ! Admin::user_can_manage_document( $document_type ) ) {
+					$message = esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' );
+					wcpdf_safe_redirect_or_die( $redirect_url, $message );
+				}
+
+				if ( ! $order ) {
+					$message = sprintf(
+						/* translators: %s: Order ID */
+						esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						$order_id
+					);
+				} else {
+					$message = esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' );
+				}
+
 				wcpdf_safe_redirect_or_die( null, $message );
 			}
 		}
