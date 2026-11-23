@@ -1028,9 +1028,12 @@ function wpo_ips_edi_get_identifier_mappings( string $country = '', string $type
 /**
  * Format a company registration number for EDI output.
  *
- * This intentionally avoids digits-only normalization because some countries use
- * alphanumeric company registration numbers. By default, it trims the value and
- * removes whitespace only.
+ * By default, it trims the value and removes whitespace only, because some
+ * countries use alphanumeric company registration numbers. When the country's
+ * registration_number identifier mapping defines normalization rules
+ * (strip_prefixes, keep_pattern, length), those are applied as well. Example:
+ * Belgian enterprise numbers (ICD 0208) must be 10 digits without the "BE"
+ * prefix (PEPPOL-COMMON-R043).
  *
  * @param string $registration_number Registration number to format.
  * @param string $country             Country code in ISO 3166-1 alpha-2 format.
@@ -1042,12 +1045,100 @@ function wpo_ips_edi_format_registration_number( string $registration_number, st
 	$registration_number     = preg_replace( '/\s+/', '', $registration_number ) ?? '';
 	$country                 = strtoupper( trim( $country ) );
 
+	$registration_number = wpo_ips_edi_apply_registration_number_mapping_rules( $registration_number, $country );
+
 	return (string) apply_filters(
 		'wpo_ips_edi_format_registration_number',
 		$registration_number,
 		$country,
 		$raw_registration_number
 	);
+}
+
+/**
+ * Apply country-specific registration number normalization rules from the identifier mappings.
+ *
+ * Rules are taken from the first registration_number mapping that defines any of
+ * strip_prefixes, keep_pattern or length. If the normalized value does not match
+ * the expected length(s), the original value is returned unchanged so malformed
+ * input is never mangled. Example: for Belgium, the "BE" prefix is only stripped
+ * when the remainder is exactly 10 digits (PEPPOL-COMMON-R043).
+ *
+ * @param string $registration_number Registration number with whitespace removed.
+ * @param string $country             Country code in ISO 3166-1 alpha-2 format.
+ * @return string
+ */
+function wpo_ips_edi_apply_registration_number_mapping_rules( string $registration_number, string $country ): string {
+	if ( '' === $registration_number || '' === $country ) {
+		return $registration_number;
+	}
+
+	$configs = wpo_ips_edi_get_identifier_mappings( $country, 'registration_number' );
+
+	if ( empty( $configs ) || ! is_array( $configs ) ) {
+		return $registration_number;
+	}
+
+	foreach ( $configs as $config ) {
+		if ( ! is_array( $config ) ) {
+			continue;
+		}
+
+		$has_rules = ! empty( $config['strip_prefixes'] ) || ! empty( $config['keep_pattern'] ) || ! empty( $config['length'] );
+
+		if ( ! $has_rules ) {
+			continue;
+		}
+
+		$value = $registration_number;
+
+		if ( ! empty( $config['strip_prefixes'] ) && is_array( $config['strip_prefixes'] ) ) {
+			foreach ( $config['strip_prefixes'] as $strip_prefix ) {
+				$strip_prefix = strtoupper( trim( (string) $strip_prefix ) );
+
+				if ( '' === $strip_prefix ) {
+					continue;
+				}
+
+				$value = (string) preg_replace(
+					'/^' . preg_quote( $strip_prefix, '/' ) . '/i',
+					'',
+					$value
+				);
+			}
+		}
+
+		if ( ! empty( $config['keep_pattern'] ) && is_string( $config['keep_pattern'] ) ) {
+			if ( preg_match_all( $config['keep_pattern'], $value, $matches ) ) {
+				$value = implode( '', $matches[0] );
+			} else {
+				$value = '';
+			}
+		}
+
+		$value = trim( $value );
+
+		if ( '' === $value ) {
+			return $registration_number;
+		}
+
+		if ( ! empty( $config['length'] ) ) {
+			$lengths = is_array( $config['length'] )
+				? $config['length']
+				: array( $config['length'] );
+
+			$lengths = array_values( array_filter( array_map( 'absint', $lengths ) ) );
+
+			if ( ! empty( $lengths ) && ! in_array( strlen( $value ), $lengths, true ) ) {
+				// The normalized value does not match the expected format: keep the original.
+				return $registration_number;
+			}
+		}
+
+		return $value;
+	}
+
+	return $registration_number;
 }
 
 /**
