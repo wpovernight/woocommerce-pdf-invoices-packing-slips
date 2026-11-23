@@ -233,10 +233,12 @@ class WPO_WCPDF {
 		// Register document routing on every request so rewrite rebuilds retain its rule.
 		$this->get_instance( 'endpoint' );
 
+		// Compatibility hooks must be registered on every request.
+		$this->get_instance( 'third_party_plugins' );
+
 		// Document-related runtime
 		if ( $is_document_context ) {
 			$this->get_instance( 'file_system' );
-			$this->get_instance( 'third_party_plugins' );
 			$this->get_instance( 'font_synchronizer' );
 		}
 
@@ -269,6 +271,17 @@ class WPO_WCPDF {
 		) {
 			$this->get_instance( 'frontend' );
 		}
+
+		// On 'wp' an account or order-received page can also be detected via the
+		// shortcode, block or woocommerce_is_account_page filter on a custom page.
+		add_action( 'wp', function () {
+			if (
+				wpo_ips_is_frontend_page_request() &&
+				( wpo_ips_is_account_page() || wpo_ips_is_order_received_page() )
+			) {
+				$this->get_instance( 'frontend' )->register_order_action_hooks();
+			}
+		} );
 
 		// REST_REQUEST is not defined during normal init. Load services before REST routes.
 		add_action( 'rest_api_init', function () {
