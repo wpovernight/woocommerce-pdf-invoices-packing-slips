@@ -35,10 +35,7 @@ class Frontend {
 		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( $this, 'add_invoice_number_to_wc_order_api' ), 10, 3 );
 
 		// Order actions.
-		if ( wpo_ips_is_account_page() || wpo_ips_is_order_received_page() ) {
-			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 );
-			add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
-		}
+		$this->register_order_action_hooks();
 
 		// Optional Checkout field (General Settings).
 		if ( \WPO_WCPDF()->get_instance( 'checkout_field' )->is_enabled() ) {
@@ -73,6 +70,24 @@ class Frontend {
 			add_action( 'woocommerce_edit_account_form', array( $this, 'account_details_display_checkout_field' ), 20 );
 			add_filter( 'woocommerce_save_account_details_errors', array( $this, 'account_details_validate_checkout_field' ), 20, 2 );
 			add_action( 'woocommerce_save_account_details', array( $this, 'account_details_save_checkout_field' ), 20, 1 );
+		}
+	}
+
+	/**
+	 * Register the My Account order action hooks.
+	 *
+	 * Called from the constructor and again on 'wp' (see WPO_WCPDF::includes()),
+	 * because on a custom page rendering the account UI via shortcode or block,
+	 * wpo_ips_is_account_page() can only match after the main query has run.
+	 * Re-adding the same callbacks is harmless: WordPress dedupes identical
+	 * callback/priority pairs.
+	 *
+	 * @return void
+	 */
+	public function register_order_action_hooks(): void {
+		if ( wpo_ips_is_account_page() || wpo_ips_is_order_received_page() ) {
+			add_filter( 'woocommerce_my_account_my_orders_actions', array( $this, 'my_account_invoice_actions' ), 999, 2 );
+			add_action( 'wp_enqueue_scripts', array( $this, 'open_my_account_link_on_new_tab' ), 999 );
 		}
 	}
 
