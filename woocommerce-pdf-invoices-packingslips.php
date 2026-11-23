@@ -272,6 +272,17 @@ class WPO_WCPDF {
 			$this->get_instance( 'frontend' );
 		}
 
+		// On 'wp' an account or order-received page can also be detected via the
+		// shortcode, block or woocommerce_is_account_page filter on a custom page.
+		add_action( 'wp', function () {
+			if (
+				wpo_ips_is_frontend_page_request() &&
+				( wpo_ips_is_account_page() || wpo_ips_is_order_received_page() )
+			) {
+				$this->get_instance( 'frontend' )->register_order_action_hooks();
+			}
+		} );
+
 		// REST_REQUEST is not defined during normal init. Load services before REST routes.
 		add_action( 'rest_api_init', function () {
 			$this->get_instance( 'frontend' );
