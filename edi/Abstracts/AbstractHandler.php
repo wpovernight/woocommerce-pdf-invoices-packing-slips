@@ -1108,6 +1108,19 @@ abstract class AbstractHandler implements HandlerInterface {
 			);
 		}
 
+		// Product items that are not taxable (tax status "none" or "shipping") carry
+		// no tax rows, so their tax class must not be mapped to a rated category.
+		if ( is_callable( array( $item, 'get_tax_status' ) ) && 'taxable' !== (string) $item->get_tax_status() ) {
+			$zero_meta = $this->get_preferred_zero_tax_meta( $item );
+
+			return array(
+				'scheme'     => $zero_meta['scheme'],
+				'category'   => $zero_meta['category'],
+				'percentage' => 0.0,
+				'reason'     => $zero_meta['reason'],
+			);
+		}
+
 		$tax_class = is_callable( array( $item, 'get_tax_class' ) )
 			? (string) $item->get_tax_class()
 			: '';
