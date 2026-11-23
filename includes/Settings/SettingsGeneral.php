@@ -957,6 +957,10 @@ class SettingsGeneral {
 			wp_send_json_error( array( 'message' => __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
 		}
 
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
+		}
+
 		$request = stripslashes_deep( $_POST );
 
 		if ( empty( $request['country'] ) ) {

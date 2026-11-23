@@ -17,12 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 				'<a href="mailto:support@wpovernight.com">support@wpovernight.com</a>'
 			); ?></p>
 
+			<?php if ( current_user_can( 'manage_options' ) ) : ?>
 			<p>
 				<label>
 					<input type="checkbox" id="wpo_ips_include_sensitive" />
 					<?php esc_html_e( 'Include sensitive data in the report (license keys, logs, user name and email, directory permissions).', 'woocommerce-pdf-invoices-packing-slips' ); ?>
 				</label>
 			</p>
+			<?php endif; ?>
 
 			<p>
 				<label>

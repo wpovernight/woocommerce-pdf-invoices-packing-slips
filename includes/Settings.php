@@ -715,7 +715,7 @@ class Settings {
 	public function get_output_format( ?object $document = null, ?array $request = null ): string {
 		$output_format = 'pdf'; // default
 
-		if ( isset( $this->get_settings( 'debug' )['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] ) ) {
+		if ( isset( $this->get_settings( 'debug' )['html_output'] ) || ( isset( $request['output'] ) && 'html' === $request['output'] && $this->user_can_manage_settings() ) ) {
 			$output_format = 'html';
 		} elseif ( isset( $request['output'] ) && ! empty( $request['output'] ) && ! empty( $document ) && in_array( $request['output'], $document->output_formats, true ) ) {
 			$output_format = esc_attr( $request['output'] );
@@ -1907,6 +1907,10 @@ class Settings {
 	 */
 	public function sync_shop_address_with_woo(): void {
 		check_ajax_referer( 'wpo_wcpdf_admin_nonce', 'security' );
+
+		if ( ! $this->user_can_manage_settings() ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) ), 403 );
+		}
 
 		$address_field = ! empty( $_POST['address_field'] )
 			? sanitize_text_field( wp_unslash( $_POST['address_field'] ) )

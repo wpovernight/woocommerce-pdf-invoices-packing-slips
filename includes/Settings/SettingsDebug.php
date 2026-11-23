@@ -367,7 +367,20 @@ class SettingsDebug {
 
 		$debug_tool = sanitize_key( $data['debug_tool'] );
 
-		if ( is_callable( array( $this, $debug_tool ) ) ) {
+		$allowed_tools = array(
+			'generate_random_string',
+			'install_fonts',
+			'reschedule_yearly_reset',
+			'clear_tmp',
+			'clear_released_semaphore_locks',
+			'clear_released_legacy_semaphore_locks',
+			'export_settings',
+			'import_settings',
+			'reset_settings',
+			'clear_extensions_license_cache',
+		);
+
+		if ( in_array( $debug_tool, $allowed_tools, true ) ) {
 			call_user_func_array( array( $this, $debug_tool ), array( $data ) );
 		} else {
 			$message = __( 'Debug tool is not available.', 'woocommerce-pdf-invoices-packing-slips' );
@@ -644,6 +657,14 @@ class SettingsDebug {
 		}
 
 		check_ajax_referer( 'wpo_wcpdf_debug_nonce', 'nonce' );
+
+		if (
+			! current_user_can( 'administrator' ) ||
+			! isset( \WPO_WCPDF()->get_instance( 'settings' )->get_settings( 'debug' )['enable_danger_zone_tools'] )
+		) {
+			$message = __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' );
+			wp_send_json_error( compact( 'message' ), 403 );
+		}
 
 		$request = stripslashes_deep( $_POST );
 
@@ -2047,7 +2068,7 @@ class SettingsDebug {
 
 		check_ajax_referer( 'wpo_ips_plugin_report', 'nonce' );
 
-		$include_sensitive    = isset( $_GET['include_sensitive'] )
+		$include_sensitive    = current_user_can( 'manage_options' ) && isset( $_GET['include_sensitive'] )
 			? filter_var( wp_unslash( $_GET['include_sensitive'] ), FILTER_VALIDATE_BOOLEAN )
 			: false;
 		$output_html          = isset( $_GET['output_html'] )

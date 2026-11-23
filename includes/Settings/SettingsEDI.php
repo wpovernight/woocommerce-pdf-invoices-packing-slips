@@ -777,6 +777,10 @@ class SettingsEDI {
 			wp_send_json_error( __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			wp_send_json_error( __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ), 403 );
+		}
+
 		$request  = stripslashes_deep( $_GET );
 		$order_id = absint( $request['order_id'] );
 
@@ -810,6 +814,10 @@ class SettingsEDI {
 			wp_send_json_error( __( 'Invalid request.', 'woocommerce-pdf-invoices-packing-slips' ) );
 		}
 
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			wp_send_json_error( __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ), 403 );
+		}
+
 		$request      = stripslashes_deep( $_POST );
 		$tax_settings = isset( $request['wpo_ips_edi_tax_settings'] ) ? $request['wpo_ips_edi_tax_settings'] : array();
 
@@ -826,6 +834,10 @@ class SettingsEDI {
 	public function ajax_reload_tax_table(): void {
 		if ( ! check_ajax_referer( 'wpo_ips_edi_nonce', 'nonce', false ) ) {
 			wp_send_json_error( __( 'Invalid nonce.', 'woocommerce-pdf-invoices-packing-slips' ) );
+		}
+
+		if ( ! \WPO_WCPDF()->get_instance( 'settings' )->user_can_manage_settings() ) {
+			wp_die( esc_html( __( 'You are not allowed to perform this action.', 'woocommerce-pdf-invoices-packing-slips' ) ), '', array( 'response' => 403 ) );
 		}
 
 		$request   = stripslashes_deep( $_GET );
@@ -937,7 +949,42 @@ class SettingsEDI {
 	 * @return void
 	 */
 	private function save_tax_settings( array $tax_settings = array() ): void {
-		update_option( 'wpo_ips_edi_tax_settings', $tax_settings );
+		$allowed_types  = array( 'class', 'rate' );
+		$allowed_fields = array( 'scheme', 'category', 'reason' );
+
+		$sanitized = array();
+
+		foreach ( $tax_settings as $type => $entries ) {
+			if ( ! is_array( $entries ) ) {
+				continue;
+			}
+
+			$type = sanitize_text_field( (string) $type );
+
+			if ( ! in_array( $type, $allowed_types, true ) ) {
+				continue;
+			}
+
+			foreach ( $entries as $id => $fields ) {
+				if ( ! is_array( $fields ) ) {
+					continue;
+				}
+
+				$id = sanitize_text_field( (string) $id );
+
+				foreach ( $fields as $field => $value ) {
+					$field = sanitize_text_field( (string) $field );
+
+					if ( ! in_array( $field, $allowed_fields, true ) || ! is_scalar( $value ) ) {
+						continue;
+					}
+
+					$sanitized[ $type ][ $id ][ $field ] = sanitize_text_field( (string) $value );
+				}
+			}
+		}
+
+		update_option( 'wpo_ips_edi_tax_settings', $sanitized );
 	}
 
 	/**
