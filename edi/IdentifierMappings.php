@@ -57,8 +57,11 @@ class IdentifierMappings {
 					),
 					'registration_number' => array(
 						array(
-							'icd'   => '0208',
-							'label' => __( 'Enterprise number', 'woocommerce-pdf-invoices-packing-slips' ),
+							'icd'            => '0208',
+							'label'          => __( 'Enterprise number', 'woocommerce-pdf-invoices-packing-slips' ),
+							'strip_prefixes' => array( 'BE' ),
+							'keep_pattern'   => '/\d+/',
+							'length'         => 10,
 						),
 					),
 				),
@@ -378,8 +381,11 @@ class IdentifierMappings {
 					),
 					'registration_number' => array(
 						array(
-							'icd'   => '0106',
-							'label' => __( 'KVK number', 'woocommerce-pdf-invoices-packing-slips' ),
+							'icd'            => '0106',
+							'label'          => __( 'KVK number', 'woocommerce-pdf-invoices-packing-slips' ),
+							'strip_prefixes' => array( 'NL' ),
+							'keep_pattern'   => '/\d+/',
+							'length'         => 8,
 						),
 					),
 				),
@@ -397,8 +403,11 @@ class IdentifierMappings {
 					),
 					'registration_number' => array(
 						array(
-							'icd'   => '0192',
-							'label' => __( 'Organisasjonsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
+							'icd'            => '0192',
+							'label'          => __( 'Organisasjonsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
+							'strip_prefixes' => array( 'NO' ),
+							'keep_pattern'   => '/\d+/',
+							'length'         => 9,
 						),
 					),
 				),
@@ -458,8 +467,11 @@ class IdentifierMappings {
 					),
 					'registration_number' => array(
 						array(
-							'icd'   => '0007',
-							'label' => __( 'Organisationsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
+							'icd'            => '0007',
+							'label'          => __( 'Organisationsnummer', 'woocommerce-pdf-invoices-packing-slips' ),
+							'strip_prefixes' => array( 'SE' ),
+							'keep_pattern'   => '/\d+/',
+							'length'         => 10,
 						),
 					),
 				),

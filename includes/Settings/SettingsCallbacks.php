@@ -1152,9 +1152,18 @@ class SettingsCallbacks {
 						$value = $this->normalize_identifier( (string) $value );
 					}
 
+					// Sanitize the checkout field label on save.
+					if ( 'checkout_field_label' === $key ) {
+						$value = sanitize_text_field( (string) $value );
+					}
+
 					$output[ $key ] = $value;
 				}
 			}
+		}
+
+		if ( array_key_exists( 'template_path', $output ) || ( is_array( $input ) && array_key_exists( 'template_path', $input ) ) ) {
+			$output['template_path'] = WPO_WCPDF()->get_instance( 'settings' )->validate_template_path( $output['template_path'] ?? '' );
 		}
 
 		// Return the array processing any additional functions filtered by this action.
