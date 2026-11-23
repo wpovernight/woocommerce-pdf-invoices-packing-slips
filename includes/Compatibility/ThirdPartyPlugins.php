@@ -90,16 +90,18 @@ class ThirdPartyPlugins {
 			$documents_meta  = array_merge( $documents_meta, $document_meta );
 		}
 
+		// The old deprecated hook (`wcs_renewal_order_meta`) sends $meta with this data structure: array(... , array( "meta_key":"_wcpdf_invoice_number","meta_value":"158" ), ...)
+		// The new hook (`wc_subscriptions_renewal_order_data`) sends $meta with this data structure: array(... ,"_wcpdf_invoice_number":"158", ...)
+		// With the new hook, values can be arrays too (e.g. unserialized `_wcpdf_invoice_number_data` under HPOS), so the format must be detected from the hook, not from the value type.
+		$legacy_format = in_array( current_filter(), array( 'wcs_renewal_order_meta', 'wcs_resubscribe_order_meta' ), true );
+
 		foreach ( $meta as $key => $value ) {
-			// The old deprecated hook (`wcs_renewal_order_meta`) sends $meta with this data structure: array(... , array( "meta_key":"_wcpdf_invoice_number","meta_value":"158" ), ...)
-			// The new hook (`wc_subscriptions_renewal_order_data`) sends $meta with this data structure: array(... ,"_wcpdf_invoice_number":"158", ...)
-			$meta_key = is_array( $value ) ? ( $value['meta_key'] ?? null ) : $key;
+			$meta_key = $legacy_format ? ( is_array( $value ) ? ( $value['meta_key'] ?? null ) : null ) : $key;
 			if ( in_array( $meta_key, $documents_meta, true ) ) {
 				unset( $meta[ $key ] );
 			}
 		}
 
-		$legacy_format = in_array( current_filter(), array( 'wcs_renewal_order_meta', 'wcs_resubscribe_order_meta' ), true );
 		$set_meta = static function ( string $key, $value ) use ( &$meta, $legacy_format ): void {
 			if ( ! $legacy_format ) {
 				$meta[ $key ] = $value;
