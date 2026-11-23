@@ -46,7 +46,6 @@ class Main {
 		$this->register_document_link_email_hooks();
 		
 		// WP
-		add_filter( 'wp_mail', array( $this, 'set_phpmailer_validator'), 10, 1 );
 		add_action( 'wp_scheduled_delete', array( $this, 'schedule_temporary_files_cleanup' ) );
 		
 		// Woo
@@ -93,15 +92,15 @@ class Main {
 	/**
 	 * Attach document to WooCommerce email
 	 * 
-	 * @param array           $attachments
-	 * @param string          $email_id
+	 * @param mixed           $attachments Passed through unchanged when not an array.
+	 * @param mixed           $email_id
 	 * @param mixed           $order
 	 * @param mixed|\WC_Email $email
-	 * @return array
+	 * @return mixed
 	 */
-	public function attach_document_to_email( array $attachments, string $email_id, mixed $order, $email = null ): array {
+	public function attach_document_to_email( $attachments, $email_id, mixed $order, $email = null ) {
 		// check if all variables properly set
-		if ( ! is_object( $order ) || ! isset( $email_id ) ) {
+		if ( ! is_object( $order ) || ! isset( $email_id ) || ! is_array( $attachments ) || ! is_string( $email_id ) ) {
 			return $attachments;
 		}
 
@@ -490,15 +489,23 @@ class Main {
 			$order_id = reset( $order_ids );
 			$order    = wc_get_order( $order_id );
 
-			if ( $order && $order->get_status() == 'auto-draft' ) {
-				$message = esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' );
-				wcpdf_safe_redirect_or_die( null, $message );
-			} elseif ( ! $order ) {
-				$message = sprintf(
-					/* translators: %s: Order ID */
-					esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ),
-					$order_id
-				);
+			if ( ! $order || 'auto-draft' === $order->get_status() ) {
+				// Same response as a failed credential check, so a missing or unsaved order is not revealed.
+				if ( ! Admin::user_can_manage_document( $document_type ) ) {
+					$message = esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' );
+					wcpdf_safe_redirect_or_die( $redirect_url, $message );
+				}
+
+				if ( ! $order ) {
+					$message = sprintf(
+						/* translators: %s: Order ID */
+						esc_attr__( 'Could not find the order #%s.', 'woocommerce-pdf-invoices-packing-slips' ),
+						$order_id
+					);
+				} else {
+					$message = esc_attr__( 'You have to save the order before generating a PDF document for it.', 'woocommerce-pdf-invoices-packing-slips' );
+				}
+
 				wcpdf_safe_redirect_or_die( null, $message );
 			}
 		}
@@ -581,6 +588,22 @@ class Main {
 		if ( ! $valid_credentials || ! $allowed ) {
 			$message = esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' );
 			wcpdf_safe_redirect_or_die( $redirect_url, $message );
+		}
+
+		// Refund objects only support specific document types (e.g. credit notes).
+		if ( $order instanceof \WC_Order_Refund ) {
+			/**
+			 * Filters the document types that may be generated for a refund object.
+			 *
+			 * @param string[]         $allowed_document_types Document types allowed on refund objects.
+			 * @param \WC_Order_Refund $order                  The refund object.
+			 */
+			$allowed_document_types = apply_filters( 'wpo_ips_refund_allowed_document_types', array( 'credit-note' ), $order );
+
+			if ( ! in_array( $document_type, $allowed_document_types, true ) ) {
+				$message = esc_attr__( 'You do not have sufficient permissions to access this page.', 'woocommerce-pdf-invoices-packing-slips' );
+				wcpdf_safe_redirect_or_die( $redirect_url, $message );
+			}
 		}
 
 		// if we got here, we're safe to go!
@@ -1686,33 +1709,6 @@ class Main {
 			'_wcpdf_invoice_date_formatted' => esc_html__( 'Invoice Date', 'woocommerce-pdf-invoices-packing-slips' ),
 		);
 		return $meta_to_export + $private_address_meta;
-	}
-
-	/**
-	 * Set the default PHPMailer validator to 'php' ( which uses filter_var($address, FILTER_VALIDATE_EMAIL) )
-	 * This avoids issues with the presence of attachments affecting email address validation in some distros of PHP 7.3
-	 * See: https://wordpress.org/support/topic/invalid-address-setfrom/#post-11583815
-	 * Fixed in WP5.5 due to upgrade to newer PHPMailer
-	 * 
-	 * @param array $mailArray The array of mail data being passed to PHPMailer
-	 * @return array The unmodified mail array, after setting the PHPMailer validator
-	 */
-	public function set_phpmailer_validator( array $mailArray ): array {
-		if ( version_compare( get_bloginfo( 'version' ), '5.5-dev', '>=' ) ) {
-			return $mailArray;
-		}
-		
-		global $phpmailer;
-		
-		if ( ! $phpmailer instanceof \PHPMailer ) {
-			require_once ABSPATH . WPINC . '/class-phpmailer.php';
-			require_once ABSPATH . WPINC . '/class-smtp.php';
-			$phpmailer = new \PHPMailer( true );
-		}
-		
-		$phpmailer::$validator = 'php';
-
-		return $mailArray;
 	}
 
 	/**
