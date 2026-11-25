@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.1-rc.3\n"
+"Project-Id-Version: PDF Invoices & Packing Slips for WooCommerce 6.0.1-rc.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/woocommerce-pdf-invoices-packing-slips\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-21T18:29:59+00:00\n"
+"POT-Creation-Date: 2026-11-23T14:27:03+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: woocommerce-pdf-invoices-packing-slips\n"
@@ -44,46 +44,46 @@ msgstr ""
 msgid "Enterprise number"
 msgstr ""
 
-#: edi/IdentifierMappings.php:150
+#: edi/IdentifierMappings.php:153
 msgid "Company Code"
 msgstr ""
 
-#: edi/IdentifierMappings.php:183
+#: edi/IdentifierMappings.php:186
 msgid "Organization Identifier"
 msgstr ""
 
-#: edi/IdentifierMappings.php:208
+#: edi/IdentifierMappings.php:211
 msgid "SIREN"
 msgstr ""
 
-#: edi/IdentifierMappings.php:297
+#: edi/IdentifierMappings.php:300
 msgid "Codice Fiscale"
 msgstr ""
 
-#: edi/IdentifierMappings.php:316
+#: edi/IdentifierMappings.php:319
 msgid "Legal entity code"
 msgstr ""
 
-#: edi/IdentifierMappings.php:349
+#: edi/IdentifierMappings.php:352
 msgid "Unified registration number"
 msgstr ""
 
-#: edi/IdentifierMappings.php:382
+#: edi/IdentifierMappings.php:385
 msgid "KVK number"
 msgstr ""
 
-#: edi/IdentifierMappings.php:401
+#: edi/IdentifierMappings.php:407
 #: edi/Standards/EN16931.php:536
 msgid "Organisasjonsnummer"
 msgstr ""
 
-#: edi/IdentifierMappings.php:462
+#: edi/IdentifierMappings.php:471
 #: edi/Standards/EN16931.php:237
 #: edi/Standards/EN16931.php:355
 msgid "Organisationsnummer"
 msgstr ""
 
-#: edi/IdentifierMappings.php:562
+#: edi/IdentifierMappings.php:574
 #: includes/CheckoutField.php:61
 #: includes/CheckoutField.php:268
 msgid "Company registration number"
@@ -2782,8 +2782,8 @@ msgstr ""
 
 #: includes/CheckoutField.php:60
 #: includes/CheckoutField.php:259
-#: wpo-ips-functions-edi.php:1111
-#: wpo-ips-functions-edi.php:1187
+#: wpo-ips-functions-edi.php:1202
+#: wpo-ips-functions-edi.php:1278
 msgid "VAT number"
 msgstr ""
 
@@ -2794,7 +2794,7 @@ msgstr ""
 
 #: includes/Documents/Invoice.php:20
 #: includes/Documents/Invoice.php:72
-#: includes/Frontend.php:90
+#: includes/Frontend.php:105
 #: includes/Settings/SettingsDebug.php:1018
 #: views/settings-page.php:182
 msgid "Invoice"
@@ -3324,16 +3324,16 @@ msgid "Upgrade to our Professional extension to attach packing slips to any emai
 msgstr ""
 
 #. translators: %s: Document type
-#: includes/Frontend.php:291
+#: includes/Frontend.php:306
 #, php-format
 msgid "Download %s (PDF)"
 msgstr ""
 
-#: includes/Frontend.php:904
+#: includes/Frontend.php:919
 msgid "Please include the country prefix (for example NL123456789)."
 msgstr ""
 
-#: includes/Frontend.php:1019
+#: includes/Frontend.php:1034
 msgid "Please enter a VAT number including a valid country prefix (for example PT123456789)."
 msgstr ""
 
@@ -4803,8 +4803,8 @@ msgid "Postcode / ZIP"
 msgstr ""
 
 #: includes/Settings/SettingsEDI.php:1183
-#: wpo-ips-functions-edi.php:1096
-#: wpo-ips-functions-edi.php:1172
+#: wpo-ips-functions-edi.php:1187
+#: wpo-ips-functions-edi.php:1263
 msgid "City"
 msgstr ""
 
@@ -6322,67 +6322,67 @@ msgid "Visit shop"
 msgstr ""
 
 #. translators: 1: legacy add-on name, 2: last deprecated add-on version
-#: woocommerce-pdf-invoices-packingslips.php:558
+#: woocommerce-pdf-invoices-packingslips.php:569
 #, php-format
 msgid "The %1$s add-on cannot be activated because the installed version is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce. Please update the add-on to a version newer than %2$s first."
 msgstr ""
 
 #. translators: %s: legacy add-on name
-#: woocommerce-pdf-invoices-packingslips.php:565
+#: woocommerce-pdf-invoices-packingslips.php:576
 #, php-format
 msgid "The legacy %s add-on cannot be activated because it is not compatible with this version of PDF Invoices & Packing Slips for WooCommerce."
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:584
+#: woocommerce-pdf-invoices-packingslips.php:595
 msgid "Plugin activation blocked"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:660
+#: woocommerce-pdf-invoices-packingslips.php:671
 msgid "Outdated version — update to activate"
 msgstr ""
 
-#: woocommerce-pdf-invoices-packingslips.php:662
+#: woocommerce-pdf-invoices-packingslips.php:673
 msgid "Legacy add-on — activation unavailable"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1081
-#: wpo-ips-functions-edi.php:1157
+#: wpo-ips-functions-edi.php:1172
+#: wpo-ips-functions-edi.php:1248
 msgid "Name"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1086
+#: wpo-ips-functions-edi.php:1177
 msgid "Street address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1091
-#: wpo-ips-functions-edi.php:1167
+#: wpo-ips-functions-edi.php:1182
+#: wpo-ips-functions-edi.php:1258
 msgid "Postcode"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1101
-#: wpo-ips-functions-edi.php:1177
+#: wpo-ips-functions-edi.php:1192
+#: wpo-ips-functions-edi.php:1268
 msgid "State"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1106
-#: wpo-ips-functions-edi.php:1182
+#: wpo-ips-functions-edi.php:1197
+#: wpo-ips-functions-edi.php:1273
 msgid "Country Code"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1121
-#: wpo-ips-functions-edi.php:1192
+#: wpo-ips-functions-edi.php:1212
+#: wpo-ips-functions-edi.php:1283
 msgid "Email"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1132
+#: wpo-ips-functions-edi.php:1223
 msgid "PEPPOL Endpoint ID"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1162
+#: wpo-ips-functions-edi.php:1253
 msgid "Address"
 msgstr ""
 
-#: wpo-ips-functions-edi.php:1225
+#: wpo-ips-functions-edi.php:1316
 msgid "Endpoint ID"
 msgstr ""
 
