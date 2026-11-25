@@ -255,6 +255,11 @@ class Invoice extends OrderDocumentMethods {
 	 * @return array
 	 */
 	public function get_pdf_settings_fields( string $option_name ): array {
+		$invoice_number_search_description = __( 'Enables searching orders by invoice number. On HPOS stores, this adds an "Invoice numbers" option to the order search type selector and supports searching multiple invoice numbers using a comma-separated list. The search process may be slower on non-HPOS stores.', 'woocommerce-pdf-invoices-packing-slips' );
+		if ( WPO_WCPDF()->get_instance( 'admin' )->hpos_fulltext_search_enabled() ) {
+			$invoice_number_search_description .= ' <strong>' . __( 'Note: while the HPOS full-text search index is enabled, the "All" option in the orders list search does not match invoice numbers. Use the "Invoice numbers" option instead.', 'woocommerce-pdf-invoices-packing-slips' ) . '</strong>';
+		}
+
 		$settings_fields = array(
 			array(
 				'type'     => 'section',
@@ -567,7 +572,7 @@ class Invoice extends OrderDocumentMethods {
 				'args'     => array(
 					'option_name' => $option_name,
 					'id'          => 'invoice_number_search',
-					'description' => __( 'Enables searching orders by invoice number. On HPOS stores, this adds an "Invoice numbers" option to the order search type selector and supports searching multiple invoice numbers using a comma-separated list. The search process may be slower on non-HPOS stores.', 'woocommerce-pdf-invoices-packing-slips' ),
+					'description' => $invoice_number_search_description,
 				)
 			),
 			array(
