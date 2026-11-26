@@ -351,6 +351,9 @@ class Settings {
 
 				// process settings data
 				if ( ! empty( $_POST['data'] ) ) {
+					if ( ! is_string( $_POST['data'] ) ) {
+						wp_send_json_error( array( 'error' => esc_html__( 'Invalid preview data.', 'woocommerce-pdf-invoices-packing-slips' ) ), 400 );
+					}
 					// parse form data
 					parse_str( $_POST['data'], $form_data ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 					$form_data = stripslashes_deep( $form_data );
