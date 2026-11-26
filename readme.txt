@@ -3,9 +3,9 @@ Contributors: pomegranate, alexmigf, yordansoares, kluver, dpeyou, dwpriv, moham
 Donate link: https://wpovernight.com/downloads/woocommerce-pdf-invoices-packing-slips-bundle/
 Tags: woocommerce, pdf, ubl, invoices, packing slips
 Requires at least: 5.9
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 8.1
-Stable tag: 6.0.1-rc.4
+Stable tag: 6.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,9 +110,37 @@ There's a setting on the Advanced tab of the settings page that allows you to to
 
 == Changelog ==
 
-= 6.0.1 (unreleased) =
+= 6.0.1 (2026-11-25) =
 - Tweak: Require WooCommerce 7.0+ instead of 4.0+, the first version line fully supporting PHP 8.1
 - Tweak: Align the minimum WordPress version requirement to 5.9 in the readme and status page
+- Tweak: Allow safe HTML formatting in shop name, titles and shop address fields in PDFs
+- Fix: Escape customer identifiers in E-Documents order meta box
+- Fix: Guard against non-numeric tax rate IDs in `get_tax_rate()`
+- Fix: Fatal error when adding meta boxes with null object
+- Fix: Plugins page crash when Jetpack passes null plugin metadata
+- Fix: Prevent fatal error in plain-text Order Notification emails
+- Fix: Empty invoice number column in Woo Analytics Orders
+- Fix: Output CII RoundingAmount before GrandTotalAmount
+- Fix: Prevent unsafe PDF template selection
+- Fix: Keep order emails sending when adding document links fails
+- Fix: Render customer identifiers as plain text in the EDI settings tab
+- Fix: Require the settings capability in admin AJAX and notice handlers and sanitize the EDI tax settings on save
+- Fix: Enforce danger zone and debug tool permissions server-side
+- Fix: Prevent documents other than credit notes from being generated on refund objects
+- Fix: Restrict the URL HTML output option to users who can manage settings
+- Fix: Restrict sensitive plugin report data to administrators
+- Fix: Only clear the new install notice for users who can manage settings when the setup wizard page is requested
+- Fix: Do not reveal whether an order exists in the document download endpoint
+- Fix: Apply third-party plugin compatibility hooks to documents generated in background and payment contexts
+- Fix: Keep WooCommerce emails sending when another plugin returns invalid attachment filter values
+- Fix: Remove obsolete PHPMailer validator workaround from site emails
+- Fix: Show document buttons on My Account pages rendered via shortcode or block on custom pages
+- Fix: Prevent Peppol validation errors for prefixed company registration numbers
+- Fix: Subscription renewals reuse parent document numbers with HPOS
+- Fix: Warn that the All order search skips invoice numbers while the HPOS full-text search index is enabled
+- Fix: Use the default VAT category on e-invoice lines when no tax classification is saved
+- Translations: Updated translation template (POT)
+- Tested: Tested up WordPress 7.2
 
 = 6.0.0 (2026-11-16) =
 - New: Modernized, object-oriented codebase with strict types, full type coverage and improved performance

@@ -835,6 +835,7 @@ abstract class AbstractHandler implements HandlerInterface {
 	 */
 	protected function get_item_tax_candidates( \WC_Order_Item $item ): array {
 		$candidates = array();
+		$zero_meta  = $this->get_preferred_zero_tax_meta( $item );
 
 		foreach ( $this->get_item_tax_rows( $item ) as $tax_id => $tax_amt ) {
 			if ( ! is_numeric( $tax_amt ) ) {
@@ -843,12 +844,31 @@ abstract class AbstractHandler implements HandlerInterface {
 
 			$row = $this->document->order_tax_data[ $tax_id ] ?? array();
 
+			$scheme     = strtoupper( trim( (string) ( $row['scheme'] ?? 'VAT' ) ) );
+			$category   = strtoupper( trim( (string) ( $row['category'] ?? 'Z' ) ) );
+			$percentage = (float) ( $row['percentage'] ?? 0 );
+			$reason     = strtoupper( trim( (string) ( $row['reason'] ?? 'NONE' ) ) );
+
+			if ( '' === $scheme || 'DEFAULT' === $scheme ) {
+				$scheme = 'VAT';
+			}
+
+			if ( '' === $category || 'DEFAULT' === $category ) {
+				$category = ( 0.0 < $percentage ) ? 'S' : $zero_meta['category'];
+			}
+
+			if ( '' === $reason || 'DEFAULT' === $reason || 'NONE' === $reason ) {
+				$reason = ( 0.0 === $percentage && $category === $zero_meta['category'] && $scheme === $zero_meta['scheme'] )
+					? $zero_meta['reason']
+					: 'NONE';
+			}
+
 			$candidates[] = array(
 				'tax_id'     => $tax_id,
-				'scheme'     => strtoupper( $row['scheme']   ?? 'VAT' ),
-				'category'   => strtoupper( $row['category'] ?? 'Z' ),
-				'percentage' => (float) ( $row['percentage'] ?? 0 ),
-				'reason'     => strtoupper( $row['reason']   ?? 'NONE' ),
+				'scheme'     => $scheme,
+				'category'   => $category,
+				'percentage' => $percentage,
+				'reason'     => $reason,
 				'tax_amount' => (float) $tax_amt,
 			);
 		}

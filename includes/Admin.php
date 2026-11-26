@@ -43,6 +43,7 @@ class Admin {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_boxes' ), 10, 2 );
 		add_filter( 'request', array( $this, 'request_query_sort_by_column' ) );
 		add_action( 'admin_bar_menu', array( $this, 'debug_enabled_warning' ), 999 );
+		add_action( 'admin_notices', array( $this, 'invoice_number_search_fts_notice' ) );
 		
 		// Woo
 		add_filter( 'manage_woocommerce_page_wc-orders_columns', array( $this, 'add_invoice_columns' ), 200 ); // WC 7.1+ (we lowered the priority to 200 to make sure it works with Admin Columns plugin: https://www.admincolumns.com/)
@@ -371,6 +372,67 @@ class Admin {
 		$setting_key      = $check_partial ? 'invoice_number_partial_search' : 'invoice_number_search';
 
 		return isset( $invoice_settings[ $setting_key ] );
+	}
+
+	/**
+	 * Check if HPOS is in use and its full-text search index is enabled.
+	 *
+	 * While the index is enabled, WooCommerce does not search order meta (so also not the invoice
+	 * number keys added through 'woocommerce_order_table_search_query_meta_keys') for the "All"
+	 * and "Customers" order search filters; the "Invoice numbers" filter remains available instead.
+	 *
+	 * @return bool
+	 */
+	public function hpos_fulltext_search_enabled(): bool {
+		if ( ! WPO_WCPDF()->get_instance( 'order_util' )->custom_orders_table_usage_is_enabled() ) {
+			return false;
+		}
+
+		// Option names match CustomOrdersTableController::HPOS_FTS_INDEX_OPTION and
+		// HPOS_FTS_ADDRESS_INDEX_CREATED_OPTION (WooCommerce 9.0+); literals are used so older
+		// WooCommerce versions without that class keep working.
+		return 'yes' === get_option( 'woocommerce_hpos_fts_index_enabled' )
+			&& 'yes' === get_option( 'woocommerce_hpos_address_fts_index_created' );
+	}
+
+	/**
+	 * Show a notice on the orders list when a search with the "All" filter cannot match invoice
+	 * numbers because the HPOS full-text search index is enabled.
+	 *
+	 * @return void
+	 */
+	public function invoice_number_search_fts_notice(): void {
+		if ( ! $this->invoice_number_search_enabled() || ! $this->hpos_fulltext_search_enabled() ) {
+			return;
+		}
+
+		global $pagenow;
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display check.
+		if ( ! ( 'admin.php' === $pagenow && 'wc-orders' === $page ) ) {
+			return;
+		}
+
+		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display check.
+		// The orders list table submits the search filter as the hyphenated 'search-filter' request var
+		// (mapped to the 'search_filter' query arg internally by WooCommerce).
+		$search_filter = isset( $_GET['search-filter'] ) ? sanitize_key( wp_unslash( $_GET['search-filter'] ) ) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display check.
+		if ( '' === $search || ! in_array( $search_filter, array( 'all', '' ), true ) ) {
+			return;
+		}
+
+		$url = add_query_arg(
+			array(
+				'page'          => 'wc-orders',
+				's'             => $search,
+				'search-filter' => 'invoice_numbers',
+			),
+			admin_url( 'admin.php' )
+		);
+
+		echo '<div class="notice notice-info is-dismissible"><p>';
+		echo esc_html__( 'The "All" search option does not include invoice numbers while the WooCommerce HPOS full-text search index is enabled.', 'woocommerce-pdf-invoices-packing-slips' );
+		echo ' <a href="' . esc_url( $url ) . '">' . esc_html__( 'Search with the "Invoice numbers" option instead', 'woocommerce-pdf-invoices-packing-slips' ) . '</a>';
+		echo '</p></div>';
 	}
 
 
@@ -1670,6 +1732,11 @@ class Admin {
 		$notice        = isset( $request['wpcdf_document_data_notice'] ) ? sanitize_text_field( $request['wpcdf_document_data_notice'] ) : 'saved';
 
 		// parse form data
+		if ( ! isset( $request['form_data'] ) || ! is_string( $request['form_data'] ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Invalid form data!', 'woocommerce-pdf-invoices-packing-slips' ),
+			), 400 );
+		}
 		parse_str( $request['form_data'], $form_data );
 
 		if ( is_array( $form_data ) ) {
