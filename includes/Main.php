@@ -773,9 +773,17 @@ class Main {
 		$template_path     = '';
 		$settings_instance = WPO_WCPDF()->get_instance( 'settings' );
 
-		if ( isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) && ! empty( $_POST['data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		// This runs at init (via the document constructors), before the AJAX handler's own
+		// checks, so the preview data is only parsed for requests that pass the same nonce
+		// action, nonce field and capability check as Settings::ajax_preview() (includes/Settings.php:301,228).
+		if (
+			isset( $_POST['action'] ) && 'wpo_wcpdf_preview' === sanitize_text_field( wp_unslash( $_POST['action'] ) ) &&
+			isset( $_POST['data'] ) && is_string( $_POST['data'] ) && '' !== $_POST['data'] &&
+			isset( $_REQUEST['security'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['security'] ) ), 'wpo_wcpdf_preview' ) &&
+			$settings_instance->user_can_manage_settings()
+		) {
 			// parse form data
-			parse_str( wp_unslash( $_POST['data'] ), $form_data ); // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			parse_str( wp_unslash( $_POST['data'] ), $form_data ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			$form_data   = stripslashes_deep( $form_data );
 			$selected_id = sanitize_text_field( $form_data['wpo_wcpdf_settings_general']['template_path'] ?? '' );

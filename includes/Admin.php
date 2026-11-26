@@ -1732,6 +1732,11 @@ class Admin {
 		$notice        = isset( $request['wpcdf_document_data_notice'] ) ? sanitize_text_field( $request['wpcdf_document_data_notice'] ) : 'saved';
 
 		// parse form data
+		if ( ! isset( $request['form_data'] ) || ! is_string( $request['form_data'] ) ) {
+			wp_send_json_error( array(
+				'message' => esc_html__( 'Invalid form data!', 'woocommerce-pdf-invoices-packing-slips' ),
+			), 400 );
+		}
 		parse_str( $request['form_data'], $form_data );
 
 		if ( is_array( $form_data ) ) {
