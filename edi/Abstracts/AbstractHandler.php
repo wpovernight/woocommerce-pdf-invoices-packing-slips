@@ -1128,6 +1128,10 @@ abstract class AbstractHandler implements HandlerInterface {
 			);
 		}
 
+		// Product items that are not taxable (tax status "none" or "shipping") carry
+		// no tax rows, so their tax class must not be mapped to a rated category.
+		$is_non_taxable = $this->is_non_taxable_item( $item );
+
 		$tax_class = is_callable( array( $item, 'get_tax_class' ) )
 			? (string) $item->get_tax_class()
 			: '';
@@ -1211,6 +1215,26 @@ abstract class AbstractHandler implements HandlerInterface {
 			'reason'     => '' !== $reason ? $reason : 'NONE',
 		);
 
+		if ( $is_non_taxable ) {
+			// Keep the configured class mapping when it resolves to a zero-tax
+			// category (e.g. E with VATEX-EU-132); a non-taxable item can never be
+			// rated, so any other category falls back to the generic zero-tax meta.
+			if ( wpo_ips_edi_is_zero_tax_category( $fallback['category'] ) ) {
+				$fallback['percentage'] = 0.0;
+
+				return $fallback;
+			}
+
+			$zero_meta = $this->get_preferred_zero_tax_meta( $item );
+
+			return array(
+				'scheme'     => $zero_meta['scheme'],
+				'category'   => $zero_meta['category'],
+				'percentage' => 0.0,
+				'reason'     => $zero_meta['reason'],
+			);
+		}
+
 		// Never return S with a zero or missing percentage.
 		if ( $this->is_invalid_standard_tax_meta( $fallback ) ) {
 			$zero_meta = $this->get_zero_tax_meta( $item );
@@ -1224,6 +1248,33 @@ abstract class AbstractHandler implements HandlerInterface {
 		}
 
 		return $fallback;
+	}
+
+	/**
+	 * Determine whether an order item is not taxable.
+	 *
+	 * Uses the live product's tax status when available. When the product was
+	 * deleted, get_tax_status() reports "taxable" again, so the tax rows stored
+	 * on the item are used instead: WooCommerce records empty total/subtotal
+	 * arrays for items that were not taxable when the order was placed.
+	 *
+	 * @param \WC_Order_Item $item Order item instance.
+	 * @return bool
+	 */
+	protected function is_non_taxable_item( \WC_Order_Item $item ): bool {
+		if ( is_callable( array( $item, 'get_tax_status' ) ) && 'taxable' !== (string) $item->get_tax_status() ) {
+			return true;
+		}
+
+		if ( $item instanceof \WC_Order_Item_Product && ! $item->get_product() ) {
+			$taxes = $item->get_taxes();
+
+			return isset( $taxes['total'], $taxes['subtotal'] )
+				&& is_array( $taxes['total'] ) && empty( $taxes['total'] )
+				&& is_array( $taxes['subtotal'] ) && empty( $taxes['subtotal'] );
+		}
+
+		return false;
 	}
 
 	/**
